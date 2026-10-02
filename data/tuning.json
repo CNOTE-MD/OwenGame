@@ -1,0 +1,6 @@
+{
+  "player": { "hearts": 3, "speed": 72, "swing_damage": 1, "zombie_bonus": 1 },
+  "jon": { "throw_range": 110, "throw_speed": 190, "throw_damage": 1 },
+  "penguin": { "hp": 2, "speed": 38, "touch_damage": 1, "sight": 140 },
+  "boss": { "hp": 14, "speed": 30, "charge_speed": 150, "touch_damage": 2 }
+}

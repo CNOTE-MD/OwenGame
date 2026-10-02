@@ -8,7 +8,7 @@ You play Owen's narrator, an undead voodoo zombie bonded to Jon (Jöntuka), a fl
 
 ## Core mechanic (proposal)
 
-Top-down 2D action-adventure. Jon is thrown, hovers, and returns like a boomerang; he talks in speech bubbles (Owen's voice: bossy, proud, loyal). Because you are bonded to Jon, dying brings you back as a zombie once per room ("un-unalived"), and zombie mode unlocks a voodoo power.
+Top-down 2D action-adventure in the style of SNES *A Link to the Past* (16px tiles, 256x224, 8-direction movement, hearts, dialogue boxes). Decided with Chase: story is ongoing (chapters will be added), no drawings from Owen (pixel art is drawn in code), the demon is a real fight. Jon is thrown, hovers, and returns like a boomerang; he talks in speech bubbles (Owen's voice: bossy, proud, loyal). Because you are bonded to Jon, dying brings you back as a zombie once per room ("un-unalived"), and zombie mode unlocks a voodoo power.
 
 | Story beat | Game level | Mechanic |
 |---|---|---|

@@ -1,0 +1,37 @@
+{
+  "intro": [
+    ["Jon", "Get up, you oaf!"],
+    ["Owen", "Jon is a flying axe that can talk. If you think that's weird, he can also recite Rush E note for note."],
+    ["Jon", "TA DA! Norway! Time to get going."],
+    ["Owen", "Norway was where I got Jon, but also where I was killed and brought back to life."],
+    ["Jon", "Arrows move you. Z swings me. X throws me. I always come back. Because I'm loyal."]
+  ],
+  "dive": [
+    ["Owen", "I jumped in the lake to get away from the penguin."],
+    ["Jon", "Found you! Rocketing you out like the lady of the lake!"]
+  ],
+  "boss": [
+    ["Owen", "The possessed, rabid, crazy penguin. He's waiting on the shore."],
+    ["Jon", "Dodge his charge, then chop him! Stay on the move!"]
+  ],
+  "revive": [
+    ["Owen", "He killed me. (Not going into details about that.)"],
+    ["Jon", "Voodoo magic! Now we're bonded for eternity. Get up, zombie!"],
+    ["Owen", "I'm an undead voodoo magic zombie now. I hit harder, but I can't die twice."]
+  ],
+  "win": [
+    ["Jon", "You killed the penguin while he was shocked about the zombie thing!"],
+    ["Owen", "Ever since, Jon has been making penguin noises in the middle of the night."],
+    ["Jon", "Next stop: Flight 364. Don't look at the flight attendant."]
+  ],
+  "quips": [
+    "Get up, you oaf!",
+    "da da da... (Rush E)",
+    "World's best owner!",
+    "I'm loyal!",
+    "Penguin noises: ak ak ak",
+    "You can't get rid of me."
+  ],
+  "game_over": "Un-unalived once. Not twice. Press Z to try again.",
+  "to_be_continued": "TO BE CONTINUED..."
+}
