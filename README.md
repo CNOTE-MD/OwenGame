@@ -4,8 +4,8 @@ A top-down action game in the style of SNES *A Link to the Past*, based on Owen'
 
 ## Play
 
-**Mac:** unzip `JontukaViking.zip`, then right-click the app and choose Open (the first launch is blocked until you do, because the app isn't signed).
-**Windows:** double-click `JontukaViking.exe`; if SmartScreen warns, choose More info, then Run anyway.
+**Mac:** download `builds/JontukaViking-mac.zip` and unzip it, then right-click the app and choose Open (the first launch is blocked until you do, because the app isn't signed).
+**Windows:** unzip `builds/JontukaViking-windows.zip`, then double-click `JontukaViking.exe`; if SmartScreen warns, choose More info, then Run anyway.
 **From source:** open this folder in Godot 4.3 and press F5.
 **Rebuild:** `godot --headless --path . --export-release macOS export/mac/JontukaViking.zip` (also `Windows`, `Web`); needs Godot 4.3 export templates.
 
