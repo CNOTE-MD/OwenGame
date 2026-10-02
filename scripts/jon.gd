@@ -79,14 +79,27 @@ func _hit_enemies(dmg: float, reach: float) -> void:
 			e.hit(int(dmg), g.player.position if mode == "swing" else position)
 
 func _draw() -> void:
+	# Viking battle axe: long wooden handle, steel bearded head with a face, glowing blue (magic).
 	draw_set_transform(Vector2.ZERO, spin, Vector2.ONE)
-	draw_rect(Rect2(-1, -7, 2, 15), Color(0.5, 0.32, 0.14))
-	draw_colored_polygon(PackedVector2Array([Vector2(1, -8), Vector2(9, -10), Vector2(9, 0), Vector2(1, -3)]), Color(0.75, 0.82, 0.9))
-	draw_polyline(PackedVector2Array([Vector2(1, -8), Vector2(9, -10), Vector2(9, 0), Vector2(1, -3)]), Color(0.3, 0.45, 0.7), 1.0)
-	draw_rect(Rect2(3, -7, 2, 2), Color.WHITE)
-	draw_rect(Rect2(6, -8, 2, 2), Color.WHITE)
-	draw_rect(Rect2(4, -7, 1, 1), Color.BLACK)
-	draw_rect(Rect2(7, -8, 1, 1), Color.BLACK)
+	var steel := Color(0.82, 0.88, 0.95)
+	var edge := Color(0.95, 0.98, 1.0)
+	var dark := Color(0.25, 0.35, 0.55)
+	draw_rect(Rect2(-6, -9, 12, 18), Color(0.3, 0.6, 1.0, 0.18))   # magic glow
+	draw_rect(Rect2(-1, -8, 2, 17), Color(0.5, 0.32, 0.14))         # handle
+	draw_rect(Rect2(-1, -2, 2, 1), Color(0.3, 0.18, 0.08))          # grip wrap
+	draw_rect(Rect2(-1, 2, 2, 1), Color(0.3, 0.18, 0.08))
+	draw_rect(Rect2(-1, 8, 2, 2), Color(0.7, 0.7, 0.75))            # pommel
+	# axe head: crescent blade on the right, small spike on the left
+	draw_colored_polygon(PackedVector2Array([Vector2(1, -9), Vector2(10, -12), Vector2(12, -5), Vector2(10, 2), Vector2(1, -1)]), steel)
+	draw_colored_polygon(PackedVector2Array([Vector2(10, -12), Vector2(12, -5), Vector2(10, 2), Vector2(9, -5)]), edge)
+	draw_colored_polygon(PackedVector2Array([Vector2(-1, -8), Vector2(-4, -6), Vector2(-1, -4)]), steel)
+	draw_polyline(PackedVector2Array([Vector2(1, -9), Vector2(10, -12), Vector2(12, -5), Vector2(10, 2), Vector2(1, -1), Vector2(1, -9)]), dark, 1.0)
+	# face
+	draw_rect(Rect2(3, -8, 3, 3), Color.WHITE)
+	draw_rect(Rect2(7, -8, 3, 3), Color.WHITE)
+	draw_rect(Rect2(4, -7, 1, 2), Color.BLACK)
+	draw_rect(Rect2(8, -7, 1, 2), Color.BLACK)
+	draw_rect(Rect2(4, -3, 5, 1), dark)
 	draw_set_transform(Vector2.ZERO, 0.0, Vector2.ONE)
 	if quip_t > 0.0 and quip != "":
 		var f := ThemeDB.fallback_font
