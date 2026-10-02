@@ -4,7 +4,7 @@ Engine: Godot 4 (GDScript). Source story: `story/OWEN_STORY_TRANSCRIPT.md`.
 
 ## Pitch
 
-You play Owen's narrator, an undead voodoo zombie bonded to Jon (Jontuka), a flying, talking, singing Viking axe who can recite Rush E from memory. Jon is loyal, impatient and sticks to you. Fight through Norway's lake and a haunted flight, with Jon as your weapon and your sidekick.
+You play Owen's narrator, an undead voodoo zombie bonded to Jon (Jöntuka), a flying, talking, singing Viking axe who can recite Rush E from memory. Jon is loyal, impatient and sticks to you. Fight through Norway's lake and a haunted flight, with Jon as your weapon and your sidekick.
 
 ## Core mechanic (proposal)
 

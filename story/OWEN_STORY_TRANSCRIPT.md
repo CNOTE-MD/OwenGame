@@ -6,7 +6,7 @@ Teacher/parent comments in the margins are listed separately and are not story t
 
 ## Page 1 (IMG_3150), title: "A VIKING TALE"
 
-As I woke up, Jon yelled at me, "Get up you oaf!" [first lines faint and partly unreadable: `[?]` ... "who I [?] to mention Jon is a flying axe that can talk."] If you think that's weird, just know that he can recite Rush E note for note, from memory. I should probably tell you how I got Jon. So, maybe a bizillion years ago, Jontuka was forged in a volcano by Walter the Wonderful (I just call him that because I can't remember his actual name). Then, this Viking man threw it in a lake so only someone of Viking blood could pull it out. And then I went to the lake and fell in to avoid being decapitated by a possessed/rabid/crazy penguin and Jon found me. Ever since, me and Jon have been mutual friends. (And by that I mean I've been trying to get rid of him but he keeps sticking to me.)
+As I woke up, Jon yelled at me, "Get up you oaf!" [first lines faint and partly unreadable: `[?]` ... "who I [?] to mention Jon is a flying axe that can talk."] If you think that's weird, just know that he can recite Rush E note for note, from memory. I should probably tell you how I got Jon. So, maybe a bizillion years ago, Jöntuka was forged in a volcano by Walter the Wonderful (I just call him that because I can't remember his actual name). Then, this Viking man threw it in a lake so only someone of Viking blood could pull it out. And then I went to the lake and fell in to avoid being decapitated by a possessed/rabid/crazy penguin and Jon found me. Ever since, me and Jon have been mutual friends. (And by that I mean I've been trying to get rid of him but he keeps sticking to me.)
 
 ## Page 2 (IMG_3151)
 
