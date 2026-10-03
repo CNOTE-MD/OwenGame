@@ -29,7 +29,7 @@ function tinted(c, color) { const f = mkCanvas(c.width, c.height), g = f.getCont
 
 // ---------------- palettes ----------------
 const PAL_OWEN = { w: '#f4ecd0', h: '#c8ccd8', H: '#8a90a4', r: '#a0581e', s: '#f8c898', S: '#d89060', e: '#20141c',
-  t: '#3c7ce0', T: '#2850a0', b: '#7a4418', g: '#ffd84a', p: '#6a4a2a', f: '#4a2c14' };
+  t: '#3c7ce0', T: '#2850a0', b: '#7a4418', g: '#ffd84a', p: '#6a4a2a', f: '#4a2c14', P: '#4a3220', F: '#2e1a0c' };
 const PAL_ZOMBIE = { ...PAL_OWEN, s: '#a8d090', S: '#78a868', t: '#8a50c0', T: '#5a3088' };
 const PAL_JON = { h: '#9a6030', b: '#5a3418', p: '#c0c0cc', S: '#c8d8ec', l: '#f4fbff', d: '#a8b8cc', D: '#d8e4f4', w: '#ffffff', k: '#141018', m: '#4a5a80' };
 const PAL_PENGUIN = { n: '#20203a', N: '#3e3e66', w: '#f4f4ff', W: '#c4c4dc', o: '#ffa020', O: '#c86010', r: '#ff2828', g: '#ffd84a', G: '#c89a18', c: '#7a1a8a', h: '#a8acc0', H: '#6a6e84', R: '#e02838' };
@@ -99,16 +99,63 @@ const OWEN_BODY_SIDE = [
   '.....ttttttt....',
   '.....TTTTTTT....',
 ];
-const LEGS = {
-  down: [['....ppp..ppp....', '....fff..fff....'], ['....ppp..fff....', '....fff.........'], ['....fff..ppp....', '.........fff....']],
-  up: [['....ppp..ppp....', '....fff..fff....'], ['....ppp..fff....', '....fff.........'], ['....fff..ppp....', '.........fff....']],
-  side: [['......pp.pp.....', '......ff.ff.....'], ['.....pp...pp....', '....ff.....ff...'], ['......pppp......', '......ffff......']],
+// ---- walk cycle: 8 frames per direction, legs + swinging arms + a 1px body bob ----
+const setc = (row, i, ch) => row.slice(0, i) + ch + row.slice(i + 1);
+const LEG_POSES = {
+  front: {   // down and up views
+    N: ['....ppp..ppp....', '....fff..fff....', '................'],
+    Lh: ['....ppp..ppp....', '....ppp..fff....', '....fff.........'],
+    L: ['....ppp..fff....', '....ppp.........', '....fff.........'],
+    Rh: ['....ppp..ppp....', '....fff..ppp....', '.........fff....'],
+    R: ['....fff..ppp....', '.........ppp....', '.........fff....'],
+  },
+  side: {    // P/F = the far leg, a shade darker
+    N: ['......pp.pp.....', '......ff.ff.....', '................'],
+    Lh: ['......PP.pp.....', '.....FF...ff....', '................'],
+    L: ['.....PP...pp....', '....FF.....ff...', '................'],
+    Rh: ['......pp.PP.....', '.....ff...FF....', '................'],
+    R: ['.....pp...PP....', '....ff.....FF...', '................'],
+  },
 };
-// swinging arm variants of the body row (arm thrust forward)
-const OWEN_ATTACK_BODY = {
-  down: ['....tttttttt....', '...stttttttt....', '...sTtttttttss..', '....bbbggbbb.ss.', '....tttttttt....', '....TTTttTTT....'],
-  up: ['....ttttttttss..', '...sttttttttss..', '...sTttttttT....', '....bbbbbbbb....', '....tttttttt....', '....TTTTTTTT....'],
-  side: ['.....ttttttt....', '.....ttttttsss..', '.....tTtttTsss..', '.....bbbbgbb....', '.....ttttttt....', '.....TTTTTTT....'],
+const WALK = ['N', 'Lh', 'L', 'Lh', 'N', 'Rh', 'R', 'Rh'];
+const WALK_BOB = [0, 0, 1, 0, 0, 0, 1, 0];
+const WALK_ARM = [0, 1, 1, 1, 0, -1, -1, -1];
+function swingArms(body, dir, arm) {
+  const b = body.slice();
+  if (!arm) return b;
+  if (dir === 'side') {
+    b[1] = setc(b[1], 8, 't'); b[2] = setc(b[2], 8, 't');
+    if (arm > 0) { b[2] = setc(b[2], 9, 's'); b[3] = setc(b[3], 10, 's'); }
+    else { b[2] = setc(b[2], 6, 's'); b[3] = setc(b[3], 5, 's'); }
+    return b;
+  }
+  // front/back view: the forward hand drops a pixel, the other rises
+  const fwd = arm > 0 ? 12 : 3, back = arm > 0 ? 3 : 12;
+  b[3] = setc(b[3], fwd, 's'); b[2] = setc(b[2], back, '.');
+  return b;
+}
+function walkFrame(head, body, dir, i) {
+  const legs = LEG_POSES[dir === 'side' ? 'side' : 'front'][WALK[i]];
+  const torso = [...head, ...swingArms(body, dir, WALK_ARM[i])];
+  return WALK_BOB[i] ? ['................', ...torso, ...legs.slice(1)] : [...torso, ...legs];
+}
+// ---- swinging Jon: wind-up, strike, follow-through (body rows only) ----
+const OWEN_ATTACK = {
+  down: [
+    ['....tttttttt.s..', '...stttttttt.s..', '...sTtttttttT...', '....bbbggbbb....', '....tttttttt....', '....TTTttTTT....'],
+    ['....tttttttt....', '...stttttttts...', '...sTtttttttTs..', '....bbbggbbb.ss.', '....tttttttt..s.', '....TTTttTTT....'],
+    ['....tttttttt....', '..sstttttttts...', '.ss.TtttttttT...', '....bbbggbbb....', '....tttttttt....', '....TTTttTTT....'],
+  ],
+  up: [
+    ['..s.tttttttt....', '..s.tttttttts...', '...sTttttttTs...', '....bbbbbbbb....', '....tttttttt....', '....TTTTTTTT....'],
+    ['....tttttttt.s..', '...sttttttttss..', '...sTttttttT....', '....bbbbbbbb....', '....tttttttt....', '....TTTTTTTT....'],
+    ['....ttttttttss..', '...stttttttt.ss.', '...sTttttttT....', '....bbbbbbbb....', '....tttttttt....', '....TTTTTTTT....'],
+  ],
+  side: [
+    ['...ssttttttt....', '.....ttttttt....', '.....tTttttT....', '.....bbbbgbb....', '.....ttttttt....', '.....TTTTTTT....'],
+    ['.....ttttttt....', '.....ttttttsss..', '.....tTtttTsss..', '.....bbbbgbb....', '.....ttttttt....', '.....TTTTTTT....'],
+    ['.....ttttttt....', '.....ttttttt....', '.....tTttttTs...', '.....bbbbgbbss..', '.....ttttttt....', '.....TTTTTTT....'],
+  ],
 };
 
 // ---------------- Jon (16 x 16, blade up) ----------------
@@ -355,15 +402,18 @@ function buildAll() {
     for (const dir of ['down', 'up', 'side']) {
       const head = dir === 'down' ? OWEN_HEAD_DOWN : dir === 'up' ? OWEN_HEAD_UP : OWEN_HEAD_SIDE;
       const body = dir === 'down' ? OWEN_BODY_DOWN : dir === 'up' ? OWEN_BODY_UP : OWEN_BODY_SIDE;
-      for (let f = 0; f < 3; f++) {
-        const c = buildSprite([...head, ...body, ...LEGS[dir][f]], pal);
-        SPR[`${key}_${dir}_${f}`] = c; SPR[`${key}_${dir}_${f}_f`] = flipped(c);
+      const legsN = LEG_POSES[dir === 'side' ? 'side' : 'front'].N;
+      for (let i = 0; i < 8; i++) {
+        const c = buildSprite(walkFrame(head, body, dir, i), pal);
+        SPR[`${key}_${dir}_w${i}`] = c; SPR[`${key}_${dir}_w${i}_f`] = flipped(c);
       }
-      const a = buildSprite([...head, ...OWEN_ATTACK_BODY[dir], ...LEGS[dir][0]], pal);
-      SPR[`${key}_${dir}_atk`] = a; SPR[`${key}_${dir}_atk_f`] = flipped(a);
+      for (let i = 0; i < 3; i++) {
+        const c = buildSprite([...head, ...OWEN_ATTACK[dir][i], ...legsN], pal);
+        SPR[`${key}_${dir}_a${i}`] = c; SPR[`${key}_${dir}_a${i}_f`] = flipped(c);
+      }
     }
     // holding an item over his head (both arms up)
-    const hold = [...OWEN_HEAD_DOWN.map((r, i) => i === 6 || i === 7 ? 's' + r.slice(1, 15) + 's' : r), ...OWEN_BODY_DOWN.map((r, i) => i < 2 ? '.' + r.slice(1, 15) + '.' : r), ...LEGS.down[0]];
+    const hold = [...OWEN_HEAD_DOWN.map((r, i) => i === 6 || i === 7 ? 's' + r.slice(1, 15) + 's' : r), ...OWEN_BODY_DOWN.map((r, i) => i < 2 ? '.' + r.slice(1, 15) + '.' : r), ...LEG_POSES.front.N];
     hold[4] = 's' + hold[4].slice(1, 15) + 's'; hold[5] = 's' + hold[5].slice(1, 15) + 's';
     SPR[`${key}_hold`] = buildSprite(hold, pal);
   }
@@ -385,7 +435,9 @@ function buildAll() {
   SPR.shadow = buildSprite(['..xxxxxxxx..', '.xxxxxxxxxx.', 'xxxxxxxxxxxx', '.xxxxxxxxxx.', '..xxxxxxxx..'], { x: '#000000' }, false);
   for (const id in LOOKS) {
     const l = LOOKS[id];
-    SPR['npc_' + id] = buildSprite(personRows(l), { h: l.hair, B: l.hair, s: l.skin || '#f0c49a', S: '#c89068', e: '#20141c', t: l.shirt, T: shade(l.shirt, -0.3), p: '#4a3a2a', f: '#2a1a10', y: l.hat || '#000' });
+    const npcPal = { h: l.hair, B: l.hair, s: l.skin || '#f0c49a', S: '#c89068', e: '#20141c', t: l.shirt, T: shade(l.shirt, -0.3), p: '#4a3a2a', f: '#2a1a10', y: l.hat || '#000' };
+    SPR['npc_' + id] = buildSprite(personRows(l), npcPal);
+    SPR['npc_' + id + '_blink'] = buildSprite(personRows(l).map(r => r.replace(/e/g, 'S')), npcPal);
   }
   SPR.chest = buildSprite(CHEST_ROWS, PAL_CHEST);
   SPR.chest_open = buildSprite(CHEST_ROWS.map((r, i) => i === 1 || i === 2 ? 'b' + 'k'.repeat(12) + 'b' : r), { ...PAL_CHEST, k: '#1a0c06' });
@@ -421,7 +473,6 @@ function buildPoof() {
       const a = i / n * Math.PI * 2 + f * 0.4, px = 12 + Math.cos(a) * r * 1.2, py = 12 + Math.sin(a) * r;
       const rr = Math.max(1, 5 - f);
       g.fillStyle = f < 2 ? '#ffffff' : '#c8d0e8'; g.beginPath(); g.arc(Math.round(px), Math.round(py), rr, 0, Math.PI * 2); g.fill();
-      g.fillStyle = OUTLINE; g.fillRect(Math.round(px) - 1, Math.round(py) + rr - 1, 2, 1);
     }
     POOF.push(c);
   }

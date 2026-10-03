@@ -140,7 +140,7 @@ function updateTransition(dt) {
   const k = Math.min(1, tr.t);
   G.cam.x = tr.from.x + (tr.to.x - tr.from.x) * k;
   G.cam.y = tr.from.y + (tr.to.y - tr.from.y) * k;
-  p.x += tr.dx * 52 * dt; p.y += tr.dy * 52 * dt; p.walk += dt * 10;
+  p.x += tr.dx * 52 * dt; p.y += tr.dy * 52 * dt; p.walk += dt * 14;
   G.jon.x = p.x + 10; G.jon.y = p.y - 14;
   if (k >= 1) { G.trans = null; enterScreen(); }
 }

@@ -82,6 +82,7 @@ function update(dt) {
       return;
     case 'levelup': case 'shop': case 'arenapause': case 'arenaover': updateArenaMenus(); return;
     case 'thunder': updateThunder(dt); updateFx(dt); return;
+    case 'dying': updateDying(dt); updateFx(dt); return;
   }
   // play
   if (G.trans) { updateTransition(dt); return; }

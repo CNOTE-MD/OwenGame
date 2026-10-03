@@ -1171,7 +1171,7 @@ function updateTransition(dt) {
   const k = Math.min(1, tr.t);
   G.cam.x = tr.from.x + (tr.to.x - tr.from.x) * k;
   G.cam.y = tr.from.y + (tr.to.y - tr.from.y) * k;
-  p.x += tr.dx * 52 * dt; p.y += tr.dy * 52 * dt; p.walk += dt * 10;
+  p.x += tr.dx * 52 * dt; p.y += tr.dy * 52 * dt; p.walk += dt * 14;
   G.jon.x = p.x + 10; G.jon.y = p.y - 14;
   if (k >= 1) { G.trans = null; enterScreen(); }
 }
@@ -1318,10 +1318,12 @@ function drawFx() {
   for (const f of G.fx) {
     if (f.kind === 'text') { text(f.label, f.x - G.cam.x, f.y - G.cam.y - f.t * 12, f.color, 'center'); continue; }
     if (f.kind === 'poof') { const img = POOF[Math.min(3, Math.floor(f.t / f.life * 4))], s = f.scale; ctx.drawImage(img, Math.round(f.x - G.cam.x - 12 * s), Math.round(f.y - G.cam.y - 12 * s), 24 * s, 24 * s); continue; }
+    if (f.kind === 'ripple') { if (f.t < 0) continue; const k = f.t / f.life; ctx.strokeStyle = `rgba(220,240,255,${1 - k})`; ctx.lineWidth = 1; ctx.beginPath(); ctx.ellipse(Math.round(f.x - G.cam.x), Math.round(f.y - G.cam.y + 4), 4 + k * 14, 2 + k * 6, 0, 0, Math.PI * 2); ctx.stroke(); continue; }
     if (f.kind === 'leaf') { R(f.x - G.cam.x, f.y - G.cam.y, 2, 1, f.color); R(f.x - G.cam.x + 1, f.y - G.cam.y + 1, 1, 1, '#205818'); continue; }
     R(f.x - G.cam.x, f.y - G.cam.y, f.size, f.size, f.color);
   }
 }
+function ripple(x, y, delay = 0) { G.fx.push({ kind: 'ripple', x, y, vx: 0, vy: 0, t: -delay, life: 0.6 }); }
 function leaves(x, y, colors) {
   for (let i = 0; i < 8; i++) G.fx.push({ kind: 'leaf', x: x + rnd(-5, 5), y: y + rnd(-5, 3), vx: rnd(-50, 50), vy: rnd(-90, -30), grav: 260, t: 0, life: 0.55, color: pick(colors) });
 }
@@ -1350,18 +1352,23 @@ function updatePlayer(dt) {
     p.lp += dt / 0.7;
     const k = Math.min(p.lp, 1);
     p.x = p.from.x + (p.to.x - p.from.x) * k; p.y = p.from.y + (p.to.y - p.from.y) * k;
-    if (p.lp >= 1) p.launching = false;
+    if (p.lp >= 1) { p.launching = false; puff(p.x, p.y + 6, '#e8e0c8', 6); }
     return;
   }
   const v = inputVec();
   p.moving = !!(v.x || v.y);
-  if (p.moving) { p.fx = v.x; p.fy = v.y; p.walk += dt * 9; }
+  if (p.moving) { p.fx = v.x; p.fy = v.y; p.walk += dt * 14; }
   const onIce = tileAt(p.x, p.y) === 'i';
   const spd = 72 * G.st.speed;
   if (onIce) { const k = Math.min(1, 2.2 * dt); p.vx += (v.x * spd * 1.1 - p.vx) * k; p.vy += (v.y * spd * 1.1 - p.vy) * k; }
   else { p.vx = v.x * spd; p.vy = v.y * spd; }
   const hit = tryMove(p, p.vx * dt, p.vy * dt, 5, 'player');
-  if (onIce) { if (hit.hitX) p.vx *= -0.3; if (hit.hitY) p.vy *= -0.3; }
+  if (onIce) {
+    if (hit.hitX) p.vx *= -0.3; if (hit.hitY) p.vy *= -0.3;
+    // skidding throws up frost
+    if (Math.hypot(v.x * spd - p.vx, v.y * spd - p.vy) > 45 && Math.hypot(p.vx, p.vy) > 15 && Math.random() < 0.5)
+      G.fx.push({ x: p.x + rnd(-3, 3), y: p.y + 6, vx: -p.vx * 0.2 + rnd(-10, 10), vy: rnd(-20, -5), t: 0, life: 0.35, color: Math.random() < 0.5 ? '#ffffff' : '#cfefff', size: 1 });
+  }
   const kl = Math.hypot(p.kx, p.ky);
   if (kl > 1) { tryMove(p, p.kx * dt, p.ky * dt, 5, 'player'); const nl = Math.max(0, kl - 520 * dt); p.kx *= nl / kl; p.ky *= nl / kl; }
 
@@ -1373,6 +1380,7 @@ function updatePlayer(dt) {
   const here = tileAt(p.x, p.y);
   if (here === '~') {
     p.launching = true; p.lp = 0; p.from = { x: p.x, y: p.y }; p.to = nearestDry(p.x, p.y); p.inv = 1.2;
+    ripple(p.x, p.y); ripple(p.x, p.y, 0.15);
     G.jon.mode = 'follow'; Sound.play('splash'); puff(p.x, p.y, '#bfe0ff', 10);
     floatText(p.x, p.y - 20, 'Lady of the Lake!', '#bfe0ff');
     return;
@@ -1426,10 +1434,24 @@ function hurtPlayer(dmg, from, force) {
   p.hp -= dmg; p.inv = 1; Sound.play('hurt'); G.shake = 0.15;
   if (from) { const d = Math.hypot(p.x - from.x, p.y - from.y) || 1; p.kx = (p.x - from.x) / d * 170; p.ky = (p.y - from.y) / d * 170; }
   if (p.hp > 0) return;
+  // A Link to the Past death: Owen spins in place, then juice, voodoo or game over
+  p.hp = 0; p.kx = p.ky = 0; G.state = 'dying'; G.dieT = 0; G.jon.mode = 'follow'; Sound.play('fall');
+}
+function updateDying(dt) {
+  const p = G.player;
+  G.dieT += dt;
+  const dirs = [[0, 1], [1, 0], [0, -1], [-1, 0]], i = Math.floor(G.dieT / 0.07) % 4;
+  if (G.dieT < 0.85) { p.fx = dirs[i][0]; p.fy = dirs[i][1]; return; }
+  p.fx = 0; p.fy = 1;
+  finishDeath();
+}
+function finishDeath() {
+  const p = G.player, s = G.save;
+  G.state = 'play';
   if (s.potions > 0) { s.potions--; p.hp = s.maxHp; p.inv = 2; Sound.play('heart'); return say(STORY.juice); }
-  if (G.mode === 'arena') { p.hp = 0; return arenaOver(false); }
+  if (G.mode === 'arena') return arenaOver(false);
   if (s.voodoo) { s.voodoo = false; p.hp = s.maxHp; p.inv = 2.5; puff(p.x, p.y, '#9a4dd9', 16); Sound.play('secret'); return say(STORY.revive); }
-  p.hp = 0; G.state = 'over'; G.menuSel = 0;
+  G.state = 'over'; G.menuSel = 0;
 }
 
 function interact(e) {
@@ -1545,6 +1567,9 @@ function updateJon(dt) {
     jonHits(1, 9, j, 'throw');
     if (d < 9) j.mode = 'follow';
   }
+  if (j.mode === 'out' || j.mode === 'back') {
+    j.trail = (j.trail || []).concat([{ x: j.x, y: j.y, spin: j.spin }]).slice(-4);
+  } else j.trail = [];
   if (j.mode === 'out' || j.mode === 'back') {
     for (const e of G.ents) if (e.kind === 'pickup' && dist(e, j) < 10) { e.x = j.x; e.y = j.y; }   // Jon fetches loot
   }
@@ -1771,7 +1796,7 @@ function tinted(c, color) { const f = mkCanvas(c.width, c.height), g = f.getCont
 
 // ---------------- palettes ----------------
 const PAL_OWEN = { w: '#f4ecd0', h: '#c8ccd8', H: '#8a90a4', r: '#a0581e', s: '#f8c898', S: '#d89060', e: '#20141c',
-  t: '#3c7ce0', T: '#2850a0', b: '#7a4418', g: '#ffd84a', p: '#6a4a2a', f: '#4a2c14' };
+  t: '#3c7ce0', T: '#2850a0', b: '#7a4418', g: '#ffd84a', p: '#6a4a2a', f: '#4a2c14', P: '#4a3220', F: '#2e1a0c' };
 const PAL_ZOMBIE = { ...PAL_OWEN, s: '#a8d090', S: '#78a868', t: '#8a50c0', T: '#5a3088' };
 const PAL_JON = { h: '#9a6030', b: '#5a3418', p: '#c0c0cc', S: '#c8d8ec', l: '#f4fbff', d: '#a8b8cc', D: '#d8e4f4', w: '#ffffff', k: '#141018', m: '#4a5a80' };
 const PAL_PENGUIN = { n: '#20203a', N: '#3e3e66', w: '#f4f4ff', W: '#c4c4dc', o: '#ffa020', O: '#c86010', r: '#ff2828', g: '#ffd84a', G: '#c89a18', c: '#7a1a8a', h: '#a8acc0', H: '#6a6e84', R: '#e02838' };
@@ -1841,16 +1866,63 @@ const OWEN_BODY_SIDE = [
   '.....ttttttt....',
   '.....TTTTTTT....',
 ];
-const LEGS = {
-  down: [['....ppp..ppp....', '....fff..fff....'], ['....ppp..fff....', '....fff.........'], ['....fff..ppp....', '.........fff....']],
-  up: [['....ppp..ppp....', '....fff..fff....'], ['....ppp..fff....', '....fff.........'], ['....fff..ppp....', '.........fff....']],
-  side: [['......pp.pp.....', '......ff.ff.....'], ['.....pp...pp....', '....ff.....ff...'], ['......pppp......', '......ffff......']],
+// ---- walk cycle: 8 frames per direction, legs + swinging arms + a 1px body bob ----
+const setc = (row, i, ch) => row.slice(0, i) + ch + row.slice(i + 1);
+const LEG_POSES = {
+  front: {   // down and up views
+    N: ['....ppp..ppp....', '....fff..fff....', '................'],
+    Lh: ['....ppp..ppp....', '....ppp..fff....', '....fff.........'],
+    L: ['....ppp..fff....', '....ppp.........', '....fff.........'],
+    Rh: ['....ppp..ppp....', '....fff..ppp....', '.........fff....'],
+    R: ['....fff..ppp....', '.........ppp....', '.........fff....'],
+  },
+  side: {    // P/F = the far leg, a shade darker
+    N: ['......pp.pp.....', '......ff.ff.....', '................'],
+    Lh: ['......PP.pp.....', '.....FF...ff....', '................'],
+    L: ['.....PP...pp....', '....FF.....ff...', '................'],
+    Rh: ['......pp.PP.....', '.....ff...FF....', '................'],
+    R: ['.....pp...PP....', '....ff.....FF...', '................'],
+  },
 };
-// swinging arm variants of the body row (arm thrust forward)
-const OWEN_ATTACK_BODY = {
-  down: ['....tttttttt....', '...stttttttt....', '...sTtttttttss..', '....bbbggbbb.ss.', '....tttttttt....', '....TTTttTTT....'],
-  up: ['....ttttttttss..', '...sttttttttss..', '...sTttttttT....', '....bbbbbbbb....', '....tttttttt....', '....TTTTTTTT....'],
-  side: ['.....ttttttt....', '.....ttttttsss..', '.....tTtttTsss..', '.....bbbbgbb....', '.....ttttttt....', '.....TTTTTTT....'],
+const WALK = ['N', 'Lh', 'L', 'Lh', 'N', 'Rh', 'R', 'Rh'];
+const WALK_BOB = [0, 0, 1, 0, 0, 0, 1, 0];
+const WALK_ARM = [0, 1, 1, 1, 0, -1, -1, -1];
+function swingArms(body, dir, arm) {
+  const b = body.slice();
+  if (!arm) return b;
+  if (dir === 'side') {
+    b[1] = setc(b[1], 8, 't'); b[2] = setc(b[2], 8, 't');
+    if (arm > 0) { b[2] = setc(b[2], 9, 's'); b[3] = setc(b[3], 10, 's'); }
+    else { b[2] = setc(b[2], 6, 's'); b[3] = setc(b[3], 5, 's'); }
+    return b;
+  }
+  // front/back view: the forward hand drops a pixel, the other rises
+  const fwd = arm > 0 ? 12 : 3, back = arm > 0 ? 3 : 12;
+  b[3] = setc(b[3], fwd, 's'); b[2] = setc(b[2], back, '.');
+  return b;
+}
+function walkFrame(head, body, dir, i) {
+  const legs = LEG_POSES[dir === 'side' ? 'side' : 'front'][WALK[i]];
+  const torso = [...head, ...swingArms(body, dir, WALK_ARM[i])];
+  return WALK_BOB[i] ? ['................', ...torso, ...legs.slice(1)] : [...torso, ...legs];
+}
+// ---- swinging Jon: wind-up, strike, follow-through (body rows only) ----
+const OWEN_ATTACK = {
+  down: [
+    ['....tttttttt.s..', '...stttttttt.s..', '...sTtttttttT...', '....bbbggbbb....', '....tttttttt....', '....TTTttTTT....'],
+    ['....tttttttt....', '...stttttttts...', '...sTtttttttTs..', '....bbbggbbb.ss.', '....tttttttt..s.', '....TTTttTTT....'],
+    ['....tttttttt....', '..sstttttttts...', '.ss.TtttttttT...', '....bbbggbbb....', '....tttttttt....', '....TTTttTTT....'],
+  ],
+  up: [
+    ['..s.tttttttt....', '..s.tttttttts...', '...sTttttttTs...', '....bbbbbbbb....', '....tttttttt....', '....TTTTTTTT....'],
+    ['....tttttttt.s..', '...sttttttttss..', '...sTttttttT....', '....bbbbbbbb....', '....tttttttt....', '....TTTTTTTT....'],
+    ['....ttttttttss..', '...stttttttt.ss.', '...sTttttttT....', '....bbbbbbbb....', '....tttttttt....', '....TTTTTTTT....'],
+  ],
+  side: [
+    ['...ssttttttt....', '.....ttttttt....', '.....tTttttT....', '.....bbbbgbb....', '.....ttttttt....', '.....TTTTTTT....'],
+    ['.....ttttttt....', '.....ttttttsss..', '.....tTtttTsss..', '.....bbbbgbb....', '.....ttttttt....', '.....TTTTTTT....'],
+    ['.....ttttttt....', '.....ttttttt....', '.....tTttttTs...', '.....bbbbgbbss..', '.....ttttttt....', '.....TTTTTTT....'],
+  ],
 };
 
 // ---------------- Jon (16 x 16, blade up) ----------------
@@ -2097,15 +2169,18 @@ function buildAll() {
     for (const dir of ['down', 'up', 'side']) {
       const head = dir === 'down' ? OWEN_HEAD_DOWN : dir === 'up' ? OWEN_HEAD_UP : OWEN_HEAD_SIDE;
       const body = dir === 'down' ? OWEN_BODY_DOWN : dir === 'up' ? OWEN_BODY_UP : OWEN_BODY_SIDE;
-      for (let f = 0; f < 3; f++) {
-        const c = buildSprite([...head, ...body, ...LEGS[dir][f]], pal);
-        SPR[`${key}_${dir}_${f}`] = c; SPR[`${key}_${dir}_${f}_f`] = flipped(c);
+      const legsN = LEG_POSES[dir === 'side' ? 'side' : 'front'].N;
+      for (let i = 0; i < 8; i++) {
+        const c = buildSprite(walkFrame(head, body, dir, i), pal);
+        SPR[`${key}_${dir}_w${i}`] = c; SPR[`${key}_${dir}_w${i}_f`] = flipped(c);
       }
-      const a = buildSprite([...head, ...OWEN_ATTACK_BODY[dir], ...LEGS[dir][0]], pal);
-      SPR[`${key}_${dir}_atk`] = a; SPR[`${key}_${dir}_atk_f`] = flipped(a);
+      for (let i = 0; i < 3; i++) {
+        const c = buildSprite([...head, ...OWEN_ATTACK[dir][i], ...legsN], pal);
+        SPR[`${key}_${dir}_a${i}`] = c; SPR[`${key}_${dir}_a${i}_f`] = flipped(c);
+      }
     }
     // holding an item over his head (both arms up)
-    const hold = [...OWEN_HEAD_DOWN.map((r, i) => i === 6 || i === 7 ? 's' + r.slice(1, 15) + 's' : r), ...OWEN_BODY_DOWN.map((r, i) => i < 2 ? '.' + r.slice(1, 15) + '.' : r), ...LEGS.down[0]];
+    const hold = [...OWEN_HEAD_DOWN.map((r, i) => i === 6 || i === 7 ? 's' + r.slice(1, 15) + 's' : r), ...OWEN_BODY_DOWN.map((r, i) => i < 2 ? '.' + r.slice(1, 15) + '.' : r), ...LEG_POSES.front.N];
     hold[4] = 's' + hold[4].slice(1, 15) + 's'; hold[5] = 's' + hold[5].slice(1, 15) + 's';
     SPR[`${key}_hold`] = buildSprite(hold, pal);
   }
@@ -2127,7 +2202,9 @@ function buildAll() {
   SPR.shadow = buildSprite(['..xxxxxxxx..', '.xxxxxxxxxx.', 'xxxxxxxxxxxx', '.xxxxxxxxxx.', '..xxxxxxxx..'], { x: '#000000' }, false);
   for (const id in LOOKS) {
     const l = LOOKS[id];
-    SPR['npc_' + id] = buildSprite(personRows(l), { h: l.hair, B: l.hair, s: l.skin || '#f0c49a', S: '#c89068', e: '#20141c', t: l.shirt, T: shade(l.shirt, -0.3), p: '#4a3a2a', f: '#2a1a10', y: l.hat || '#000' });
+    const npcPal = { h: l.hair, B: l.hair, s: l.skin || '#f0c49a', S: '#c89068', e: '#20141c', t: l.shirt, T: shade(l.shirt, -0.3), p: '#4a3a2a', f: '#2a1a10', y: l.hat || '#000' };
+    SPR['npc_' + id] = buildSprite(personRows(l), npcPal);
+    SPR['npc_' + id + '_blink'] = buildSprite(personRows(l).map(r => r.replace(/e/g, 'S')), npcPal);
   }
   SPR.chest = buildSprite(CHEST_ROWS, PAL_CHEST);
   SPR.chest_open = buildSprite(CHEST_ROWS.map((r, i) => i === 1 || i === 2 ? 'b' + 'k'.repeat(12) + 'b' : r), { ...PAL_CHEST, k: '#1a0c06' });
@@ -2163,7 +2240,6 @@ function buildPoof() {
       const a = i / n * Math.PI * 2 + f * 0.4, px = 12 + Math.cos(a) * r * 1.2, py = 12 + Math.sin(a) * r;
       const rr = Math.max(1, 5 - f);
       g.fillStyle = f < 2 ? '#ffffff' : '#c8d0e8'; g.beginPath(); g.arc(Math.round(px), Math.round(py), rr, 0, Math.PI * 2); g.fill();
-      g.fillStyle = OUTLINE; g.fillRect(Math.round(px) - 1, Math.round(py) + rr - 1, 2, 1);
     }
     POOF.push(c);
   }
@@ -2661,12 +2737,24 @@ function drawOwen(x, y) {
   shadowAt(x, y + 6, p.launching ? 0.7 : 1);
   const hurt = p.inv > 0 && Math.floor(p.inv * 20) % 2 === 0 && !p.launching && G.state === 'play';
   const key = G.save.voodoo || G.mode === 'arena' ? 'owen' : 'zombie';
-  if (p.hold) { spr(SPR[key + '_hold'], x, y + 7); drawItemIcon(p.hold.id, x, y - 22); return; }
+  if (p.hold) {
+    spr(SPR[key + '_hold'], x, y + 7);
+    // A Link to the Past item fanfare: rays and twinkles around the prize
+    const ix = x, iy = y - 22, t = G.t * 3;
+    ctx.strokeStyle = 'rgba(255,240,170,0.5)'; ctx.lineWidth = 1;
+    for (let i = 0; i < 8; i++) { const a = t * 0.5 + i * Math.PI / 4, r0 = 9, r1 = 14 + 3 * Math.sin(t * 2 + i); ctx.beginPath(); ctx.moveTo(ix + Math.cos(a) * r0, iy + Math.sin(a) * r0); ctx.lineTo(ix + Math.cos(a) * r1, iy + Math.sin(a) * r1); ctx.stroke(); }
+    drawItemIcon(p.hold.id, ix, iy);
+    for (let i = 0; i < 3; i++) { const a = t + i * 2.1; drawTwinkle(ix + Math.cos(a) * 12, iy + Math.sin(a) * 9, (Math.floor(G.t * 8) + i) % 2); }
+    return;
+  }
   const { d, flip } = dirOf(p.fx, p.fy);
   let f;
-  if (G.jon.mode === 'swing') f = 'atk';
-  else f = (p.moving || G.trans) ? [1, 0, 2, 0][Math.floor(p.walk) % 4] : 0;
+  if (G.jon.mode === 'swing') { const k = G.jon.st / (0.2 / G.st.atk); f = 'a' + (k < 0.25 ? 0 : k < 0.7 ? 1 : 2); }
+  else f = 'w' + ((p.moving || G.trans) ? Math.floor(p.walk) % 8 : 0);
   spr(SPR[`${key}_${d}_${f}${flip ? '_f' : ''}`], x, y + 7 - lift, { scale, white: hurt });
+}
+function drawTwinkle(x, y, big) {
+  R(x, y - (big ? 3 : 2), 1, big ? 7 : 5, '#ffffff'); R(x - (big ? 3 : 2), y, big ? 7 : 5, 1, '#ffffff'); R(x, y, 1, 1, '#ffe066');
 }
 
 function drawJonSprite(x, y, spin, blink) {
@@ -2690,6 +2778,8 @@ function drawJon() {
   const j = G.jon, x = j.x - G.cam.x, y = j.y - G.cam.y;
   drawSlash();
   if (j.mode === 'follow') shadowAt(x, y + 18, 0.6);
+  (j.trail || []).forEach((tr, i) => { ctx.globalAlpha = 0.12 + i * 0.07; drawJonSprite(tr.x - G.cam.x, tr.y - G.cam.y, tr.spin); });
+  ctx.globalAlpha = 1;
   drawJonSprite(x, y, j.spin, j.t % 3.2 < 0.14);
   if (j.qt > 0 && j.quip && G.state === 'play') {
     ctx.font = FONT;
@@ -2706,7 +2796,8 @@ function drawEnemy(e) {
     case 'penguin': case 'knight': case 'king': {
       const s = e.type === 'king' ? 3 : e.type === 'knight' ? 2 : 1;
       const { d, flip } = dirOf(e.fx, e.fy);
-      const shake = e.type === 'king' && (e.st === 'wind' || e.st === 'slide') ? Math.round(rnd(-1, 1)) : 0;
+      const waddle = e.st === 'daze' || e.st === 'slide' ? 0 : [0, 1, 0, -1][Math.floor(e.wob / 2.5) % 4] * s;
+      const shake = (e.type === 'king' && (e.st === 'wind' || e.st === 'slide') ? Math.round(rnd(-1, 1)) : 0) + waddle;
       shadowAt(x, y + 5 * s, s);
       const img = SPR[`peng_${d}_${e.st === 'daze' ? 0 : f}${flip ? '_f' : ''}`];
       const foot = y + 6 * s;
@@ -2760,7 +2851,8 @@ function drawStar(x, y) { R(x - 1, y - 3, 2, 6, '#ffe066'); R(x - 3, y - 1, 6, 2
 function drawPerson(x, y, id, bob) {
   const b = Math.round(Math.sin(G.t * 2 + bob) * 0.6);
   shadowAt(x, y + 6, 1);
-  spr(SPR['npc_' + id] || SPR.npc_sven, x, y + 7 + b);
+  const blink = (G.t + bob) % 3.6 < 0.13;
+  spr(SPR['npc_' + id + (blink ? '_blink' : '')] || SPR.npc_sven, x, y + 7 + b);
 }
 const LOOKS = {
   astrid: { shirt: '#6b3fa0', hair: '#e8e8e8', long: true },
@@ -3464,6 +3556,7 @@ function update(dt) {
       return;
     case 'levelup': case 'shop': case 'arenapause': case 'arenaover': updateArenaMenus(); return;
     case 'thunder': updateThunder(dt); updateFx(dt); return;
+    case 'dying': updateDying(dt); updateFx(dt); return;
   }
   // play
   if (G.trans) { updateTransition(dt); return; }

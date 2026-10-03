@@ -46,10 +46,12 @@ function drawFx() {
   for (const f of G.fx) {
     if (f.kind === 'text') { text(f.label, f.x - G.cam.x, f.y - G.cam.y - f.t * 12, f.color, 'center'); continue; }
     if (f.kind === 'poof') { const img = POOF[Math.min(3, Math.floor(f.t / f.life * 4))], s = f.scale; ctx.drawImage(img, Math.round(f.x - G.cam.x - 12 * s), Math.round(f.y - G.cam.y - 12 * s), 24 * s, 24 * s); continue; }
+    if (f.kind === 'ripple') { if (f.t < 0) continue; const k = f.t / f.life; ctx.strokeStyle = `rgba(220,240,255,${1 - k})`; ctx.lineWidth = 1; ctx.beginPath(); ctx.ellipse(Math.round(f.x - G.cam.x), Math.round(f.y - G.cam.y + 4), 4 + k * 14, 2 + k * 6, 0, 0, Math.PI * 2); ctx.stroke(); continue; }
     if (f.kind === 'leaf') { R(f.x - G.cam.x, f.y - G.cam.y, 2, 1, f.color); R(f.x - G.cam.x + 1, f.y - G.cam.y + 1, 1, 1, '#205818'); continue; }
     R(f.x - G.cam.x, f.y - G.cam.y, f.size, f.size, f.color);
   }
 }
+function ripple(x, y, delay = 0) { G.fx.push({ kind: 'ripple', x, y, vx: 0, vy: 0, t: -delay, life: 0.6 }); }
 function leaves(x, y, colors) {
   for (let i = 0; i < 8; i++) G.fx.push({ kind: 'leaf', x: x + rnd(-5, 5), y: y + rnd(-5, 3), vx: rnd(-50, 50), vy: rnd(-90, -30), grav: 260, t: 0, life: 0.55, color: pick(colors) });
 }
@@ -78,18 +80,23 @@ function updatePlayer(dt) {
     p.lp += dt / 0.7;
     const k = Math.min(p.lp, 1);
     p.x = p.from.x + (p.to.x - p.from.x) * k; p.y = p.from.y + (p.to.y - p.from.y) * k;
-    if (p.lp >= 1) p.launching = false;
+    if (p.lp >= 1) { p.launching = false; puff(p.x, p.y + 6, '#e8e0c8', 6); }
     return;
   }
   const v = inputVec();
   p.moving = !!(v.x || v.y);
-  if (p.moving) { p.fx = v.x; p.fy = v.y; p.walk += dt * 9; }
+  if (p.moving) { p.fx = v.x; p.fy = v.y; p.walk += dt * 14; }
   const onIce = tileAt(p.x, p.y) === 'i';
   const spd = 72 * G.st.speed;
   if (onIce) { const k = Math.min(1, 2.2 * dt); p.vx += (v.x * spd * 1.1 - p.vx) * k; p.vy += (v.y * spd * 1.1 - p.vy) * k; }
   else { p.vx = v.x * spd; p.vy = v.y * spd; }
   const hit = tryMove(p, p.vx * dt, p.vy * dt, 5, 'player');
-  if (onIce) { if (hit.hitX) p.vx *= -0.3; if (hit.hitY) p.vy *= -0.3; }
+  if (onIce) {
+    if (hit.hitX) p.vx *= -0.3; if (hit.hitY) p.vy *= -0.3;
+    // skidding throws up frost
+    if (Math.hypot(v.x * spd - p.vx, v.y * spd - p.vy) > 45 && Math.hypot(p.vx, p.vy) > 15 && Math.random() < 0.5)
+      G.fx.push({ x: p.x + rnd(-3, 3), y: p.y + 6, vx: -p.vx * 0.2 + rnd(-10, 10), vy: rnd(-20, -5), t: 0, life: 0.35, color: Math.random() < 0.5 ? '#ffffff' : '#cfefff', size: 1 });
+  }
   const kl = Math.hypot(p.kx, p.ky);
   if (kl > 1) { tryMove(p, p.kx * dt, p.ky * dt, 5, 'player'); const nl = Math.max(0, kl - 520 * dt); p.kx *= nl / kl; p.ky *= nl / kl; }
 
@@ -101,6 +108,7 @@ function updatePlayer(dt) {
   const here = tileAt(p.x, p.y);
   if (here === '~') {
     p.launching = true; p.lp = 0; p.from = { x: p.x, y: p.y }; p.to = nearestDry(p.x, p.y); p.inv = 1.2;
+    ripple(p.x, p.y); ripple(p.x, p.y, 0.15);
     G.jon.mode = 'follow'; Sound.play('splash'); puff(p.x, p.y, '#bfe0ff', 10);
     floatText(p.x, p.y - 20, 'Lady of the Lake!', '#bfe0ff');
     return;
@@ -154,10 +162,24 @@ function hurtPlayer(dmg, from, force) {
   p.hp -= dmg; p.inv = 1; Sound.play('hurt'); G.shake = 0.15;
   if (from) { const d = Math.hypot(p.x - from.x, p.y - from.y) || 1; p.kx = (p.x - from.x) / d * 170; p.ky = (p.y - from.y) / d * 170; }
   if (p.hp > 0) return;
+  // A Link to the Past death: Owen spins in place, then juice, voodoo or game over
+  p.hp = 0; p.kx = p.ky = 0; G.state = 'dying'; G.dieT = 0; G.jon.mode = 'follow'; Sound.play('fall');
+}
+function updateDying(dt) {
+  const p = G.player;
+  G.dieT += dt;
+  const dirs = [[0, 1], [1, 0], [0, -1], [-1, 0]], i = Math.floor(G.dieT / 0.07) % 4;
+  if (G.dieT < 0.85) { p.fx = dirs[i][0]; p.fy = dirs[i][1]; return; }
+  p.fx = 0; p.fy = 1;
+  finishDeath();
+}
+function finishDeath() {
+  const p = G.player, s = G.save;
+  G.state = 'play';
   if (s.potions > 0) { s.potions--; p.hp = s.maxHp; p.inv = 2; Sound.play('heart'); return say(STORY.juice); }
-  if (G.mode === 'arena') { p.hp = 0; return arenaOver(false); }
+  if (G.mode === 'arena') return arenaOver(false);
   if (s.voodoo) { s.voodoo = false; p.hp = s.maxHp; p.inv = 2.5; puff(p.x, p.y, '#9a4dd9', 16); Sound.play('secret'); return say(STORY.revive); }
-  p.hp = 0; G.state = 'over'; G.menuSel = 0;
+  G.state = 'over'; G.menuSel = 0;
 }
 
 function interact(e) {
@@ -273,6 +295,9 @@ function updateJon(dt) {
     jonHits(1, 9, j, 'throw');
     if (d < 9) j.mode = 'follow';
   }
+  if (j.mode === 'out' || j.mode === 'back') {
+    j.trail = (j.trail || []).concat([{ x: j.x, y: j.y, spin: j.spin }]).slice(-4);
+  } else j.trail = [];
   if (j.mode === 'out' || j.mode === 'back') {
     for (const e of G.ents) if (e.kind === 'pickup' && dist(e, j) < 10) { e.x = j.x; e.y = j.y; }   // Jon fetches loot
   }

@@ -159,6 +159,8 @@ const SHOTS = process.env.SHOTS || '/tmp';
   const maxHp = await ev(() => G.save.maxHp);
   await place(22, 7, 0, 1); await wait(1400); await talkThrough();
   await check('heart container +1 heart', await ev(() => G.save.maxHp) === maxHp + 2);
+  // animation frames exist for every direction
+  await check('8-frame walk + 3-frame attack sprites built', await ev(() => ['down', 'up', 'side'].every(d => [0, 1, 2, 3, 4, 5, 6, 7].every(i => SPR[`owen_${d}_w${i}`] && SPR[`zombie_${d}_w${i}_f`]) && [0, 1, 2].every(i => SPR[`owen_${d}_a${i}`]))));
   // menu
   await pg.keyboard.press('Enter'); await wait(100);
   await pg.screenshot({ path: SHOTS + '/p7_menu.png' });
@@ -174,9 +176,12 @@ const SHOTS = process.env.SHOTS || '/tmp';
 
   // game over path: potion, voodoo, then over
   await ev(() => { G.save.potions = 0; G.save.voodoo = true; G.player.inv = 0; G.state = 'play'; hurtPlayer(99, G.player); });
+  await check('death spin plays first', await ev(() => G.state === 'dying'));
+  await pg.waitForFunction(() => G.state !== 'dying', null, { timeout: 5000 });
   await talkThrough();
   await check('voodoo revive', await ev(() => !G.save.voodoo && G.player.hp === G.save.maxHp));
   await ev(() => { G.player.inv = 0; G.state = 'play'; hurtPlayer(99, G.player); });
+  await pg.waitForFunction(() => G.state !== 'dying', null, { timeout: 5000 });
   await check('game over after voodoo used', await ev(() => G.state === 'over'));
   await ev(() => { G.save.cp = { map: 'overworld', x: 39 * 16 + 8, y: 4 * 16 + 8 }; writeSave(); });
   await pg.keyboard.press('KeyZ'); await wait(150); await talkThrough();

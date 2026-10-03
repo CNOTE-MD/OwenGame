@@ -8,12 +8,24 @@ function drawOwen(x, y) {
   shadowAt(x, y + 6, p.launching ? 0.7 : 1);
   const hurt = p.inv > 0 && Math.floor(p.inv * 20) % 2 === 0 && !p.launching && G.state === 'play';
   const key = G.save.voodoo || G.mode === 'arena' ? 'owen' : 'zombie';
-  if (p.hold) { spr(SPR[key + '_hold'], x, y + 7); drawItemIcon(p.hold.id, x, y - 22); return; }
+  if (p.hold) {
+    spr(SPR[key + '_hold'], x, y + 7);
+    // A Link to the Past item fanfare: rays and twinkles around the prize
+    const ix = x, iy = y - 22, t = G.t * 3;
+    ctx.strokeStyle = 'rgba(255,240,170,0.5)'; ctx.lineWidth = 1;
+    for (let i = 0; i < 8; i++) { const a = t * 0.5 + i * Math.PI / 4, r0 = 9, r1 = 14 + 3 * Math.sin(t * 2 + i); ctx.beginPath(); ctx.moveTo(ix + Math.cos(a) * r0, iy + Math.sin(a) * r0); ctx.lineTo(ix + Math.cos(a) * r1, iy + Math.sin(a) * r1); ctx.stroke(); }
+    drawItemIcon(p.hold.id, ix, iy);
+    for (let i = 0; i < 3; i++) { const a = t + i * 2.1; drawTwinkle(ix + Math.cos(a) * 12, iy + Math.sin(a) * 9, (Math.floor(G.t * 8) + i) % 2); }
+    return;
+  }
   const { d, flip } = dirOf(p.fx, p.fy);
   let f;
-  if (G.jon.mode === 'swing') f = 'atk';
-  else f = (p.moving || G.trans) ? [1, 0, 2, 0][Math.floor(p.walk) % 4] : 0;
+  if (G.jon.mode === 'swing') { const k = G.jon.st / (0.2 / G.st.atk); f = 'a' + (k < 0.25 ? 0 : k < 0.7 ? 1 : 2); }
+  else f = 'w' + ((p.moving || G.trans) ? Math.floor(p.walk) % 8 : 0);
   spr(SPR[`${key}_${d}_${f}${flip ? '_f' : ''}`], x, y + 7 - lift, { scale, white: hurt });
+}
+function drawTwinkle(x, y, big) {
+  R(x, y - (big ? 3 : 2), 1, big ? 7 : 5, '#ffffff'); R(x - (big ? 3 : 2), y, big ? 7 : 5, 1, '#ffffff'); R(x, y, 1, 1, '#ffe066');
 }
 
 function drawJonSprite(x, y, spin, blink) {
@@ -37,6 +49,8 @@ function drawJon() {
   const j = G.jon, x = j.x - G.cam.x, y = j.y - G.cam.y;
   drawSlash();
   if (j.mode === 'follow') shadowAt(x, y + 18, 0.6);
+  (j.trail || []).forEach((tr, i) => { ctx.globalAlpha = 0.12 + i * 0.07; drawJonSprite(tr.x - G.cam.x, tr.y - G.cam.y, tr.spin); });
+  ctx.globalAlpha = 1;
   drawJonSprite(x, y, j.spin, j.t % 3.2 < 0.14);
   if (j.qt > 0 && j.quip && G.state === 'play') {
     ctx.font = FONT;
@@ -53,7 +67,8 @@ function drawEnemy(e) {
     case 'penguin': case 'knight': case 'king': {
       const s = e.type === 'king' ? 3 : e.type === 'knight' ? 2 : 1;
       const { d, flip } = dirOf(e.fx, e.fy);
-      const shake = e.type === 'king' && (e.st === 'wind' || e.st === 'slide') ? Math.round(rnd(-1, 1)) : 0;
+      const waddle = e.st === 'daze' || e.st === 'slide' ? 0 : [0, 1, 0, -1][Math.floor(e.wob / 2.5) % 4] * s;
+      const shake = (e.type === 'king' && (e.st === 'wind' || e.st === 'slide') ? Math.round(rnd(-1, 1)) : 0) + waddle;
       shadowAt(x, y + 5 * s, s);
       const img = SPR[`peng_${d}_${e.st === 'daze' ? 0 : f}${flip ? '_f' : ''}`];
       const foot = y + 6 * s;
@@ -107,7 +122,8 @@ function drawStar(x, y) { R(x - 1, y - 3, 2, 6, '#ffe066'); R(x - 3, y - 1, 6, 2
 function drawPerson(x, y, id, bob) {
   const b = Math.round(Math.sin(G.t * 2 + bob) * 0.6);
   shadowAt(x, y + 6, 1);
-  spr(SPR['npc_' + id] || SPR.npc_sven, x, y + 7 + b);
+  const blink = (G.t + bob) % 3.6 < 0.13;
+  spr(SPR['npc_' + id + (blink ? '_blink' : '')] || SPR.npc_sven, x, y + 7 + b);
 }
 const LOOKS = {
   astrid: { shirt: '#6b3fa0', hair: '#e8e8e8', long: true },
