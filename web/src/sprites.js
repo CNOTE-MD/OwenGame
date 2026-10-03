@@ -149,7 +149,7 @@ function drawThing(e) {
       if (e.life !== undefined && e.life < 2 && Math.floor(t * 10) % 2) break;
       const b = Math.round(Math.sin(t * 4 + e.x) * 1.5);
       if (e.what === 'heart') drawHeart(x - 3, y - 3 + b, 1);
-      else if (e.what === 'kr1' || e.what === 'kr5') { R(x - 3, y - 3 + b, 6, 6, e.what === 'kr5' ? '#ffd84a' : '#d0d6e0'); R(x - 1, y - 2 + b, 2, 4, e.what === 'kr5' ? '#a87a10' : '#8a92a0'); }
+      else if (e.what === 'kr1' || e.what === 'kr5' || e.what === 'krn') { R(x - 3, y - 3 + b, 6, 6, (e.what === 'kr5' || e.value >= 5) ? '#ffd84a' : '#d0d6e0'); R(x - 1, y - 2 + b, 2, 4, (e.what === 'kr5' || e.value >= 5) ? '#a87a10' : '#8a92a0'); }
       else if (e.what === 'rune') drawItemIcon('shard', x, y + b);
       else drawItemIcon(e.what, x, y + b);
       break; }

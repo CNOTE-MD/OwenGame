@@ -679,5 +679,40 @@ const MAPS = {
 ]
 }
 ]
+},
+"arena": {
+"name": "Valhalla Arena",
+"rows": [
+"VVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVV",
+"VVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVV",
+"VaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaV",
+"VaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaV",
+"VaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaV",
+"Vaaaaaaaaaaaaaa##aaaaaaaaaaaaaaV",
+"VaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaV",
+"Vaaaaaa#aaaaaaaaaaaaaaaa#aaaaaaV",
+"VaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaV",
+"VaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaV",
+"VaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaV",
+"VaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaV",
+"VaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaV",
+"VaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaV",
+"VaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaV",
+"VaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaV",
+"VaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaV",
+"VaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaV",
+"VaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaV",
+"VaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaV",
+"Vaaaaaa#aaaaaaaaaaaaaaaa#aaaaaaV",
+"VaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaV",
+"Vaaaaaaaaaaaaaa##aaaaaaaaaaaaaaV",
+"VaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaV",
+"VaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaV",
+"VaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaV",
+"VaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaV",
+"VVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVV"
+],
+"ents": [],
+"arena": true
 }
 };

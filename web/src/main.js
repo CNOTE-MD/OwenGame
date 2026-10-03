@@ -1,6 +1,7 @@
 // State machine and main loop.
 
 function newGame() {
+  G.mode = 'story'; G.st = baseStats();
   G.save = newSave();
   G.player = makePlayer(); G.jon = makeJon();
   const st = MAPS.home.ents.find(e => e.t === 'start').at;
@@ -9,6 +10,7 @@ function newGame() {
   say(STORY.intro);
 }
 function continueGame() {
+  G.mode = 'story'; G.st = baseStats();
   G.save = readSave() || newSave();
   G.player = makePlayer(); G.jon = makeJon();
   G.player.hp = G.save.maxHp;
@@ -53,6 +55,7 @@ function update(dt) {
       if (just('a') || just('menu') || just('tap')) {
         const o = opts[G.menuSel];
         if (o.disabled) { Sound.play('clank'); break; }
+        if (o.id === 'arena') { startArena(); break; }
         if (o.id === 'continue') continueGame();
         else if (o.id === 'new') {
           if (readSave() && !G.confirmErase) { G.confirmErase = true; break; }
@@ -73,18 +76,20 @@ function update(dt) {
     case 'over':
       if (just('a') || just('menu') || just('tap')) { continueGame(); }
       return;
+    case 'levelup': case 'shop': case 'arenapause': case 'arenaover': updateArenaMenus(); return;
     case 'thunder': updateThunder(dt); updateFx(dt); return;
   }
   // play
   if (G.trans) { updateTransition(dt); return; }
-  if (just('menu')) { G.state = 'menu'; Sound.play('menu'); return; }
+  if (just('menu')) { G.state = G.mode === 'arena' ? 'arenapause' : 'menu'; Sound.play('menu'); return; }
   const s = G.save;
   if (s.items.thunder) { G.runeT = (G.runeT || 0) + dt; if (G.runeT > 5) { G.runeT = 0; s.rune = Math.min(RUNE_MAX, s.rune + 1); } }
   updatePlayer(dt);
   if (G.state !== 'play') return;
   updateJon(dt);
+  if (G.mode === 'arena') { updateArena(dt); if (G.state !== 'play') return; }
   for (const e of G.ents.slice()) {
-    if (e.kind === 'enemy' && e.alive) updateEnemy(e, dt);
+    if (e.kind === 'enemy' && e.alive) { if (e.slow > 0) { e.slow -= dt; updateEnemy(e, dt * 0.5); } else updateEnemy(e, dt); }
     else if (e.kind === 'pickup') updatePickup(e, dt);
     else if (e.kind === 'switch') e.cd = Math.max(0, e.cd - dt);
     if (G.state !== 'play') break;
@@ -104,17 +109,19 @@ function render() {
   const list = G.ents.filter(e => e.kind !== 'warp' || e.portal).map(e => ({ y: e.y, f: () => drawThing(e) }));
   list.push({ y: p.y, f: () => drawOwen(p.x - G.cam.x, p.y - G.cam.y) });
   list.sort((a, b) => a.y - b.y).forEach(o => o.f());
+  if (G.mode === 'arena') drawArenaWorld();
   if (!p.hold) drawJon();
   drawFx();
   drawLightning();
   ctx.setTransform(1, 0, 0, 1, 0, 0);
   if (G.map.dungeon) { const g = ctx.createRadialGradient(p.x - G.cam.x, p.y - G.cam.y, 40, p.x - G.cam.x, p.y - G.cam.y, 200); g.addColorStop(0, 'rgba(0,0,20,0)'); g.addColorStop(1, 'rgba(0,0,20,.45)'); ctx.fillStyle = g; ctx.fillRect(0, 0, VW, VH); }
   if (G.flash > 0) { ctx.globalAlpha = Math.min(1, G.flash * 3); R(0, 0, VW, VH, G.flashColor || '#fff'); ctx.globalAlpha = 1; }
-  drawHud();
+  if (G.mode === 'arena') drawArenaHud(); else drawHud();
   if (G.state === 'warp') { ctx.globalAlpha = clamp(1 - Math.abs(G.warp.t - 0.35) / 0.35, 0, 1); R(0, 0, VW, VH, '#000'); ctx.globalAlpha = 1; }
   if (G.bannerT > 0) { R(0, 92, VW, 34, 'rgba(0,0,0,.8)'); text(G.banner, VW / 2, 113, '#ffd84a', 'center'); }
   if (G.state === 'talk') drawTalk();
   if (G.state === 'menu') drawMenu();
+  drawArenaMenus();
   if (G.state === 'over') {
     R(0, 0, VW, VH, 'rgba(40,0,0,.8)');
     text('GAME OVER', VW / 2, 96, '#ff6b6b', 'center');

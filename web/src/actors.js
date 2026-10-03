@@ -79,8 +79,9 @@ function updatePlayer(dt) {
   const v = inputVec();
   if (v.x || v.y) { p.fx = v.x; p.fy = v.y; p.walk += dt * 10; }
   const onIce = tileAt(p.x, p.y) === 'i';
-  if (onIce) { const k = Math.min(1, 2.2 * dt); p.vx += (v.x * 80 - p.vx) * k; p.vy += (v.y * 80 - p.vy) * k; }
-  else { p.vx = v.x * 72; p.vy = v.y * 72; }
+  const spd = 72 * G.st.speed;
+  if (onIce) { const k = Math.min(1, 2.2 * dt); p.vx += (v.x * spd * 1.1 - p.vx) * k; p.vy += (v.y * spd * 1.1 - p.vy) * k; }
+  else { p.vx = v.x * spd; p.vy = v.y * spd; }
   const hit = tryMove(p, p.vx * dt, p.vy * dt, 5, 'player');
   if (onIce) { if (hit.hitX) p.vx *= -0.3; if (hit.hitY) p.vy *= -0.3; }
   const kl = Math.hypot(p.kx, p.ky);
@@ -143,10 +144,12 @@ function tryUnlock(tx, ty, c) {
 function hurtPlayer(dmg, from, force) {
   const p = G.player, s = G.save;
   if (!force && (p.inv > 0 || p.launching || G.state !== 'play')) return;
+  if (!force && G.st.armor > 0 && Math.random() < Math.min(0.6, G.st.armor * 0.1)) { p.inv = 0.4; floatText(p.x, p.y - 18, 'BLOCK', '#9fd0ff'); Sound.play('clank'); return; }
   p.hp -= dmg; p.inv = 1; Sound.play('hurt'); G.shake = 0.15;
   if (from) { const d = Math.hypot(p.x - from.x, p.y - from.y) || 1; p.kx = (p.x - from.x) / d * 170; p.ky = (p.y - from.y) / d * 170; }
   if (p.hp > 0) return;
   if (s.potions > 0) { s.potions--; p.hp = s.maxHp; p.inv = 2; Sound.play('heart'); return say(STORY.juice); }
+  if (G.mode === 'arena') { p.hp = 0; return arenaOver(false); }
   if (s.voodoo) { s.voodoo = false; p.hp = s.maxHp; p.inv = 2.5; puff(p.x, p.y, '#9a4dd9', 16); Sound.play('secret'); return say(STORY.revive); }
   p.hp = 0; G.state = 'over'; G.menuSel = 0;
 }
@@ -220,7 +223,7 @@ function makeJon() {
   j.swing = a => { j.mode = 'swing'; j.st = 0; j.base = a; j.hit = []; };
   j.throw = (x, y, fx, fy) => {
     j.mode = 'out'; j.x = x; j.y = y; j.trav = 0; j.hit = [];
-    const l = Math.hypot(fx, fy) || 1, sp = 200; j.vx = fx / l * sp; j.vy = fy / l * sp;
+    const l = Math.hypot(fx, fy) || 1, sp = 200 * G.st.atk; j.vx = fx / l * sp; j.vy = fy / l * sp;
     j.target = G.save.items.homing ? findTarget(x, y, fx / l, fy / l) : null;
   };
   return j;
@@ -239,20 +242,20 @@ function findTarget(x, y, fx, fy) {
 function updateJon(dt) {
   const j = G.jon, p = G.player;
   j.t += dt;
-  const range = G.save.items.homing ? 175 : 88;
+  const range = (G.save.items.homing ? 175 : 88) * G.st.range;
   if (j.mode === 'follow') {
     const tx = p.x + 10, ty = p.y - 14 + Math.sin(j.t * 3) * 2, k = Math.min(1, 8 * dt);
     j.x += (tx - j.x) * k; j.y += (ty - j.y) * k; j.spin = 0;
   } else if (j.mode === 'swing') {
     j.st += dt;
-    const k = j.st / 0.2, a = j.base + (-1.3 + 2.6 * k);
+    const k = j.st / (0.2 / G.st.atk), a = j.base + (-1.3 + 2.6 * k);
     j.x = p.x + Math.cos(a) * 15; j.y = p.y + Math.sin(a) * 15; j.spin = a + Math.PI / 2;
     jonHits(1, 11, p, 'swing');
     cutAt(j.x, j.y);
     if (k >= 1) j.mode = 'follow';
   } else if (j.mode === 'out') {
     if (j.target && (j.target.alive || j.target.hittable) && G.ents.includes(j.target)) {
-      const dx = j.target.x - j.x, dy = j.target.y - j.y, d = Math.hypot(dx, dy) || 1, sp = 210;
+      const dx = j.target.x - j.x, dy = j.target.y - j.y, d = Math.hypot(dx, dy) || 1, sp = 210 * G.st.atk;
       const k = Math.min(1, 9 * dt); j.vx += (dx / d * sp - j.vx) * k; j.vy += (dy / d * sp - j.vy) * k;
     }
     j.x += j.vx * dt; j.y += j.vy * dt; j.trav += Math.hypot(j.vx, j.vy) * dt; j.spin += dt * 22;
@@ -260,7 +263,7 @@ function updateJon(dt) {
     if (cutAt(j.x, j.y) || j.trav > range || solidAt(j.x, j.y, 'jon')) { j.mode = 'back'; j.hit = []; }
   } else if (j.mode === 'back') {
     const dx = p.x - j.x, dy = p.y - j.y, d = Math.hypot(dx, dy) || 1;
-    j.x += dx / d * 240 * dt; j.y += dy / d * 240 * dt; j.spin += dt * 22;
+    j.x += dx / d * 240 * G.st.atk * dt; j.y += dy / d * 240 * G.st.atk * dt; j.spin += dt * 22;
     jonHits(1, 9, j, 'throw');
     if (d < 9) j.mode = 'follow';
   }
@@ -278,8 +281,9 @@ function jonHits(dmg, reach, from, how) {
     if (!e.enemy || !e.alive) continue;
     if (dist(j, e) < reach + e.r) {
       j.hit.push(e);
-      const blockedHit = damageEnemy(e, dmg, from, how);
+      const blockedHit = damageEnemy(e, rollDamage(dmg), from, how);
       if (blockedHit && how === 'throw') j.mode = 'back';
+      else if (!blockedHit && G.mode === 'arena') arenaOnHit(e);
     }
   }
 }
@@ -298,17 +302,28 @@ function hitSwitch(e) {
   else Sound.play('switch');
 }
 
+// damage with Owen's stats; crits double it
+function rollDamage(base) {
+  let d = base * G.st.dmg;
+  if (G.st.crit > 0 && Math.random() < G.st.crit) { d *= 2; G.lastCrit = true; } else G.lastCrit = false;
+  return d;
+}
+
 // ---------- enemies ----------
 function damageEnemy(e, dmg, from, how) {
-  if (e.flash > 0.05 && how !== 'thunder') return false;
+  // how: 'swing' | 'throw' (Jon), 'thunder' (Thunder Strike), 'magic' (arena weapons)
+  const jonHit = how === 'swing' || how === 'throw';
+  if (e.flash > 0.05 && jonHit) return false;
   const dx = from.x - e.x, dy = from.y - e.y, d = Math.hypot(dx, dy) || 1;
-  if (how !== 'thunder') {
-    if (e.shield && (dx / d * e.fx + dy / d * e.fy) > 0.55 && e.st !== 'charge') { Sound.play('clank'); puff(e.x + e.fx * 8, e.y + e.fy * 8, '#ffd84a', 4); return true; }
-    if (e.type === 'king' && e.st !== 'daze') { Sound.play('clank'); floatText(e.x, e.y - 30, 'CLANK', '#ffd84a'); return true; }
+  if (jonHit && e.shield && (dx / d * e.fx + dy / d * e.fy) > 0.55 && e.st !== 'charge') { Sound.play('clank'); puff(e.x + e.fx * 8, e.y + e.fy * 8, '#ffd84a', 4); return true; }
+  if (e.type === 'king' && e.st !== 'daze' && how !== 'thunder') {
+    if (jonHit) { Sound.play('clank'); floatText(e.x, e.y - 30, 'CLANK', '#ffd84a'); }
+    return true;
   }
   if (e.type === 'king' && how === 'thunder') { e.st = 'daze'; e.t = 0; dmg = 2; }
   e.hp -= dmg; e.flash = 0.18; Sound.play('hit');
-  const k = e.boss ? 60 : 150; e.kx = -dx / d * k; e.ky = -dy / d * k;
+  if (G.mode === 'arena') floatText(e.x, e.y - 12, String(Math.round(dmg * 10) / 10), G.lastCrit ? '#ffd84a' : '#fff');
+  const k = (e.boss ? 60 : 150) * G.st.knock; e.kx = -dx / d * k; e.ky = -dy / d * k;
   if (e.hp <= 0) killEnemy(e);
   return false;
 }
@@ -318,6 +333,7 @@ function killEnemy(e) {
   puff(e.x, e.y, '#fff', e.boss ? 24 : 9); Sound.play('kill');
   const s = G.save;
   if (s.items.thunder) s.rune = Math.min(RUNE_MAX, s.rune + 1);
+  if (G.mode === 'arena') return arenaKill(e);
   if (!e.boss) maybeDrop(e.x, e.y, 0.65);
   if (e.type === 'king') { G.shake = 0.6; say(STORY.king_down, checkRoomClear); return; }
   checkRoomClear();
@@ -339,10 +355,10 @@ function updateEnemy(e, dt) {
   const toward = sp => tryMove(e, dx / d * sp * dt, dy / d * sp * dt, mr, who);
   switch (e.type) {
     case 'penguin':
-      if (d < 120) { toward(e.speed); e.fx = dx / d; e.fy = dy / d; }
+      if (d < 120 || e.aggro) { toward(e.speed); e.fx = dx / d; e.fy = dy / d; }
       break;
     case 'draugr':
-      if (d < 110) { e.fx = dx / d; e.fy = dy / d; toward(e.speed); }
+      if (d < 110 || e.aggro) { e.fx = dx / d; e.fy = dy / d; toward(e.speed); }
       else { if (e.t > 2) { e.t = 0; e.tx = e.x + rnd(-30, 30); e.ty = e.y + rnd(-30, 30); }
         const ax = e.tx - e.x, ay = e.ty - e.y, al = Math.hypot(ax, ay); if (al > 2) { e.fx = ax / al; e.fy = ay / al; tryMove(e, ax / al * 14 * dt, ay / al * 14 * dt, mr, who); } }
       break;
@@ -364,7 +380,8 @@ function updateEnemy(e, dt) {
       if (e.st === 'intro') { if (G.state === 'play') { e.st = 'waddle'; e.t = 0; } break; }
       if (!e.summoned && e.hp <= 5) {
         e.summoned = true;
-        spawnEnemy('penguin', G.cam.x + 40, G.cam.y + 60); spawnEnemy('penguin', G.cam.x + VW - 40, G.cam.y + 60);
+        if (G.mode === 'arena') { arenaSpawn('penguin', e.x - 40, e.y); arenaSpawn('penguin', e.x + 40, e.y); }
+        else { spawnEnemy('penguin', G.cam.x + 40, G.cam.y + 60); spawnEnemy('penguin', G.cam.x + VW - 40, G.cam.y + 60); }
       }
       if (e.st === 'waddle') { e.fx = dx / d; e.fy = dy / d; toward(e.speed); if (e.t > 2.2) { e.st = 'wind'; e.t = 0; Sound.play('charge'); } }
       else if (e.st === 'wind') { e.fx = dx / d; e.fy = dy / d; if (e.t > 0.6) { e.st = 'slide'; e.t = 0; e.bounces = 0; } }
@@ -381,13 +398,16 @@ function updateEnemy(e, dt) {
 
 function updatePickup(e, dt) {
   if (e.life !== undefined) { e.life -= dt; if (e.life <= 0) { G.ents = G.ents.filter(o => o !== e); return; } }
-  if (dist(e, G.player) > 11) return;
+  const dp = dist(e, G.player);
+  if (G.mode === 'arena' && (dp < G.st.pickup || e.magnet)) { const k = Math.min(1, 9 * dt); e.x += (G.player.x - e.x) * k; e.y += (G.player.y - e.y) * k; }
+  if (dp > 11) return;
   G.ents = G.ents.filter(o => o !== e);
   const s = G.save, p = G.player;
   switch (e.what) {
     case 'heart': p.hp = Math.min(s.maxHp, p.hp + 2); Sound.play('heart'); break;
     case 'kr1': s.kr += 1; Sound.play('coin'); break;
     case 'kr5': s.kr += 5; Sound.play('coin'); break;
+    case 'krn': s.kr += e.value; Sound.play('coin'); break;
     case 'rune': s.rune = Math.min(RUNE_MAX, s.rune + 4); Sound.play('heart'); break;
     case 'piece': case 'container':
       setFlag('got:' + e.id);

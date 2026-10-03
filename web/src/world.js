@@ -1,6 +1,6 @@
 // Game state, maps, tiles, collision and screen-by-screen camera (like A Link to the Past).
 const G = {
-  state: 'title', t: 0,
+  state: 'title', t: 0, mode: 'story', st: null,
   save: null,                 // persistent progress (see newSave)
   mapId: '', map: null, rows: null, cols: 0, nrows: 0,
   scr: { x: 0, y: 0 }, cam: { x: 0, y: 0 }, trans: null,
@@ -15,7 +15,11 @@ function newSave() {
     items: {}, flags: {}, keys: {}, bigkeys: {}, voodoo: true };
 }
 const SAVE_KEY = 'jontuka-save-v1';
+// Stats Owen carries. Story mode uses the defaults; the Arena upgrades them.
+function baseStats() { return { dmg: 1, speed: 1, atk: 1, range: 1, pickup: 28, armor: 0, regen: 0, crit: 0, knock: 1 }; }
+G.st = baseStats();
 function writeSave() {
+  if (G.mode === 'arena') return;
   const s = G.save, p = G.player;
   if (p) { s.x = p.x; s.y = p.y; s.hp = p.hp; s.map = G.mapId; }
   try { localStorage.setItem(SAVE_KEY, JSON.stringify(s)); } catch (e) { /* storage blocked: progress lives for this visit only */ }
@@ -27,7 +31,7 @@ const flag = k => !!G.save.flags[k];
 const setFlag = k => { G.save.flags[k] = true; };
 
 // ---------- tiles ----------
-const SOLID = new Set('T#MwHRDPqX+lWtOYQZxLKb'.split(''));
+const SOLID = new Set('T#MwHRDPqX+lWtOYQZxLKbV'.split(''));
 function tile(tx, ty) {
   if (tx < 0 || ty < 0 || tx >= G.cols || ty >= G.nrows) return G.map.dungeon ? 'W' : 'T';
   return G.rows[ty][tx];
@@ -35,14 +39,14 @@ function tile(tx, ty) {
 const tileAt = (x, y) => tile(Math.floor(x / T), Math.floor(y / T));
 function setTile(tx, ty, c) { G.rows[ty][tx] = c; }
 function screenOf(x, y) { return { x: Math.floor(x / VW), y: Math.floor(y / VH) }; }
-const sameScreen = (tx, ty) => Math.floor(tx / SW) === G.scr.x && Math.floor(ty / SH) === G.scr.y;
+const sameScreen = (tx, ty) => (G.map && G.map.arena) || (Math.floor(tx / SW) === G.scr.x && Math.floor(ty / SH) === G.scr.y);
 function shutterClosed(tx, ty) { return sameScreen(tx, ty) && G.roomEnemies && G.ents.some(e => e.enemy && e.alive); }
 function gatesDown() { return flag(G.mapId + ':gates'); }
 
 // who: 'player' | 'walker' | 'flyer' | 'jon'
 function solidTile(tx, ty, who) {
   const c = tile(tx, ty);
-  if (who === 'flyer') return c === 'W' || c === 'T' || c === 'M' || c === 'Z';
+  if (who === 'flyer') return c === 'W' || c === 'T' || c === 'M' || c === 'Z' || c === 'V';
   if (c === 'h') return shutterClosed(tx, ty);
   if (c === 'G') return !gatesDown();
   if (who === 'jon') return SOLID.has(c) && c !== 'b' && c !== 'O' && c !== 'x' && c !== 'w' && c !== 'Q';
@@ -54,7 +58,7 @@ function blocked(x, y, r, who, self) {
   if (solidAt(x - r, y - r, who) || solidAt(x + r, y - r, who) || solidAt(x - r, y + r, who) || solidAt(x + r, y + r, who)) return true;
   // keep actors inside the current screen
   const sx = G.scr.x * VW, sy = G.scr.y * VH;
-  if (who !== 'player' && (x - r < sx || x + r > sx + VW || y - r < sy || y + r > sy + VH)) return true;
+  if (who !== 'player' && !G.map.arena && (x - r < sx || x + r > sx + VW || y - r < sy || y + r > sy + VH)) return true;
   if (who === 'player' || who === 'walker') {
     for (const e of G.ents) if (e.solid && e !== self && Math.abs(e.x - x) < 7 + r && Math.abs(e.y - y) < 7 + r) return true;
   }
@@ -120,6 +124,7 @@ function checkRoomClear() {
 
 // screen transitions: when Owen walks off the edge, slide the camera to the next screen
 function checkScreenEdge() {
+  if (G.map.arena) return;
   const p = G.player, s = screenOf(p.x, p.y);
   if (s.x === G.scr.x && s.y === G.scr.y) return;
   const dx = Math.sign(s.x - G.scr.x), dy = Math.sign(s.y - G.scr.y);
@@ -158,6 +163,7 @@ function nearestDry(px, py) {
 const SNOWY = (tx, ty) => G.mapId === 'overworld' && Math.floor(ty / SH) === 0 && Math.floor(tx / SW) >= 2;
 function groundColor(tx, ty) {
   if (G.map.dungeon) return '#5b6b8c';
+  if (G.map.arena) return '#8a7a5a';
   if (G.mapId === 'home') return '#a8703c';
   return SNOWY(tx, ty) ? '#e8eef7' : '#549a3d';
 }
@@ -214,6 +220,8 @@ function drawTile(c, ox, oy, tx, ty) {
     case 'Y': R(ox, oy, T, T, '#a8703c'); { const top = tile(tx, ty - 1) !== 'Y'; R(ox + 1, oy, 14, T, '#2f5aa8'); if (top) R(ox + 2, oy + 2, 12, 5, '#f2f2f2'); } break;
     case 'Q': R(ox, oy, T, T, ground === '#549a3d' ? '#dbc780' : ground); R(ox, oy + 4, T, 9, '#8a5a2b'); R(ox, oy + 4, T, 2, '#b07a4e'); R(ox + 1, oy + 13, 2, 3, '#5e3f1f'); R(ox + 13, oy + 13, 2, 3, '#5e3f1f'); break;
     case 'd': R(ox, oy, T, T, '#3a2a1a'); R(ox + 1, oy, 14, T, '#5e3f1f'); R(ox + 2, oy + 12, 12, 4, '#a83a3a'); break;
+    case 'a': R(ox, oy, T, T, '#8a7a5a'); R(ox, oy, T, 1, '#6e6146'); R(ox, oy, 1, T, '#6e6146'); if ((tx + ty) % 4 === 0) R(ox + 4, oy + 4, 8, 8, '#93835f'); if (h < 8) R(ox + 6, oy + 9, 3, 1, '#5e5238'); break;
+    case 'V': R(ox, oy, T, T, '#3a2e1e'); R(ox + 1, oy + 1, 14, 14, '#5a4630'); R(ox, oy + 7, T, 2, '#c9a227'); if (tx % 4 === 0 && ty <= 1) { R(ox + 5, oy + 1, 6, 6, '#b33a2e'); R(ox + 7, oy + 2, 2, 4, '#ffd84a'); } break;
     case 'r': R(ox, oy, T, T, '#a83a3a'); R(ox + 2, oy + 2, 12, 12, '#c25a3a'); if ((tx + ty) % 2) R(ox + 6, oy + 6, 4, 4, '#ffd84a'); break;
     default: R(ox, oy, T, T, ground);
   }

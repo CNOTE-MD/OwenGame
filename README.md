@@ -9,9 +9,10 @@
 | `web/src/story.js` | Every word in the game. Owen can edit this. |
 | `tools/maps.py` | ASCII maps for Norway, the Ice Cavern and Owen's room, plus a reachability checker |
 | `web/src/*.js` | Engine, world, actors, sprites, UI, main loop |
+| `web/src/arena.js` | Valhalla Arena: waves, shop cards, level-ups (tune or add cards here) |
 | `STORY_BIBLE.md` | Characters, chapter arc, items, the Red-Eye side quest, Arena mode |
 
-Rebuild: `python3 tools/maps.py && python3 tools/build_web.py`. Test: `NODE_PATH=$(npm root -g) node tests/web_playtest.js`.
+Rebuild: `python3 tools/maps.py && python3 tools/build_web.py`. Test: `NODE_PATH=$(npm root -g) node tests/web_playtest.js` and `node tests/arena_playtest.js` (same NODE_PATH).
 
 ## Godot prototype (frozen)
 
