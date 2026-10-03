@@ -55,6 +55,10 @@ const SHOTS = process.env.SHOTS || '/tmp';
   await wait(200);
   await pg.screenshot({ path: SHOTS + '/p3_airstrip.png' });
 
+  // big scenery: 2x2 trees with walkable canopies, buildings found from the map
+  await check('big trees and buildings built', await ev(() => G.bigs.filter(b => b.kind === 'tree').length > 50 && G.bigs.filter(b => b.kind === 'house').length === 3));
+  await check('Owen can walk behind a tree canopy', await ev(() => { const k = [...G.canopy][0], x = k % G.cols, y = Math.floor(k / G.cols); return tile(x, y) === 'T' && !solidTile(x, y, 'player') && solidTile(x, y + 1, 'player'); }));
+
   // screen transition: walk west off the airstrip screen
   await place(17, 33, -1, 0);
   const before = await ev(() => G.scr.x);
@@ -115,10 +119,12 @@ const SHOTS = process.env.SHOTS || '/tmp';
   await goScreen('cavern', 8, 20); await ev(() => { G.ents = G.ents.filter(e => !e.enemy); });
   await ev(() => { const e = makeEnemy('draugr', 8 * 16 + 8, 18 * 16 + 8); e.fx = 0; e.fy = 1; e.t = 0; G.ents.push(e); G.roomEnemies = true; });
   await place(8, 19, 0, -1); await pg.keyboard.press('KeyZ'); await wait(300);
-  await check('draugr blocks from the front', await ev(() => G.ents.find(e => e.type === 'draugr').hp === 4));
-  await ev(() => { const e = G.ents.find(e => e.type === 'draugr'); e.t = 0; e.x = 8 * 16 + 8; e.y = 18 * 16 + 8; e.fx = 0; e.fy = 1; });
+  await check('draugr shield blocks the first frontal hit and staggers', await ev(() => { const e = G.ents.find(e => e.type === 'draugr'); return e.hp === e.max && e.guardDown > 0; }));
+  await ev(() => { const e = G.ents.find(e => e.type === 'draugr'); damageEnemy(e, 1, G.player, 'swing'); });
+  await check('second frontal hit lands while staggered', await ev(() => { const e = G.ents.find(e => e.type === 'draugr'); return !e || e.hp < e.max; }));
+  await ev(() => { const e = G.ents.find(e => e.type === 'draugr'); if (e) { e.hp = e.max; e.guardDown = 0; e.flash = 0; e.kx = e.ky = 0; e.t = 0; e.x = 8 * 16 + 8; e.y = 18 * 16 + 8; e.fx = 0; e.fy = 1; } });
   await place(8, 17, 0, 1); await pg.keyboard.press('KeyZ'); await wait(300);
-  await check('draugr takes damage from behind', await ev(() => { const e = G.ents.find(e => e.type === 'draugr'); return !e || e.hp < 4; }));
+  await check('draugr takes damage from behind', await ev(() => { const e = G.ents.find(e => e.type === 'draugr'); return !e || e.hp < e.max; }));
   await goScreen('cavern', 24, 20); await ev(() => { G.ents = G.ents.filter(e => !e.enemy); G.roomEnemies = false; });
 
   // boss door needs big key
@@ -153,6 +159,8 @@ const SHOTS = process.env.SHOTS || '/tmp';
   const maxHp = await ev(() => G.save.maxHp);
   await place(22, 7, 0, 1); await wait(1400); await talkThrough();
   await check('heart container +1 heart', await ev(() => G.save.maxHp) === maxHp + 2);
+  // animation frames exist for every direction
+  await check('8-frame walk + 3-frame attack sprites built', await ev(() => ['down', 'up', 'side'].every(d => [0, 1, 2, 3, 4, 5, 6, 7].every(i => SPR[`owen_${d}_w${i}`] && SPR[`zombie_${d}_w${i}_f`]) && [0, 1, 2].every(i => SPR[`owen_${d}_a${i}`]))));
   // menu
   await pg.keyboard.press('Enter'); await wait(100);
   await pg.screenshot({ path: SHOTS + '/p7_menu.png' });
@@ -168,9 +176,12 @@ const SHOTS = process.env.SHOTS || '/tmp';
 
   // game over path: potion, voodoo, then over
   await ev(() => { G.save.potions = 0; G.save.voodoo = true; G.player.inv = 0; G.state = 'play'; hurtPlayer(99, G.player); });
+  await check('death spin plays first', await ev(() => G.state === 'dying'));
+  await pg.waitForFunction(() => G.state !== 'dying', null, { timeout: 5000 });
   await talkThrough();
   await check('voodoo revive', await ev(() => !G.save.voodoo && G.player.hp === G.save.maxHp));
   await ev(() => { G.player.inv = 0; G.state = 'play'; hurtPlayer(99, G.player); });
+  await pg.waitForFunction(() => G.state !== 'dying', null, { timeout: 5000 });
   await check('game over after voodoo used', await ev(() => G.state === 'over'));
   await ev(() => { G.save.cp = { map: 'overworld', x: 39 * 16 + 8, y: 4 * 16 + 8 }; writeSave(); });
   await pg.keyboard.press('KeyZ'); await wait(150); await talkThrough();
