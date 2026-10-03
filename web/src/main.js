@@ -112,6 +112,7 @@ function render() {
   const p = G.player;
   const list = G.ents.filter(e => e.kind !== 'warp' || e.portal).map(e => ({ y: e.y, f: () => drawThing(e) }));
   list.push({ y: p.y, f: () => drawOwen(p.x - G.cam.x, p.y - G.cam.y) });
+  list.push(...bigDrawList());
   list.sort((a, b) => a.y - b.y).forEach(o => o.f());
   if (G.mode === 'arena') drawArenaWorld();
   if (!p.hold) drawJon();

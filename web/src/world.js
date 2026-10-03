@@ -46,6 +46,7 @@ function gatesDown() { return flag(G.mapId + ':gates'); }
 // who: 'player' | 'walker' | 'flyer' | 'jon'
 function solidTile(tx, ty, who) {
   const c = tile(tx, ty);
+  if (c === 'T' && isCanopy(tx, ty)) return false;   // walk behind big tree tops
   if (who === 'flyer') return c === 'W' || c === 'T' || c === 'M' || c === 'Z' || c === 'V';
   if (c === 'h') return shutterClosed(tx, ty);
   if (c === 'G') return !gatesDown();
@@ -76,6 +77,7 @@ function loadMap(id, px, py) {
   G.mapId = id; G.map = MAPS[id];
   G.rows = G.map.rows.map(r => [...r]);
   G.nrows = G.rows.length; G.cols = G.rows[0].length;
+  computeBigs();
   // reapply opened doors from the save
   for (const k in G.save.flags) {
     const m = k.match(/^open:(\w+):(\d+),(\d+)$/);
@@ -231,7 +233,7 @@ function drawMap() {
   const x0 = Math.floor(cx / T), y0 = Math.floor(cy / T);
   for (let ty = y0; ty <= y0 + SH; ty++) for (let tx = x0; tx <= x0 + SW; tx++) {
     if (tx < 0 || ty < 0 || tx >= G.cols || ty >= G.nrows) continue;
-    const c = G.rows[ty][tx], ox = tx * T - cx, oy = ty * T - cy;
+    const c = claimedGround(tx, ty) || G.rows[ty][tx], ox = tx * T - cx, oy = ty * T - cy;
     if (!drawTileArt(c, ox, oy, tx, ty)) drawTile(c, ox, oy, tx, ty);
   }
 }

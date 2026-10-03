@@ -55,6 +55,10 @@ const SHOTS = process.env.SHOTS || '/tmp';
   await wait(200);
   await pg.screenshot({ path: SHOTS + '/p3_airstrip.png' });
 
+  // big scenery: 2x2 trees with walkable canopies, buildings found from the map
+  await check('big trees and buildings built', await ev(() => G.bigs.filter(b => b.kind === 'tree').length > 50 && G.bigs.filter(b => b.kind === 'house').length === 3));
+  await check('Owen can walk behind a tree canopy', await ev(() => { const k = [...G.canopy][0], x = k % G.cols, y = Math.floor(k / G.cols); return tile(x, y) === 'T' && !solidTile(x, y, 'player') && solidTile(x, y + 1, 'player'); }));
+
   // screen transition: walk west off the airstrip screen
   await place(17, 33, -1, 0);
   const before = await ev(() => G.scr.x);
