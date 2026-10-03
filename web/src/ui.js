@@ -104,13 +104,13 @@ function drawTitle() {
   text('A VIKING TALE', VW / 2, 80, '#f3ecd2', 'center');
   text('a game by Owen', VW / 2, 96, '#a79fc4', 'center');
   drawJonSprite(VW / 2 + 74 + Math.sin(G.t * 2) * 3, 124, Math.sin(G.t * 1.5) * 0.3);
-  const opts = titleOptions();
+  const opts = G.titleOpts || titleOptions();
   opts.forEach((o, i) => {
     const sel = i === G.menuSel;
     text((sel ? '> ' : '  ') + o.label, VW / 2 - 58, 170 + i * 14, o.disabled ? '#55577a' : sel ? '#ffd84a' : '#f3ecd2');
   });
   if (G.confirmErase) text('Press Z again to erase your save', VW / 2, 218, '#ff8a8a', 'center');
-  const best = arenaBest(); if (best && !G.confirmErase) text('Arena best: wave ' + best, VW / 2, 218, '#a79fc4', 'center');
+  const best = G.titleBest || 0; if (best && !G.confirmErase) text('Arena best: wave ' + best, VW / 2, 218, '#a79fc4', 'center');
 }
 function titleOptions() {
   const has = !!readSave();

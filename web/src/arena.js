@@ -63,6 +63,7 @@ function startArena() {
   Object.assign(A, { wave: 0, kills: 0, xp: 0, lvl: 1, pendingLv: 0, owned: {}, orbit: 0, frost: 0, chain: 0, turrets: [], pals: [], shots: [], bolts: [], marks: [], won: false, rerolls: 0 });
   G.state = 'play';
   loadMap('arena', 16 * T, 14 * T + 8);
+  G.cam = { x: 16 * T - VW / 2, y: 14 * T + 8 - VH / 2 };
   say([
     ['Jon', 'Welcome to VALHALLA ARENA! Chilly sends twenty waves of minions. We survive all twenty.'],
     ['Jon', 'Enemies drop kroner. Between waves we shop for upgrades. Level ups give free stats.'],
@@ -79,7 +80,7 @@ function nextWave() {
   G.banner = A.wave % 5 === 0 ? `WAVE ${A.wave} · BOSS` : `WAVE ${A.wave}`; G.bannerT = 1.6;
   if (sp.bosses) {
     Sound.play('boss');
-    for (let i = 0; i < sp.bosses; i++) arenaSpawn('king', 16 * T + (i ? 80 : -80) * (sp.bosses > 1 ? 1 : 0), 6 * T, true);
+    for (let i = 0; i < sp.bosses; i++) arenaSpawn('king', 16 * T + (i ? 80 : -80) * (sp.bosses > 1 ? 1 : 0), 9 * T, true);
   }
 }
 function placeTurrets() {
@@ -259,11 +260,11 @@ function updateArenaMenus() {
   }
   if (G.state === 'arenapause') {
     if (just('menu') || just('a')) G.state = 'play';
-    if (just('b')) { G.mode = 'story'; G.st = baseStats(); G.state = 'title'; G.menuSel = 0; }
+    if (just('b')) { G.mode = 'story'; G.st = baseStats(); G.state = 'title'; G.menuSel = 0; G.titleOpts = null; }
     return;
   }
   if (G.state === 'arenaover') {
-    if (just('a') || just('menu') || just('tap')) { G.mode = 'story'; G.st = baseStats(); G.state = 'title'; G.menuSel = 0; }
+    if (just('a') || just('menu') || just('tap')) { G.mode = 'story'; G.st = baseStats(); G.state = 'title'; G.menuSel = 0; G.titleOpts = null; }
   }
 }
 

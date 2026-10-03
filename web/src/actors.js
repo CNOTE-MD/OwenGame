@@ -143,7 +143,7 @@ function tryUnlock(tx, ty, c) {
 
 function hurtPlayer(dmg, from, force) {
   const p = G.player, s = G.save;
-  if (!force && (p.inv > 0 || p.launching || G.state !== 'play')) return;
+  if (!force && (p.inv > 0 || p.launching || p.falling > 0 || G.state !== 'play')) return;
   if (!force && G.st.armor > 0 && Math.random() < Math.min(0.6, G.st.armor * 0.1)) { p.inv = 0.4; floatText(p.x, p.y - 18, 'BLOCK', '#9fd0ff'); Sound.play('clank'); return; }
   p.hp -= dmg; p.inv = 1; Sound.play('hurt'); G.shake = 0.15;
   if (from) { const d = Math.hypot(p.x - from.x, p.y - from.y) || 1; p.kx = (p.x - from.x) / d * 170; p.ky = (p.y - from.y) / d * 170; }
@@ -165,7 +165,7 @@ function interact(e) {
       if (!flag('cargo')) { setFlag('cargo'); Sound.play('creep'); G.flash = 0.25; G.flashColor = '#5a0000'; return say(STORY.cargo); }
       return say(STORY.cargo_later);
     case 'runestone':
-      p.hp = s.maxHp; s.voodoo = true; writeSave(); Sound.play('save'); puff(e.x, e.y - 6, '#7fd4ff', 12);
+      p.hp = s.maxHp; s.voodoo = true; s.cp = { map: G.mapId, x: p.x, y: p.y }; writeSave(); Sound.play('save'); puff(e.x, e.y - 6, '#7fd4ff', 12);
       return say(STORY.saved);
     case 'npc': return say(npcLines(e.id));
     case 'shop': return buy(e);
@@ -358,7 +358,8 @@ function updateEnemy(e, dt) {
       if (d < 120 || e.aggro) { toward(e.speed); e.fx = dx / d; e.fy = dy / d; }
       break;
     case 'draugr':
-      if (d < 110 || e.aggro) { e.fx = dx / d; e.fy = dy / d; toward(e.speed); }
+      // sluggish: only turns to face you every 0.8s, so circling behind works
+      if (d < 110 || e.aggro) { if (e.t > 0.8) { e.t = 0; e.fx = dx / d; e.fy = dy / d; } tryMove(e, e.fx * e.speed * dt, e.fy * e.speed * dt, mr, who); }
       else { if (e.t > 2) { e.t = 0; e.tx = e.x + rnd(-30, 30); e.ty = e.y + rnd(-30, 30); }
         const ax = e.tx - e.x, ay = e.ty - e.y, al = Math.hypot(ax, ay); if (al > 2) { e.fx = ax / al; e.fy = ay / al; tryMove(e, ax / al * 14 * dt, ay / al * 14 * dt, mr, who); } }
       break;
@@ -372,7 +373,7 @@ function updateEnemy(e, dt) {
       break;
     case 'knight':
       if (e.st === 'intro') { if (G.state === 'play') { e.st = 'chase'; e.t = 0; } break; }
-      if (e.st === 'chase') { e.fx = dx / d; e.fy = dy / d; toward(e.speed); if (e.t > 2.8) { e.st = 'wind'; e.t = 0; } }
+      if (e.st === 'chase') { e.turnT = (e.turnT || 0) + dt; if (e.turnT > 0.5) { e.turnT = 0; e.fx = dx / d; e.fy = dy / d; } tryMove(e, e.fx * e.speed * dt, e.fy * e.speed * dt, mr, who); if (e.t > 2.8) { e.st = 'wind'; e.t = 0; } }
       else if (e.st === 'wind') { e.fx = dx / d; e.fy = dy / d; if (e.t > 0.5) { e.st = 'charge'; e.t = 0; Sound.play('charge'); } }
       else if (e.st === 'charge') { const h = tryMove(e, e.fx * 140 * dt, e.fy * 140 * dt, mr, who); if (e.t > 0.7 || h.hitX || h.hitY) { e.st = 'chase'; e.t = 0; } }
       break;
@@ -428,7 +429,7 @@ function updateThunder(dt) {
   j.x += (p.x - j.x) * Math.min(1, 6 * dt); j.y += (p.y - 40 - j.y) * Math.min(1, 6 * dt);
   if (G.thunderT > 0.45 && !G.thunderHit) {
     G.thunderHit = true; G.flash = 0.35; G.flashColor = '#ffffff'; G.shake = 0.5; Sound.play('thunder');
-    for (const e of G.ents.slice()) if (e.enemy && e.alive) damageEnemy(e, 4, e, 'thunder');
+    for (const e of G.ents.slice()) if (e.enemy && e.alive) damageEnemy(e, 4 * G.st.dmg, e, 'thunder');
     floatText(p.x, p.y - 50, 'THUNDER STRIKE!', '#ffe066');
   }
   if (G.thunderT > 1.3) G.state = 'play';

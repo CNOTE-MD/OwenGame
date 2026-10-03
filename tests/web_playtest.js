@@ -111,6 +111,16 @@ const SHOTS = process.env.SHOTS || '/tmp';
   await check('Homing Jon hits switch -> gates down', await ev(() => !!G.save.flags['cavern:gates']));
   await talkThrough();
 
+  // draugr: frontal hits clank, hits from behind land
+  await goScreen('cavern', 8, 20); await ev(() => { G.ents = G.ents.filter(e => !e.enemy); });
+  await ev(() => { const e = makeEnemy('draugr', 8 * 16 + 8, 18 * 16 + 8); e.fx = 0; e.fy = 1; e.t = 0; G.ents.push(e); G.roomEnemies = true; });
+  await place(8, 19, 0, -1); await pg.keyboard.press('KeyZ'); await wait(300);
+  await check('draugr blocks from the front', await ev(() => G.ents.find(e => e.type === 'draugr').hp === 4));
+  await ev(() => { const e = G.ents.find(e => e.type === 'draugr'); e.t = 0; e.x = 8 * 16 + 8; e.y = 18 * 16 + 8; e.fx = 0; e.fy = 1; });
+  await place(8, 17, 0, 1); await pg.keyboard.press('KeyZ'); await wait(300);
+  await check('draugr takes damage from behind', await ev(() => { const e = G.ents.find(e => e.type === 'draugr'); return !e || e.hp < 4; }));
+  await goScreen('cavern', 24, 20); await ev(() => { G.ents = G.ents.filter(e => !e.enemy); G.roomEnemies = false; });
+
   // boss door needs big key
   await place(24, 15, 0, -1); await pg.keyboard.down('ArrowUp'); await wait(300); await pg.keyboard.up('ArrowUp'); await talkThrough();
   await check('boss door locked without big key', await ev(() => tile(23, 14) === 'K'));
@@ -162,6 +172,9 @@ const SHOTS = process.env.SHOTS || '/tmp';
   await check('voodoo revive', await ev(() => !G.save.voodoo && G.player.hp === G.save.maxHp));
   await ev(() => { G.player.inv = 0; G.state = 'play'; hurtPlayer(99, G.player); });
   await check('game over after voodoo used', await ev(() => G.state === 'over'));
+  await ev(() => { G.save.cp = { map: 'overworld', x: 39 * 16 + 8, y: 4 * 16 + 8 }; writeSave(); });
+  await pg.keyboard.press('KeyZ'); await wait(150); await talkThrough();
+  await check('continue after game over -> last runestone, voodoo back', await ev(() => G.mapId === 'overworld' && G.save.voodoo && Math.floor(G.player.x / 16) === 39));
 
   console.log('errors:', JSON.stringify(errs));
   console.log('FAILS:', fails + errs.length);

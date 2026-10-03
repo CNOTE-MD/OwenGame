@@ -9,13 +9,15 @@ function newGame() {
   loadMap('home', st[0] * T + 8, st[1] * T + 8);
   say(STORY.intro);
 }
-function continueGame() {
+function continueGame(fromCheckpoint) {
   G.mode = 'story'; G.st = baseStats();
   G.save = readSave() || newSave();
   G.player = makePlayer(); G.jon = makeJon();
   G.player.hp = G.save.maxHp;
   G.state = 'play';
   if (!G.save.x) return newGame();
+  // after a game over you wake at the last runestone with the voodoo bond recharged
+  if (fromCheckpoint && G.save.cp) { G.save.voodoo = true; loadMap(G.save.cp.map, G.save.cp.x, G.save.cp.y); writeSave(); return; }
   loadMap(G.save.map, G.save.x, G.save.y);
 }
 
@@ -48,11 +50,13 @@ function update(dt) {
   if (just('mute')) Sound.muted = !Sound.muted;
   switch (G.state) {
     case 'title': {
-      const opts = titleOptions();
+      if (!G.titleOpts) { G.titleOpts = titleOptions(); G.titleBest = arenaBest(); }
+      const opts = G.titleOpts;
       if (just('up')) { G.menuSel = (G.menuSel + opts.length - 1) % opts.length; G.confirmErase = false; Sound.play('menu'); }
       if (just('down')) { G.menuSel = (G.menuSel + 1) % opts.length; G.confirmErase = false; Sound.play('menu'); }
       G.menuSel = clamp(G.menuSel, 0, opts.length - 1);
       if (just('a') || just('menu') || just('tap')) {
+        G.titleOpts = null;
         const o = opts[G.menuSel];
         if (o.disabled) { Sound.play('clank'); break; }
         if (o.id === 'arena') { startArena(); break; }
@@ -74,7 +78,7 @@ function update(dt) {
     case 'warp': updateWarp(dt); return;
     case 'menu': if (just('menu') || just('a') || just('tap')) { G.state = 'play'; Sound.play('menu'); } return;
     case 'over':
-      if (just('a') || just('menu') || just('tap')) { continueGame(); }
+      if (just('a') || just('menu') || just('tap')) { continueGame(true); }
       return;
     case 'levelup': case 'shop': case 'arenapause': case 'arenaover': updateArenaMenus(); return;
     case 'thunder': updateThunder(dt); updateFx(dt); return;

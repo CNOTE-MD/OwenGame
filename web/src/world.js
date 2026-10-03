@@ -129,7 +129,7 @@ function checkScreenEdge() {
   if (s.x === G.scr.x && s.y === G.scr.y) return;
   const dx = Math.sign(s.x - G.scr.x), dy = Math.sign(s.y - G.scr.y);
   G.trans = { from: { ...G.cam }, to: { x: s.x * VW, y: s.y * VH }, t: 0, dx, dy };
-  G.ents = G.ents.filter(e => e.keep); G.fx = [];
+  G.ents = G.ents.filter(e => e.keep); G.fx = []; G.roomEnemies = false;
   G.scr = s;
 }
 function updateTransition(dt) {
