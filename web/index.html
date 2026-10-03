@@ -27,8 +27,8 @@
   .btn { background: var(--panel); color: var(--ink); border: 2px solid var(--axe); font-family: var(--pixel); font-size: 12px; touch-action: none; border-radius: 4px; }
   .btn:active, .btn.on { background: var(--axe); color: var(--bg); }
   .btn:focus-visible { outline: 3px solid var(--gold); outline-offset: 2px; }
-  .ab { display: flex; gap: 14px; }
-  .ab .btn { width: 76px; height: 76px; border-radius: 50%; font-size: 10px; }
+  .ab { display: grid; grid-template-columns: repeat(2, 76px); gap: 10px; }
+  .ab .btn { width: 76px; height: 56px; border-radius: 28px; font-size: 9px; }
 </style>
 <main>
   <div class="screen"><canvas id="g" width="256" height="224" tabindex="0" aria-label="Jöntuka game screen"></canvas></div>
@@ -36,6 +36,9 @@
     <span><b>Arrows / WASD</b> move</span>
     <span><b>Z / Space</b> swing Jon</span>
     <span><b>X / Shift</b> throw Jon</span>
+    <span><b>C</b> Thunder Strike</span>
+    <span><b>Enter</b> gear and quest</span>
+    <span><b>M</b> sound</span>
   </div>
   <div class="pad" aria-label="Touch controls">
     <div class="dpad">
@@ -44,420 +47,2097 @@
       <span></span><button class="btn" data-a="down" aria-label="Down">▼</button><span></span>
     </div>
     <div class="ab">
-      <button class="btn" data-a="throw" aria-label="Throw Jon">THROW</button>
-      <button class="btn" data-a="swing" aria-label="Swing Jon">SWING</button>
+      <button class="btn" data-a="menu" aria-label="Gear menu">GEAR</button>
+      <button class="btn" data-a="c" aria-label="Thunder Strike">RUNE</button>
+      <button class="btn" data-a="b" aria-label="Throw Jon">THROW</button>
+      <button class="btn" data-a="a" aria-label="Swing Jon or talk">SWING</button>
     </div>
   </div>
 </main>
 <script>
-const MAP = ["TTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTT", "TTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTT", "TT..................T...T.............TT", "TT..sssssssspssssssssssssspssssssssss.TT", "TT..ssssssssssssssspsssssssssssssssss.TT", "TT...........ssssssssssssssssssssssss.TT", "TT.......##..s~~~~~~~~~~~~~~sssspssss.TT", "TT...........s~~~~~~~~~~~~~~sssssssss.TT", "TT...TT......s~~~~~~~~~~~~~~sssssssss.TT", "TT...T.......s~~~~~~~~~~~~~~sssssssss.TT", "TT...........s~~~~~~~~~~~~~~ssssspsss.TT", "TT...@.......s~~~~~~~~~~~~~~sssssssss.TT", "TTTT.........s~~~~~~~~~~~~~~ssssssssssTT", "TT...........s~~~~~~~~~~~~~~ssLsssssssTT", "TT......TT...s~~~~~~~~~~~~~~ssssssssssTT", "TT......T....s~~~~~~~~~~~~~~sss#ss#ss#TT", "TT...........s~~~~~~~~~~~~~~ssssssssssTT", "TT...........s~~~~~~~~~~~~~~ssssssssssTT", "TT..TT.......s~~~~~~~~~~~~~~ssssssssssTT", "TT...........s~~~~~~~~~~~~~~ss#ss#ss#sTT", "TT.....#.....s~~~~~~~~~~~~~~ssssssssssTT", "TT...........sssssssssssssssssssssssssTT", "TT........TT.................ssssssBssTT", "TT........T..................sssssssssTT", "TT...........................sssssssssTT", "TT...........................sssssssssTT", "TTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTT", "TTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTT"];
-const LINES = {
-  "intro": [
-    ["Jon", "Get up, you oaf!"],
-    ["Owen", "Jon is a flying axe that can talk. If you think that's weird, he can also recite Rush E note for note."],
-    ["Jon", "TA DA! Norway! Time to get going."],
-    ["Owen", "Norway was where I got Jon, but also where I was killed and brought back to life."],
-    ["Jon", "Arrows move you. Z swings me. X throws me. I always come back. Because I'm loyal."]
-  ],
-  "dive": [
-    ["Owen", "I jumped in the lake to get away from the penguin."],
-    ["Jon", "Found you! Rocketing you out like the lady of the lake!"]
-  ],
-  "boss": [
-    ["Owen", "The possessed, rabid, crazy penguin. He's waiting on the shore."],
-    ["Jon", "Dodge his charge, then chop him! Stay on the move!"]
-  ],
-  "revive": [
-    ["Owen", "He killed me. (Not going into details about that.)"],
-    ["Jon", "Voodoo magic! Now we're bonded for eternity. Get up, zombie!"],
-    ["Owen", "I'm an undead voodoo magic zombie now. I hit harder, but I can't die twice."]
-  ],
-  "win": [
-    ["Jon", "You killed the penguin while he was shocked about the zombie thing!"],
-    ["Owen", "Ever since, Jon has been making penguin noises in the middle of the night."],
-    ["Jon", "Next stop: Flight 364. Don't look at the flight attendant."]
-  ],
-  "quips": [
-    "Get up, you oaf!",
-    "da da da... (Rush E)",
-    "World's best owner!",
-    "I'm loyal!",
-    "Penguin noises: ak ak ak",
-    "You can't get rid of me."
-  ],
-  "game_over": "Un-unalived once. Not twice. Press Z to try again.",
-  "to_be_continued": "TO BE CONTINUED..."
-};
-const TUNE = {
-  "player": { "hearts": 3, "speed": 72, "swing_damage": 1, "zombie_bonus": 1 },
-  "jon": { "throw_range": 110, "throw_speed": 190, "throw_damage": 1 },
-  "penguin": { "hp": 2, "speed": 38, "touch_damage": 1, "sight": 140 },
-  "boss": { "hp": 14, "speed": 30, "charge_speed": 150, "touch_damage": 2 }
+'use strict';
+// ===== maps.js =====
+// Generated by tools/maps.py. Edit the ASCII there, then rerun it.
+const MAPS = {
+"overworld": {
+"name": "Norway",
+"rows": [
+"TTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTT",
+"TMMMMMMMMMMMMMMTTTT..T....T..TTTTMMMMMMMMMMMMMMTTMMMMMMMMMMMMMMT",
+"TMMMMMMXMMMMMMMTT....b..T...bbbTTMMMMMMEMMMMMMMTTMMMMMMXMMMMMMMT",
+"T......s.......TT.T.......T.b.bTTnnnnnnsnnnnnn#TTnnnnnnsnnnnnnnT",
+"T..T...s...b...TT....TT.....bbbTTnTnnnnsnnnnnnnTTnn#nnnsnnnnTnnT",
+"T......s................T.......nnnnnnnsnnnTnnnnnnnnnnnsnnnnnnnT",
+"T..b...ssssssssssssssssssssssssssssssssssnnnnnnnnnnnnnnsnnnnnnnT",
+"T......s..............f.........nnnnnnnsnnnnnnnnnnnnnnnsnn#nnnnT",
+"T.T....s....T.....T......TT.....nnTnnnnsnnnn#nnnnnnnnnnsnnnnnnnT",
+"T......s.....b.TT....b.......T.TTnnnnnnsnnnnnn#TTnnTnnnsnnnnnnnT",
+"T.bb...s.......TT..TT....b.....TTnn#nnnsnnnTnnnTTnnnnnnsnnnnnTnT",
+"T......s..T....TT.......T...T..TTnnnnnnsnnnnnnnTTnnn#nnsnnnnnnnT",
+"T......s.......TTT..b..........TTnnnnnTsnnnnnnnTTnnnnnnsnnnnnnnT",
+"TTTTTT.s..TTTTTTTTTTTT.s..TTTTTTTTTTTT.s..TTTTTTTTTTTT.s..TTTTTT",
+"TTTTTT.s..TTTTTTTTTTTT.s..TTTTTTTTTTTT.s..TTTTTTTTTTTT.s..TTTTTT",
+"T......s.......TT......s.......TT.....ss.......TT#.....s....lllT",
+"T.RRRRR.s......TT..RRRRRR......TT..sssssssssss.TT..#...s...lMMMT",
+"T.RRRRR.s..RRRRTT..RRRRRR...f..TT..s~~~~~~~~~s.TT......s...lMXMT",
+"T.HHDHH.s..RRRRTT..HHHHHH......TT..s~~~~~~~~~s.TT....#.s...lMsMT",
+"T.......s..HHDHTT..xQ.Q.Qx.........s~~~~~~~~~s.........s....ss.T",
+"T.ff....sssssssssssssssssssssss.ssss~~~~~~~~~sssssssssssssssss.T",
+"T.......s...............s..........s~~~~~~~~~s.........s.......T",
+"T..x.x..s..f.......f....s..........s~~~~~~~~~s.....#...s...#...T",
+"T.......s.......T.......s....b.TT..s~~~~~~~~~s.TT......s.......T",
+"T..b....s....b.TT..b....s......TT..sssssssssss.TT.#....s....#..T",
+"T.......s......TT.......s......TT......s.......TT......s.......T",
+"T.......s......TT.......s......TT..T...s....T..TT......s..#....T",
+"TTTTTT.s..TTTTTTTTTTTT.s..TTTTTTTTTTTT.s..TTTTTTTTTTTT.s..TTTTTT",
+"TTTTTT.s..TTTTTTTTTTTT.s..TTTTTTTTTTTT.s..TTTTTTTTTTTT.s..TTTTTT",
+"T......s.......TT......s.......TT..ss..s..ss...TT......s.......T",
+"T..b...s.......TT......s.......TT.sssssssssss..TT.+.+.+s+.+.+..T",
+"T......s...f...TT......s..qq...TT.sssssssssss..TT......s.......T",
+"T......s.......TT.PPPPPPPPPPPP.TT.sssssssssss..TT.+.+.+s+.+.+..T",
+"T......s..........PPPPPPPPPPPP....sssssssssss..........s.......T",
+"T......ssssssssssssssssssqqssss.sssssssssssssss.sssssssss......T",
+"Twwwww.s..................s.......sssssssssss...T......s.......T",
+"TwwwwwUUU......T....ssssssss....T.sssssssssss..TT.+.+..s..+.+..T",
+"Twwwwwwww.b....TT..............TT.sssssssssss..TT......s.......T",
+"TwwwwwwwwwT....TT..b....f......TT..sssssssss...TT.+.+..s..+.+.+T",
+"TwwwwwwwwwwT...TT......T.......TT..............TT......s.......T",
+"TwwwwwwwwwwwT..TT..........b...TT..T......T....TT..............T",
+"TTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTT"
+],
+"ents": [
+{
+"t": "start",
+"at": [
+24,
+36
+]
+},
+{
+"t": "runestone",
+"at": [
+20,
+36
+]
+},
+{
+"t": "sign",
+"at": [
+28,
+36
+],
+"text": "sign_airstrip"
+},
+{
+"t": "cargo",
+"at": [
+29,
+33
+]
+},
+{
+"t": "npc",
+"id": "astrid",
+"at": [
+5,
+20
+]
+},
+{
+"t": "npc",
+"id": "lars",
+"at": [
+23,
+19
+]
+},
+{
+"t": "shop",
+"item": "juice",
+"price": 40,
+"at": [
+20,
+19
+]
+},
+{
+"t": "shop",
+"item": "shard",
+"price": 25,
+"at": [
+22,
+19
+]
+},
+{
+"t": "shop",
+"item": "heart3",
+"price": 10,
+"at": [
+24,
+19
+]
+},
+{
+"t": "npc",
+"id": "sven",
+"at": [
+28,
+23
+]
+},
+{
+"t": "npc",
+"id": "ingrid",
+"at": [
+9,
+36
+]
+},
+{
+"t": "sign",
+"at": [
+10,
+21
+],
+"text": "sign_fjordvik"
+},
+{
+"t": "runestone",
+"at": [
+42,
+4
+]
+},
+{
+"t": "sign",
+"at": [
+41,
+3
+],
+"text": "sign_cavern"
+},
+{
+"t": "sealed",
+"at": [
+7,
+2
+],
+"text": "seal_barrow"
+},
+{
+"t": "sealed",
+"at": [
+55,
+2
+],
+"text": "seal_peak"
+},
+{
+"t": "sealed",
+"at": [
+61,
+17
+],
+"text": "seal_forge"
+},
+{
+"t": "sign",
+"at": [
+38,
+37
+],
+"text": "sign_beach"
+},
+{
+"t": "warp",
+"at": [
+39,
+2
+],
+"to": "cavern",
+"dest": [
+24,
+54
+]
+},
+{
+"t": "piece",
+"id": "hp_forest",
+"at": [
+29,
+3
+]
+},
+{
+"t": "piece",
+"id": "hp_grave",
+"at": [
+62,
+40
+]
+},
+{
+"t": "chest",
+"id": "c_coast",
+"at": [
+14,
+30
+],
+"item": "kr20"
+},
+{
+"t": "penguin",
+"at": [
+37,
+31
+]
+},
+{
+"t": "penguin",
+"at": [
+42,
+32
+]
+},
+{
+"t": "penguin",
+"at": [
+39,
+36
+]
+},
+{
+"t": "penguin",
+"at": [
+36,
+7
+]
+},
+{
+"t": "penguin",
+"at": [
+44,
+9
+]
+},
+{
+"t": "penguin",
+"at": [
+58,
+6
+]
+},
+{
+"t": "wisp",
+"at": [
+53,
+10
+]
+},
+{
+"t": "draugr",
+"at": [
+20,
+8
+]
+},
+{
+"t": "wisp",
+"at": [
+27,
+10
+]
+},
+{
+"t": "draugr",
+"at": [
+52,
+33
+]
+},
+{
+"t": "draugr",
+"at": [
+59,
+37
+]
+},
+{
+"t": "wisp",
+"at": [
+55,
+39
+]
+},
+{
+"t": "wisp",
+"at": [
+10,
+9
+]
+},
+{
+"t": "penguin",
+"at": [
+4,
+11
+]
+},
+{
+"t": "draugr",
+"at": [
+57,
+23
+]
+},
+{
+"t": "wisp",
+"at": [
+52,
+17
+]
+},
+{
+"t": "penguin",
+"at": [
+33,
+23
+]
+}
+],
+"outdoor": true
+},
+"cavern": {
+"name": "Penguin Ice Cavern",
+"rows": [
+"WWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWW",
+"WWWWWWWWWWWWWWWWWt____________tWWWWWWWWWWWWWWWWW",
+"WWWWWWWWWWWWWWWWW_iiiiiiiiiiii_WWWWWWWWWWWWWWWWW",
+"WWWWWWWWWWWWWWWWW_iiiiiiiiiiii_WWWWWWWWWWWWWWWWW",
+"WWWWWWWWWWWWWWWWW_iiiiiiiiiiii_WWWWWWWWWWWWWWWWW",
+"WWWWWWWWWWWWWWWWW_iiiiiiiiiiii_WWWWWWWWWWWWWWWWW",
+"WWWWWWWWWWWWWWWWW_iiiiiiiiiiii_WWWWWWWWWWWWWWWWW",
+"WWWWWWWWWWWWWWWWW_iiiiiiiiiiii_WWWWWWWWWWWWWWWWW",
+"WWWWWWWWWWWWWWWWW_iiiiiiiiiiii_WWWWWWWWWWWWWWWWW",
+"WWWWWWWWWWWWWWWWW_iiiiiiiiiiii_WWWWWWWWWWWWWWWWW",
+"WWWWWWWWWWWWWWWWW_iiiiiiiiiiii_WWWWWWWWWWWWWWWWW",
+"WWWWWWWWWWWWWWWWW_iiiiiiiiiiii_WWWWWWWWWWWWWWWWW",
+"WWWWWWWWWWWWWWWWWt____________tWWWWWWWWWWWWWWWWW",
+"WWWWWWWWWWWWWWWWWWWWWWWhhWWWWWWWWWWWWWWWWWWWWWWW",
+"WWWWWWWWWWWWWWWWWWWWWWWKKWWWWWWWWWWWWWWWWWWWWWWW",
+"Wt____________tWWt____________tWWt____________tW",
+"W______________WW______________WW______________W",
+"W______________WWvvvvvvGGvvvvvvWW__iiiiiiiiii__W",
+"W______________WWvvvvvvGGvvvvvvWW__iiiiiiiiii__W",
+"W______________WWvvvvvvGGvvvvvvWW__iiiiiiiiii__W",
+"W______________WWvvvvvvGGvvvvvvWW__iiiiiiiiii__W",
+"W______________WWvvvvvvGGvvvvvvWW__iiiiiiiiii__W",
+"W______________WW______________WW__iiiiiiiiii__W",
+"W______________________________Lh__iiiiiiiiii__W",
+"W______________________________Lh__iiiiiiiiii__W",
+"W______________WW______________WW______________W",
+"Wt____________tWWt____________tWWt____________tW",
+"WWWWWWWWWWWWWWWWWWWWWWWLLWWWWWWWWWWWWWWWWWWWWWWW",
+"WWWWWWWWWWWWWWWWWWWWWWWLLWWWWWWWWWWWWWWWWWWWWWWW",
+"Wt____________tWWt____________tWWt____________tW",
+"W_O__O_________WW______________WW_vvvvvvvvvv_v_W",
+"W______________WW__iiiiiiiiii__WW_vvvvvvvvvv_v_W",
+"W______________WW__iiiiiiiiii__WW_vvv________v_W",
+"W______________WW__iiiiiiiiii__WW_vvv_vvvvvvvv_W",
+"W__________________iiiiiiiiii_________vvvv_____W",
+"W__________________iiiiiiiiii_________vvvvvvvv_W",
+"W______________WW__iiiiiiiiii__WW_vvvvvvvvvvvv_W",
+"W_O__O_________WW__iiiiiiiiii__WW_vvvvvvvvvvvv_W",
+"W______________WW__iiiiiiiiii__WW______________W",
+"W______________WW______________WW______________W",
+"Wt____________tWWt____________tWWt____________tW",
+"WWWWWWWWWWWWWWWWWWWWWWW__WWWWWWWWWWWWWWWWWWWWWWW",
+"WWWWWWWWWWWWWWWWWWWWWWW__WWWWWWWWWWWWWWWWWWWWWWW",
+"WWWWWWWWWWWWWWWWWt____________tWWWWWWWWWWWWWWWWW",
+"WWWWWWWWWWWWWWWWW______________WWWWWWWWWWWWWWWWW",
+"WWWWWWWWWWWWWWWWW______________WWWWWWWWWWWWWWWWW",
+"WWWWWWWWWWWWWWWWW______________WWWWWWWWWWWWWWWWW",
+"WWWWWWWWWWWWWWWWW______________WWWWWWWWWWWWWWWWW",
+"WWWWWWWWWWWWWWWWW______________WWWWWWWWWWWWWWWWW",
+"WWWWWWWWWWWWWWWWW______________WWWWWWWWWWWWWWWWW",
+"WWWWWWWWWWWWWWWWW______________WWWWWWWWWWWWWWWWW",
+"WWWWWWWWWWWWWWWWW______________WWWWWWWWWWWWWWWWW",
+"WWWWWWWWWWWWWWWWW______________WWWWWWWWWWWWWWWWW",
+"WWWWWWWWWWWWWWWWW______________WWWWWWWWWWWWWWWWW",
+"WWWWWWWWWWWWWWWWWt____________tWWWWWWWWWWWWWWWWW",
+"WWWWWWWWWWWWWWWWWWWWWWW__WWWWWWWWWWWWWWWWWWWWWWW"
+],
+"ents": [
+{
+"t": "warp",
+"at": [
+23,
+55
+],
+"to": "overworld",
+"dest": [
+39,
+3
+]
+},
+{
+"t": "warp",
+"at": [
+24,
+55
+],
+"to": "overworld",
+"dest": [
+39,
+3
+]
+},
+{
+"t": "runestone",
+"at": [
+20,
+48
+]
+},
+{
+"t": "sign",
+"at": [
+26,
+48
+],
+"text": "sign_cavern_in"
+},
+{
+"t": "penguin",
+"at": [
+21,
+33
+]
+},
+{
+"t": "penguin",
+"at": [
+26,
+33
+]
+},
+{
+"t": "penguin",
+"at": [
+24,
+37
+]
+},
+{
+"t": "bat",
+"at": [
+5,
+33
+]
+},
+{
+"t": "bat",
+"at": [
+10,
+36
+]
+},
+{
+"t": "bat",
+"at": [
+7,
+38
+]
+},
+{
+"t": "chest",
+"id": "cv_key1",
+"at": [
+7,
+34
+],
+"item": "key",
+"clear": true
+},
+{
+"t": "bat",
+"at": [
+44,
+32
+]
+},
+{
+"t": "bat",
+"at": [
+36,
+39
+]
+},
+{
+"t": "chest",
+"id": "cv_key2",
+"at": [
+44,
+30
+],
+"item": "key"
+},
+{
+"t": "switch",
+"id": "cv_gate",
+"at": [
+18,
+15
+]
+},
+{
+"t": "draugr",
+"at": [
+5,
+18
+]
+},
+{
+"t": "draugr",
+"at": [
+10,
+22
+]
+},
+{
+"t": "penguin",
+"at": [
+7,
+25
+]
+},
+{
+"t": "chest",
+"id": "cv_bigkey",
+"at": [
+7,
+20
+],
+"item": "bigkey",
+"clear": true
+},
+{
+"t": "knight",
+"at": [
+41,
+19
+]
+},
+{
+"t": "chest",
+"id": "cv_homing",
+"at": [
+40,
+21
+],
+"item": "homing",
+"clear": true
+},
+{
+"t": "king",
+"at": [
+24,
+5
+]
+},
+{
+"t": "chest",
+"id": "cv_thunder",
+"at": [
+24,
+4
+],
+"item": "thunder",
+"clear": true
+},
+{
+"t": "container",
+"id": "hc_cavern",
+"at": [
+22,
+7
+],
+"clear": true
+},
+{
+"t": "warp",
+"at": [
+26,
+7
+],
+"to": "overworld",
+"dest": [
+39,
+4
+],
+"clear": true,
+"portal": true
+}
+],
+"dungeon": true
+},
+"home": {
+"name": "Owen's Room, New York",
+"rows": [
+"ZZZZZZZZZZZZZZZZ",
+"ZFFFFFFFFFFFFFFZ",
+"ZFYYFFFFFFFQQQFZ",
+"ZFYYFFFFFFFFFFFZ",
+"ZFFFFFFFFFFFFFFZ",
+"ZFFFFrrrrrFFFFFZ",
+"ZFFFFrrrrrFFFFFZ",
+"ZFFFFrrrrrFFFFFZ",
+"ZFFFFFFFFFFFFFFZ",
+"ZFFFFFFFFFFFFFFZ",
+"ZFQFFFFFFFFFFFFZ",
+"ZFFFFFFFFFFFFFFZ",
+"ZFFFFFFFFFFFFFFZ",
+"ZZZZZZZddZZZZZZZ"
+],
+"ents": [
+{
+"t": "start",
+"at": [
+3,
+4
+]
+},
+{
+"t": "plaque",
+"at": [
+12,
+2
+]
+},
+{
+"t": "sign",
+"at": [
+2,
+10
+],
+"text": "sign_poster"
+},
+{
+"t": "flight",
+"at": [
+7,
+13
+]
+},
+{
+"t": "flight",
+"at": [
+8,
+13
+]
+}
+]
+}
 };
 
-const T = 16, VW = 256, VH = 224;
-const COLS = MAP[0].length, ROWS = MAP.length;
+// ===== story.js =====
+// All words in the game. Owen: edit freely. [speaker, text] pairs; speaker '' = narration.
+const STORY = {
+  intro: [
+    ['Jon', 'Get up, you oaf!'],
+    ['Owen', 'Oh yeah. Jon is a flying axe that can talk. If you think that\'s weird, he can also recite Rush E note for note, from memory.'],
+    ['Jon', 'Come look at the table! I carved you something!'],
+  ],
+  plaque: [
+    ['', '"WORLD\'S BEST OWNER OF A FLYING AND TALKING AXE NAMED JON"'],
+    ['Jon', 'Well?'],
+    ['Owen', 'Very nice of you Jon, I appreciate it.'],
+    ['Jon', 'Are you gonna put it in our room?!?'],
+    ['Owen', 'Um, sure...'],
+    ['Jon', 'Well, I think we should get going. TO... (dramatic pause...) NORWAY!'],
+    ['Owen', 'WHAT?! Norway is where I got you. It\'s also where I was killed and brought back to life.'],
+    ['Jon', 'Exactly. Unfinished business. Grab your stuff. Door\'s at the bottom.'],
+  ],
+  poster: [['', 'A poster of a Viking longship. Under it, in marker: "OWEN\'S ROOM. NO PENGUINS."']],
+  flight: [
+    { art: 'plane', lines: [['', 'Flight 364. New York to Norway. Jon is in a checked bag down below.'], ['Owen', 'I tried not to think about my last time in Norway.']] },
+    { art: 'cabin', lines: [['Attendant', 'Refreshments will come around once we reach a steady flying level.'], ['Owen', '(She gave me an odd look.)']] },
+    { art: 'demon', lines: [['Owen', '"DEMON!!" my mind screamed.'], ['Attendant', 'Is everything alright, sir?'], ['Owen', 'Yep...']] },
+    { art: 'cabin', lines: [['', 'I fell asleep. My dreams were incredibly weird. One was that I turned into a cow.']] },
+    { art: 'demon', lines: [['Attendant', 'Any refreshments, sir?'], ['', 'Her nails grew into talons. Her teeth into fangs.'], ['Attendant', 'Wonderful...'], ['Owen', 'I tried to call Jon.']] },
+    { art: 'land', lines: [['', '...and then the wheels hit the runway. Fjordvik, Norway.'], ['Owen', 'Was that a dream? It had to be a dream.']] },
+  ],
+  arrival: [
+    ['Jon', '*thump* Ow. Who packs an axe UNDER a cello? Anyway. NORWAY!'],
+    ['Owen', 'Jon. The flight attendant. She had fangs.'],
+    ['Jon', 'Probably just the airline food. Look, we have bigger problems. Look at the beach down south.'],
+    ['Jon', 'PENGUINS. In NORWAY. Penguins don\'t even LIVE here, Owen. Somebody is possessing them again.'],
+    ['Jon', 'Elder Astrid in Fjordvik knows the old stories. Village is north-west of the airstrip.'],
+    ['', 'Arrows/WASD move. Z swings Jon or talks. X throws Jon. Enter opens your gear. Touch a runestone to save.'],
+  ],
+  cargo: [
+    ['', 'Something is scratching inside the cargo hold. Slowly. Like long fingernails.'],
+    ['', 'A voice whispers your name through the metal. Then it laughs.'],
+    ['Jon', 'Nope. Nope nope nope. We are NOT going in there yet. Come back when we are stronger.'],
+  ],
+  cargo_later: [['Jon', 'The scratching stopped. That is somehow worse. (The Red-Eye side quest arrives in a later chapter.)']],
+  astrid_1: [
+    ['Astrid', 'So. The boy who pulled Jontuka out of the lake has come back. And still alive. Mostly.'],
+    ['Owen', 'Undead voodoo magic zombie, actually.'],
+    ['Astrid', 'Hm. Well. Listen. A bizillion years ago, a smith forged that axe in the volcano east of here.'],
+    ['Astrid', 'Walther the Wise, we called him. Or was it Waldo? Wilbur? Nobody remembers his real name.'],
+    ['Owen', 'I just call him Walter the Wonderful.'],
+    ['Astrid', 'Then a Viking chieftain, Ulf the Unready, threw the axe in the lake so only Viking blood could pull it out.'],
+    ['Astrid', 'He was hiding it from Hrimnir, the Frost Demon. Hrimnir wants Jontuka. With it, he could crack open the volcano and freeze the whole world.'],
+    ['Astrid', 'Hrimnir cannot walk in daylight. So he possesses creatures that do not belong here. Like penguins.'],
+    ['Jon', 'Told you.'],
+    ['Astrid', 'His penguins nest in the Ice Cavern up the Frozen Path, north-east. Whatever leads them lives at the bottom.'],
+    ['Astrid', 'Take this. Every bit of coin helps. Lars at the market sells lingonberry juice. It brings you back from almost anything.'],
+  ],
+  astrid_2: [['Astrid', 'The Ice Cavern is up the Frozen Path, north-east. Mind the slippery floors. Penguins love ice.']],
+  astrid_3: [
+    ['Astrid', 'The Thunder Rune! Walter carved that rune for the axe himself. Jontuka remembers who he is.'],
+    ['Astrid', 'Hrimnir will not stop. Three more rune doors are sealed: the Drowned Barrow, Walter\'s Forge, and the Storm Peak.'],
+    ['Astrid', 'They will open when the story is ready to be told.'],
+  ],
+  lars: [['Lars', 'Velkommen! Lingonberry juice, rune shards, hearts. Walk up to a table and press Z to buy.']],
+  sven_1: [['Sven', 'My big sister says if you cut bushes with an axe you find kroner. I saw a sparkly thing in the forest behind a ring of bushes.']],
+  sven_2: [['Sven', 'There is another sparkly thing in the graveyard. In the far corner. I am NOT going in there.']],
+  ingrid: [
+    ['Ingrid', 'You swim in the lake, it spits you right back out. Lake\'s got manners, that one.'],
+    ['Ingrid', 'Ever since the penguins showed up, I hear them at night. "Ak ak ak."'],
+    ['Jon', '...that one was me.'],
+  ],
+  signs: {
+    sign_airstrip: [['', 'FJORDVIK AIRSTRIP. Village: north-west. Lake: north-east. Beach: east.']],
+    sign_fjordvik: [['', 'FJORDVIK. Population: 41 Vikings, 0 penguins (we hope).']],
+    sign_cavern: [['', 'PENGUIN ICE CAVERN. Turn back. Seriously.']],
+    sign_cavern_in: [['', 'Locked doors take a small key. The big door takes the BIG key. Crystals switch things.']],
+    sign_beach: [['', 'HERE IS THE BEACH WHERE OWEN DIED. (He got better.)']],
+    sign_poster: [['', 'A poster of a Viking longship. Under it, in marker: "OWEN\'S ROOM. NO PENGUINS."']],
+    seal_barrow: [['', 'A stone door, sealed by a glowing rune. The DROWNED BARROW. Chapter 2.']],
+    seal_forge: [['', 'A stone door, sealed by a glowing rune. WALTER\'S FORGE. Chapter 3.']],
+    seal_peak: [['', 'A stone door, sealed by a glowing rune. The STORM PEAK. Chapter 4.']],
+  },
+  house: [['', 'Nobody answers. Someone inside is humming Rush E.']],
+  cavern_enter: [['Jon', 'It\'s FREEZING. Penguins everywhere. Stay off the ice if you like stopping.']],
+  pit_first: [['Jon', 'You fell in a hole. I would have flown. Just saying.']],
+  locked: [['', 'Locked. You need a small key.']],
+  bossdoor: [['', 'A huge door with a huge lock. You need the BIG key.']],
+  knight: [['Jon', 'A penguin in ARMOR. Hit him from the side or the back. His shield blocks the front!']],
+  king: [
+    ['Penguin King', 'AK. AK AK. The axe. Give... me... the AXE.'],
+    ['Owen', 'You\'re the one who killed me!'],
+    ['Penguin King', 'That was my cousin. I am WORSE. Hrimnir made me KING.'],
+    ['Jon', 'He belly-slides! Dodge him, let him smack the wall, THEN chop him while he\'s dizzy!'],
+  ],
+  king_down: [
+    ['Penguin King', 'Ak... Hrimnir... will... find you...'],
+    ['', 'The frost spirit flies out of the penguin and shatters. A very confused regular penguin waddles away.'],
+    ['Jon', 'And THAT is how we do it in Norway.'],
+  ],
+  revive: [['Jon', 'Voodoo bond! Get up, zombie! (Touch a runestone to recharge it.)']],
+  juice: [['', 'You drank the Lingonberry Juice. Hearts restored!']],
+  saved: [['', 'The runestone glows. Game saved. Hearts and voodoo bond restored.']],
+  chapter_done: 'CHAPTER 1 COMPLETE',
+  quips: ['da da da... (Rush E)', 'I\'m loyal!', 'World\'s best owner!', 'Ak ak ak', 'You can\'t get rid of me', 'Penguins. Ugh.', 'Bring me THUNDER!'],
+};
+
+const ITEMS = {
+  key: { name: 'Small Key', icon: 'key', lines: [['', 'You got a SMALL KEY! It opens one locked door in this dungeon.']] },
+  bigkey: { name: 'Big Key', icon: 'bigkey', lines: [['', 'You got the BIG KEY! It opens the boss door.']] },
+  homing: { name: 'Homing Jon', icon: 'homing', lines: [
+    ['', 'You got HOMING JON!'],
+    ['Jon', 'I can SEE them now! Throw me and I lock on to enemies and crystals. And I fly way farther. You are welcome.'],
+    ['', 'Throw Jon with X. He curves toward the nearest target.']] },
+  thunder: { name: 'Thunder Rune', icon: 'thunder', lines: [
+    ['', 'You got the THUNDER RUNE!'],
+    ['Jon', 'Oh. Oh YES. I remember this. Walter carved it into me. Fill the rune meter, press C, and I come down like lightning!'],
+    ['', 'Thunder Strike hits every enemy on the screen. Defeat enemies to fill the rune meter.']] },
+  piece: { name: 'Piece of Heart', icon: 'piece', lines: [['', 'You got a PIECE OF HEART! Collect four to grow a new heart.']] },
+  container: { name: 'Heart Container', icon: 'container', lines: [['', 'You got a HEART CONTAINER! Your life grew by one heart.']] },
+  kr20: { name: '20 Kroner', icon: 'coin', lines: [['', 'You found 20 kroner!']] },
+  juice: { name: 'Lingonberry Juice', icon: 'juice', lines: [['', 'LINGONBERRY JUICE! If your hearts run out, you drink it automatically.']] },
+  shard: { name: 'Rune Shard', icon: 'shard', lines: [['', 'A RUNE SHARD! Your rune meter fills up.']] },
+  heart3: { name: 'Heart Refill', icon: 'heart', lines: [['', 'Hearts refilled!']] },
+};
+
+// ===== engine.js =====
+// Screen, input, sound and drawing helpers.
+const T = 16, SW = 16, SH = 14, VW = 256, VH = 224;
 const cv = document.getElementById('g');
 const ctx = cv.getContext('2d');
 ctx.imageSmoothingEnabled = false;
 const FONT = '8px "Press Start 2P", ui-monospace, Menlo, Consolas, monospace';
 
+const clamp = (v, a, b) => Math.max(a, Math.min(b, v));
+const dist = (a, b) => Math.hypot(a.x - b.x, a.y - b.y);
+const rnd = (a, b) => a + Math.random() * (b - a);
+const pick = arr => arr[Math.floor(Math.random() * arr.length)];
+
 // ---------- input ----------
 const ACTIONS = {
   left: ['ArrowLeft', 'KeyA'], right: ['ArrowRight', 'KeyD'], up: ['ArrowUp', 'KeyW'], down: ['ArrowDown', 'KeyS'],
-  swing: ['KeyZ', 'Space', 'KeyJ'], throw: ['KeyX', 'KeyK', 'ShiftLeft', 'ShiftRight'],
-  confirm: ['KeyZ', 'Space', 'Enter', 'KeyJ'],
+  a: ['KeyZ', 'Space', 'KeyJ'], b: ['KeyX', 'KeyK', 'ShiftLeft', 'ShiftRight'], c: ['KeyC', 'KeyL'],
+  menu: ['Enter', 'Escape', 'KeyP'], mute: ['KeyM'],
 };
 const keys = {}, virt = {}, edge = {};
 const held = a => !!virt[a] || ACTIONS[a].some(c => keys[c]);
 const just = a => !!edge[a];
+function inputVec() {
+  let x = (held('right') ? 1 : 0) - (held('left') ? 1 : 0), y = (held('down') ? 1 : 0) - (held('up') ? 1 : 0);
+  const m = Math.hypot(x, y);
+  return m ? { x: x / m, y: y / m } : { x: 0, y: 0 };
+}
 window.addEventListener('keydown', e => {
-  if (e.code.startsWith('Arrow') || e.code === 'Space') e.preventDefault();
+  if (e.code.startsWith('Arrow') || e.code === 'Space' || e.code === 'Tab') e.preventDefault();
   if (e.repeat) return;
   keys[e.code] = true;
   for (const a in ACTIONS) if (ACTIONS[a].includes(e.code)) edge[a] = true;
+  Sound.unlock();
 });
 window.addEventListener('keyup', e => { keys[e.code] = false; });
 window.addEventListener('blur', () => { for (const k in keys) keys[k] = false; for (const k in virt) virt[k] = false; });
-cv.addEventListener('pointerdown', () => { cv.focus(); if (G.state === 'title') edge.confirm = true; });
+cv.addEventListener('pointerdown', () => { cv.focus(); Sound.unlock(); edge.tap = true; });
 document.querySelectorAll('.btn[data-a]').forEach(b => {
   const a = b.dataset.a;
-  const on = e => { e.preventDefault(); virt[a] = true; b.classList.add('on'); edge[a] = true; if (a === 'swing') edge.confirm = true; };
+  const on = e => { e.preventDefault(); virt[a] = true; edge[a] = true; b.classList.add('on'); Sound.unlock(); };
   const off = e => { e.preventDefault(); virt[a] = false; b.classList.remove('on'); };
   b.addEventListener('pointerdown', on);
   ['pointerup', 'pointercancel', 'pointerleave'].forEach(t => b.addEventListener(t, off));
 });
 
-// ---------- world ----------
-const G = { state: 'title', t: 0, player: null, jon: null, enemies: [], boss: null, launch: { x: 0, y: 0 },
-  bossSeen: false, dived: false, queue: [], done: null, who: '', text: '', talking: false, banner: '' };
-
-const tileAt = (x, y) => {
-  const tx = Math.floor(x / T), ty = Math.floor(y / T);
-  if (tx < 0 || ty < 0 || tx >= COLS || ty >= ROWS) return 'T';
-  return MAP[ty][tx];
-};
-const solid = (x, y) => { const c = tileAt(x, y); return c === 'T' || c === '#'; };
-const blocked = (x, y, r) => solid(x - r, y - r) || solid(x + r, y - r) || solid(x - r, y + r) || solid(x + r, y + r);
-function tryMove(n, mx, my, r) {
-  if (!blocked(n.x + mx, n.y, r)) n.x += mx;
-  if (!blocked(n.x, n.y + my, r)) n.y += my;
-}
-const dist = (a, b) => Math.hypot(a.x - b.x, a.y - b.y);
-
-function start() {
-  G.enemies = []; G.boss = null; G.bossSeen = false; G.dived = false; G.banner = ''; G.talking = false;
-  let sp = { x: 0, y: 0 };
-  MAP.forEach((row, ty) => [...row].forEach((c, tx) => {
-    const p = { x: tx * T + 8, y: ty * T + 8 };
-    if (c === '@') sp = p;
-    if (c === 'L') G.launch = p;
-    if (c === 'p' || c === 'B') {
-      const boss = c === 'B', d = boss ? TUNE.boss : TUNE.penguin;
-      const e = { x: p.x, y: p.y, boss, hp: d.hp, speed: d.speed, touch: d.touch_damage, sight: d.sight || 0,
-        charge: d.charge_speed || 0, active: !boss, r: boss ? 11 : 6, flash: 0, kx: 0, ky: 0, st: 'chase', t: 0, dx: 0, dy: 0, wob: 0 };
-      G.enemies.push(e); if (boss) G.boss = e;
+// ---------- sound: tiny chiptune effects ----------
+const Sound = {
+  ac: null, muted: false,
+  unlock() { try { if (!this.ac) this.ac = new (window.AudioContext || window.webkitAudioContext)(); if (this.ac.state === 'suspended') this.ac.resume(); } catch (e) { this.ac = null; } },
+  tone(seq, vol = 0.08) {
+    if (this.muted || !this.ac) return;
+    let t = this.ac.currentTime;
+    for (const [f, d, type = 'square', f2] of seq) {
+      if (f > 0) {
+        const o = this.ac.createOscillator(), g = this.ac.createGain();
+        o.type = type; o.frequency.setValueAtTime(f, t);
+        if (f2) o.frequency.exponentialRampToValueAtTime(f2, t + d);
+        g.gain.setValueAtTime(vol, t); g.gain.exponentialRampToValueAtTime(0.0008, t + d);
+        o.connect(g).connect(this.ac.destination); o.start(t); o.stop(t + d + 0.02);
+      }
+      t += d;
     }
+  },
+  noise(d, vol = 0.12, lp = 1200) {
+    if (this.muted || !this.ac) return;
+    const n = Math.floor(this.ac.sampleRate * d), buf = this.ac.createBuffer(1, n, this.ac.sampleRate), ch = buf.getChannelData(0);
+    for (let i = 0; i < n; i++) ch[i] = (Math.random() * 2 - 1) * (1 - i / n);
+    const s = this.ac.createBufferSource(), f = this.ac.createBiquadFilter(), g = this.ac.createGain();
+    f.type = 'lowpass'; f.frequency.value = lp; g.gain.value = vol;
+    s.buffer = buf; s.connect(f).connect(g).connect(this.ac.destination); s.start();
+  },
+  play(name) {
+    switch (name) {
+      case 'swing': this.tone([[700, 0.07, 'square', 200]], 0.04); break;
+      case 'throw': this.tone([[300, 0.06, 'triangle', 600], [600, 0.06, 'triangle', 300]], 0.06); break;
+      case 'hit': this.tone([[240, 0.06, 'square', 120]], 0.07); break;
+      case 'clank': this.tone([[1400, 0.04, 'triangle'], [900, 0.06, 'triangle']], 0.07); break;
+      case 'hurt': this.tone([[420, 0.18, 'sawtooth', 90]], 0.07); break;
+      case 'kill': this.noise(0.15, 0.1, 2000); break;
+      case 'coin': this.tone([[1320, 0.05], [1980, 0.12]], 0.05); break;
+      case 'heart': this.tone([[880, 0.05], [1175, 0.08]], 0.05); break;
+      case 'item': this.tone([[523, 0.12], [659, 0.12], [784, 0.12], [1047, 0.45]], 0.07); break;
+      case 'secret': this.tone([[784, 0.09], [740, 0.09], [622, 0.09], [440, 0.09], [415, 0.09], [659, 0.09], [831, 0.09], [1047, 0.3]], 0.06); break;
+      case 'door': this.tone([[200, 0.12, 'square', 420]], 0.06); break;
+      case 'fall': this.tone([[700, 0.5, 'triangle', 90]], 0.08); break;
+      case 'switch': this.tone([[1200, 0.06, 'triangle'], [1600, 0.1, 'triangle']], 0.07); break;
+      case 'blip': this.tone([[1100, 0.012, 'square']], 0.015); break;
+      case 'menu': this.tone([[660, 0.05], [990, 0.05]], 0.04); break;
+      case 'splash': this.noise(0.35, 0.12, 900); this.tone([[200, 0.3, 'sine', 800]], 0.06); break;
+      case 'save': this.tone([[523, 0.1, 'triangle'], [784, 0.1, 'triangle'], [1047, 0.3, 'triangle']], 0.07); break;
+      case 'thunder': this.noise(1.2, 0.35, 500); this.tone([[90, 0.9, 'sawtooth', 40]], 0.1); break;
+      case 'charge': this.tone([[200, 0.4, 'sawtooth', 900]], 0.04); break;
+      case 'boss': this.tone([[110, 0.2, 'sawtooth'], [104, 0.2, 'sawtooth'], [98, 0.5, 'sawtooth']], 0.08); break;
+      case 'creep': this.tone([[70, 1.2, 'sine', 55]], 0.12); this.tone([[1760, 0.6, 'sine', 1700]], 0.012); break;
+    }
+  },
+};
+
+// ---------- drawing ----------
+const R = (x, y, w, h, c) => { ctx.fillStyle = c; ctx.fillRect(Math.round(x), Math.round(y), w, h); };
+function poly(pts, fill, stroke) {
+  ctx.beginPath(); pts.forEach(([a, b], i) => i ? ctx.lineTo(a, b) : ctx.moveTo(a, b)); ctx.closePath();
+  if (fill) { ctx.fillStyle = fill; ctx.fill(); }
+  if (stroke) { ctx.strokeStyle = stroke; ctx.lineWidth = 1; ctx.stroke(); }
+}
+function text(s, x, y, color = '#fff', align = 'left', shadow = true) {
+  ctx.font = FONT; ctx.textAlign = align;
+  if (shadow) { ctx.fillStyle = '#000'; ctx.fillText(s, x + 1, y + 1); }
+  ctx.fillStyle = color; ctx.fillText(s, x, y);
+}
+function wrap(s, maxW) {
+  ctx.font = FONT;
+  const out = []; let line = '';
+  for (const w of s.split(' ')) {
+    const t = line ? line + ' ' + w : w;
+    if (ctx.measureText(t).width > maxW && line) { out.push(line); line = w; } else line = t;
+  }
+  if (line) out.push(line);
+  return out;
+}
+const hash = (x, y) => Math.floor(Math.abs(Math.sin(x * 12.9898 + y * 78.233) * 43758.5453)) % 100;
+const HEART = [' ## ## ', '#######', '#######', ' ##### ', '  ###  ', '   #   '];
+function drawHeart(x, y, fill, color = '#f22633') {
+  HEART.forEach((row, yy) => [...row].forEach((ch, xx) => {
+    if (ch !== '#') return;
+    const lit = fill >= 1 || (fill > 0 && xx < 4);
+    R(x + xx, y + yy, 1, 1, lit ? color : '#3a1820');
   }));
-  G.player = { x: sp.x, y: sp.y, fx: 0, fy: 1, max: TUNE.player.hearts * 2, hp: TUNE.player.hearts * 2, inv: 0, cd: 0,
-    zombie: false, kx: 0, ky: 0, walk: 0, launching: false, lp: 0, from: null, to: null };
-  G.jon = { x: sp.x + 10, y: sp.y - 14, mode: 'follow', vx: 0, vy: 0, trav: 0, hit: [], t: 0, st: 0, base: 0, spin: 0,
-    quip: '', qt: 0, nq: 6 };
-  say(LINES.intro);
 }
 
-// ---------- dialogue ----------
-function say(lines, done) { G.queue = lines.slice(); G.done = done || null; G.state = 'talk'; nextLine(); }
-function nextLine() {
-  if (!G.queue.length) {
-    G.talking = false; G.state = 'play'; G.player.cd = 0.25;
-    const cb = G.done; G.done = null; if (cb) cb(); return;
+// ===== world.js =====
+// Game state, maps, tiles, collision and screen-by-screen camera (like A Link to the Past).
+const G = {
+  state: 'title', t: 0,
+  save: null,                 // persistent progress (see newSave)
+  mapId: '', map: null, rows: null, cols: 0, nrows: 0,
+  scr: { x: 0, y: 0 }, cam: { x: 0, y: 0 }, trans: null,
+  ents: [], fx: [], pending: [], roomEnemies: false,
+  player: null, jon: null,
+  talk: null, banner: '', bannerT: 0, shake: 0, flash: 0,
+  entry: { x: 0, y: 0 },
+};
+
+function newSave() {
+  return { map: 'home', x: 0, y: 0, maxHp: 6, hp: 6, kr: 0, rune: 0, potions: 0, pieces: 0,
+    items: {}, flags: {}, keys: {}, bigkeys: {}, voodoo: true };
+}
+const SAVE_KEY = 'jontuka-save-v1';
+function writeSave() {
+  const s = G.save, p = G.player;
+  if (p) { s.x = p.x; s.y = p.y; s.hp = p.hp; s.map = G.mapId; }
+  try { localStorage.setItem(SAVE_KEY, JSON.stringify(s)); } catch (e) { /* storage blocked: progress lives for this visit only */ }
+}
+function readSave() {
+  try { const s = localStorage.getItem(SAVE_KEY); return s ? Object.assign(newSave(), JSON.parse(s)) : null; } catch (e) { return null; }
+}
+const flag = k => !!G.save.flags[k];
+const setFlag = k => { G.save.flags[k] = true; };
+
+// ---------- tiles ----------
+const SOLID = new Set('T#MwHRDPqX+lWtOYQZxLKb'.split(''));
+function tile(tx, ty) {
+  if (tx < 0 || ty < 0 || tx >= G.cols || ty >= G.nrows) return G.map.dungeon ? 'W' : 'T';
+  return G.rows[ty][tx];
+}
+const tileAt = (x, y) => tile(Math.floor(x / T), Math.floor(y / T));
+function setTile(tx, ty, c) { G.rows[ty][tx] = c; }
+function screenOf(x, y) { return { x: Math.floor(x / VW), y: Math.floor(y / VH) }; }
+const sameScreen = (tx, ty) => Math.floor(tx / SW) === G.scr.x && Math.floor(ty / SH) === G.scr.y;
+function shutterClosed(tx, ty) { return sameScreen(tx, ty) && G.roomEnemies && G.ents.some(e => e.enemy && e.alive); }
+function gatesDown() { return flag(G.mapId + ':gates'); }
+
+// who: 'player' | 'walker' | 'flyer' | 'jon'
+function solidTile(tx, ty, who) {
+  const c = tile(tx, ty);
+  if (who === 'flyer') return c === 'W' || c === 'T' || c === 'M' || c === 'Z';
+  if (c === 'h') return shutterClosed(tx, ty);
+  if (c === 'G') return !gatesDown();
+  if (who === 'jon') return SOLID.has(c) && c !== 'b' && c !== 'O' && c !== 'x' && c !== 'w' && c !== 'Q';
+  if (who === 'walker' && (c === 'v' || c === '~' || c === 'E')) return true;
+  return SOLID.has(c);
+}
+function solidAt(x, y, who) { return solidTile(Math.floor(x / T), Math.floor(y / T), who); }
+function blocked(x, y, r, who, self) {
+  if (solidAt(x - r, y - r, who) || solidAt(x + r, y - r, who) || solidAt(x - r, y + r, who) || solidAt(x + r, y + r, who)) return true;
+  // keep actors inside the current screen
+  const sx = G.scr.x * VW, sy = G.scr.y * VH;
+  if (who !== 'player' && (x - r < sx || x + r > sx + VW || y - r < sy || y + r > sy + VH)) return true;
+  if (who === 'player' || who === 'walker') {
+    for (const e of G.ents) if (e.solid && e !== self && Math.abs(e.x - x) < 7 + r && Math.abs(e.y - y) < 7 + r) return true;
   }
-  const [who, text] = G.queue.shift();
-  G.who = who; G.text = text; G.talking = true; G.shown = 0;
+  return false;
+}
+function tryMove(n, mx, my, r, who) {
+  let hitX = false, hitY = false;
+  if (!blocked(n.x + mx, n.y, r, who, n)) n.x += mx; else hitX = mx !== 0;
+  if (!blocked(n.x, n.y + my, r, who, n)) n.y += my; else hitY = my !== 0;
+  return { hitX, hitY };
 }
 
-// ---------- events ----------
-function dive(p) {
-  p.launching = true; p.lp = 0; p.from = { x: p.x, y: p.y }; p.to = G.launch; p.inv = 1.5;
-  G.jon.mode = 'follow';
-  if (!G.dived) { G.dived = true; say(LINES.dive); }
-}
-function hurt(dmg, from) {
+// ---------- maps and screens ----------
+function loadMap(id, px, py) {
+  G.mapId = id; G.map = MAPS[id];
+  G.rows = G.map.rows.map(r => [...r]);
+  G.nrows = G.rows.length; G.cols = G.rows[0].length;
+  // reapply opened doors from the save
+  for (const k in G.save.flags) {
+    const m = k.match(/^open:(\w+):(\d+),(\d+)$/);
+    if (m && m[1] === id) setTile(+m[2], +m[3], '_');
+  }
   const p = G.player;
-  if (p.inv > 0 || p.launching || G.state !== 'play') return;
-  p.hp -= dmg; p.inv = 1;
-  const d = Math.hypot(p.x - from.x, p.y - from.y) || 1;
-  p.kx = (p.x - from.x) / d * 160; p.ky = (p.y - from.y) / d * 160;
-  if (p.hp <= 0) {
-    p.hp = 0;
-    if (!p.zombie) { p.zombie = true; p.hp = p.max; p.inv = 2; say(LINES.revive); }
-    else { G.state = 'over'; G.banner = LINES.game_over; }
+  p.x = px; p.y = py; p.vx = p.vy = p.kx = p.ky = 0; p.launching = false; p.falling = 0; p.hold = null;
+  G.jon.x = px + 10; G.jon.y = py - 14; G.jon.mode = 'follow';
+  G.scr = screenOf(px, py);
+  G.trans = null;
+  enterScreen();
+}
+
+function enterScreen() {
+  G.cam = { x: G.scr.x * VW, y: G.scr.y * VH };
+  G.entry = { x: G.player.x, y: G.player.y };
+  G.ents = []; G.fx = []; G.pending = [];
+  const key = `clear:${G.mapId}:${G.scr.x},${G.scr.y}`;
+  const cleared = flag(key);
+  for (const d of G.map.ents) {
+    const [tx, ty] = d.at;
+    if (!sameScreen(tx, ty)) continue;
+    const e = makeEnt(d, tx * T + 8, ty * T + 8);
+    if (!e) continue;
+    if (e.enemy && G.map.dungeon && cleared) continue;
+    if (d.clear && !cleared) { G.pending.push(e); continue; }
+    G.ents.push(e);
+  }
+  G.roomEnemies = G.ents.some(e => e.enemy);
+  if (G.map.dungeon && !G.roomEnemies && !cleared) setFlag(key);
+  if (G.map.dungeon && cleared) G.ents.push(...G.pending.splice(0));
+  onEnterScreen();
+}
+
+function checkRoomClear() {
+  if (!G.roomEnemies || G.ents.some(e => e.enemy && e.alive)) return;
+  G.roomEnemies = false;
+  const key = `clear:${G.mapId}:${G.scr.x},${G.scr.y}`;
+  if (G.map.dungeon) setFlag(key);
+  if (G.pending.length) {
+    for (const e of G.pending) { G.ents.push(e); puff(e.x, e.y, '#fff'); }
+    G.pending = [];
+    Sound.play('secret');
+  } else if (G.map.dungeon) Sound.play('door');
+}
+
+// screen transitions: when Owen walks off the edge, slide the camera to the next screen
+function checkScreenEdge() {
+  const p = G.player, s = screenOf(p.x, p.y);
+  if (s.x === G.scr.x && s.y === G.scr.y) return;
+  const dx = Math.sign(s.x - G.scr.x), dy = Math.sign(s.y - G.scr.y);
+  G.trans = { from: { ...G.cam }, to: { x: s.x * VW, y: s.y * VH }, t: 0, dx, dy };
+  G.ents = G.ents.filter(e => e.keep); G.fx = [];
+  G.scr = s;
+}
+function updateTransition(dt) {
+  const tr = G.trans, p = G.player;
+  tr.t += dt / 0.5;
+  const k = Math.min(1, tr.t);
+  G.cam.x = tr.from.x + (tr.to.x - tr.from.x) * k;
+  G.cam.y = tr.from.y + (tr.to.y - tr.from.y) * k;
+  p.x += tr.dx * 52 * dt; p.y += tr.dy * 52 * dt; p.walk += dt * 10;
+  G.jon.x = p.x + 10; G.jon.y = p.y - 14;
+  if (k >= 1) { G.trans = null; enterScreen(); }
+}
+
+// find the nearest dry, walkable tile (used when the lake spits Owen out)
+function nearestDry(px, py) {
+  const sx = Math.floor(px / T), sy = Math.floor(py / T);
+  const seen = new Set([sx + ',' + sy]), q = [[sx, sy]];
+  while (q.length) {
+    const [x, y] = q.shift();
+    const c = tile(x, y);
+    if (c !== '~' && !solidTile(x, y, 'player') && c !== 'v' && sameScreen(x, y)) return { x: x * T + 8, y: y * T + 8 };
+    for (const [dx, dy] of [[1, 0], [-1, 0], [0, 1], [0, -1]]) {
+      const k = (x + dx) + ',' + (y + dy);
+      if (!seen.has(k) && x + dx >= 0 && y + dy >= 0 && x + dx < G.cols && y + dy < G.nrows) { seen.add(k); q.push([x + dx, y + dy]); }
+    }
+  }
+  return { ...G.entry };
+}
+
+// ---------- tile art ----------
+const SNOWY = (tx, ty) => G.mapId === 'overworld' && Math.floor(ty / SH) === 0 && Math.floor(tx / SW) >= 2;
+function groundColor(tx, ty) {
+  if (G.map.dungeon) return '#5b6b8c';
+  if (G.mapId === 'home') return '#a8703c';
+  return SNOWY(tx, ty) ? '#e8eef7' : '#549a3d';
+}
+function drawTile(c, ox, oy, tx, ty) {
+  const h = hash(tx, ty), t = G.t;
+  const ground = groundColor(tx, ty);
+  switch (c) {
+    case '.': R(ox, oy, T, T, '#549a3d'); if (h < 30) R(ox + h % 12 + 1, oy + (h * 7) % 12 + 1, 2, 3, '#40801d'); break;
+    case 'f': R(ox, oy, T, T, '#549a3d');
+      for (const [a, b] of [[3, 3], [10, 5], [5, 10], [12, 12]]) { R(ox + a, oy + b, 2, 2, h % 2 ? '#ffd84a' : '#ff8ab0'); R(ox + a, oy + b + 2, 1, 2, '#2f6b1a'); } break;
+    case 's': R(ox, oy, T, T, SNOWY(tx, ty) ? '#c9d2e0' : '#dbc780'); if (h < 25) R(ox + h % 12 + 1, oy + (h * 5) % 12 + 1, 2, 1, SNOWY(tx, ty) ? '#aab4c8' : '#bda866'); break;
+    case 'n': R(ox, oy, T, T, '#e8eef7'); if (h < 30) R(ox + h % 12 + 1, oy + (h * 3) % 12 + 1, 2, 1, '#c3cfe3'); break;
+    case 'T': R(ox, oy, T, T, SNOWY(tx, ty) ? '#dfe7f2' : '#2f6b2a');
+      R(ox + 2, oy + 1, 12, 10, SNOWY(tx, ty) ? '#2e5e4a' : '#1f7a33'); R(ox + 1, oy + 4, 14, 5, SNOWY(tx, ty) ? '#2e5e4a' : '#1f7a33');
+      R(ox + 4, oy + 2, 5, 3, SNOWY(tx, ty) ? '#ffffff' : '#36a24a'); R(ox + 6, oy + 11, 4, 5, '#6b4322'); break;
+    case 'b': R(ox, oy, T, T, '#549a3d'); R(ox + 2, oy + 3, 12, 11, '#1d5e22'); R(ox + 3, oy + 2, 10, 11, '#4fbf4a'); R(ox + 5, oy + 4, 3, 2, '#9be08a'); break;
+    case '#': R(ox, oy, T, T, ground); R(ox + 1, oy + 3, 14, 12, '#77778a'); R(ox + 3, oy + 3, 8, 3, '#a9a9bb'); R(ox + 1, oy + 12, 14, 3, '#4c4c5c'); break;
+    case 'M': R(ox, oy, T, T, '#7a5a3c'); R(ox, oy + (h % 3) * 4 + 2, T, 2, '#5c4128'); R(ox + (h % 10), oy, 2, T, '#8f6c4a'); break;
+    case 'w': R(ox, oy, T, T, '#1d3f8a'); if ((Math.floor(t * 2) + tx + ty) % 3 === 0) R(ox + 3, oy + 6, 8, 1, '#3d66c4'); break;
+    case '~': R(ox, oy, T, T, '#3366cc'); { const w = Math.floor(t * 2 + tx + ty) % 4; if (w === 0) R(ox + 3, oy + 5, 8, 1, '#73a6f2'); else if (w === 2) R(ox + 5, oy + 11, 7, 1, '#73a6f2'); } break;
+    case 'U': R(ox, oy, T, T, '#1d3f8a'); R(ox, oy + 2, T, 12, '#9c6b3a'); for (let i = 0; i < 4; i++) R(ox + i * 4, oy + 2, 1, 12, '#6b4322'); break;
+    case 'x': R(ox, oy, T, T, ground); R(ox, oy + 5, T, 2, '#8a5a2b'); R(ox, oy + 10, T, 2, '#8a5a2b'); R(ox + 2, oy + 3, 2, 11, '#6b4322'); R(ox + 12, oy + 3, 2, 11, '#6b4322'); break;
+    case 'R': R(ox, oy, T, T, '#b33a2e'); R(ox, oy + 3 + (tx % 2) * 4, T, 2, '#8a2a21'); R(ox, oy + 11, T, 1, '#8a2a21'); break;
+    case 'H': R(ox, oy, T, T, '#a8743f'); R(ox, oy + 5, T, 1, '#7a5229'); R(ox, oy + 10, T, 1, '#7a5229'); R(ox + 7, oy + 2, 2, 2, '#ffe9a3'); break;
+    case 'D': R(ox, oy, T, T, '#a8743f'); R(ox + 3, oy + 2, 10, 14, '#4a2e17'); R(ox + 10, oy + 9, 2, 2, '#ffd84a'); break;
+    case 'P': { const top = tile(tx, ty - 1) !== 'P';
+      R(ox, oy, T, T, ground === '#549a3d' ? '#549a3d' : ground);
+      R(ox, oy + (top ? 4 : 0), T, top ? 12 : 10, '#e9edf2'); R(ox, oy + (top ? 4 : 0), T, 1, '#c3cad4');
+      if (top) { R(ox + 3, oy + 8, 3, 3, '#3a5a8a'); R(ox + 10, oy + 8, 3, 3, '#3a5a8a'); } else R(ox, oy + 2, T, 3, '#c0392b');
+      if (tile(tx - 1, ty) !== 'P') { R(ox, oy, 4, T, '#549a3d'); R(ox + 2, oy + (top ? 6 : 0), 3, top ? 10 : 8, '#e9edf2'); }
+      if (tile(tx + 1, ty) !== 'P' && top) R(ox + 8, oy - 6, 8, 10, '#c0392b');
+      break; }
+    case 'q': R(ox, oy, T, T, ground === '#549a3d' ? '#dbc780' : ground); R(ox, oy + 4, T, 8, '#b6bcc6'); R(ox, oy + 11, T, 1, '#8a909a'); break;
+    case 'E': R(ox, oy, T, T, '#7a5a3c'); R(ox + 2, oy + 3, 12, 13, '#111'); R(ox + 3, oy + 2, 10, 2, '#111'); break;
+    case 'X': R(ox, oy, T, T, '#7a5a3c'); R(ox + 1, oy + 1, 14, 15, '#6c6c7c'); R(ox + 2, oy + 2, 12, 13, '#555565');
+      { const g = 0.5 + 0.5 * Math.sin(t * 3 + tx); ctx.globalAlpha = 0.5 + g * 0.5; R(ox + 7, oy + 4, 2, 9, '#7fd4ff'); R(ox + 5, oy + 6, 6, 2, '#7fd4ff'); R(ox + 5, oy + 10, 2, 2, '#7fd4ff'); R(ox + 9, oy + 10, 2, 2, '#7fd4ff'); ctx.globalAlpha = 1; } break;
+    case '+': R(ox, oy, T, T, '#549a3d'); R(ox + 4, oy + 3, 8, 12, '#8a8a99'); R(ox + 5, oy + 2, 6, 2, '#8a8a99'); R(ox + 7, oy + 5, 2, 6, '#5c5c6b'); R(ox + 5, oy + 7, 6, 2, '#5c5c6b'); R(ox + 3, oy + 14, 10, 2, '#3a5a2a'); break;
+    case 'l': { const g = Math.sin(t * 4 + tx * 2 + ty) > 0; R(ox, oy, T, T, '#c2410c'); R(ox + 2, oy + 3, 6, 3, g ? '#fb923c' : '#fde047'); R(ox + 9, oy + 10, 5, 2, g ? '#fde047' : '#fb923c'); break; }
+    case '_': R(ox, oy, T, T, '#5b6b8c'); R(ox, oy, T, 1, '#4c5a78'); R(ox, oy, 1, T, '#4c5a78'); if (h < 15) R(ox + 5, oy + 7, 3, 1, '#6c7c9e'); break;
+    case 'i': R(ox, oy, T, T, '#a8d8f0'); R(ox, oy, T, 1, '#8cc4e0'); R(ox, oy, 1, T, '#8cc4e0'); if ((h + Math.floor(t)) % 7 === 0) R(ox + 4, oy + 4, 5, 1, '#fff'); break;
+    case 'W': R(ox, oy, T, T, '#25304d'); R(ox, oy + 7, T, 1, '#1a2238'); R(ox + (ty % 2) * 8, oy, 1, 7, '#1a2238'); R(ox + ((ty + 1) % 2) * 8, oy + 8, 1, 8, '#1a2238'); R(ox, oy, T, 1, '#36446b'); break;
+    case 't': { R(ox, oy, T, T, '#5b6b8c'); R(ox + 4, oy + 8, 8, 7, '#3a3a4a'); R(ox + 3, oy + 7, 10, 2, '#59596b');
+      const f = Math.floor(t * 8 + tx) % 3; R(ox + 5, oy + 2 + f, 6, 6 - f, '#ff9a1f'); R(ox + 7, oy + 3 + f, 2, 4 - f, '#ffe066'); break; }
+    case 'v': R(ox, oy, T, T, '#05060a'); if (tile(tx, ty - 1) !== 'v') R(ox, oy, T, 3, '#2a3550'); break;
+    case 'L': R(ox, oy, T, T, '#25304d'); R(ox + 1, oy + 1, 14, 14, '#7a5229'); R(ox + 1, oy + 1, 14, 2, '#5e3f1f'); R(ox + 6, oy + 6, 4, 4, '#ffd84a'); R(ox + 7, oy + 9, 2, 3, '#222'); break;
+    case 'K': R(ox, oy, T, T, '#25304d'); R(ox + 1, oy + 1, 14, 14, '#5c2a6b'); R(ox + 4, oy + 5, 8, 7, '#ffd84a'); R(ox + 5, oy + 2, 6, 4, '#c9a227'); R(ox + 7, oy + 8, 2, 3, '#222'); break;
+    case 'h': R(ox, oy, T, T, '#5b6b8c'); if (shutterClosed(tx, ty)) { R(ox, oy, T, T, '#3a3a4a'); for (let i = 1; i < 16; i += 4) R(ox + i, oy, 2, T, '#9aa0b4'); } break;
+    case 'G': R(ox, oy, T, T, '#5b6b8c');
+      if (!gatesDown()) { R(ox + 1, oy + 1, 14, 14, '#e07b1a'); R(ox + 1, oy + 1, 14, 3, '#ffb15c'); R(ox + 1, oy + 12, 14, 3, '#9c4f0d'); }
+      else { R(ox + 2, oy + 2, 12, 12, '#cf6f12'); R(ox + 3, oy + 3, 10, 10, '#5b6b8c'); } break;
+    case 'O': R(ox, oy, T, T, ground === '#e8eef7' ? '#5b6b8c' : ground); R(ox + 3, oy + 5, 10, 10, '#8a5a3a'); R(ox + 5, oy + 3, 6, 3, '#6b4322'); R(ox + 4, oy + 8, 8, 2, '#b07a4e'); break;
+    case 'F': R(ox, oy, T, T, '#a8703c'); R(ox, oy + 7, T, 1, '#8a5a2b'); R(ox + ((ty % 2) ? 4 : 11), oy, 1, 7, '#8a5a2b'); R(ox + ((ty % 2) ? 11 : 4), oy + 8, 1, 8, '#8a5a2b'); break;
+    case 'Z': R(ox, oy, T, T, '#e6d3b0'); R(ox, oy + 12, T, 4, '#8a6a4a'); if (ty === 0 && tx % 5 === 2) { R(ox + 3, oy + 3, 10, 7, '#9fd0ff'); R(ox + 7, oy + 3, 1, 7, '#fff'); } break;
+    case 'Y': R(ox, oy, T, T, '#a8703c'); { const top = tile(tx, ty - 1) !== 'Y'; R(ox + 1, oy, 14, T, '#2f5aa8'); if (top) R(ox + 2, oy + 2, 12, 5, '#f2f2f2'); } break;
+    case 'Q': R(ox, oy, T, T, ground === '#549a3d' ? '#dbc780' : ground); R(ox, oy + 4, T, 9, '#8a5a2b'); R(ox, oy + 4, T, 2, '#b07a4e'); R(ox + 1, oy + 13, 2, 3, '#5e3f1f'); R(ox + 13, oy + 13, 2, 3, '#5e3f1f'); break;
+    case 'd': R(ox, oy, T, T, '#3a2a1a'); R(ox + 1, oy, 14, T, '#5e3f1f'); R(ox + 2, oy + 12, 12, 4, '#a83a3a'); break;
+    case 'r': R(ox, oy, T, T, '#a83a3a'); R(ox + 2, oy + 2, 12, 12, '#c25a3a'); if ((tx + ty) % 2) R(ox + 6, oy + 6, 4, 4, '#ffd84a'); break;
+    default: R(ox, oy, T, T, ground);
   }
 }
-function hitEnemy(e, dmg, from) {
-  e.hp -= dmg; e.flash = 0.15;
-  const d = Math.hypot(e.x - from.x, e.y - from.y) || 1, k = e.boss ? 80 : 140;
-  e.kx = (e.x - from.x) / d * k; e.ky = (e.y - from.y) / d * k;
-  if (e.hp <= 0) {
-    e.active = false; G.enemies = G.enemies.filter(o => o !== e);
-    if (e === G.boss) say(LINES.win, () => { G.state = 'win'; G.banner = LINES.to_be_continued + '\nPress Z to restart'; });
+function drawMap() {
+  const cx = Math.floor(G.cam.x), cy = Math.floor(G.cam.y);
+  const x0 = Math.floor(cx / T), y0 = Math.floor(cy / T);
+  for (let ty = y0; ty <= y0 + SH; ty++) for (let tx = x0; tx <= x0 + SW; tx++) {
+    if (tx < 0 || ty < 0 || tx >= G.cols || ty >= G.nrows) continue;
+    drawTile(G.rows[ty][tx], tx * T - cx, ty * T - cy, tx, ty);
   }
 }
 
-// ---------- update ----------
-function update(dt) {
-  G.t += dt;
-  const p = G.player, j = G.jon;
-  if (G.state === 'title') { if (just('confirm')) start(); return; }
-  if (G.state === 'talk') {
-    G.shown += dt * 60;
-    if (just('confirm')) { if (G.shown < G.text.length) G.shown = G.text.length; else nextLine(); }
+// ===== actors.js =====
+// Owen, Jon, enemies, people and things.
+
+// ---------- factory ----------
+function makeEnt(d, x, y) {
+  const s = G.save;
+  const base = { x, y, def: d, kind: d.t };
+  switch (d.t) {
+    case 'start': return null;
+    case 'runestone': return { ...base, solid: true, talk: true };
+    case 'sign': case 'plaque': return { ...base, solid: true, talk: true };
+    case 'sealed': case 'cargo': return { ...base, talk: true };
+    case 'npc': return { ...base, solid: true, talk: true, id: d.id, bob: Math.random() * 6 };
+    case 'shop': return { ...base, talk: true, item: d.item, price: d.price };
+    case 'chest': return { ...base, solid: true, talk: true, open: !!s.flags['chest:' + d.id] };
+    case 'piece': case 'container': return s.flags['got:' + d.id] ? null : { ...base, kind: 'pickup', what: d.t, id: d.id, permanent: true };
+    case 'warp': return { ...base, portal: !!d.portal };
+    case 'flight': return { ...base };
+    case 'switch': return { ...base, solid: true, hittable: true, id: d.id, cd: 0 };
+    default: return makeEnemy(d.t, x, y);
+  }
+}
+const ENEMY = {
+  penguin: { hp: 2, r: 6, touch: 1, speed: 40 },
+  draugr: { hp: 4, r: 6, touch: 2, speed: 20, shield: true },
+  wisp: { hp: 1, r: 5, touch: 1, speed: 26, fly: true },
+  bat: { hp: 1, r: 5, touch: 1, speed: 75, fly: true },
+  knight: { hp: 7, r: 9, touch: 2, speed: 30, shield: true, boss: true },
+  king: { hp: 10, r: 14, touch: 2, speed: 26, boss: true },
+};
+function makeEnemy(type, x, y) {
+  const d = ENEMY[type];
+  if (!d) return null;
+  return { x, y, kind: 'enemy', enemy: true, alive: true, type, ...d, max: d.hp, flash: 0, kx: 0, ky: 0, t: Math.random() * 2,
+    st: type === 'king' || type === 'knight' ? 'intro' : 'idle', fx: 0, fy: 1, wob: Math.random() * 6, tx: x, ty: y, bounces: 0, summoned: false };
+}
+
+// ---------- particles ----------
+function puff(x, y, color = '#fff', n = 7) {
+  for (let i = 0; i < n; i++) { const a = Math.random() * Math.PI * 2, s = rnd(20, 60); G.fx.push({ x, y, vx: Math.cos(a) * s, vy: Math.sin(a) * s, t: 0, life: 0.4, color, size: 2 }); }
+}
+function updateFx(dt) {
+  for (const f of G.fx) { f.t += dt; f.x += f.vx * dt; f.y += f.vy * dt; f.vx *= 0.9; f.vy *= 0.9; }
+  G.fx = G.fx.filter(f => f.t < f.life);
+}
+function drawFx() {
+  for (const f of G.fx) {
+    if (f.kind === 'text') { text(f.label, f.x - G.cam.x, f.y - G.cam.y - f.t * 12, f.color, 'center'); continue; }
+    R(f.x - G.cam.x, f.y - G.cam.y, f.size, f.size, f.color);
+  }
+}
+function floatText(x, y, label, color = '#fff') { G.fx.push({ kind: 'text', x, y, vx: 0, vy: 0, t: 0, life: 0.9, label, color }); }
+
+// ---------- Owen ----------
+function makePlayer() {
+  return { x: 0, y: 0, vx: 0, vy: 0, fx: 0, fy: 1, hp: G.save.hp, inv: 0, cd: 0, kx: 0, ky: 0, walk: 0,
+    launching: false, lp: 0, from: null, to: null, falling: 0, bump: 0, hold: null };
+}
+const facing4 = p => Math.abs(p.fx) > Math.abs(p.fy) ? { x: Math.sign(p.fx), y: 0 } : { x: 0, y: Math.sign(p.fy) || 1 };
+
+function updatePlayer(dt) {
+  const p = G.player, s = G.save;
+  p.inv = Math.max(0, p.inv - dt); p.cd = Math.max(0, p.cd - dt); p.bump = Math.max(0, p.bump - dt);
+  if (p.falling > 0) {
+    p.falling -= dt;
+    if (p.falling <= 0) {
+      p.x = G.entry.x; p.y = G.entry.y; p.vx = p.vy = 0;
+      hurtPlayer(1, null, true);
+      if (!flag('tip:pit')) { setFlag('tip:pit'); say(STORY.pit_first); }
+    }
     return;
   }
-  if (G.state === 'over' || (G.state === 'win' && G.banner)) { if (just('confirm')) start(); return; }
-  p.inv = Math.max(0, p.inv - dt); p.cd = Math.max(0, p.cd - dt);
-
   if (p.launching) {
-    p.lp += dt / 0.6;
+    p.lp += dt / 0.7;
     const k = Math.min(p.lp, 1);
     p.x = p.from.x + (p.to.x - p.from.x) * k; p.y = p.from.y + (p.to.y - p.from.y) * k;
     if (p.lp >= 1) p.launching = false;
-  } else {
-    let vx = (held('right') ? 1 : 0) - (held('left') ? 1 : 0), vy = (held('down') ? 1 : 0) - (held('up') ? 1 : 0);
-    const m = Math.hypot(vx, vy);
-    if (m > 0) {
-      vx /= m; vy /= m; p.fx = vx; p.fy = vy; p.walk += dt * 10;
-      tryMove(p, vx * TUNE.player.speed * dt, vy * TUNE.player.speed * dt, 5);
-    }
-    const kl = Math.hypot(p.kx, p.ky);
-    if (kl > 1) {
-      tryMove(p, p.kx * dt, p.ky * dt, 5);
-      const nl = Math.max(0, kl - 500 * dt); p.kx *= nl / kl; p.ky *= nl / kl;
-    }
-    if (tileAt(p.x, p.y) === '~') dive(p);
-    else if (p.cd <= 0 && j.mode === 'follow') {
-      if (just('swing')) { j.mode = 'swing'; j.st = 0; j.base = Math.atan2(p.fy, p.fx); j.hit = []; }
-      else if (just('throw')) {
-        j.mode = 'out'; j.x = p.x; j.y = p.y; j.trav = 0; j.hit = [];
-        const l = Math.hypot(p.fx, p.fy) || 1; j.vx = p.fx / l * TUNE.jon.throw_speed; j.vy = p.fy / l * TUNE.jon.throw_speed;
-      }
-    }
+    return;
   }
-  updateJon(dt);
-  for (const e of G.enemies.slice()) updateEnemy(e, dt);
-  if (!G.bossSeen && G.boss && dist(p, G.boss) < 110) { G.bossSeen = true; G.boss.active = true; say(LINES.boss); }
+  const v = inputVec();
+  if (v.x || v.y) { p.fx = v.x; p.fy = v.y; p.walk += dt * 10; }
+  const onIce = tileAt(p.x, p.y) === 'i';
+  if (onIce) { const k = Math.min(1, 2.2 * dt); p.vx += (v.x * 80 - p.vx) * k; p.vy += (v.y * 80 - p.vy) * k; }
+  else { p.vx = v.x * 72; p.vy = v.y * 72; }
+  const hit = tryMove(p, p.vx * dt, p.vy * dt, 5, 'player');
+  if (onIce) { if (hit.hitX) p.vx *= -0.3; if (hit.hitY) p.vy *= -0.3; }
+  const kl = Math.hypot(p.kx, p.ky);
+  if (kl > 1) { tryMove(p, p.kx * dt, p.ky * dt, 5, 'player'); const nl = Math.max(0, kl - 520 * dt); p.kx *= nl / kl; p.ky *= nl / kl; }
+
+  // doors that need keys
+  if (v.x || v.y) {
+    const f = facing4(p), c = tileAt(p.x + f.x * 9, p.y + f.y * 9);
+    if ((c === 'L' || c === 'K') && p.bump <= 0) tryUnlock(Math.floor((p.x + f.x * 9) / T), Math.floor((p.y + f.y * 9) / T), c);
+  }
+  const here = tileAt(p.x, p.y);
+  if (here === '~') {
+    p.launching = true; p.lp = 0; p.from = { x: p.x, y: p.y }; p.to = nearestDry(p.x, p.y); p.inv = 1.2;
+    G.jon.mode = 'follow'; Sound.play('splash'); puff(p.x, p.y, '#bfe0ff', 10);
+    floatText(p.x, p.y - 20, 'Lady of the Lake!', '#bfe0ff');
+    return;
+  }
+  if (here === 'v') { p.falling = 0.6; Sound.play('fall'); return; }
+
+  // warps and triggers
+  for (const e of G.ents) {
+    if (e.kind === 'warp' && Math.abs(e.x - p.x) < 8 && Math.abs(e.y - p.y) < 8) return startWarp(e.def.to, e.def.dest);
+    if (e.kind === 'flight' && Math.abs(e.x - p.x) < 9 && Math.abs(e.y - p.y) < 10) return startFlight();
+  }
+
+  // actions
+  if (p.cd > 0) return;
+  if (just('a')) {
+    const f = facing4(p), px = p.x + f.x * 13, py = p.y + f.y * 13;
+    const target = G.ents.find(e => e.talk && Math.abs(e.x - px) < 11 && Math.abs(e.y - py) < 11);
+    if (target) return interact(target);
+    if (tileAt(px, py) === 'D' && G.mapId === 'overworld') return say(STORY.house);
+    if (G.jon.mode === 'follow') { G.jon.swing(Math.atan2(p.fy, p.fx)); Sound.play('swing'); }
+  } else if (just('b') && G.jon.mode === 'follow') {
+    G.jon.throw(p.x, p.y, p.fx, p.fy); Sound.play('throw');
+  } else if (just('c')) {
+    if (!s.items.thunder) floatText(p.x, p.y - 18, 'No rune yet', '#aab');
+    else if (s.rune < RUNE_MAX) { floatText(p.x, p.y - 18, 'Rune not full', '#7fd4ff'); }
+    else startThunder();
+  }
 }
 
-function jonHits(dmg, reach, from) {
-  const j = G.jon;
-  for (const e of G.enemies.slice()) {
-    if (j.hit.includes(e) || !e.active) continue;
-    if (dist(j, e) < reach + e.r) { j.hit.push(e); hitEnemy(e, dmg, from); }
+function tryUnlock(tx, ty, c) {
+  const s = G.save, p = G.player;
+  p.bump = 0.6;
+  if (c === 'L' && !(s.keys[G.mapId] > 0)) return say(STORY.locked);
+  if (c === 'K' && !s.bigkeys[G.mapId]) return say(STORY.bossdoor);
+  if (c === 'L') s.keys[G.mapId]--;
+  // open the whole door (both tiles, both sides)
+  const q = [[tx, ty]], seen = new Set();
+  while (q.length) {
+    const [x, y] = q.pop(); const k = x + ',' + y;
+    if (seen.has(k) || tile(x, y) !== c) continue;
+    seen.add(k); setTile(x, y, '_'); setFlag(`open:${G.mapId}:${x},${y}`);
+    q.push([x + 1, y], [x - 1, y], [x, y + 1], [x, y - 1]);
   }
+  Sound.play('door'); puff(tx * T + 8, ty * T + 8, '#ffd84a');
+}
+
+function hurtPlayer(dmg, from, force) {
+  const p = G.player, s = G.save;
+  if (!force && (p.inv > 0 || p.launching || G.state !== 'play')) return;
+  p.hp -= dmg; p.inv = 1; Sound.play('hurt'); G.shake = 0.15;
+  if (from) { const d = Math.hypot(p.x - from.x, p.y - from.y) || 1; p.kx = (p.x - from.x) / d * 170; p.ky = (p.y - from.y) / d * 170; }
+  if (p.hp > 0) return;
+  if (s.potions > 0) { s.potions--; p.hp = s.maxHp; p.inv = 2; Sound.play('heart'); return say(STORY.juice); }
+  if (s.voodoo) { s.voodoo = false; p.hp = s.maxHp; p.inv = 2.5; puff(p.x, p.y, '#9a4dd9', 16); Sound.play('secret'); return say(STORY.revive); }
+  p.hp = 0; G.state = 'over'; G.menuSel = 0;
+}
+
+function interact(e) {
+  const s = G.save, p = G.player;
+  p.cd = 0.2;
+  switch (e.kind) {
+    case 'sign': return say(STORY.signs[e.def.text] || [['', '...']]);
+    case 'sealed': return say(STORY.signs[e.def.text]);
+    case 'plaque': return say(STORY.plaque, () => setFlag('read_plaque'));
+    case 'cargo':
+      if (!flag('cargo')) { setFlag('cargo'); Sound.play('creep'); G.flash = 0.25; G.flashColor = '#5a0000'; return say(STORY.cargo); }
+      return say(STORY.cargo_later);
+    case 'runestone':
+      p.hp = s.maxHp; s.voodoo = true; writeSave(); Sound.play('save'); puff(e.x, e.y - 6, '#7fd4ff', 12);
+      return say(STORY.saved);
+    case 'npc': return say(npcLines(e.id));
+    case 'shop': return buy(e);
+    case 'chest':
+      if (e.open) return say([['', 'The chest is empty.']]);
+      e.open = true; setFlag('chest:' + e.def.id);
+      return giveItem(e.def.item);
+  }
+}
+
+function npcLines(id) {
+  if (id === 'astrid') {
+    if (!flag('met_astrid')) { setFlag('met_astrid'); G.save.kr += 30; return [...STORY.astrid_1, ['', 'Astrid gave you 30 kroner.']]; }
+    return flag('d1done') ? STORY.astrid_3 : STORY.astrid_2;
+  }
+  if (id === 'sven') return flag('got:hp_forest') ? STORY.sven_2 : STORY.sven_1;
+  return STORY[id] || [['', '...']];
+}
+
+function buy(e) {
+  const s = G.save, it = ITEMS[e.item];
+  if (e.item === 'juice' && s.potions >= 3) return say([['Lars', 'You can only carry three bottles. Drink some first. Or die. Then it drinks itself.']]);
+  if (s.kr < e.price) return say([['Lars', `${it.name} costs ${e.price} kroner. You have ${s.kr}. Cut more bushes!`]]);
+  s.kr -= e.price; Sound.play('coin');
+  applyItem(e.item);
+  say([['Lars', `One ${it.name}. Takk!`], ...it.lines]);
+}
+
+const RUNE_MAX = 16;
+function applyItem(id) {
+  const s = G.save, p = G.player;
+  switch (id) {
+    case 'key': s.keys[G.mapId] = (s.keys[G.mapId] || 0) + 1; break;
+    case 'bigkey': s.bigkeys[G.mapId] = true; break;
+    case 'homing': s.items.homing = true; break;
+    case 'thunder': s.items.thunder = true; s.rune = RUNE_MAX; break;
+    case 'piece': s.pieces++; if (s.pieces >= 4) { s.pieces = 0; s.maxHp += 2; p.hp = s.maxHp; } break;
+    case 'container': s.maxHp += 2; p.hp = s.maxHp; break;
+    case 'kr20': s.kr += 20; break;
+    case 'juice': s.potions++; break;
+    case 'shard': s.rune = RUNE_MAX; break;
+    case 'heart3': p.hp = s.maxHp; break;
+  }
+}
+function giveItem(id, after) {
+  applyItem(id);
+  G.player.hold = { id, t: 1.1 };
+  G.state = 'hold'; Sound.play('item');
+  G.afterHold = () => say(ITEMS[id].lines, () => { if (after) after(); writeSave(); });
+}
+
+// ---------- Jon ----------
+function makeJon() {
+  const j = { x: 0, y: 0, mode: 'follow', vx: 0, vy: 0, trav: 0, hit: [], t: 0, st: 0, base: 0, spin: 0, quip: '', qt: 0, nq: 8 };
+  j.swing = a => { j.mode = 'swing'; j.st = 0; j.base = a; j.hit = []; };
+  j.throw = (x, y, fx, fy) => {
+    j.mode = 'out'; j.x = x; j.y = y; j.trav = 0; j.hit = [];
+    const l = Math.hypot(fx, fy) || 1, sp = 200; j.vx = fx / l * sp; j.vy = fy / l * sp;
+    j.target = G.save.items.homing ? findTarget(x, y, fx / l, fy / l) : null;
+  };
+  return j;
+}
+function findTarget(x, y, fx, fy) {
+  let best = null, bd = 1e9;
+  for (const e of G.ents) {
+    if (!((e.enemy && e.alive) || e.hittable)) continue;
+    const dx = e.x - x, dy = e.y - y, d = Math.hypot(dx, dy);
+    if (d > 200) continue;
+    const score = d - (dx * fx + dy * fy) * 0.6;   // prefer things in front
+    if (score < bd) { bd = score; best = e; }
+  }
+  return best;
 }
 function updateJon(dt) {
   const j = G.jon, p = G.player;
-  const bonus = p.zombie ? TUNE.player.zombie_bonus : 0;
   j.t += dt;
+  const range = G.save.items.homing ? 175 : 88;
   if (j.mode === 'follow') {
     const tx = p.x + 10, ty = p.y - 14 + Math.sin(j.t * 3) * 2, k = Math.min(1, 8 * dt);
     j.x += (tx - j.x) * k; j.y += (ty - j.y) * k; j.spin = 0;
   } else if (j.mode === 'swing') {
     j.st += dt;
-    const k = j.st / 0.22, a = j.base + (-1.3 + 2.6 * k);
+    const k = j.st / 0.2, a = j.base + (-1.3 + 2.6 * k);
     j.x = p.x + Math.cos(a) * 15; j.y = p.y + Math.sin(a) * 15; j.spin = a + Math.PI / 2;
-    jonHits(TUNE.player.swing_damage + bonus, 10, p);
+    jonHits(1, 11, p, 'swing');
+    cutAt(j.x, j.y);
     if (k >= 1) j.mode = 'follow';
   } else if (j.mode === 'out') {
+    if (j.target && (j.target.alive || j.target.hittable) && G.ents.includes(j.target)) {
+      const dx = j.target.x - j.x, dy = j.target.y - j.y, d = Math.hypot(dx, dy) || 1, sp = 210;
+      const k = Math.min(1, 9 * dt); j.vx += (dx / d * sp - j.vx) * k; j.vy += (dy / d * sp - j.vy) * k;
+    }
     j.x += j.vx * dt; j.y += j.vy * dt; j.trav += Math.hypot(j.vx, j.vy) * dt; j.spin += dt * 22;
-    jonHits(TUNE.jon.throw_damage + bonus, 9, j);
-    if (j.trav > TUNE.jon.throw_range || solid(j.x, j.y)) { j.mode = 'back'; j.hit = []; }
+    jonHits(1, 9, j, 'throw');
+    if (cutAt(j.x, j.y) || j.trav > range || solidAt(j.x, j.y, 'jon')) { j.mode = 'back'; j.hit = []; }
   } else if (j.mode === 'back') {
     const dx = p.x - j.x, dy = p.y - j.y, d = Math.hypot(dx, dy) || 1;
-    j.x += dx / d * 230 * dt; j.y += dy / d * 230 * dt; j.spin += dt * 22;
-    jonHits(TUNE.jon.throw_damage + bonus, 9, j);
-    if (d < 8) j.mode = 'follow';
+    j.x += dx / d * 240 * dt; j.y += dy / d * 240 * dt; j.spin += dt * 22;
+    jonHits(1, 9, j, 'throw');
+    if (d < 9) j.mode = 'follow';
+  }
+  if (j.mode === 'out' || j.mode === 'back') {
+    for (const e of G.ents) if (e.kind === 'pickup' && dist(e, j) < 10) { e.x = j.x; e.y = j.y; }   // Jon fetches loot
   }
   j.nq -= dt; j.qt = Math.max(0, j.qt - dt);
-  if (j.nq <= 0) { j.nq = 9 + Math.random() * 7; j.quip = LINES.quips[Math.floor(Math.random() * LINES.quips.length)]; j.qt = 2.5; }
+  if (j.nq <= 0) { j.nq = rnd(12, 20); j.quip = pick(STORY.quips); j.qt = 2.5; }
 }
+function jonHits(dmg, reach, from, how) {
+  const j = G.jon;
+  for (const e of G.ents.slice()) {
+    if (j.hit.includes(e)) continue;
+    if (e.hittable && dist(j, e) < reach + 6) { j.hit.push(e); hitSwitch(e); if (how === 'throw') j.mode = 'back'; continue; }
+    if (!e.enemy || !e.alive) continue;
+    if (dist(j, e) < reach + e.r) {
+      j.hit.push(e);
+      const blockedHit = damageEnemy(e, dmg, from, how);
+      if (blockedHit && how === 'throw') j.mode = 'back';
+    }
+  }
+}
+function cutAt(x, y) {
+  const tx = Math.floor(x / T), ty = Math.floor(y / T), c = tile(tx, ty);
+  if (!sameScreen(tx, ty)) return false;
+  if (c === 'b') { setTile(tx, ty, '.'); puff(tx * T + 8, ty * T + 8, '#4fbf4a', 8); Sound.play('swing'); maybeDrop(tx * T + 8, ty * T + 8, 0.4); return true; }
+  if (c === 'O') { setTile(tx, ty, '_'); puff(tx * T + 8, ty * T + 8, '#8a5a3a', 8); Sound.play('kill'); maybeDrop(tx * T + 8, ty * T + 8, 0.6); return true; }
+  return false;
+}
+function hitSwitch(e) {
+  if (e.cd > 0) return;
+  e.cd = 0.5;
+  const k = G.mapId + ':gates';
+  if (!flag(k)) { setFlag(k); Sound.play('secret'); G.shake = 0.2; floatText(e.x, e.y - 14, 'Gates lowered!', '#ffb15c'); writeSave(); }
+  else Sound.play('switch');
+}
+
+// ---------- enemies ----------
+function damageEnemy(e, dmg, from, how) {
+  if (e.flash > 0.05 && how !== 'thunder') return false;
+  const dx = from.x - e.x, dy = from.y - e.y, d = Math.hypot(dx, dy) || 1;
+  if (how !== 'thunder') {
+    if (e.shield && (dx / d * e.fx + dy / d * e.fy) > 0.55 && e.st !== 'charge') { Sound.play('clank'); puff(e.x + e.fx * 8, e.y + e.fy * 8, '#ffd84a', 4); return true; }
+    if (e.type === 'king' && e.st !== 'daze') { Sound.play('clank'); floatText(e.x, e.y - 30, 'CLANK', '#ffd84a'); return true; }
+  }
+  if (e.type === 'king' && how === 'thunder') { e.st = 'daze'; e.t = 0; dmg = 2; }
+  e.hp -= dmg; e.flash = 0.18; Sound.play('hit');
+  const k = e.boss ? 60 : 150; e.kx = -dx / d * k; e.ky = -dy / d * k;
+  if (e.hp <= 0) killEnemy(e);
+  return false;
+}
+function killEnemy(e) {
+  e.alive = false;
+  G.ents = G.ents.filter(o => o !== e);
+  puff(e.x, e.y, '#fff', e.boss ? 24 : 9); Sound.play('kill');
+  const s = G.save;
+  if (s.items.thunder) s.rune = Math.min(RUNE_MAX, s.rune + 1);
+  if (!e.boss) maybeDrop(e.x, e.y, 0.65);
+  if (e.type === 'king') { G.shake = 0.6; say(STORY.king_down, checkRoomClear); return; }
+  checkRoomClear();
+}
+function maybeDrop(x, y, chance) {
+  if (Math.random() > chance) return;
+  const r = Math.random();
+  const what = r < 0.35 ? 'heart' : r < 0.75 ? 'kr1' : r < 0.9 ? 'kr5' : 'rune';
+  G.ents.push({ kind: 'pickup', what, x, y, life: 9 });
+}
+function spawnEnemy(type, x, y) { const e = makeEnemy(type, x, y); e.st = 'idle'; G.ents.push(e); puff(x, y, '#cfe8ff', 8); G.roomEnemies = true; }
+
 function updateEnemy(e, dt) {
-  e.flash = Math.max(0, e.flash - dt);
-  if (!e.active) return;
-  e.wob += dt * 8;
-  const kl = Math.hypot(e.kx, e.ky);
-  if (kl > 1) { tryMove(e, e.kx * dt, e.ky * dt, e.r * 0.6); const nl = Math.max(0, kl - 400 * dt); e.kx *= nl / kl; e.ky *= nl / kl; }
+  e.flash = Math.max(0, e.flash - dt); e.wob += dt * 8; e.t += dt;
   const p = G.player, dx = p.x - e.x, dy = p.y - e.y, d = Math.hypot(dx, dy) || 1;
-  if (e.boss) {
-    e.t += dt;
-    if (e.st === 'chase') { tryMove(e, dx / d * e.speed * dt, dy / d * e.speed * dt, e.r * 0.6); if (e.t > 2.2) { e.st = 'wind'; e.t = 0; } }
-    else if (e.st === 'wind') { e.dx = dx / d; e.dy = dy / d; if (e.t > 0.6) { e.st = 'charge'; e.t = 0; } }
-    else {
-      const bx = e.x, by = e.y;
-      tryMove(e, e.dx * e.charge * dt, e.dy * e.charge * dt, e.r * 0.6);
-      if (e.t > 0.7 || Math.hypot(bx - e.x, by - e.y) < 0.1) { e.st = 'chase'; e.t = 0; }
-    }
-  } else if (d < e.sight) tryMove(e, dx / d * e.speed * dt, dy / d * e.speed * dt, e.r * 0.6);
-  if (d < e.r + 4) hurt(e.touch, e);
+  const who = e.fly ? 'flyer' : 'walker', mr = e.r * 0.6;
+  const kl = Math.hypot(e.kx, e.ky);
+  if (kl > 1) { tryMove(e, e.kx * dt, e.ky * dt, mr, who); const nl = Math.max(0, kl - 420 * dt); e.kx *= nl / kl; e.ky *= nl / kl; }
+  const toward = sp => tryMove(e, dx / d * sp * dt, dy / d * sp * dt, mr, who);
+  switch (e.type) {
+    case 'penguin':
+      if (d < 120) { toward(e.speed); e.fx = dx / d; e.fy = dy / d; }
+      break;
+    case 'draugr':
+      if (d < 110) { e.fx = dx / d; e.fy = dy / d; toward(e.speed); }
+      else { if (e.t > 2) { e.t = 0; e.tx = e.x + rnd(-30, 30); e.ty = e.y + rnd(-30, 30); }
+        const ax = e.tx - e.x, ay = e.ty - e.y, al = Math.hypot(ax, ay); if (al > 2) { e.fx = ax / al; e.fy = ay / al; tryMove(e, ax / al * 14 * dt, ay / al * 14 * dt, mr, who); } }
+      break;
+    case 'wisp': {
+      const a = e.t * 2.2;
+      tryMove(e, (dx / d * e.speed + Math.cos(a) * 30) * dt, (dy / d * e.speed + Math.sin(a * 1.3) * 30) * dt, mr, who);
+      break; }
+    case 'bat':
+      if (e.t > 0.7) { e.t = 0; e.tx = p.x + rnd(-40, 40); e.ty = p.y + rnd(-40, 40); }
+      { const ax = e.tx - e.x, ay = e.ty - e.y, al = Math.hypot(ax, ay) || 1; tryMove(e, ax / al * e.speed * dt, ay / al * e.speed * dt, mr, who); }
+      break;
+    case 'knight':
+      if (e.st === 'intro') { if (G.state === 'play') { e.st = 'chase'; e.t = 0; } break; }
+      if (e.st === 'chase') { e.fx = dx / d; e.fy = dy / d; toward(e.speed); if (e.t > 2.8) { e.st = 'wind'; e.t = 0; } }
+      else if (e.st === 'wind') { e.fx = dx / d; e.fy = dy / d; if (e.t > 0.5) { e.st = 'charge'; e.t = 0; Sound.play('charge'); } }
+      else if (e.st === 'charge') { const h = tryMove(e, e.fx * 140 * dt, e.fy * 140 * dt, mr, who); if (e.t > 0.7 || h.hitX || h.hitY) { e.st = 'chase'; e.t = 0; } }
+      break;
+    case 'king':
+      if (e.st === 'intro') { if (G.state === 'play') { e.st = 'waddle'; e.t = 0; } break; }
+      if (!e.summoned && e.hp <= 5) {
+        e.summoned = true;
+        spawnEnemy('penguin', G.cam.x + 40, G.cam.y + 60); spawnEnemy('penguin', G.cam.x + VW - 40, G.cam.y + 60);
+      }
+      if (e.st === 'waddle') { e.fx = dx / d; e.fy = dy / d; toward(e.speed); if (e.t > 2.2) { e.st = 'wind'; e.t = 0; Sound.play('charge'); } }
+      else if (e.st === 'wind') { e.fx = dx / d; e.fy = dy / d; if (e.t > 0.6) { e.st = 'slide'; e.t = 0; e.bounces = 0; } }
+      else if (e.st === 'slide') {
+        const h = tryMove(e, e.fx * 190 * dt, e.fy * 190 * dt, mr, who);
+        if (h.hitX) e.fx *= -1; if (h.hitY) e.fy *= -1;
+        if (h.hitX || h.hitY) { e.bounces++; G.shake = 0.15; Sound.play('clank'); }
+        if (e.bounces >= 3 || e.t > 4) { e.st = 'daze'; e.t = 0; }
+      } else if (e.st === 'daze') { if (e.t > 2.2) { e.st = 'waddle'; e.t = 0; } }
+      break;
+  }
+  if (d < e.r + 5 && e.st !== 'daze') hurtPlayer(e.touch, e);
 }
 
-// ---------- drawing ----------
-const R = (x, y, w, h, c) => { ctx.fillStyle = c; ctx.fillRect(Math.round(x), Math.round(y), w, h); };
-const hash = (x, y) => Math.floor(Math.abs(Math.sin(x * 12.9898 + y * 78.233) * 43758.5453)) % 100;
+function updatePickup(e, dt) {
+  if (e.life !== undefined) { e.life -= dt; if (e.life <= 0) { G.ents = G.ents.filter(o => o !== e); return; } }
+  if (dist(e, G.player) > 11) return;
+  G.ents = G.ents.filter(o => o !== e);
+  const s = G.save, p = G.player;
+  switch (e.what) {
+    case 'heart': p.hp = Math.min(s.maxHp, p.hp + 2); Sound.play('heart'); break;
+    case 'kr1': s.kr += 1; Sound.play('coin'); break;
+    case 'kr5': s.kr += 5; Sound.play('coin'); break;
+    case 'rune': s.rune = Math.min(RUNE_MAX, s.rune + 4); Sound.play('heart'); break;
+    case 'piece': case 'container':
+      setFlag('got:' + e.id);
+      giveItem(e.what);
+      break;
+  }
+}
 
-function drawMap(cx, cy) {
-  const x0 = Math.floor(cx / T), y0 = Math.floor(cy / T);
-  for (let ty = y0; ty <= y0 + 14; ty++) for (let tx = x0; tx <= x0 + 16; tx++) {
-    if (tx < 0 || ty < 0 || tx >= COLS || ty >= ROWS) continue;
-    const c = MAP[ty][tx], ox = tx * T - cx, oy = ty * T - cy, h = hash(tx, ty);
-    const sand = c === 's' || c === 'L' || c === 'B', water = c === '~';
-    R(ox, oy, T, T, water ? '#3366cc' : sand ? '#dbc780' : '#549a3d');
-    if (!water && !sand && h < 30) R(ox + h % 12 + 1, oy + (h * 7) % 12 + 1, 2, 3, '#40801d');
-    else if (sand && h < 20) R(ox + h % 12 + 1, oy + (h * 5) % 12 + 1, 2, 1, '#bda866');
-    else if (water) {
-      const w = Math.floor(G.t * 2 + tx + ty) % 4;
-      if (w === 0) R(ox + 3, oy + 5, 8, 1, '#73a6f2'); else if (w === 2) R(ox + 5, oy + 11, 7, 1, '#73a6f2');
-    } else if (c === 'T') {
-      R(ox, oy, T, T, '#145926'); R(ox + 2, oy + 1, 12, 9, '#1f8033'); R(ox + 5, oy + 3, 4, 3, '#33a047'); R(ox + 6, oy + 10, 4, 6, '#66421f');
-    } else if (c === '#') {
-      R(ox + 1, oy + 3, 14, 12, '#73737f'); R(ox + 3, oy + 3, 8, 3, '#a6a6b3'); R(ox + 1, oy + 12, 14, 3, '#4d4d59');
+// ---------- thunder strike ----------
+function startThunder() {
+  G.save.rune = 0; G.state = 'thunder'; G.thunderT = 0; G.thunderHit = false;
+  Sound.play('charge');
+  G.jon.mode = 'follow';
+}
+function updateThunder(dt) {
+  G.thunderT += dt;
+  const j = G.jon, p = G.player;
+  j.x += (p.x - j.x) * Math.min(1, 6 * dt); j.y += (p.y - 40 - j.y) * Math.min(1, 6 * dt);
+  if (G.thunderT > 0.45 && !G.thunderHit) {
+    G.thunderHit = true; G.flash = 0.35; G.flashColor = '#ffffff'; G.shake = 0.5; Sound.play('thunder');
+    for (const e of G.ents.slice()) if (e.enemy && e.alive) damageEnemy(e, 4, e, 'thunder');
+    floatText(p.x, p.y - 50, 'THUNDER STRIKE!', '#ffe066');
+  }
+  if (G.thunderT > 1.3) G.state = 'play';
+}
+function drawLightning() {
+  if (G.state !== 'thunder') return;
+  const t = G.thunderT, j = G.jon;
+  ctx.fillStyle = `rgba(10,10,40,${Math.min(0.6, t * 1.5)})`; ctx.fillRect(0, 0, VW, VH);
+  if (t > 0.3 && t < 1.0) {
+    const x0 = j.x - G.cam.x, y1 = j.y - G.cam.y;
+    for (const [w, c] of [[5, 'rgba(127,212,255,0.5)'], [2, '#fff']]) {
+      ctx.strokeStyle = c; ctx.lineWidth = w; ctx.beginPath();
+      let x = x0 + rnd(-20, 20); ctx.moveTo(x, 0);
+      for (let y = 0; y < y1; y += 12) { x = x0 + rnd(-10, 10) * (1 - y / y1); ctx.lineTo(x, y); }
+      ctx.lineTo(x0, y1); ctx.stroke();
+    }
+    for (const e of G.ents) if (e.enemy && e.alive && t > 0.45 && t < 0.7) {
+      ctx.strokeStyle = '#fff'; ctx.lineWidth = 1; ctx.beginPath(); ctx.moveTo(x0, y1);
+      ctx.lineTo((x0 + e.x - G.cam.x) / 2 + rnd(-8, 8), (y1 + e.y - G.cam.y) / 2 + rnd(-8, 8)); ctx.lineTo(e.x - G.cam.x, e.y - G.cam.y); ctx.stroke();
     }
   }
 }
 
-function drawPlayer(cx, cy) {
+// ===== sprites.js =====
+// Pixel art drawn in code. Everything is centered on (x, y) = feet-ish center.
+
+function drawOwen(x, y) {
   const p = G.player;
-  const lift = p.launching ? Math.sin(Math.PI * Math.min(p.lp, 1)) * 28 : 0;
-  const x = p.x - cx, y = p.y - cy;
+  let lift = 0, scale = 1;
+  if (p.launching) lift = Math.sin(Math.PI * Math.min(p.lp, 1)) * 30;
+  if (p.falling > 0) scale = Math.max(0.1, p.falling / 0.6);
   R(x - 5, y + 5, 10, 2, 'rgba(0,0,0,.3)');
-  if (p.inv > 0 && Math.floor(p.inv * 20) % 2 === 0 && !p.launching) return;
-  const o = y - lift;
-  const skin = p.zombie ? '#8cbf80' : '#fac799', tunic = p.zombie ? '#73409c' : '#3380d9';
-  const st = Math.floor(p.walk) % 2;
-  R(x - 4, o + 3 + st, 3, 3, '#59381a'); R(x + 1, o + 3 + (1 - st), 3, 3, '#59381a');
-  R(x - 5, o - 3, 10, 7, tunic); R(x - 5, o + 1, 10, 1, '#664019');
-  R(x - 4, o - 9, 8, 7, skin);
-  R(x - 5, o - 11, 10, 4, '#9999ad'); R(x - 7, o - 13, 2, 4, '#f2ebcc'); R(x + 5, o - 13, 2, 4, '#f2ebcc');
+  if (p.inv > 0 && Math.floor(p.inv * 20) % 2 === 0 && !p.launching && G.state === 'play') return;
+  ctx.save(); ctx.translate(Math.round(x), Math.round(y - lift)); ctx.scale(scale, scale);
+  const zombie = !G.save.voodoo;
+  const skin = zombie ? '#8cbf80' : '#fac799', tunic = zombie ? '#73409c' : '#3380d9';
+  const st = (G.state === 'play' || G.trans) ? Math.floor(p.walk) % 2 : 0;
+  R(-4, 3 + st, 3, 3, '#59381a'); R(1, 3 + (1 - st), 3, 3, '#59381a');
+  R(-5, -3, 10, 7, tunic); R(-5, 1, 10, 1, '#664019'); R(-1, 1, 2, 1, '#ffd84a');
+  R(-4, -9, 8, 7, skin); R(-4, -9, 8, 2, '#8a5a2b');
+  R(-5, -11, 10, 4, '#9999ad'); R(-5, -11, 10, 1, '#c9c9d9'); R(-7, -13, 2, 4, '#f2ebcc'); R(5, -13, 2, 4, '#f2ebcc');
   const back = p.fy < -0.5 && Math.abs(p.fx) < 0.3;
-  if (!back) {
-    const ex = p.fy <= 0.5 ? Math.max(-1, Math.min(1, p.fx)) : 0;
-    R(x - 3 + ex, o - 6, 1, 2, '#1a1a1a'); R(x + 2 + ex, o - 6, 1, 2, '#1a1a1a');
-  }
-}
-
-function drawPenguin(e, cx, cy) {
-  const s = e.boss ? 2 : 1, x = e.x - cx, y = e.y - cy;
-  ctx.save(); ctx.translate(Math.round(x), Math.round(y)); ctx.scale(s, s);
-  R(-6, 5, 12, 2, 'rgba(0,0,0,.3)');
-  const sw = Math.round(Math.sin(e.wob));
-  let body = '#1a1a38';
-  if (e.flash > 0) body = '#fff'; else if (e.boss && e.st === 'wind') body = '#8c1a1a';
-  R(-5 + sw, -6, 10, 12, body); R(-3 + sw, -2, 6, 7, '#f2f2ff'); R(-4 + sw, -5, 8, 3, body);
-  R(-1 + sw, -3, 3, 2, '#ffa61a'); R(-3, 6, 2, 1, '#ffa61a'); R(1, 6, 2, 1, '#ffa61a');
-  R(-3 + sw, -5, 2, 2, '#ff1a1a'); R(1 + sw, -5, 2, 2, '#ff1a1a');
+  if (!back) { const ex = p.fy <= 0.5 ? clamp(p.fx, -1, 1) : 0; R(-3 + ex, -6, 1, 2, '#1a1a1a'); R(2 + ex, -6, 1, 2, '#1a1a1a'); }
+  if (p.hold) { ctx.restore(); drawItemIcon(p.hold.id, x, y - 26); return; }
   ctx.restore();
 }
 
-function drawJon(cx, cy) {
-  const j = G.jon, x = Math.round(j.x - cx), y = Math.round(j.y - cy);
-  ctx.save(); ctx.translate(x, y); ctx.rotate(j.spin);
-  R(-6, -9, 12, 18, 'rgba(77,153,255,.18)');
+function drawJonSprite(x, y, spin) {
+  ctx.save(); ctx.translate(Math.round(x), Math.round(y)); ctx.rotate(spin);
+  const homing = G.save && G.save.items.homing;
+  R(-6, -9, 12, 18, homing ? 'rgba(255,216,74,.18)' : 'rgba(77,153,255,.18)');
   R(-1, -8, 2, 17, '#805224'); R(-1, -2, 2, 1, '#4d2e14'); R(-1, 2, 2, 1, '#4d2e14'); R(-1, 8, 2, 2, '#b3b3bf');
-  const poly = (pts, fill, stroke) => {
-    ctx.beginPath(); pts.forEach(([a, b], i) => i ? ctx.lineTo(a, b) : ctx.moveTo(a, b)); ctx.closePath();
-    if (fill) { ctx.fillStyle = fill; ctx.fill(); } if (stroke) { ctx.strokeStyle = stroke; ctx.lineWidth = 1; ctx.stroke(); }
-  };
   poly([[1, -9], [10, -12], [12, -5], [10, 2], [1, -1]], '#d1e0f2');
   poly([[10, -12], [12, -5], [10, 2], [9, -5]], '#f2faff');
   poly([[-1, -8], [-4, -6], [-1, -4]], '#d1e0f2');
   poly([[1, -9], [10, -12], [12, -5], [10, 2], [1, -1]], null, '#40598c');
   R(3, -8, 3, 3, '#fff'); R(7, -8, 3, 3, '#fff'); R(4, -7, 1, 2, '#000'); R(8, -7, 1, 2, '#000'); R(4, -3, 5, 1, '#40598c');
   ctx.restore();
+}
+function drawJon() {
+  const j = G.jon, x = j.x - G.cam.x, y = j.y - G.cam.y;
+  drawJonSprite(x, y, j.spin);
   if (j.qt > 0 && j.quip && G.state === 'play') {
-    ctx.font = FONT; ctx.textAlign = 'left';
-    const w = Math.ceil(ctx.measureText(j.quip).width) + 6, bx = Math.max(2, Math.min(VW - w - 2, x - w / 2)), by = y - 32;
-    R(bx, by, w, 12, 'rgba(10,10,32,.85)'); ctx.fillStyle = '#ffffb3'; ctx.fillText(j.quip, bx + 3, by + 9);
+    ctx.font = FONT;
+    const w = Math.ceil(ctx.measureText(j.quip).width) + 6, bx = clamp(x - w / 2, 2, VW - w - 2), by = clamp(y - 32, 24, VH - 14);
+    R(bx, by, w, 12, 'rgba(10,10,32,.85)'); text(j.quip, bx + 3, by + 9, '#ffffb3', 'left', false);
   }
 }
 
-function wrap(text, maxW) {
-  const out = []; let line = '';
-  for (const w of text.split(' ')) {
-    const t = line ? line + ' ' + w : w;
-    if (ctx.measureText(t).width > maxW && line) { out.push(line); line = w; } else line = t;
+function drawPenguinBody(e, crown) {
+  const sw = Math.round(Math.sin(e.wob));
+  let body = '#1a1a38';
+  if (e.flash > 0) body = '#fff'; else if (e.st === 'wind') body = '#8c1a1a';
+  R(-6, 5, 12, 2, 'rgba(0,0,0,.3)');
+  R(-5 + sw, -6, 10, 12, body); R(-3 + sw, -2, 6, 7, '#f2f2ff'); R(-4 + sw, -5, 8, 3, body);
+  R(-6 + sw, -2, 1, 5, body); R(5 + sw, -2, 1, 5, body);
+  R(-1 + sw, -3, 3, 2, '#ffa61a'); R(-3, 6, 2, 1, '#ffa61a'); R(1, 6, 2, 1, '#ffa61a');
+  R(-3 + sw, -5, 2, 2, '#ff1a1a'); R(1 + sw, -5, 2, 2, '#ff1a1a');
+  if (crown) { R(-4 + sw, -9, 8, 3, '#ffd84a'); R(-4 + sw, -11, 2, 2, '#ffd84a'); R(-1 + sw, -11, 2, 2, '#ffd84a'); R(2 + sw, -11, 2, 2, '#ffd84a'); R(-1 + sw, -8, 2, 1, '#e23'); }
+}
+function drawEnemy(e) {
+  const x = Math.round(e.x - G.cam.x), y = Math.round(e.y - G.cam.y);
+  ctx.save(); ctx.translate(x, y);
+  switch (e.type) {
+    case 'penguin': drawPenguinBody(e); break;
+    case 'king':
+      if (e.st === 'wind' || e.st === 'slide') ctx.translate(rnd(-1, 1), 0);
+      ctx.scale(2.4, 2.4); drawPenguinBody(e, true);
+      if (e.st === 'daze') for (let i = 0; i < 3; i++) { const a = G.t * 5 + i * 2.1; R(Math.cos(a) * 6 - 1, -13 + Math.sin(a) * 2, 2, 2, '#ffe066'); }
+      break;
+    case 'knight':
+      ctx.scale(1.5, 1.5); drawPenguinBody(e);
+      R(-5, -8, 10, 4, '#8a8aa0'); R(-5, -8, 10, 1, '#c9c9d9'); R(-1, -10, 2, 3, '#e23');
+      R(Math.round(e.fx * 6) - 3, Math.round(e.fy * 5) - 3, 6, 8, '#6b4322'); R(Math.round(e.fx * 6) - 2, Math.round(e.fy * 5) - 2, 4, 6, '#b8b8c8');
+      break;
+    case 'draugr': {
+      const sw = Math.round(Math.sin(e.wob * 0.5));
+      const bone = e.flash > 0 ? '#fff' : '#b9c4a8';
+      R(-6, 6, 12, 2, 'rgba(0,0,0,.3)');
+      R(-4, 2 + sw, 3, 5, '#5a5a4a'); R(1, 2 - sw, 3, 5, '#5a5a4a');
+      R(-5, -4, 10, 7, '#4a5a3a'); R(-4, -11, 8, 7, bone); R(-3, -8, 2, 2, '#111'); R(1, -8, 2, 2, '#111'); R(-2, -5, 4, 1, '#111');
+      R(-5, -13, 10, 3, '#7a7a8a'); R(-1, -15, 2, 2, '#7a7a8a');
+      R(Math.round(e.fx * 7) - 4, Math.round(e.fy * 5) - 4, 8, 8, '#8a2a21'); R(Math.round(e.fx * 7) - 1, Math.round(e.fy * 5) - 1, 2, 2, '#ffd84a');
+      break; }
+    case 'wisp': {
+      const g = 0.6 + 0.4 * Math.sin(G.t * 6 + e.wob);
+      ctx.globalAlpha = 0.35 * g; R(-7, -7, 14, 14, '#7fd4ff'); ctx.globalAlpha = 1;
+      R(-3, -3, 6, 6, e.flash > 0 ? '#fff' : '#cfefff'); R(-1, -5, 2, 2, '#cfefff'); R(-2, -1, 1, 1, '#123'); R(1, -1, 1, 1, '#123');
+      break; }
+    case 'bat': {
+      const f = Math.floor(G.t * 12 + e.wob) % 2;
+      const c = e.flash > 0 ? '#fff' : '#3d5a9e';
+      R(-2, -2, 4, 4, c); R(-7, f ? -4 : 0, 5, 2, c); R(2, f ? -4 : 0, 5, 2, c); R(-1, -1, 1, 1, '#ff4'); R(1, -1, 1, 1, '#ff4');
+      break; }
   }
-  if (line) out.push(line); return out;
+  ctx.restore();
+  if (e.boss && e.alive) {
+    const w = 60, bx = x - w / 2, by = y - (e.type === 'king' ? 44 : 26);
+    R(bx - 1, by - 1, w + 2, 5, '#000'); R(bx, by, w * Math.max(0, e.hp / e.max), 3, '#e23');
+  }
 }
 
-const HEART = [' ## ## ', '#######', '#######', ' ##### ', '  ###  ', '   #   '];
+function drawPerson(x, y, look, bob) {
+  const b = Math.round(Math.sin(G.t * 2 + bob) * 0.6);
+  R(x - 5, y + 5, 10, 2, 'rgba(0,0,0,.3)');
+  R(x - 4, y + 3, 3, 3, '#3a2a1a'); R(x + 1, y + 3, 3, 3, '#3a2a1a');
+  R(x - 5, y - 3 + b, 10, 7, look.shirt); R(x - 4, y - 9 + b, 8, 7, look.skin || '#f0c49a');
+  R(x - 4, y - 10 + b, 8, 3, look.hair);
+  if (look.long) { R(x - 5, y - 9 + b, 2, 8, look.hair); R(x + 3, y - 9 + b, 2, 8, look.hair); }
+  if (look.beard) R(x - 4, y - 4 + b, 8, 3, look.hair);
+  if (look.hat) { R(x - 5, y - 12 + b, 10, 3, look.hat); }
+  R(x - 3, y - 6 + b, 1, 2, '#111'); R(x + 2, y - 6 + b, 1, 2, '#111');
+}
+const LOOKS = {
+  astrid: { shirt: '#6b3fa0', hair: '#e8e8e8', long: true },
+  lars: { shirt: '#b33a2e', hair: '#d9a441', beard: true },
+  sven: { shirt: '#2f8a5a', hair: '#f2d27a' },
+  ingrid: { shirt: '#2f5aa8', hair: '#a0522d', long: true, hat: '#e0c040' },
+};
+
+function drawItemIcon(id, x, y) {
+  x = Math.round(x); y = Math.round(y);
+  switch (ITEMS[id] ? ITEMS[id].icon : id) {
+    case 'key': R(x - 1, y - 6, 3, 9, '#ffd84a'); R(x - 3, y - 7, 7, 4, '#ffd84a'); R(x - 1, y - 6, 3, 2, '#000'); R(x + 2, y + 1, 2, 2, '#ffd84a'); break;
+    case 'bigkey': R(x - 2, y - 7, 4, 13, '#ffd84a'); R(x - 5, y - 8, 10, 6, '#ffd84a'); R(x - 2, y - 7, 4, 3, '#a87a10'); R(x + 2, y + 2, 3, 2, '#ffd84a'); R(x + 2, y - 1, 3, 2, '#ffd84a'); break;
+    case 'homing': drawJonSprite(x, y, 0.4); R(x - 8, y - 8, 3, 1, '#ffd84a'); R(x + 6, y + 6, 3, 1, '#ffd84a'); break;
+    case 'thunder': R(x - 6, y - 7, 12, 14, '#2a3a6a'); poly([[x + 1, y - 6], [x - 4, y + 1], [x, y + 1], [x - 2, y + 6], [x + 4, y - 1], [x, y - 1]], '#ffe066'); break;
+    case 'piece': poly([[x, y - 2], [x - 5, y - 6], [x - 6, y - 1], [x, y + 5]], '#f22633'); R(x - 4, y - 5, 2, 2, '#ff9aa2'); break;
+    case 'container': R(x - 7, y - 7, 15, 14, '#ffd84a'); drawHeart(x - 3, y - 3, 1); break;
+    case 'heart': drawHeart(x - 3, y - 3, 1); break;
+    case 'coin': R(x - 3, y - 3, 7, 7, '#d0d6e0'); R(x - 1, y - 2, 3, 5, '#8a92a0'); break;
+    case 'juice': R(x - 3, y - 6, 6, 3, '#d8d8e8'); R(x - 4, y - 3, 8, 9, '#c0182b'); R(x - 2, y - 1, 2, 4, '#ff6b7f'); break;
+    case 'shard': poly([[x, y - 6], [x + 4, y], [x, y + 6], [x - 4, y]], '#7fd4ff'); R(x - 1, y - 2, 2, 4, '#fff'); break;
+  }
+}
+
+function drawThing(e) {
+  const x = Math.round(e.x - G.cam.x), y = Math.round(e.y - G.cam.y), t = G.t;
+  switch (e.kind) {
+    case 'enemy': return drawEnemy(e);
+    case 'npc': return drawPerson(x, y, LOOKS[e.id] || LOOKS.sven, e.bob);
+    case 'sign': R(x - 1, y, 2, 7, '#6b4322'); R(x - 7, y - 7, 14, 9, '#b07a4e'); R(x - 7, y - 7, 14, 1, '#d9a46e'); R(x - 5, y - 4, 10, 1, '#6b4322'); R(x - 5, y - 1, 7, 1, '#6b4322'); break;
+    case 'plaque': R(x - 7, y - 4, 14, 7, '#c08a50'); R(x - 6, y - 3, 12, 1, '#6b4322'); R(x - 6, y, 9, 1, '#6b4322'); break;
+    case 'runestone': {
+      R(x - 6, y + 5, 12, 2, 'rgba(0,0,0,.3)'); R(x - 5, y - 9, 10, 15, '#7c7c8c'); R(x - 4, y - 11, 8, 3, '#7c7c8c'); R(x - 5, y - 9, 2, 15, '#9a9aaa');
+      ctx.globalAlpha = 0.6 + 0.4 * Math.sin(t * 3); R(x - 1, y - 8, 2, 11, '#7fd4ff'); R(x - 3, y - 6, 6, 2, '#7fd4ff'); R(x - 3, y - 1, 2, 2, '#7fd4ff'); R(x + 1, y + 1, 2, 2, '#7fd4ff'); ctx.globalAlpha = 1;
+      break; }
+    case 'chest':
+      R(x - 7, y - 5, 14, 11, '#7a4a1f'); R(x - 7, y - 5, 14, 3, e.open ? '#3a2410' : '#9c6431'); R(x - 7, y - 1, 14, 1, '#ffd84a'); R(x - 1, y - 2, 3, 3, e.open ? '#7a4a1f' : '#ffd84a');
+      R(x - 7, y - 5, 1, 11, '#ffd84a'); R(x + 6, y - 5, 1, 11, '#ffd84a'); break;
+    case 'shop': drawItemIcon(e.item, x, y - 2); text(String(e.price), x, y + 12, '#fff', 'center'); break;
+    case 'pickup': {
+      if (e.life !== undefined && e.life < 2 && Math.floor(t * 10) % 2) break;
+      const b = Math.round(Math.sin(t * 4 + e.x) * 1.5);
+      if (e.what === 'heart') drawHeart(x - 3, y - 3 + b, 1);
+      else if (e.what === 'kr1' || e.what === 'kr5') { R(x - 3, y - 3 + b, 6, 6, e.what === 'kr5' ? '#ffd84a' : '#d0d6e0'); R(x - 1, y - 2 + b, 2, 4, e.what === 'kr5' ? '#a87a10' : '#8a92a0'); }
+      else if (e.what === 'rune') drawItemIcon('shard', x, y + b);
+      else drawItemIcon(e.what, x, y + b);
+      break; }
+    case 'switch': {
+      const on = flag(G.mapId + ':gates');
+      R(x - 5, y + 2, 10, 5, '#3a3a4a'); poly([[x, y - 9], [x + 6, y - 2], [x, y + 4], [x - 6, y - 2]], on ? '#7fd4ff' : '#ff9a1f'); R(x - 2, y - 5, 2, 3, '#fff');
+      break; }
+    case 'warp': if (e.portal) { for (let i = 0; i < 3; i++) { const r = 4 + ((t * 10 + i * 4) % 10); ctx.strokeStyle = `rgba(127,212,255,${1 - r / 14})`; ctx.lineWidth = 1; ctx.beginPath(); ctx.ellipse(x, y, r, r * 0.6, 0, 0, Math.PI * 2); ctx.stroke(); } } break;
+  }
+}
+
+// ===== ui.js =====
+// Dialogue, HUD, gear menu, title screen, Flight 364 cutscene.
+
+function say(lines, done) {
+  if (!lines || !lines.length) { if (done) done(); return; }
+  G.talk = { queue: lines.slice(), done: done || null, cur: null, shown: 0, back: G.state === 'talk' ? 'play' : (G.state === 'hold' ? 'play' : G.state) };
+  if (G.talk.back !== 'play' && G.talk.back !== 'cutscene') G.talk.back = 'play';
+  G.state = 'talk';
+  nextLine();
+}
+function nextLine() {
+  const tk = G.talk;
+  if (!tk.queue.length) {
+    G.state = tk.back; G.talk = null; if (G.player) G.player.cd = 0.25;
+    if (tk.done) tk.done();
+    return;
+  }
+  tk.cur = tk.queue.shift(); tk.shown = 0;
+}
+function updateTalk(dt) {
+  const tk = G.talk, before = Math.floor(tk.shown);
+  tk.shown += dt * 55;
+  if (Math.floor(tk.shown) !== before && Math.floor(tk.shown) % 3 === 0 && tk.shown < tk.cur[1].length) Sound.play('blip');
+  if (just('a') || just('b') || just('tap')) { if (tk.shown < tk.cur[1].length) tk.shown = 999; else nextLine(); }
+}
+function drawTalk() {
+  const tk = G.talk; if (!tk) return;
+  const [who, msg] = tk.cur;
+  const inCut = tk.back === 'cutscene';
+  const top = !inCut && G.player && G.player.y - G.cam.y > 140;
+  const by = top ? 26 : 152;
+  R(8, by - 2, 240, 66, '#fff'); R(10, by, 236, 62, '#0d0d33');
+  let y = by + 12;
+  if (who) { text(who, 16, y, '#ffe64d'); y += 12; }
+  let left = Math.floor(tk.shown);
+  for (const l of wrap(msg, 222).slice(0, who ? 4 : 5)) { text(l.slice(0, Math.max(0, left)), 16, y, '#fff', 'left', false); left -= l.length + 1; y += 10; }
+  if (tk.shown >= msg.length && Math.floor(G.t * 3) % 2 === 0) text('▼', 234, by + 58, '#fff', 'left', false);
+}
+
+// ---------- HUD (A Link to the Past layout: magic meter, item box, money, keys, life) ----------
 function drawHud() {
-  const p = G.player;
-  for (let i = 0; i < p.max / 2; i++) {
-    const full = Math.max(0, Math.min(2, p.hp - i * 2));
-    HEART.forEach((row, yy) => [...row].forEach((ch, xx) => {
-      if (ch !== '#') return;
-      const lit = full === 2 || (full === 1 && xx < 4);
-      R(8 + i * 9 + xx, 8 + yy, 1, 1, lit ? (p.zombie ? '#9a4dd9' : '#f22633') : '#40191f');
-    }));
-  }
-  if (p.zombie) { ctx.font = FONT; ctx.fillStyle = '#c9a0f0'; ctx.textAlign = 'left'; ctx.fillText('ZOMBIE', 8, 26); }
-  ctx.font = FONT; ctx.textAlign = 'left';
-  if (G.talking) {
-    R(8, 150, 240, 66, '#fff'); R(10, 152, 236, 62, '#0d0d33');
-    ctx.fillStyle = '#ffe64d'; ctx.fillText(G.who, 16, 166);
-    ctx.fillStyle = '#fff';
-    let left = Math.floor(G.shown);
-    wrap(G.text, 224).forEach((l, i) => {
-      ctx.fillText(l.slice(0, Math.max(0, left)), 16, 180 + i * 10);
-      left -= l.length + 1;
-    });
-    if (G.shown >= G.text.length && Math.floor(G.t * 3) % 2 === 0) ctx.fillText('▼', 232, 210);
-  }
-  if (G.banner) {
-    R(0, 70, VW, 76, 'rgba(0,0,0,.8)'); ctx.textAlign = 'center'; ctx.fillStyle = '#fff';
-    let y = 92;
-    for (const part of G.banner.split('\n')) for (const l of wrap(part, 232)) { ctx.fillText(l, VW / 2, y); y += 14; }
-    ctx.textAlign = 'left';
+  const s = G.save, p = G.player;
+  R(0, 0, VW, 22, 'rgba(0,0,0,.45)');
+  // rune meter
+  R(6, 3, 8, 17, '#000'); R(7, 4, 6, 15, '#1a2238');
+  const fill = Math.round(15 * s.rune / RUNE_MAX); R(7, 19 - fill, 6, fill, s.rune >= RUNE_MAX ? (Math.floor(G.t * 4) % 2 ? '#7fd4ff' : '#cfefff') : '#2f8fd0');
+  // item box
+  R(17, 2, 20, 19, '#ffd84a'); R(18, 3, 18, 17, '#0d0d33');
+  if (s.items.thunder) drawItemIcon('thunder', 27, 12); else if (s.items.homing) drawItemIcon('homing', 27, 12);
+  // kroner, keys
+  drawItemIcon('coin', 46, 7); text(String(s.kr).padStart(3, '0'), 52, 11, '#fff');
+  if (G.map && G.map.dungeon) { drawItemIcon('key', 46, 17); text('x' + (s.keys[G.mapId] || 0), 52, 20, '#fff'); if (s.bigkeys[G.mapId]) drawItemIcon('bigkey', 82, 15); }
+  if (s.potions) { drawItemIcon('juice', 98, 12); text('x' + s.potions, 104, 16, '#fff'); }
+  // life
+  text('-LIFE-', 190, 9, '#f2ebcc', 'center');
+  const n = s.maxHp / 2;
+  for (let i = 0; i < n; i++) {
+    const v = clamp(p.hp - i * 2, 0, 2) / 2, row = Math.floor(i / 10), col = i % 10;
+    drawHeart(144 + col * 9, 12 + row * 8, v, s.voodoo ? '#f22633' : '#9a4dd9');
   }
 }
 
+// ---------- gear menu ----------
+function objective() {
+  const s = G.save;
+  if (G.mapId === 'home') return 'Read what Jon carved, then leave through the door.';
+  if (!flag('met_astrid')) return 'Find Elder Astrid in Fjordvik: west of the airstrip, then north.';
+  if (!s.items.homing && !flag('d1done')) return 'Go to the Penguin Ice Cavern on the Frozen Path (north-east). Find the treasure behind the Penguin Knight.';
+  if (!flag('d1done')) return 'Defeat whatever is possessing the penguins at the bottom of the Ice Cavern.';
+  return 'Chapter 1 complete! Talk to Astrid. Three sealed rune doors wait for Owen\'s next chapters.';
+}
+function drawMenu() {
+  const s = G.save;
+  R(0, 0, VW, VH, 'rgba(5,5,20,.92)');
+  R(8, 8, 240, 208, '#ffd84a'); R(10, 10, 236, 204, '#0d0d33');
+  text('GEAR', 20, 26, '#ffe64d');
+  const slots = [
+    ['Jon (swing Z)', 'homing', true, () => drawJonSprite(30, 48, 0)],
+    ['Homing Jon (throw X)', 'homing', !!s.items.homing],
+    ['Thunder Rune (C)', 'thunder', !!s.items.thunder],
+    ['Lingonberry Juice x' + s.potions, 'juice', s.potions > 0],
+  ];
+  slots.forEach(([label, icon, have, custom], i) => {
+    const y = 48 + i * 20;
+    R(20, y - 9, 18, 18, '#1a2238');
+    if (have) { if (custom) custom(); else drawItemIcon(icon, 29, y); text(label, 44, y + 4, '#fff'); }
+    else text('???', 44, y + 4, '#55577a');
+  });
+  text('Heart pieces: ' + s.pieces + '/4', 20, 138, '#f2ebcc');
+  text('Voodoo bond: ' + (s.voodoo ? 'ready' : 'used'), 20, 150, s.voodoo ? '#9be08a' : '#c9a0f0');
+  if (G.map.dungeon) text('Keys ' + (s.keys[G.mapId] || 0) + '   Big key: ' + (s.bigkeys[G.mapId] ? 'yes' : 'no'), 20, 162, '#f2ebcc');
+  text('QUEST', 20, 180, '#ffe64d');
+  wrap(objective(), 214).slice(0, 3).forEach((l, i) => text(l, 20, 192 + i * 10, '#fff', 'left', false));
+  text(Sound.muted ? 'M: sound off' : 'M: sound on', 236, 26, '#8a8ab0', 'right', false);
+}
+
+// ---------- title ----------
 function drawTitle() {
   R(0, 0, VW, VH, '#14121f');
-  for (let i = 0; i < 40; i++) R((i * 53) % VW, (i * 97) % 120, 1, 1, i % 3 ? '#4a4570' : '#a79fc4');
+  for (let i = 0; i < 50; i++) R((i * 53) % VW, (i * 97) % 130, 1, 1, i % 3 ? '#4a4570' : '#a79fc4');
   R(0, 150, VW, 74, '#1b3a6b'); R(0, 150, VW, 2, '#73a6f2');
-  ctx.textAlign = 'center'; ctx.font = '20px "Press Start 2P", ui-monospace, Menlo, monospace';
-  ctx.fillStyle = '#8fd0ff'; ctx.fillText('JÖNTUKA', VW / 2, 70);
-  ctx.font = FONT; ctx.fillStyle = '#f3ecd2'; ctx.fillText('A VIKING TALE', VW / 2, 92);
-  ctx.fillStyle = '#a79fc4'; ctx.fillText('a game by Owen', VW / 2, 110);
-  if (Math.floor(G.t * 2) % 2 === 0) { ctx.fillStyle = '#ffd84a'; ctx.fillText('PRESS Z OR CLICK', VW / 2, 190); }
-  ctx.textAlign = 'left';
-  G.jon = G.jon || { x: 0, y: 0, mode: 'follow', spin: 0, qt: 0, quip: '', t: 0 };
-  const j = { ...G.jon, x: VW / 2 + 70 + Math.sin(G.t * 2) * 3, y: 128, spin: Math.sin(G.t * 1.5) * 0.3, qt: 0 };
-  const save = G.jon; G.jon = j; drawJon(0, 0); G.jon = save;
+  for (let x = 0; x < VW; x += 32) R(x + (G.t * 8) % 32, 160 + (x / 32 % 3) * 14, 10, 1, '#3d66c4');
+  ctx.font = '20px "Press Start 2P", ui-monospace, Menlo, monospace'; ctx.textAlign = 'center';
+  ctx.fillStyle = '#000'; ctx.fillText('JÖNTUKA', VW / 2 + 2, 62); ctx.fillStyle = '#8fd0ff'; ctx.fillText('JÖNTUKA', VW / 2, 60);
+  text('A VIKING TALE', VW / 2, 80, '#f3ecd2', 'center');
+  text('a game by Owen', VW / 2, 96, '#a79fc4', 'center');
+  drawJonSprite(VW / 2 + 74 + Math.sin(G.t * 2) * 3, 124, Math.sin(G.t * 1.5) * 0.3);
+  const opts = titleOptions();
+  opts.forEach((o, i) => {
+    const sel = i === G.menuSel;
+    text((sel ? '> ' : '  ') + o.label, VW / 2 - 50, 178 + i * 14, o.disabled ? '#55577a' : sel ? '#ffd84a' : '#f3ecd2');
+  });
+  if (G.confirmErase) text('Press Z again to erase your save', VW / 2, 214, '#ff8a8a', 'center');
+}
+function titleOptions() {
+  const has = !!readSave();
+  const o = [];
+  if (has) o.push({ label: 'CONTINUE', id: 'continue' });
+  o.push({ label: 'NEW GAME', id: 'new' });
+  o.push({ label: 'ARENA (soon)', id: 'arena', disabled: true });
+  return o;
+}
+
+// ---------- Flight 364 ----------
+function drawCutscene() {
+  const c = G.cut, page = STORY.flight[c.i], t = G.t;
+  R(0, 0, VW, VH, '#000');
+  switch (page.art) {
+    case 'plane':
+      R(0, 0, VW, 140, '#1b2a55'); for (let i = 0; i < 30; i++) R((i * 71) % VW, (i * 37) % 120, 1, 1, '#8899cc');
+      for (let i = 0; i < 4; i++) { const cx = ((i * 90 - t * 20) % 340 + 340) % 340 - 40; R(cx, 100 + i * 8, 40, 8, '#2c3e70'); }
+      R(80, 60, 96, 14, '#e9edf2'); R(76, 63, 6, 8, '#e9edf2'); R(172, 52, 10, 10, '#c0392b'); R(110, 72, 30, 6, '#b6bcc6');
+      for (let i = 0; i < 7; i++) R(92 + i * 10, 64, 3, 3, '#3a5a8a');
+      R(80, 66, 96, 2, '#c0392b');
+      break;
+    case 'cabin':
+    case 'demon': {
+      const flick = page.art === 'demon' && Math.sin(t * 23) > 0.6;
+      R(0, 0, VW, 140, flick ? '#050505' : '#3a3a48');
+      for (let i = 0; i < 5; i++) { R(14 + i * 50, 70, 30, 40, '#2f5aa8'); R(14 + i * 50, 66, 30, 8, '#24488a'); }
+      for (let i = 0; i < 4; i++) R(30 + i * 60, 20, 18, 12, flick ? '#111' : '#9fb4d0');
+      if (page.art === 'demon') {
+        const x = 128, y = 60;
+        R(x - 12, y - 20, 24, 50, '#7a1020'); R(x - 9, y - 30, 18, 14, flick ? '#d0ffd0' : '#e8c8b0');
+        R(x - 6, y - 26, 4, 3, '#ff1a1a'); R(x + 2, y - 26, 4, 3, '#ff1a1a');
+        R(x - 6, y - 19, 12, 2, '#200'); for (let i = 0; i < 4; i++) R(x - 5 + i * 3, y - 19, 1, 3, '#fff');
+        for (let i = 0; i < 3; i++) { R(x - 18 - i * 2, y + 6 + i * 3, 6, 1, '#ddd'); R(x + 12 + i * 2, y + 6 + i * 3, 6, 1, '#ddd'); }
+        ctx.fillStyle = `rgba(120,0,0,${0.15 + 0.1 * Math.sin(t * 3)})`; ctx.fillRect(0, 0, VW, 140);
+      }
+      break; }
+    case 'land':
+      R(0, 0, VW, 140, '#7fb6e8'); R(0, 100, VW, 40, '#549a3d'); R(0, 112, VW, 10, '#777');
+      for (let x = 0; x < VW; x += 24) R(x + 4, 116, 12, 2, '#fff');
+      R(40 + Math.min(t * 10 % 200, 120), 98, 70, 12, '#e9edf2');
+      for (let i = 0; i < 5; i++) R(0, 60 + i * 5, VW, 1, '#9cc8ef');
+      break;
+  }
+  text('FLIGHT 364  ·  NEW YORK → NORWAY', VW / 2, 12, '#888', 'center', false);
+}
+function startFlight() {
+  G.state = 'cutscene'; G.cut = { i: 0 };
+  Sound.play('door');
+  say(STORY.flight[0].lines, nextFlightPage);
+}
+function nextFlightPage() {
+  G.cut.i++;
+  if (G.cut.i >= STORY.flight.length) {
+    G.state = 'play';
+    const st = MAPS.overworld.ents.find(e => e.t === 'start').at;
+    loadMap('overworld', st[0] * T + 8, st[1] * T + 8);
+    writeSave();
+    say(STORY.arrival);
+    return;
+  }
+  if (STORY.flight[G.cut.i].art === 'demon') Sound.play('creep');
+  G.state = 'cutscene';
+  say(STORY.flight[G.cut.i].lines, nextFlightPage);
+}
+
+// ===== main.js =====
+// State machine and main loop.
+
+function newGame() {
+  G.save = newSave();
+  G.player = makePlayer(); G.jon = makeJon();
+  const st = MAPS.home.ents.find(e => e.t === 'start').at;
+  G.state = 'play';
+  loadMap('home', st[0] * T + 8, st[1] * T + 8);
+  say(STORY.intro);
+}
+function continueGame() {
+  G.save = readSave() || newSave();
+  G.player = makePlayer(); G.jon = makeJon();
+  G.player.hp = G.save.maxHp;
+  G.state = 'play';
+  if (!G.save.x) return newGame();
+  loadMap(G.save.map, G.save.x, G.save.y);
+}
+
+function startWarp(to, dest) {
+  G.state = 'warp'; G.warp = { to, dest, t: 0, done: false };
+  Sound.play('door');
+}
+function updateWarp(dt) {
+  const w = G.warp; w.t += dt;
+  if (w.t > 0.35 && !w.done) {
+    w.done = true;
+    loadMap(w.to, w.dest[0] * T + 8, w.dest[1] * T + 8);
+  }
+  if (w.t > 0.7) { G.state = 'play'; writeSave(); }
+}
+
+function onEnterScreen() {
+  const has = type => G.ents.some(e => e.type === type && e.alive);
+  if (G.mapId === 'cavern' && !flag('intro:cavern')) { setFlag('intro:cavern'); say(STORY.cavern_enter); }
+  if (has('knight') && !flag('intro:knight')) { setFlag('intro:knight'); Sound.play('boss'); say(STORY.knight); }
+  if (has('king')) { Sound.play('boss'); say(flag('intro:king') ? [['Penguin King', 'AK! Back for more?']] : STORY.king); setFlag('intro:king'); }
+  if (G.mapId === 'overworld' && flag('d1done') && !flag('chapter1_banner') && G.scr.x === 2 && G.scr.y === 0) {
+    setFlag('chapter1_banner'); G.banner = STORY.chapter_done; G.bannerT = 4; Sound.play('secret'); writeSave();
+  }
+}
+
+function update(dt) {
+  G.t += dt;
+  G.shake = Math.max(0, G.shake - dt); G.flash = Math.max(0, G.flash - dt); G.bannerT = Math.max(0, G.bannerT - dt);
+  if (just('mute')) Sound.muted = !Sound.muted;
+  switch (G.state) {
+    case 'title': {
+      const opts = titleOptions();
+      if (just('up')) { G.menuSel = (G.menuSel + opts.length - 1) % opts.length; G.confirmErase = false; Sound.play('menu'); }
+      if (just('down')) { G.menuSel = (G.menuSel + 1) % opts.length; G.confirmErase = false; Sound.play('menu'); }
+      G.menuSel = clamp(G.menuSel, 0, opts.length - 1);
+      if (just('a') || just('menu') || just('tap')) {
+        const o = opts[G.menuSel];
+        if (o.disabled) { Sound.play('clank'); break; }
+        if (o.id === 'continue') continueGame();
+        else if (o.id === 'new') {
+          if (readSave() && !G.confirmErase) { G.confirmErase = true; break; }
+          try { localStorage.removeItem(SAVE_KEY); } catch (e) {}
+          newGame();
+        }
+      }
+      return;
+    }
+    case 'talk': updateTalk(dt); return;
+    case 'cutscene': return;
+    case 'hold':
+      G.player.hold.t -= dt;
+      if (G.player.hold.t <= 0) { G.player.hold = null; G.state = 'play'; G.afterHold(); }
+      return;
+    case 'warp': updateWarp(dt); return;
+    case 'menu': if (just('menu') || just('a') || just('tap')) { G.state = 'play'; Sound.play('menu'); } return;
+    case 'over':
+      if (just('a') || just('menu') || just('tap')) { continueGame(); }
+      return;
+    case 'thunder': updateThunder(dt); updateFx(dt); return;
+  }
+  // play
+  if (G.trans) { updateTransition(dt); return; }
+  if (just('menu')) { G.state = 'menu'; Sound.play('menu'); return; }
+  const s = G.save;
+  if (s.items.thunder) { G.runeT = (G.runeT || 0) + dt; if (G.runeT > 5) { G.runeT = 0; s.rune = Math.min(RUNE_MAX, s.rune + 1); } }
+  updatePlayer(dt);
+  if (G.state !== 'play') return;
+  updateJon(dt);
+  for (const e of G.ents.slice()) {
+    if (e.kind === 'enemy' && e.alive) updateEnemy(e, dt);
+    else if (e.kind === 'pickup') updatePickup(e, dt);
+    else if (e.kind === 'switch') e.cd = Math.max(0, e.cd - dt);
+    if (G.state !== 'play') break;
+  }
+  updateFx(dt);
+  if (G.state === 'play') checkScreenEdge();
 }
 
 function render() {
+  ctx.setTransform(1, 0, 0, 1, 0, 0);
   ctx.clearRect(0, 0, VW, VH);
-  if (G.state === 'title') { drawTitle(); return; }
+  if (G.state === 'title') return drawTitle();
+  if (G.state === 'cutscene' || (G.state === 'talk' && G.talk && G.talk.back === 'cutscene')) { drawCutscene(); drawTalk(); return; }
+  if (G.shake > 0) ctx.setTransform(1, 0, 0, 1, Math.round(rnd(-2, 2)), Math.round(rnd(-2, 2)));
+  drawMap();
   const p = G.player;
-  const cx = Math.round(Math.max(0, Math.min(COLS * T - VW, p.x - VW / 2)));
-  const cy = Math.round(Math.max(0, Math.min(ROWS * T - VH, p.y - VH / 2)));
-  drawMap(cx, cy);
-  const things = [...G.enemies.map(e => ({ y: e.y, f: () => drawPenguin(e, cx, cy) })), { y: p.y, f: () => drawPlayer(cx, cy) }];
-  things.sort((a, b) => a.y - b.y).forEach(t => t.f());
-  drawJon(cx, cy);
+  const list = G.ents.filter(e => e.kind !== 'warp' || e.portal).map(e => ({ y: e.y, f: () => drawThing(e) }));
+  list.push({ y: p.y, f: () => drawOwen(p.x - G.cam.x, p.y - G.cam.y) });
+  list.sort((a, b) => a.y - b.y).forEach(o => o.f());
+  if (!p.hold) drawJon();
+  drawFx();
+  drawLightning();
+  ctx.setTransform(1, 0, 0, 1, 0, 0);
+  if (G.map.dungeon) { const g = ctx.createRadialGradient(p.x - G.cam.x, p.y - G.cam.y, 40, p.x - G.cam.x, p.y - G.cam.y, 200); g.addColorStop(0, 'rgba(0,0,20,0)'); g.addColorStop(1, 'rgba(0,0,20,.45)'); ctx.fillStyle = g; ctx.fillRect(0, 0, VW, VH); }
+  if (G.flash > 0) { ctx.globalAlpha = Math.min(1, G.flash * 3); R(0, 0, VW, VH, G.flashColor || '#fff'); ctx.globalAlpha = 1; }
   drawHud();
+  if (G.state === 'warp') { ctx.globalAlpha = clamp(1 - Math.abs(G.warp.t - 0.35) / 0.35, 0, 1); R(0, 0, VW, VH, '#000'); ctx.globalAlpha = 1; }
+  if (G.bannerT > 0) { R(0, 92, VW, 34, 'rgba(0,0,0,.8)'); text(G.banner, VW / 2, 113, '#ffd84a', 'center'); }
+  if (G.state === 'talk') drawTalk();
+  if (G.state === 'menu') drawMenu();
+  if (G.state === 'over') {
+    R(0, 0, VW, VH, 'rgba(40,0,0,.8)');
+    text('GAME OVER', VW / 2, 96, '#ff6b6b', 'center');
+    text('Even zombies need a nap.', VW / 2, 116, '#fff', 'center');
+    text('Press Z to continue', VW / 2, 140, '#ffd84a', 'center');
+    text('from your last runestone', VW / 2, 154, '#ffd84a', 'center');
+  }
 }
 
 let last = performance.now();
+G.menuSel = 0;
 function frame(now) {
   const dt = Math.min(0.05, (now - last) / 1000); last = now;
-  update(dt); render();
+  try { update(dt); render(); } catch (err) { console.error(err); }
   for (const k in edge) edge[k] = false;
   requestAnimationFrame(frame);
 }
 (document.fonts && document.fonts.load ? document.fonts.load('8px "Press Start 2P"').catch(() => {}) : Promise.resolve())
   .then(() => requestAnimationFrame(t => { last = t; frame(t); }));
 window.__game = G;
+
 </script>

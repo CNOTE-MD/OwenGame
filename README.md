@@ -1,5 +1,20 @@
 # Jöntuka: A Viking Tale
 
+**Main build: the browser version in `web/`** (play it via the published artifact link). The Godot project in the repo root is frozen as the original prototype; the browser build is the low-res reference for a later Unity rebuild.
+
+## Browser build
+
+| Path | What it is |
+|---|---|
+| `web/src/story.js` | Every word in the game. Owen can edit this. |
+| `tools/maps.py` | ASCII maps for Norway, the Ice Cavern and Owen's room, plus a reachability checker |
+| `web/src/*.js` | Engine, world, actors, sprites, UI, main loop |
+| `STORY_BIBLE.md` | Characters, chapter arc, items, the Red-Eye side quest, Arena mode |
+
+Rebuild: `python3 tools/maps.py && python3 tools/build_web.py`. Test: `NODE_PATH=$(npm root -g) node tests/web_playtest.js`.
+
+## Godot prototype (frozen)
+
 A top-down action game in the style of SNES *A Link to the Past*, based on Owen's journal story. Godot 4.3.
 
 ## Play

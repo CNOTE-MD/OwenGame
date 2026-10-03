@@ -1,0 +1,59 @@
+<title>Jöntuka</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap" rel="stylesheet">
+<style>
+  /* Layout: one centered 8:7 game screen, a short key legend under it, touch pad only on touch devices. */
+  :root {
+    --bg: #14121f;
+    --panel: #221d38;
+    --ink: #f3ecd2;
+    --muted: #a79fc4;
+    --axe: #8fd0ff;
+    --gold: #ffd84a;
+    --pixel: "Press Start 2P", ui-monospace, "SF Mono", Menlo, Consolas, monospace;
+    color-scheme: dark;
+  }
+  html, body { background: var(--bg); color: var(--ink); }
+  body { margin: 0; padding-inline: 16px; padding-block: 16px 24px; font-family: var(--pixel); font-size: 10px; line-height: 1.7; }
+  main { max-width: 768px; margin-inline: auto; display: flex; flex-direction: column; gap: 14px; }
+  .screen { position: relative; width: 100%; aspect-ratio: 8 / 7; background: #000; border: 3px solid var(--panel); outline: 2px solid var(--axe); }
+  canvas { display: block; width: 100%; height: 100%; image-rendering: pixelated; image-rendering: crisp-edges; touch-action: none; }
+  .legend { display: flex; flex-wrap: wrap; gap: 8px 20px; color: var(--muted); }
+  .legend b { color: var(--gold); font-weight: normal; }
+  .pad { display: none; justify-content: space-between; align-items: center; gap: 16px; user-select: none; -webkit-user-select: none; }
+  @media (pointer: coarse) { .pad { display: flex; } }
+  .dpad { display: grid; grid-template-columns: repeat(3, 56px); grid-template-rows: repeat(3, 56px); gap: 4px; }
+  .btn { background: var(--panel); color: var(--ink); border: 2px solid var(--axe); font-family: var(--pixel); font-size: 12px; touch-action: none; border-radius: 4px; }
+  .btn:active, .btn.on { background: var(--axe); color: var(--bg); }
+  .btn:focus-visible { outline: 3px solid var(--gold); outline-offset: 2px; }
+  .ab { display: grid; grid-template-columns: repeat(2, 76px); gap: 10px; }
+  .ab .btn { width: 76px; height: 56px; border-radius: 28px; font-size: 9px; }
+</style>
+<main>
+  <div class="screen"><canvas id="g" width="256" height="224" tabindex="0" aria-label="Jöntuka game screen"></canvas></div>
+  <div class="legend">
+    <span><b>Arrows / WASD</b> move</span>
+    <span><b>Z / Space</b> swing Jon</span>
+    <span><b>X / Shift</b> throw Jon</span>
+    <span><b>C</b> Thunder Strike</span>
+    <span><b>Enter</b> gear and quest</span>
+    <span><b>M</b> sound</span>
+  </div>
+  <div class="pad" aria-label="Touch controls">
+    <div class="dpad">
+      <span></span><button class="btn" data-a="up" aria-label="Up">▲</button><span></span>
+      <button class="btn" data-a="left" aria-label="Left">◀</button><span></span><button class="btn" data-a="right" aria-label="Right">▶</button>
+      <span></span><button class="btn" data-a="down" aria-label="Down">▼</button><span></span>
+    </div>
+    <div class="ab">
+      <button class="btn" data-a="menu" aria-label="Gear menu">GEAR</button>
+      <button class="btn" data-a="c" aria-label="Thunder Strike">RUNE</button>
+      <button class="btn" data-a="b" aria-label="Throw Jon">THROW</button>
+      <button class="btn" data-a="a" aria-label="Swing Jon or talk">SWING</button>
+    </div>
+  </div>
+</main>
+<script>
+/*SCRIPT*/
+</script>

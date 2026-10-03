@@ -1,0 +1,424 @@
+"""Map designer for the browser build. Run: python3 tools/maps.py  -> writes web/src/maps.js
+Each screen is 16x14 tiles (one SNES screen). Edit the ASCII below; the checker verifies everything is reachable.
+
+Tile legend
+  .  grass        f flowers      s path/sand    n snow         i ice floor (slippery)
+  T  tree         b bush (cut)   # rock         M cliff        O pot (break)
+  ~  lake (Jon rockets you out)  w deep water   U bridge       x fence
+  R  roof         H house wall   D house door   P plane body   q plane wing
+  E  cave entrance               X sealed rune door (read it)  + gravestone
+  l  lava         _ dungeon floor   W dungeon wall   v pit     t torch
+  L  locked door (small key)     K boss door (big key)   h shutter   G gate (lowered by switch)
+  F  wood floor   Z interior wall   Y bed   Q table   r rug   d doorway
+"""
+import json, collections, pathlib
+
+SW, SH = 16, 14
+
+def check_block(name, block):
+    assert len(block) == SH, (name, len(block))
+    for i, r in enumerate(block):
+        assert len(r) == SW, (name, i, r, len(r))
+
+# ---------------- Overworld: 4 x 3 screens ----------------
+OW = {}
+OW[(0, 0)] = [  # Foothills: sealed Drowned Barrow (dungeon 2)
+    "TTTTTTTTTTTTTTTT",
+    "TMMMMMMMMMMMMMMT",
+    "TMMMMMMXMMMMMMMT",
+    "T......s.......T",
+    "T..T...s...b...T",
+    "T......s........",
+    "T..b...sssssssss",
+    "T......s........",
+    "T.T....s....T...",
+    "T......s.....b.T",
+    "T.bb...s.......T",
+    "T......s..T....T",
+    "T......s.......T",
+    "TTTTTT.s..TTTTTT",
+]
+OW[(1, 0)] = [  # Whispering Forest: heart piece in the bush ring
+    "TTTTTTTTTTTTTTTT",
+    "TTT..T....T..TTT",
+    "T....b..T...bbbT",
+    "T.T.......T.b.bT",
+    "T....TT.....bbbT",
+    "........T.......",
+    "ssssssssssssssss",
+    "......f.........",
+    "..T......TT.....",
+    "T....b.......T.T",
+    "T..TT....b.....T",
+    "T.......T...T..T",
+    "TT..b..........T",
+    "TTTTTT.s..TTTTTT",
+]
+OW[(2, 0)] = [  # Frozen Path: Penguin Ice Cavern (dungeon 1)
+    "TTTTTTTTTTTTTTTT",
+    "TMMMMMMMMMMMMMMT",
+    "TMMMMMMEMMMMMMMT",
+    "Tnnnnnnsnnnnnn#T",
+    "TnTnnnnsnnnnnnnT",
+    "nnnnnnnsnnnTnnnn",
+    "sssssssssnnnnnnn",
+    "nnnnnnnsnnnnnnnn",
+    "nnTnnnnsnnnn#nnn",
+    "Tnnnnnnsnnnnnn#T",
+    "Tnn#nnnsnnnTnnnT",
+    "TnnnnnnsnnnnnnnT",
+    "TnnnnnTsnnnnnnnT",
+    "TTTTTT.s..TTTTTT",
+]
+OW[(3, 0)] = [  # Storm Peak base: sealed (dungeon 4)
+    "TTTTTTTTTTTTTTTT",
+    "TMMMMMMMMMMMMMMT",
+    "TMMMMMMXMMMMMMMT",
+    "TnnnnnnsnnnnnnnT",
+    "Tnn#nnnsnnnnTnnT",
+    "nnnnnnnsnnnnnnnT",
+    "nnnnnnnsnnnnnnnT",
+    "nnnnnnnsnn#nnnnT",
+    "nnnnnnnsnnnnnnnT",
+    "TnnTnnnsnnnnnnnT",
+    "TnnnnnnsnnnnnTnT",
+    "Tnnn#nnsnnnnnnnT",
+    "TnnnnnnsnnnnnnnT",
+    "TTTTTT.s..TTTTTT",
+]
+OW[(0, 1)] = [  # Fjordvik west: Elder Astrid's house
+    "TTTTTT.s..TTTTTT",
+    "T......s.......T",
+    "T.RRRRR.s......T",
+    "T.RRRRR.s..RRRRT",
+    "T.HHDHH.s..RRRRT",
+    "T.......s..HHDHT",
+    "T.ff....ssssssss",
+    "T.......s.......",
+    "T..x.x..s..f....",
+    "T.......s.......",
+    "T..b....s....b.T",
+    "T.......s......T",
+    "T.......s......T",
+    "TTTTTT.s..TTTTTT",
+]
+OW[(1, 1)] = [  # Fjordvik market: Lars's stall
+    "TTTTTT.s..TTTTTT",
+    "T......s.......T",
+    "T..RRRRRR......T",
+    "T..RRRRRR...f..T",
+    "T..HHHHHH......T",
+    "T..xQ.Q.Qx......",
+    "sssssssssssssss.",
+    "........s.......",
+    "...f....s.......",
+    "T.......s....b.T",
+    "T..b....s......T",
+    "T.......s......T",
+    "T.......s......T",
+    "TTTTTT.s..TTTTTT",
+]
+OW[(2, 1)] = [  # Lake Jontuka, north shore
+    "TTTTTT.s..TTTTTT",
+    "T.....ss.......T",
+    "T..sssssssssss.T",
+    "T..s~~~~~~~~~s.T",
+    "T..s~~~~~~~~~s.T",
+    "...s~~~~~~~~~s..",
+    "ssss~~~~~~~~~sss",
+    "...s~~~~~~~~~s..",
+    "...s~~~~~~~~~s..",
+    "T..s~~~~~~~~~s.T",
+    "T..sssssssssss.T",
+    "T......s.......T",
+    "T..T...s....T..T",
+    "TTTTTT.s..TTTTTT",
+]
+OW[(3, 1)] = [  # Volcano road: sealed Walter's Forge (dungeon 3)
+    "TTTTTT.s..TTTTTT",
+    "T#.....s....lllT",
+    "T..#...s...lMMMT",
+    "T......s...lMXMT",
+    "T....#.s...lMsMT",
+    ".......s....ss.T",
+    "ssssssssssssss.T",
+    ".......s.......T",
+    "...#...s...#...T",
+    "T......s.......T",
+    "T.#....s....#..T",
+    "T......s.......T",
+    "T......s..#....T",
+    "TTTTTT.s..TTTTTT",
+]
+OW[(0, 2)] = [  # Fjord coast: Ingrid the fisher
+    "TTTTTT.s..TTTTTT",
+    "T......s.......T",
+    "T..b...s.......T",
+    "T......s...f...T",
+    "T......s.......T",
+    "T......s........",
+    "T......sssssssss",
+    "Twwwww.s........",
+    "TwwwwwUUU......T",
+    "Twwwwwwww.b....T",
+    "TwwwwwwwwwT....T",
+    "TwwwwwwwwwwT...T",
+    "TwwwwwwwwwwwT..T",
+    "TTTTTTTTTTTTTTTT",
+]
+OW[(1, 2)] = [  # Fjordvik airstrip: Flight 364 (demon side quest hook)
+    "TTTTTT.s..TTTTTT",
+    "T......s.......T",
+    "T......s.......T",
+    "T......s..qq...T",
+    "T.PPPPPPPPPPPP.T",
+    "..PPPPPPPPPPPP..",
+    "sssssssssqqssss.",
+    "..........s.....",
+    "....ssssssss....",
+    "T..............T",
+    "T..b....f......T",
+    "T......T.......T",
+    "T..........b...T",
+    "TTTTTTTTTTTTTTTT",
+]
+OW[(2, 2)] = [  # The Beach Where I Died
+    "TTTTTT.s..TTTTTT",
+    "T..ss..s..ss...T",
+    "T.sssssssssss..T",
+    "T.sssssssssss..T",
+    "T.sssssssssss..T",
+    "..sssssssssss...",
+    "sssssssssssssss.",
+    "..sssssssssss...",
+    "T.sssssssssss..T",
+    "T.sssssssssss..T",
+    "T..sssssssss...T",
+    "T..............T",
+    "T..T......T....T",
+    "TTTTTTTTTTTTTTTT",
+]
+OW[(3, 2)] = [  # Old graveyard: heart piece among the graves
+    "TTTTTT.s..TTTTTT",
+    "T......s.......T",
+    "T.+.+.+s+.+.+..T",
+    "T......s.......T",
+    "T.+.+.+s+.+.+..T",
+    ".......s.......T",
+    "sssssssss......T",
+    "T......s.......T",
+    "T.+.+..s..+.+..T",
+    "T......s.......T",
+    "T.+.+..s..+.+.+T",
+    "T......s.......T",
+    "T..............T",
+    "TTTTTTTTTTTTTTTT",
+]
+
+def compose(blocks, cols, rows):
+    grid = [["T"] * (cols * SW) for _ in range(rows * SH)]
+    for (sx, sy), b in blocks.items():
+        check_block((sx, sy), b)
+        for y, r in enumerate(b):
+            for x, c in enumerate(r):
+                grid[sy * SH + y][sx * SW + x] = c
+    H, W = len(grid), len(grid[0])
+    for x in range(W):
+        grid[0][x] = "T" if grid[0][x] not in "TMw" else grid[0][x]
+        grid[H - 1][x] = "T" if grid[H - 1][x] not in "TMw" else grid[H - 1][x]
+    for y in range(H):
+        if grid[y][0] not in "TMw": grid[y][0] = "T"
+        if grid[y][W - 1] not in "TMw": grid[y][W - 1] = "T"
+    return grid
+
+ow = compose(OW, 4, 3)
+
+def P(sx, sy, x, y):  # screen-local tile -> global tile
+    return [sx * SW + x, sy * SH + y]
+
+OW_ENT = [
+    {"t": "start", "at": P(1, 2, 8, 8)},
+    {"t": "runestone", "at": P(1, 2, 4, 8)},
+    {"t": "sign", "at": P(1, 2, 12, 8), "text": "sign_airstrip"},
+    {"t": "cargo", "at": P(1, 2, 13, 5)},
+    {"t": "npc", "id": "astrid", "at": P(0, 1, 5, 6)},
+    {"t": "npc", "id": "lars", "at": P(1, 1, 7, 5)},
+    {"t": "shop", "item": "juice", "price": 40, "at": P(1, 1, 4, 5)},
+    {"t": "shop", "item": "shard", "price": 25, "at": P(1, 1, 6, 5)},
+    {"t": "shop", "item": "heart3", "price": 10, "at": P(1, 1, 8, 5)},
+    {"t": "npc", "id": "sven", "at": P(1, 1, 12, 9)},
+    {"t": "npc", "id": "ingrid", "at": P(0, 2, 9, 8)},
+    {"t": "sign", "at": P(0, 1, 10, 7), "text": "sign_fjordvik"},
+    {"t": "runestone", "at": P(2, 0, 10, 4)},
+    {"t": "sign", "at": P(2, 0, 9, 3), "text": "sign_cavern"},
+    {"t": "sealed", "at": P(0, 0, 7, 2), "text": "seal_barrow"},
+    {"t": "sealed", "at": P(3, 0, 7, 2), "text": "seal_peak"},
+    {"t": "sealed", "at": P(3, 1, 13, 3), "text": "seal_forge"},
+    {"t": "sign", "at": P(2, 2, 6, 9), "text": "sign_beach"},
+    {"t": "warp", "at": P(2, 0, 7, 2), "to": "cavern", "dest": [24, 54]},
+    {"t": "piece", "id": "hp_forest", "at": P(1, 0, 13, 3)},
+    {"t": "piece", "id": "hp_grave", "at": P(3, 2, 14, 12)},
+    {"t": "chest", "id": "c_coast", "at": P(0, 2, 14, 2), "item": "kr20"},
+    # enemies
+    {"t": "penguin", "at": P(2, 2, 5, 3)}, {"t": "penguin", "at": P(2, 2, 10, 4)}, {"t": "penguin", "at": P(2, 2, 7, 8)},
+    {"t": "penguin", "at": P(2, 0, 4, 7)}, {"t": "penguin", "at": P(2, 0, 12, 9)},
+    {"t": "penguin", "at": P(3, 0, 10, 6)}, {"t": "wisp", "at": P(3, 0, 5, 10)},
+    {"t": "draugr", "at": P(1, 0, 4, 8)}, {"t": "wisp", "at": P(1, 0, 11, 10)},
+    {"t": "draugr", "at": P(3, 2, 4, 5)}, {"t": "draugr", "at": P(3, 2, 11, 9)}, {"t": "wisp", "at": P(3, 2, 7, 11)},
+    {"t": "wisp", "at": P(0, 0, 10, 9)}, {"t": "penguin", "at": P(0, 0, 4, 11)},
+    {"t": "draugr", "at": P(3, 1, 9, 9)}, {"t": "wisp", "at": P(3, 1, 4, 3)},
+    {"t": "penguin", "at": P(2, 1, 1, 9)},
+]
+
+# ---------------- Penguin Ice Cavern: 3 x 4 rooms ----------------
+def room(top=None, bottom=None, left=None, right=None, side_rows=(6, 7), floor="_"):
+    g = [["W"] * SW for _ in range(SH)]
+    for y in range(1, SH - 1):
+        for x in range(1, SW - 1):
+            g[y][x] = floor
+    if top: g[0][7] = g[0][8] = top
+    if bottom: g[SH - 1][7] = g[SH - 1][8] = bottom
+    if left:
+        for y in side_rows: g[y][0] = left
+    if right:
+        for y in side_rows: g[y][SW - 1] = right
+    for (x, y) in [(1, 1), (14, 1), (1, 12), (14, 12)]:
+        g[y][x] = "t"
+    return g
+
+def put(g, x0, y0, rows):
+    for dy, r in enumerate(rows):
+        for dx, c in enumerate(r):
+            if c != " ": g[y0 + dy][x0 + dx] = c
+
+R = {}
+low = (9, 10)
+R[(1, 3)] = room(top="_", bottom="_")                          # entrance
+R[(1, 2)] = room(top="L", bottom="_", left="_", right="_")      # hub (ice)
+put(R[(1, 2)], 3, 3, ["iiiiiiiiii"] * 8)
+R[(0, 2)] = room(right="_")                                     # west: bats + pots, key on clear
+put(R[(0, 2)], 2, 2, ["O  O", "", "", "", "", "", "", "O  O"])
+R[(2, 2)] = room(left="_")                                      # east: pit maze, key chest
+put(R[(2, 2)], 2, 2, [
+    "vvvvvvvvvv_v",
+    "vvvvvvvvvv_v",
+    "vvv________v",
+    "vvv_vvvvvvvv",
+    "____vvvv____",
+    "____vvvvvvvv",
+    "vvvvvvvvvvvv",
+    "vvvvvvvvvvvv",
+])
+R[(1, 1)] = room(top="K", bottom="h", left="_", right="L", side_rows=low)   # switch room
+put(R[(1, 1)], 1, 3, ["vvvvvvGGvvvvvv"] * 5)
+R[(0, 1)] = room(right="_", side_rows=low)                      # NW: draugr, big key on clear
+R[(2, 1)] = room(left="h", side_rows=low)                       # mini-boss: Penguin Knight
+put(R[(2, 1)], 3, 3, ["iiiiiiiiii"] * 8)
+R[(1, 0)] = room(bottom="h")                                    # boss: Penguin King
+put(R[(1, 0)], 2, 2, ["iiiiiiiiiiii"] * 10)
+# hub's top door is the locked door; the switch room's bottom is its far side
+R[(1, 1)][SH - 1][7] = R[(1, 1)][SH - 1][8] = "L"
+R[(1, 2)][0][7] = R[(1, 2)][0][8] = "L"
+# switch-room right door locked, mini-boss side shutter
+# boss door K is on the switch room's top; boss room bottom is a shutter
+
+cav_blocks = {k: ["".join(r) for r in v] for k, v in R.items()}
+for y in range(4):
+    for x in range(3):
+        if (x, y) not in cav_blocks:
+            cav_blocks[(x, y)] = ["W" * SW] * SH
+cav = [["W"] * (3 * SW) for _ in range(4 * SH)]
+for (sx, sy), b in cav_blocks.items():
+    check_block(("cav", sx, sy), b)
+    for y, r in enumerate(b):
+        for x, c in enumerate(r):
+            cav[sy * SH + y][sx * SW + x] = c
+
+CAV_ENT = [
+    {"t": "warp", "at": P(1, 3, 7, 13), "to": "overworld", "dest": P(2, 0, 7, 3)},
+    {"t": "warp", "at": P(1, 3, 8, 13), "to": "overworld", "dest": P(2, 0, 7, 3)},
+    {"t": "runestone", "at": P(1, 3, 4, 6)},
+    {"t": "sign", "at": P(1, 3, 10, 6), "text": "sign_cavern_in"},
+    {"t": "penguin", "at": P(1, 2, 5, 5)}, {"t": "penguin", "at": P(1, 2, 10, 5)}, {"t": "penguin", "at": P(1, 2, 8, 9)},
+    {"t": "bat", "at": P(0, 2, 5, 5)}, {"t": "bat", "at": P(0, 2, 10, 8)}, {"t": "bat", "at": P(0, 2, 7, 10)},
+    {"t": "chest", "id": "cv_key1", "at": P(0, 2, 7, 6), "item": "key", "clear": True},
+    {"t": "bat", "at": P(2, 2, 12, 4)}, {"t": "bat", "at": P(2, 2, 4, 11)},
+    {"t": "chest", "id": "cv_key2", "at": P(2, 2, 12, 2), "item": "key"},
+    {"t": "switch", "id": "cv_gate", "at": P(1, 1, 2, 1)},
+    {"t": "draugr", "at": P(0, 1, 5, 4)}, {"t": "draugr", "at": P(0, 1, 10, 8)}, {"t": "penguin", "at": P(0, 1, 7, 11)},
+    {"t": "chest", "id": "cv_bigkey", "at": P(0, 1, 7, 6), "item": "bigkey", "clear": True},
+    {"t": "knight", "at": P(2, 1, 9, 5)},
+    {"t": "chest", "id": "cv_homing", "at": P(2, 1, 8, 7), "item": "homing", "clear": True},
+    {"t": "king", "at": P(1, 0, 8, 5)},
+    {"t": "chest", "id": "cv_thunder", "at": P(1, 0, 8, 4), "item": "thunder", "clear": True},
+    {"t": "container", "id": "hc_cavern", "at": P(1, 0, 6, 7), "clear": True},
+    {"t": "warp", "at": P(1, 0, 10, 7), "to": "overworld", "dest": P(2, 0, 7, 4), "clear": True, "portal": True},
+]
+
+# ---------------- Owen's room (New York) ----------------
+HOME = [
+    "ZZZZZZZZZZZZZZZZ",
+    "ZFFFFFFFFFFFFFFZ",
+    "ZFYYFFFFFFFQQQFZ",
+    "ZFYYFFFFFFFFFFFZ",
+    "ZFFFFFFFFFFFFFFZ",
+    "ZFFFFrrrrrFFFFFZ",
+    "ZFFFFrrrrrFFFFFZ",
+    "ZFFFFrrrrrFFFFFZ",
+    "ZFFFFFFFFFFFFFFZ",
+    "ZFFFFFFFFFFFFFFZ",
+    "ZFQFFFFFFFFFFFFZ",
+    "ZFFFFFFFFFFFFFFZ",
+    "ZFFFFFFFFFFFFFFZ",
+    "ZZZZZZZddZZZZZZZ",
+]
+check_block("home", HOME)
+HOME_ENT = [
+    {"t": "start", "at": [3, 4]},
+    {"t": "plaque", "at": [12, 2]},
+    {"t": "sign", "at": [2, 10], "text": "sign_poster"},
+    {"t": "flight", "at": [7, 13]}, {"t": "flight", "at": [8, 13]},
+]
+
+# ---------------- reachability check ----------------
+WALK = set(".fsn~iU_vrFDEhLKGtd") - set("t")
+def reachable(grid, start, extra=set()):
+    H, W = len(grid), len(grid[0])
+    seen = {tuple(start)}
+    q = collections.deque([tuple(start)])
+    while q:
+        x, y = q.popleft()
+        for dx, dy in ((1, 0), (-1, 0), (0, 1), (0, -1)):
+            nx, ny = x + dx, y + dy
+            if 0 <= nx < W and 0 <= ny < H and (nx, ny) not in seen:
+                c = grid[ny][nx]
+                if c in (WALK | extra) and c not in "~v" or c == "b":
+                    seen.add((nx, ny)); q.append((nx, ny))
+    return seen
+
+ow_seen = reachable(ow, OW_ENT[0]["at"])
+for e in OW_ENT:
+    x, y = e["at"]
+    ok = any((x + dx, y + dy) in ow_seen for dx, dy in ((0, 0), (1, 0), (-1, 0), (0, 1), (0, -1)))
+    assert ok, ("overworld unreachable", e)
+cav_seen = reachable(cav, P(1, 3, 7, 12))
+for e in CAV_ENT:
+    x, y = e["at"]
+    if e["t"] == "switch":  # across the chasm on purpose
+        continue
+    ok = any((x + dx, y + dy) in cav_seen for dx, dy in ((0, 0), (1, 0), (-1, 0), (0, 1), (0, -1)))
+    assert ok, ("cavern unreachable", e)
+# the switch must be out of plain-throw range from the near side, in homing range
+sw = CAV_ENT[[e["t"] for e in CAV_ENT].index("switch")]["at"]
+near = [(x, y) for (x, y) in cav_seen if P(1, 1, 0, 8)[1] <= y < P(1, 1, 0, 13)[1] and 16 <= x < 32]
+dmin = min(((x - sw[0]) ** 2 + (y - sw[1]) ** 2) ** 0.5 * 16 for (x, y) in near)
+print("switch min distance px:", round(dmin, 1))
+
+out = {
+    "overworld": {"name": "Norway", "rows": ["".join(r) for r in ow], "ents": OW_ENT, "outdoor": True},
+    "cavern": {"name": "Penguin Ice Cavern", "rows": ["".join(r) for r in cav], "ents": CAV_ENT, "dungeon": True},
+    "home": {"name": "Owen's Room, New York", "rows": HOME, "ents": HOME_ENT},
+}
+pathlib.Path("web/src/maps.js").write_text(
+    "// Generated by tools/maps.py. Edit the ASCII there, then rerun it.\nconst MAPS = " + json.dumps(out, indent=0) + ";\n")
+print("overworld", len(ow[0]), "x", len(ow), "| cavern", len(cav[0]), "x", len(cav), "| ok")
