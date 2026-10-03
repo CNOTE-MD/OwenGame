@@ -103,7 +103,7 @@ function drawTitle() {
   ctx.fillStyle = '#000'; ctx.fillText('JÖNTUKA', VW / 2 + 2, 62); ctx.fillStyle = '#8fd0ff'; ctx.fillText('JÖNTUKA', VW / 2, 60);
   text('A VIKING TALE', VW / 2, 80, '#f3ecd2', 'center');
   text('a game by Owen', VW / 2, 96, '#a79fc4', 'center');
-  drawJonSprite(VW / 2 + 74 + Math.sin(G.t * 2) * 3, 124, Math.sin(G.t * 1.5) * 0.3);
+  drawJonSprite(VW / 2 + 74 + Math.sin(G.t * 2) * 3, 124, Math.sin(G.t * 1.5) * 0.3, G.t % 3.2 < 0.14);
   const opts = G.titleOpts || titleOptions();
   opts.forEach((o, i) => {
     const sel = i === G.menuSel;

@@ -118,7 +118,7 @@ function render() {
   drawFx();
   drawLightning();
   ctx.setTransform(1, 0, 0, 1, 0, 0);
-  if (G.map.dungeon) { const g = ctx.createRadialGradient(p.x - G.cam.x, p.y - G.cam.y, 40, p.x - G.cam.x, p.y - G.cam.y, 200); g.addColorStop(0, 'rgba(0,0,20,0)'); g.addColorStop(1, 'rgba(0,0,20,.45)'); ctx.fillStyle = g; ctx.fillRect(0, 0, VW, VH); }
+  if (G.map.dungeon) drawDungeonLight();
   if (G.flash > 0) { ctx.globalAlpha = Math.min(1, G.flash * 3); R(0, 0, VW, VH, G.flashColor || '#fff'); ctx.globalAlpha = 1; }
   if (G.mode === 'arena') drawArenaHud(); else drawHud();
   if (G.state === 'warp') { ctx.globalAlpha = clamp(1 - Math.abs(G.warp.t - 0.35) / 0.35, 0, 1); R(0, 0, VW, VH, '#000'); ctx.globalAlpha = 1; }
@@ -137,6 +137,7 @@ function render() {
 
 let last = performance.now();
 G.menuSel = 0;
+buildAll();
 function frame(now) {
   const dt = Math.min(0.05, (now - last) / 1000); last = now;
   try { update(dt); render(); } catch (err) { console.error(err); }

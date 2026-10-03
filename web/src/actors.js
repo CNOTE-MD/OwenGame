@@ -21,11 +21,11 @@ function makeEnt(d, x, y) {
 }
 const ENEMY = {
   penguin: { hp: 2, r: 6, touch: 1, speed: 40 },
-  draugr: { hp: 4, r: 6, touch: 2, speed: 20, shield: true },
+  draugr: { hp: 3, r: 6, touch: 1, speed: 18, shield: true },
   wisp: { hp: 1, r: 5, touch: 1, speed: 26, fly: true },
   bat: { hp: 1, r: 5, touch: 1, speed: 75, fly: true },
-  knight: { hp: 7, r: 9, touch: 2, speed: 30, shield: true, boss: true },
-  king: { hp: 10, r: 14, touch: 2, speed: 26, boss: true },
+  knight: { hp: 5, r: 10, touch: 2, speed: 28, shield: true, boss: true },
+  king: { hp: 10, r: 16, touch: 2, speed: 26, boss: true },
 };
 function makeEnemy(type, x, y) {
   const d = ENEMY[type];
@@ -39,14 +39,19 @@ function puff(x, y, color = '#fff', n = 7) {
   for (let i = 0; i < n; i++) { const a = Math.random() * Math.PI * 2, s = rnd(20, 60); G.fx.push({ x, y, vx: Math.cos(a) * s, vy: Math.sin(a) * s, t: 0, life: 0.4, color, size: 2 }); }
 }
 function updateFx(dt) {
-  for (const f of G.fx) { f.t += dt; f.x += f.vx * dt; f.y += f.vy * dt; f.vx *= 0.9; f.vy *= 0.9; }
+  for (const f of G.fx) { f.t += dt; f.x += f.vx * dt; f.y += f.vy * dt; if (f.grav) f.vy += f.grav * dt; else { f.vx *= 0.9; f.vy *= 0.9; } }
   G.fx = G.fx.filter(f => f.t < f.life);
 }
 function drawFx() {
   for (const f of G.fx) {
     if (f.kind === 'text') { text(f.label, f.x - G.cam.x, f.y - G.cam.y - f.t * 12, f.color, 'center'); continue; }
+    if (f.kind === 'poof') { const img = POOF[Math.min(3, Math.floor(f.t / f.life * 4))], s = f.scale; ctx.drawImage(img, Math.round(f.x - G.cam.x - 12 * s), Math.round(f.y - G.cam.y - 12 * s), 24 * s, 24 * s); continue; }
+    if (f.kind === 'leaf') { R(f.x - G.cam.x, f.y - G.cam.y, 2, 1, f.color); R(f.x - G.cam.x + 1, f.y - G.cam.y + 1, 1, 1, '#205818'); continue; }
     R(f.x - G.cam.x, f.y - G.cam.y, f.size, f.size, f.color);
   }
+}
+function leaves(x, y, colors) {
+  for (let i = 0; i < 8; i++) G.fx.push({ kind: 'leaf', x: x + rnd(-5, 5), y: y + rnd(-5, 3), vx: rnd(-50, 50), vy: rnd(-90, -30), grav: 260, t: 0, life: 0.55, color: pick(colors) });
 }
 function floatText(x, y, label, color = '#fff') { G.fx.push({ kind: 'text', x, y, vx: 0, vy: 0, t: 0, life: 0.9, label, color }); }
 
@@ -77,7 +82,8 @@ function updatePlayer(dt) {
     return;
   }
   const v = inputVec();
-  if (v.x || v.y) { p.fx = v.x; p.fy = v.y; p.walk += dt * 10; }
+  p.moving = !!(v.x || v.y);
+  if (p.moving) { p.fx = v.x; p.fy = v.y; p.walk += dt * 9; }
   const onIce = tileAt(p.x, p.y) === 'i';
   const spd = 72 * G.st.speed;
   if (onIce) { const k = Math.min(1, 2.2 * dt); p.vx += (v.x * spd * 1.1 - p.vx) * k; p.vy += (v.y * spd * 1.1 - p.vy) * k; }
@@ -290,8 +296,8 @@ function jonHits(dmg, reach, from, how) {
 function cutAt(x, y) {
   const tx = Math.floor(x / T), ty = Math.floor(y / T), c = tile(tx, ty);
   if (!sameScreen(tx, ty)) return false;
-  if (c === 'b') { setTile(tx, ty, '.'); puff(tx * T + 8, ty * T + 8, '#4fbf4a', 8); Sound.play('swing'); maybeDrop(tx * T + 8, ty * T + 8, 0.4); return true; }
-  if (c === 'O') { setTile(tx, ty, '_'); puff(tx * T + 8, ty * T + 8, '#8a5a3a', 8); Sound.play('kill'); maybeDrop(tx * T + 8, ty * T + 8, 0.6); return true; }
+  if (c === 'b') { setTile(tx, ty, SNOWY(tx, ty) ? 'n' : '.'); leaves(tx * T + 8, ty * T + 8, ['#58b840', '#a8e070', '#388828']); Sound.play('swing'); maybeDrop(tx * T + 8, ty * T + 8, 0.4); return true; }
+  if (c === 'O') { setTile(tx, ty, '_'); leaves(tx * T + 8, ty * T + 8, ['#b8784a', '#8a5432', '#e0a070']); Sound.play('kill'); maybeDrop(tx * T + 8, ty * T + 8, 0.6); return true; }
   return false;
 }
 function hitSwitch(e) {
@@ -315,7 +321,14 @@ function damageEnemy(e, dmg, from, how) {
   const jonHit = how === 'swing' || how === 'throw';
   if (e.flash > 0.05 && jonHit) return false;
   const dx = from.x - e.x, dy = from.y - e.y, d = Math.hypot(dx, dy) || 1;
-  if (jonHit && e.shield && (dx / d * e.fx + dy / d * e.fy) > 0.55 && e.st !== 'charge') { Sound.play('clank'); puff(e.x + e.fx * 8, e.y + e.fy * 8, '#ffd84a', 4); return true; }
+  // Shields block a hit from the front, but the block knocks the shield aside for a moment:
+  // hit-hit always works, and hitting from the side or back works right away.
+  if (jonHit && e.shield && !(e.guardDown > 0) && (dx / d * e.fx + dy / d * e.fy) > 0.55 && e.st !== 'charge') {
+    Sound.play('clank'); puff(e.x + e.fx * 8, e.y + e.fy * 8, '#ffd84a', 4);
+    e.guardDown = 1.1; e.kx = -dx / d * 110; e.ky = -dy / d * 110;
+    floatText(e.x, e.y - 18, 'STAGGER!', '#ffd84a');
+    return true;
+  }
   if (e.type === 'king' && e.st !== 'daze' && how !== 'thunder') {
     if (jonHit) { Sound.play('clank'); floatText(e.x, e.y - 30, 'CLANK', '#ffd84a'); }
     return true;
@@ -330,7 +343,7 @@ function damageEnemy(e, dmg, from, how) {
 function killEnemy(e) {
   e.alive = false;
   G.ents = G.ents.filter(o => o !== e);
-  puff(e.x, e.y, '#fff', e.boss ? 24 : 9); Sound.play('kill');
+  poof(e.x, e.y, e.boss); Sound.play('kill');
   const s = G.save;
   if (s.items.thunder) s.rune = Math.min(RUNE_MAX, s.rune + 1);
   if (G.mode === 'arena') return arenaKill(e);
@@ -348,6 +361,7 @@ function spawnEnemy(type, x, y) { const e = makeEnemy(type, x, y); e.st = 'idle'
 
 function updateEnemy(e, dt) {
   e.flash = Math.max(0, e.flash - dt); e.wob += dt * 8; e.t += dt;
+  if (e.guardDown > 0) { e.guardDown -= dt; if (e.type === 'draugr' || e.type === 'knight') { const kl0 = Math.hypot(e.kx, e.ky); if (kl0 > 1) { tryMove(e, e.kx * dt, e.ky * dt, e.r * 0.6, 'walker'); e.kx *= 0.85; e.ky *= 0.85; } return; } }
   const p = G.player, dx = p.x - e.x, dy = p.y - e.y, d = Math.hypot(dx, dy) || 1;
   const who = e.fly ? 'flyer' : 'walker', mr = e.r * 0.6;
   const kl = Math.hypot(e.kx, e.ky);

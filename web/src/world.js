@@ -231,6 +231,7 @@ function drawMap() {
   const x0 = Math.floor(cx / T), y0 = Math.floor(cy / T);
   for (let ty = y0; ty <= y0 + SH; ty++) for (let tx = x0; tx <= x0 + SW; tx++) {
     if (tx < 0 || ty < 0 || tx >= G.cols || ty >= G.nrows) continue;
-    drawTile(G.rows[ty][tx], tx * T - cx, ty * T - cy, tx, ty);
+    const c = G.rows[ty][tx], ox = tx * T - cx, oy = ty * T - cy;
+    if (!drawTileArt(c, ox, oy, tx, ty)) drawTile(c, ox, oy, tx, ty);
   }
 }

@@ -115,10 +115,12 @@ const SHOTS = process.env.SHOTS || '/tmp';
   await goScreen('cavern', 8, 20); await ev(() => { G.ents = G.ents.filter(e => !e.enemy); });
   await ev(() => { const e = makeEnemy('draugr', 8 * 16 + 8, 18 * 16 + 8); e.fx = 0; e.fy = 1; e.t = 0; G.ents.push(e); G.roomEnemies = true; });
   await place(8, 19, 0, -1); await pg.keyboard.press('KeyZ'); await wait(300);
-  await check('draugr blocks from the front', await ev(() => G.ents.find(e => e.type === 'draugr').hp === 4));
-  await ev(() => { const e = G.ents.find(e => e.type === 'draugr'); e.t = 0; e.x = 8 * 16 + 8; e.y = 18 * 16 + 8; e.fx = 0; e.fy = 1; });
+  await check('draugr shield blocks the first frontal hit and staggers', await ev(() => { const e = G.ents.find(e => e.type === 'draugr'); return e.hp === e.max && e.guardDown > 0; }));
+  await ev(() => { const e = G.ents.find(e => e.type === 'draugr'); damageEnemy(e, 1, G.player, 'swing'); });
+  await check('second frontal hit lands while staggered', await ev(() => { const e = G.ents.find(e => e.type === 'draugr'); return !e || e.hp < e.max; }));
+  await ev(() => { const e = G.ents.find(e => e.type === 'draugr'); if (e) { e.hp = e.max; e.guardDown = 0; e.flash = 0; e.kx = e.ky = 0; e.t = 0; e.x = 8 * 16 + 8; e.y = 18 * 16 + 8; e.fx = 0; e.fy = 1; } });
   await place(8, 17, 0, 1); await pg.keyboard.press('KeyZ'); await wait(300);
-  await check('draugr takes damage from behind', await ev(() => { const e = G.ents.find(e => e.type === 'draugr'); return !e || e.hp < 4; }));
+  await check('draugr takes damage from behind', await ev(() => { const e = G.ents.find(e => e.type === 'draugr'); return !e || e.hp < e.max; }));
   await goScreen('cavern', 24, 20); await ev(() => { G.ents = G.ents.filter(e => !e.enemy); G.roomEnemies = false; });
 
   // boss door needs big key

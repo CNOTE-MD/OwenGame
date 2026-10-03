@@ -292,12 +292,11 @@ function drawArenaWorld() {
   }
   for (const s of A.shots) R(s.x - cx - 2, s.y - cy - 2, 4, 4, '#ffd84a');
   A.pals.forEach(pl => {
-    ctx.save(); ctx.translate(Math.round(pl.x - cx), Math.round(pl.y - cy));
-    const sw = Math.round(Math.sin(pl.wob));
-    R(-5 + sw, -6, 10, 12, '#1a1a38'); R(-3 + sw, -2, 6, 7, '#f2f2ff'); R(-1 + sw, -3, 3, 2, '#ffa61a');
-    R(-3 + sw, -5, 2, 2, '#fff'); R(1 + sw, -5, 2, 2, '#fff'); R(-2 + sw, -4, 1, 1, '#000'); R(2 + sw, -4, 1, 1, '#000');
-    R(-5 + sw, -8, 10, 2, '#e23');   // little red scarf: the good penguin
-    ctx.restore();
+    const x = pl.x - cx, y = pl.y - cy, f = Math.floor(pl.wob / 2.5) % 2;
+    const { d, flip } = pl.dash > 0 ? dirOf(pl.dx, pl.dy) : { d: 'down', flip: false };
+    shadowAt(x, y + 5, 1);
+    spr(SPR[`pal_${d}_${f}${flip ? '_f' : ''}`], x, y + 6);
+    R(x - 5, y - 6, 10, 2, '#e02838'); R(x + 3, y - 4, 2, 3, '#e02838');   // red scarf: the good penguin
   });
   for (let i = 0; i < A.orbit; i++) {
     const a = G.t * 3.2 + i * Math.PI * 2 / A.orbit;
