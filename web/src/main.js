@@ -48,6 +48,7 @@ function update(dt) {
   G.t += dt;
   G.shake = Math.max(0, G.shake - dt); G.flash = Math.max(0, G.flash - dt); G.bannerT = Math.max(0, G.bannerT - dt);
   if (just('mute')) Sound.muted = !Sound.muted;
+  if (just('music')) Music.on = !Music.on;
   switch (G.state) {
     case 'title': {
       if (!G.titleOpts) { G.titleOpts = titleOptions(); G.titleBest = arenaBest(); }
@@ -142,7 +143,7 @@ G.menuSel = 0;
 buildAll();
 function frame(now) {
   const dt = Math.min(0.05, (now - last) / 1000); last = now;
-  try { update(dt); render(); } catch (err) { console.error(err); }
+  try { update(dt); render(); Music.want(musicFor()); Music.tick(); } catch (err) { console.error(err); }
   for (const k in edge) edge[k] = false;
   requestAnimationFrame(frame);
 }

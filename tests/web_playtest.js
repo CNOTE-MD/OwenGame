@@ -52,6 +52,7 @@ const SHOTS = process.env.SHOTS || '/tmp';
   await pg.screenshot({ path: SHOTS + '/p2_flight.png' });
   await talkThrough(120);
   await check('landed in Norway', await ev(() => G.mapId === 'overworld' && G.state === 'play'));
+  await check('music: overworld theme at the airstrip', await ev(() => musicFor() === 'overworld'));
   await wait(200);
   await pg.screenshot({ path: SHOTS + '/p3_airstrip.png' });
 
@@ -68,6 +69,7 @@ const SHOTS = process.env.SHOTS || '/tmp';
   // Elder Astrid at (5,20); stand right of her facing left
   await goScreen('overworld', 7, 20); await place(6, 20, -1, 0);
   await pg.keyboard.press('KeyZ'); await wait(80); await talkThrough();
+  await check('music: village theme in Fjordvik', await ev(() => musicFor() === 'village'));
   await check('met Astrid, got 30 kr', await ev(() => G.save.flags.met_astrid && G.save.kr >= 30));
 
   // cut a bush at (3,24) in village west: stand at (4,24) facing left
@@ -90,6 +92,7 @@ const SHOTS = process.env.SHOTS || '/tmp';
   await goScreen('overworld', 39, 4); await place(39, 3, 0, -1);
   await pg.keyboard.down('ArrowUp'); await wait(300); await pg.keyboard.up('ArrowUp'); await wait(900); await talkThrough();
   await check('entered Ice Cavern', await ev(() => G.mapId === 'cavern'));
+  await check('music: cavern theme', await ev(() => musicFor() === 'dungeon'));
   await pg.screenshot({ path: SHOTS + '/p4_cavern.png' });
 
   // locked door in hub (top at 23-24,28). No key -> stays locked; with key -> opens
@@ -133,6 +136,7 @@ const SHOTS = process.env.SHOTS || '/tmp';
   await ev(() => { G.save.bigkeys.cavern = true; G.player.bump = 0; });
   await place(24, 15, 0, -1); await pg.keyboard.down('ArrowUp'); await wait(900); await pg.keyboard.up('ArrowUp'); await wait(700);
   await talkThrough();
+  await check('music: boss theme with the King alive', await ev(() => musicFor() === 'boss'));
   await check('in boss room with Penguin King', await ev(() => G.scr.y === 0 && G.ents.some(e => e.type === 'king')));
   await pg.screenshot({ path: SHOTS + '/p5_boss.png' });
   // swing on an undazed king clanks

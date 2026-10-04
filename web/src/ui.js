@@ -91,6 +91,7 @@ function drawMenu() {
   text('QUEST', 20, 180, '#ffe64d');
   wrap(objective(), 214).slice(0, 3).forEach((l, i) => text(l, 20, 192 + i * 10, '#fff', 'left', false));
   text(Sound.muted ? 'M: sound off' : 'M: sound on', 236, 26, '#8a8ab0', 'right', false);
+  text(Music.on ? 'N: music on' : 'N: music off', 236, 38, '#8a8ab0', 'right', false);
 }
 
 // ---------- title ----------
