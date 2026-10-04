@@ -48,6 +48,7 @@ function update(dt) {
   G.t += dt;
   G.shake = Math.max(0, G.shake - dt); G.flash = Math.max(0, G.flash - dt); G.bannerT = Math.max(0, G.bannerT - dt);
   if (just('mute')) Sound.muted = !Sound.muted;
+  if (just('music')) Music.on = !Music.on;
   switch (G.state) {
     case 'title': {
       if (!G.titleOpts) { G.titleOpts = titleOptions(); G.titleBest = arenaBest(); }
@@ -82,6 +83,7 @@ function update(dt) {
       return;
     case 'levelup': case 'shop': case 'arenapause': case 'arenaover': updateArenaMenus(); return;
     case 'thunder': updateThunder(dt); updateFx(dt); return;
+    case 'dying': updateDying(dt); updateFx(dt); return;
   }
   // play
   if (G.trans) { updateTransition(dt); return; }
@@ -112,13 +114,14 @@ function render() {
   const p = G.player;
   const list = G.ents.filter(e => e.kind !== 'warp' || e.portal).map(e => ({ y: e.y, f: () => drawThing(e) }));
   list.push({ y: p.y, f: () => drawOwen(p.x - G.cam.x, p.y - G.cam.y) });
+  list.push(...bigDrawList());
   list.sort((a, b) => a.y - b.y).forEach(o => o.f());
   if (G.mode === 'arena') drawArenaWorld();
   if (!p.hold) drawJon();
   drawFx();
   drawLightning();
   ctx.setTransform(1, 0, 0, 1, 0, 0);
-  if (G.map.dungeon) { const g = ctx.createRadialGradient(p.x - G.cam.x, p.y - G.cam.y, 40, p.x - G.cam.x, p.y - G.cam.y, 200); g.addColorStop(0, 'rgba(0,0,20,0)'); g.addColorStop(1, 'rgba(0,0,20,.45)'); ctx.fillStyle = g; ctx.fillRect(0, 0, VW, VH); }
+  if (G.map.dungeon) drawDungeonLight();
   if (G.flash > 0) { ctx.globalAlpha = Math.min(1, G.flash * 3); R(0, 0, VW, VH, G.flashColor || '#fff'); ctx.globalAlpha = 1; }
   if (G.mode === 'arena') drawArenaHud(); else drawHud();
   if (G.state === 'warp') { ctx.globalAlpha = clamp(1 - Math.abs(G.warp.t - 0.35) / 0.35, 0, 1); R(0, 0, VW, VH, '#000'); ctx.globalAlpha = 1; }
@@ -137,9 +140,10 @@ function render() {
 
 let last = performance.now();
 G.menuSel = 0;
+buildAll();
 function frame(now) {
   const dt = Math.min(0.05, (now - last) / 1000); last = now;
-  try { update(dt); render(); } catch (err) { console.error(err); }
+  try { update(dt); render(); Music.want(musicFor()); Music.tick(); } catch (err) { console.error(err); }
   for (const k in edge) edge[k] = false;
   requestAnimationFrame(frame);
 }

@@ -21,11 +21,11 @@ function makeEnt(d, x, y) {
 }
 const ENEMY = {
   penguin: { hp: 2, r: 6, touch: 1, speed: 40 },
-  draugr: { hp: 4, r: 6, touch: 2, speed: 20, shield: true },
+  draugr: { hp: 3, r: 6, touch: 1, speed: 18, shield: true },
   wisp: { hp: 1, r: 5, touch: 1, speed: 26, fly: true },
   bat: { hp: 1, r: 5, touch: 1, speed: 75, fly: true },
-  knight: { hp: 7, r: 9, touch: 2, speed: 30, shield: true, boss: true },
-  king: { hp: 10, r: 14, touch: 2, speed: 26, boss: true },
+  knight: { hp: 5, r: 10, touch: 2, speed: 28, shield: true, boss: true },
+  king: { hp: 10, r: 16, touch: 2, speed: 26, boss: true },
 };
 function makeEnemy(type, x, y) {
   const d = ENEMY[type];
@@ -39,14 +39,21 @@ function puff(x, y, color = '#fff', n = 7) {
   for (let i = 0; i < n; i++) { const a = Math.random() * Math.PI * 2, s = rnd(20, 60); G.fx.push({ x, y, vx: Math.cos(a) * s, vy: Math.sin(a) * s, t: 0, life: 0.4, color, size: 2 }); }
 }
 function updateFx(dt) {
-  for (const f of G.fx) { f.t += dt; f.x += f.vx * dt; f.y += f.vy * dt; f.vx *= 0.9; f.vy *= 0.9; }
+  for (const f of G.fx) { f.t += dt; f.x += f.vx * dt; f.y += f.vy * dt; if (f.grav) f.vy += f.grav * dt; else { f.vx *= 0.9; f.vy *= 0.9; } }
   G.fx = G.fx.filter(f => f.t < f.life);
 }
 function drawFx() {
   for (const f of G.fx) {
     if (f.kind === 'text') { text(f.label, f.x - G.cam.x, f.y - G.cam.y - f.t * 12, f.color, 'center'); continue; }
+    if (f.kind === 'poof') { const img = POOF[Math.min(3, Math.floor(f.t / f.life * 4))], s = f.scale; ctx.drawImage(img, Math.round(f.x - G.cam.x - 12 * s), Math.round(f.y - G.cam.y - 12 * s), 24 * s, 24 * s); continue; }
+    if (f.kind === 'ripple') { if (f.t < 0) continue; const k = f.t / f.life; ctx.strokeStyle = `rgba(220,240,255,${1 - k})`; ctx.lineWidth = 1; ctx.beginPath(); ctx.ellipse(Math.round(f.x - G.cam.x), Math.round(f.y - G.cam.y + 4), 4 + k * 14, 2 + k * 6, 0, 0, Math.PI * 2); ctx.stroke(); continue; }
+    if (f.kind === 'leaf') { R(f.x - G.cam.x, f.y - G.cam.y, 2, 1, f.color); R(f.x - G.cam.x + 1, f.y - G.cam.y + 1, 1, 1, '#205818'); continue; }
     R(f.x - G.cam.x, f.y - G.cam.y, f.size, f.size, f.color);
   }
+}
+function ripple(x, y, delay = 0) { G.fx.push({ kind: 'ripple', x, y, vx: 0, vy: 0, t: -delay, life: 0.6 }); }
+function leaves(x, y, colors) {
+  for (let i = 0; i < 8; i++) G.fx.push({ kind: 'leaf', x: x + rnd(-5, 5), y: y + rnd(-5, 3), vx: rnd(-50, 50), vy: rnd(-90, -30), grav: 260, t: 0, life: 0.55, color: pick(colors) });
 }
 function floatText(x, y, label, color = '#fff') { G.fx.push({ kind: 'text', x, y, vx: 0, vy: 0, t: 0, life: 0.9, label, color }); }
 
@@ -73,17 +80,23 @@ function updatePlayer(dt) {
     p.lp += dt / 0.7;
     const k = Math.min(p.lp, 1);
     p.x = p.from.x + (p.to.x - p.from.x) * k; p.y = p.from.y + (p.to.y - p.from.y) * k;
-    if (p.lp >= 1) p.launching = false;
+    if (p.lp >= 1) { p.launching = false; puff(p.x, p.y + 6, '#e8e0c8', 6); }
     return;
   }
   const v = inputVec();
-  if (v.x || v.y) { p.fx = v.x; p.fy = v.y; p.walk += dt * 10; }
+  p.moving = !!(v.x || v.y);
+  if (p.moving) { p.fx = v.x; p.fy = v.y; p.walk += dt * 14; }
   const onIce = tileAt(p.x, p.y) === 'i';
   const spd = 72 * G.st.speed;
   if (onIce) { const k = Math.min(1, 2.2 * dt); p.vx += (v.x * spd * 1.1 - p.vx) * k; p.vy += (v.y * spd * 1.1 - p.vy) * k; }
   else { p.vx = v.x * spd; p.vy = v.y * spd; }
   const hit = tryMove(p, p.vx * dt, p.vy * dt, 5, 'player');
-  if (onIce) { if (hit.hitX) p.vx *= -0.3; if (hit.hitY) p.vy *= -0.3; }
+  if (onIce) {
+    if (hit.hitX) p.vx *= -0.3; if (hit.hitY) p.vy *= -0.3;
+    // skidding throws up frost
+    if (Math.hypot(v.x * spd - p.vx, v.y * spd - p.vy) > 45 && Math.hypot(p.vx, p.vy) > 15 && Math.random() < 0.5)
+      G.fx.push({ x: p.x + rnd(-3, 3), y: p.y + 6, vx: -p.vx * 0.2 + rnd(-10, 10), vy: rnd(-20, -5), t: 0, life: 0.35, color: Math.random() < 0.5 ? '#ffffff' : '#cfefff', size: 1 });
+  }
   const kl = Math.hypot(p.kx, p.ky);
   if (kl > 1) { tryMove(p, p.kx * dt, p.ky * dt, 5, 'player'); const nl = Math.max(0, kl - 520 * dt); p.kx *= nl / kl; p.ky *= nl / kl; }
 
@@ -95,6 +108,7 @@ function updatePlayer(dt) {
   const here = tileAt(p.x, p.y);
   if (here === '~') {
     p.launching = true; p.lp = 0; p.from = { x: p.x, y: p.y }; p.to = nearestDry(p.x, p.y); p.inv = 1.2;
+    ripple(p.x, p.y); ripple(p.x, p.y, 0.15);
     G.jon.mode = 'follow'; Sound.play('splash'); puff(p.x, p.y, '#bfe0ff', 10);
     floatText(p.x, p.y - 20, 'Lady of the Lake!', '#bfe0ff');
     return;
@@ -148,10 +162,24 @@ function hurtPlayer(dmg, from, force) {
   p.hp -= dmg; p.inv = 1; Sound.play('hurt'); G.shake = 0.15;
   if (from) { const d = Math.hypot(p.x - from.x, p.y - from.y) || 1; p.kx = (p.x - from.x) / d * 170; p.ky = (p.y - from.y) / d * 170; }
   if (p.hp > 0) return;
+  // A Link to the Past death: Owen spins in place, then juice, voodoo or game over
+  p.hp = 0; p.kx = p.ky = 0; G.state = 'dying'; G.dieT = 0; G.jon.mode = 'follow'; Sound.play('fall');
+}
+function updateDying(dt) {
+  const p = G.player;
+  G.dieT += dt;
+  const dirs = [[0, 1], [1, 0], [0, -1], [-1, 0]], i = Math.floor(G.dieT / 0.07) % 4;
+  if (G.dieT < 0.85) { p.fx = dirs[i][0]; p.fy = dirs[i][1]; return; }
+  p.fx = 0; p.fy = 1;
+  finishDeath();
+}
+function finishDeath() {
+  const p = G.player, s = G.save;
+  G.state = 'play';
   if (s.potions > 0) { s.potions--; p.hp = s.maxHp; p.inv = 2; Sound.play('heart'); return say(STORY.juice); }
-  if (G.mode === 'arena') { p.hp = 0; return arenaOver(false); }
+  if (G.mode === 'arena') return arenaOver(false);
   if (s.voodoo) { s.voodoo = false; p.hp = s.maxHp; p.inv = 2.5; puff(p.x, p.y, '#9a4dd9', 16); Sound.play('secret'); return say(STORY.revive); }
-  p.hp = 0; G.state = 'over'; G.menuSel = 0;
+  G.state = 'over'; G.menuSel = 0;
 }
 
 function interact(e) {
@@ -268,6 +296,9 @@ function updateJon(dt) {
     if (d < 9) j.mode = 'follow';
   }
   if (j.mode === 'out' || j.mode === 'back') {
+    j.trail = (j.trail || []).concat([{ x: j.x, y: j.y, spin: j.spin }]).slice(-4);
+  } else j.trail = [];
+  if (j.mode === 'out' || j.mode === 'back') {
     for (const e of G.ents) if (e.kind === 'pickup' && dist(e, j) < 10) { e.x = j.x; e.y = j.y; }   // Jon fetches loot
   }
   j.nq -= dt; j.qt = Math.max(0, j.qt - dt);
@@ -290,8 +321,8 @@ function jonHits(dmg, reach, from, how) {
 function cutAt(x, y) {
   const tx = Math.floor(x / T), ty = Math.floor(y / T), c = tile(tx, ty);
   if (!sameScreen(tx, ty)) return false;
-  if (c === 'b') { setTile(tx, ty, '.'); puff(tx * T + 8, ty * T + 8, '#4fbf4a', 8); Sound.play('swing'); maybeDrop(tx * T + 8, ty * T + 8, 0.4); return true; }
-  if (c === 'O') { setTile(tx, ty, '_'); puff(tx * T + 8, ty * T + 8, '#8a5a3a', 8); Sound.play('kill'); maybeDrop(tx * T + 8, ty * T + 8, 0.6); return true; }
+  if (c === 'b') { setTile(tx, ty, SNOWY(tx, ty) ? 'n' : '.'); leaves(tx * T + 8, ty * T + 8, ['#58b840', '#a8e070', '#388828']); Sound.play('swing'); maybeDrop(tx * T + 8, ty * T + 8, 0.4); return true; }
+  if (c === 'O') { setTile(tx, ty, '_'); leaves(tx * T + 8, ty * T + 8, ['#b8784a', '#8a5432', '#e0a070']); Sound.play('kill'); maybeDrop(tx * T + 8, ty * T + 8, 0.6); return true; }
   return false;
 }
 function hitSwitch(e) {
@@ -315,7 +346,14 @@ function damageEnemy(e, dmg, from, how) {
   const jonHit = how === 'swing' || how === 'throw';
   if (e.flash > 0.05 && jonHit) return false;
   const dx = from.x - e.x, dy = from.y - e.y, d = Math.hypot(dx, dy) || 1;
-  if (jonHit && e.shield && (dx / d * e.fx + dy / d * e.fy) > 0.55 && e.st !== 'charge') { Sound.play('clank'); puff(e.x + e.fx * 8, e.y + e.fy * 8, '#ffd84a', 4); return true; }
+  // Shields block a hit from the front, but the block knocks the shield aside for a moment:
+  // hit-hit always works, and hitting from the side or back works right away.
+  if (jonHit && e.shield && !(e.guardDown > 0) && (dx / d * e.fx + dy / d * e.fy) > 0.55 && e.st !== 'charge') {
+    Sound.play('clank'); puff(e.x + e.fx * 8, e.y + e.fy * 8, '#ffd84a', 4);
+    e.guardDown = 1.1; e.kx = -dx / d * 110; e.ky = -dy / d * 110;
+    floatText(e.x, e.y - 18, 'STAGGER!', '#ffd84a');
+    return true;
+  }
   if (e.type === 'king' && e.st !== 'daze' && how !== 'thunder') {
     if (jonHit) { Sound.play('clank'); floatText(e.x, e.y - 30, 'CLANK', '#ffd84a'); }
     return true;
@@ -330,7 +368,7 @@ function damageEnemy(e, dmg, from, how) {
 function killEnemy(e) {
   e.alive = false;
   G.ents = G.ents.filter(o => o !== e);
-  puff(e.x, e.y, '#fff', e.boss ? 24 : 9); Sound.play('kill');
+  poof(e.x, e.y, e.boss); Sound.play('kill');
   const s = G.save;
   if (s.items.thunder) s.rune = Math.min(RUNE_MAX, s.rune + 1);
   if (G.mode === 'arena') return arenaKill(e);
@@ -348,6 +386,7 @@ function spawnEnemy(type, x, y) { const e = makeEnemy(type, x, y); e.st = 'idle'
 
 function updateEnemy(e, dt) {
   e.flash = Math.max(0, e.flash - dt); e.wob += dt * 8; e.t += dt;
+  if (e.guardDown > 0) { e.guardDown -= dt; if (e.type === 'draugr' || e.type === 'knight') { const kl0 = Math.hypot(e.kx, e.ky); if (kl0 > 1) { tryMove(e, e.kx * dt, e.ky * dt, e.r * 0.6, 'walker'); e.kx *= 0.85; e.ky *= 0.85; } return; } }
   const p = G.player, dx = p.x - e.x, dy = p.y - e.y, d = Math.hypot(dx, dy) || 1;
   const who = e.fly ? 'flyer' : 'walker', mr = e.r * 0.6;
   const kl = Math.hypot(e.kx, e.ky);

@@ -234,6 +234,19 @@ def compose(blocks, cols, rows):
 
 ow = compose(OW, 4, 3)
 
+# Thicken the outer forest to two tiles so it renders as big 2x2 trees (A Link to the Past style).
+def thicken(grid, ents):
+    H, W = len(grid), len(grid[0])
+    busy = {tuple(e["at"]) for e in ents}
+    def soft(x, y):
+        return grid[y][x] in ".f" and (x, y) not in busy
+    for x in range(W):
+        if grid[0][x] == "T" and soft(x, 1): grid[1][x] = "T"
+        if grid[H - 1][x] == "T" and soft(x, H - 2): grid[H - 2][x] = "T"
+    for y in range(H):
+        if grid[y][0] == "T" and soft(1, y): grid[y][1] = "T"
+        if grid[y][W - 1] == "T" and soft(W - 2, y): grid[y][W - 2] = "T"
+
 def P(sx, sy, x, y):  # screen-local tile -> global tile
     return [sx * SW + x, sy * SH + y]
 
@@ -258,7 +271,7 @@ OW_ENT = [
     {"t": "sign", "at": P(2, 2, 6, 9), "text": "sign_beach"},
     {"t": "warp", "at": P(2, 0, 7, 2), "to": "cavern", "dest": [24, 54]},
     {"t": "piece", "id": "hp_forest", "at": P(1, 0, 13, 3)},
-    {"t": "piece", "id": "hp_grave", "at": P(3, 2, 14, 12)},
+    {"t": "piece", "id": "hp_grave", "at": P(3, 2, 13, 11)},
     {"t": "chest", "id": "c_coast", "at": P(0, 2, 14, 2), "item": "kr20"},
     # enemies
     {"t": "penguin", "at": P(2, 2, 5, 3)}, {"t": "penguin", "at": P(2, 2, 10, 4)}, {"t": "penguin", "at": P(2, 2, 7, 8)},
@@ -408,6 +421,7 @@ def reachable(grid, start, extra=set()):
                     seen.add((nx, ny)); q.append((nx, ny))
     return seen
 
+thicken(ow, OW_ENT)
 ow_seen = reachable(ow, OW_ENT[0]["at"])
 for e in OW_ENT:
     x, y = e["at"]

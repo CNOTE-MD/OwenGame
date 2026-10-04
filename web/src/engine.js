@@ -14,7 +14,7 @@ const pick = arr => arr[Math.floor(Math.random() * arr.length)];
 const ACTIONS = {
   left: ['ArrowLeft', 'KeyA'], right: ['ArrowRight', 'KeyD'], up: ['ArrowUp', 'KeyW'], down: ['ArrowDown', 'KeyS'],
   a: ['KeyZ', 'Space', 'KeyJ'], b: ['KeyX', 'KeyK', 'ShiftLeft', 'ShiftRight'], c: ['KeyC', 'KeyL'],
-  menu: ['Enter', 'Escape', 'KeyP'], mute: ['KeyM'],
+  menu: ['Enter', 'Escape', 'KeyP'], mute: ['KeyM'], music: ['KeyN'],
 };
 const keys = {}, virt = {}, edge = {};
 const held = a => !!virt[a] || ACTIONS[a].some(c => keys[c]);

@@ -65,6 +65,7 @@ const SHOTS = process.env.SHOTS || '/tmp';
   check('boss wave ends after king dies', await ev(() => G.state === 'levelup' || G.state === 'shop'));
   // death -> results
   await ev(() => { G.state = 'play'; G.save.potions = 0; G.player.inv = 0; hurtPlayer(99, G.player); });
+  await pg.waitForFunction(() => G.state !== 'dying', null, { timeout: 5000 });
   await wait(100);
   await pg.screenshot({ path: SHOTS + '/a4_over.png' });
   check('defeat screen + best saved', await ev(() => G.state === 'arenaover' && arenaBest() >= 5));

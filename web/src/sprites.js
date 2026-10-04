@@ -4,38 +4,54 @@ function drawOwen(x, y) {
   const p = G.player;
   let lift = 0, scale = 1;
   if (p.launching) lift = Math.sin(Math.PI * Math.min(p.lp, 1)) * 30;
-  if (p.falling > 0) scale = Math.max(0.1, p.falling / 0.6);
-  R(x - 5, y + 5, 10, 2, 'rgba(0,0,0,.3)');
-  if (p.inv > 0 && Math.floor(p.inv * 20) % 2 === 0 && !p.launching && G.state === 'play') return;
-  ctx.save(); ctx.translate(Math.round(x), Math.round(y - lift)); ctx.scale(scale, scale);
-  const zombie = !G.save.voodoo;
-  const skin = zombie ? '#8cbf80' : '#fac799', tunic = zombie ? '#73409c' : '#3380d9';
-  const st = (G.state === 'play' || G.trans) ? Math.floor(p.walk) % 2 : 0;
-  R(-4, 3 + st, 3, 3, '#59381a'); R(1, 3 + (1 - st), 3, 3, '#59381a');
-  R(-5, -3, 10, 7, tunic); R(-5, 1, 10, 1, '#664019'); R(-1, 1, 2, 1, '#ffd84a');
-  R(-4, -9, 8, 7, skin); R(-4, -9, 8, 2, '#8a5a2b');
-  R(-5, -11, 10, 4, '#9999ad'); R(-5, -11, 10, 1, '#c9c9d9'); R(-7, -13, 2, 4, '#f2ebcc'); R(5, -13, 2, 4, '#f2ebcc');
-  const back = p.fy < -0.5 && Math.abs(p.fx) < 0.3;
-  if (!back) { const ex = p.fy <= 0.5 ? clamp(p.fx, -1, 1) : 0; R(-3 + ex, -6, 1, 2, '#1a1a1a'); R(2 + ex, -6, 1, 2, '#1a1a1a'); }
-  if (p.hold) { ctx.restore(); drawItemIcon(p.hold.id, x, y - 26); return; }
-  ctx.restore();
+  if (p.falling > 0) scale = Math.max(0.15, p.falling / 0.6);
+  shadowAt(x, y + 6, p.launching ? 0.7 : 1);
+  const hurt = p.inv > 0 && Math.floor(p.inv * 20) % 2 === 0 && !p.launching && G.state === 'play';
+  const key = G.save.voodoo || G.mode === 'arena' ? 'owen' : 'zombie';
+  if (p.hold) {
+    spr(SPR[key + '_hold'], x, y + 7);
+    // A Link to the Past item fanfare: rays and twinkles around the prize
+    const ix = x, iy = y - 22, t = G.t * 3;
+    ctx.strokeStyle = 'rgba(255,240,170,0.5)'; ctx.lineWidth = 1;
+    for (let i = 0; i < 8; i++) { const a = t * 0.5 + i * Math.PI / 4, r0 = 9, r1 = 14 + 3 * Math.sin(t * 2 + i); ctx.beginPath(); ctx.moveTo(ix + Math.cos(a) * r0, iy + Math.sin(a) * r0); ctx.lineTo(ix + Math.cos(a) * r1, iy + Math.sin(a) * r1); ctx.stroke(); }
+    drawItemIcon(p.hold.id, ix, iy);
+    for (let i = 0; i < 3; i++) { const a = t + i * 2.1; drawTwinkle(ix + Math.cos(a) * 12, iy + Math.sin(a) * 9, (Math.floor(G.t * 8) + i) % 2); }
+    return;
+  }
+  const { d, flip } = dirOf(p.fx, p.fy);
+  let f;
+  if (G.jon.mode === 'swing') { const k = G.jon.st / (0.2 / G.st.atk); f = 'a' + (k < 0.25 ? 0 : k < 0.7 ? 1 : 2); }
+  else f = 'w' + ((p.moving || G.trans) ? Math.floor(p.walk) % 8 : 0);
+  spr(SPR[`${key}_${d}_${f}${flip ? '_f' : ''}`], x, y + 7 - lift, { scale, white: hurt });
+}
+function drawTwinkle(x, y, big) {
+  R(x, y - (big ? 3 : 2), 1, big ? 7 : 5, '#ffffff'); R(x - (big ? 3 : 2), y, big ? 7 : 5, 1, '#ffffff'); R(x, y, 1, 1, '#ffe066');
 }
 
-function drawJonSprite(x, y, spin) {
+function drawJonSprite(x, y, spin, blink) {
+  const img = blink ? SPR.jon_blink : SPR.jon;
   ctx.save(); ctx.translate(Math.round(x), Math.round(y)); ctx.rotate(spin);
-  const homing = G.save && G.save.items.homing;
-  R(-6, -9, 12, 18, homing ? 'rgba(255,216,74,.18)' : 'rgba(77,153,255,.18)');
-  R(-1, -8, 2, 17, '#805224'); R(-1, -2, 2, 1, '#4d2e14'); R(-1, 2, 2, 1, '#4d2e14'); R(-1, 8, 2, 2, '#b3b3bf');
-  poly([[1, -9], [10, -12], [12, -5], [10, 2], [1, -1]], '#d1e0f2');
-  poly([[10, -12], [12, -5], [10, 2], [9, -5]], '#f2faff');
-  poly([[-1, -8], [-4, -6], [-1, -4]], '#d1e0f2');
-  poly([[1, -9], [10, -12], [12, -5], [10, 2], [1, -1]], null, '#40598c');
-  R(3, -8, 3, 3, '#fff'); R(7, -8, 3, 3, '#fff'); R(4, -7, 1, 2, '#000'); R(8, -7, 1, 2, '#000'); R(4, -3, 5, 1, '#40598c');
+  if (G.save && G.save.items.homing) { ctx.globalAlpha = 0.25 + 0.1 * Math.sin(G.t * 6); ctx.fillStyle = '#ffd84a'; ctx.beginPath(); ctx.arc(1, -2, 10, 0, Math.PI * 2); ctx.fill(); ctx.globalAlpha = 1; }
+  ctx.drawImage(img, -img.width / 2 + 1, -img.height / 2);
   ctx.restore();
+}
+function drawSlash() {
+  const j = G.jon, p = G.player;
+  if (j.mode !== 'swing') return;
+  const k = Math.min(1, j.st / (0.2 / G.st.atk)), a0 = j.base - 1.3, a1 = j.base - 1.3 + 2.6 * k;
+  const x = p.x - G.cam.x, y = p.y - G.cam.y;
+  ctx.lineCap = 'round';
+  ctx.strokeStyle = 'rgba(255,255,255,0.55)'; ctx.lineWidth = 7; ctx.beginPath(); ctx.arc(x, y, 15, Math.max(a0, a1 - 1.6), a1); ctx.stroke();
+  ctx.strokeStyle = 'rgba(160,220,255,0.9)'; ctx.lineWidth = 2; ctx.beginPath(); ctx.arc(x, y, 18, Math.max(a0, a1 - 1.2), a1); ctx.stroke();
+  ctx.lineCap = 'butt';
 }
 function drawJon() {
   const j = G.jon, x = j.x - G.cam.x, y = j.y - G.cam.y;
-  drawJonSprite(x, y, j.spin);
+  drawSlash();
+  if (j.mode === 'follow') shadowAt(x, y + 18, 0.6);
+  (j.trail || []).forEach((tr, i) => { ctx.globalAlpha = 0.12 + i * 0.07; drawJonSprite(tr.x - G.cam.x, tr.y - G.cam.y, tr.spin); });
+  ctx.globalAlpha = 1;
+  drawJonSprite(x, y, j.spin, j.t % 3.2 < 0.14);
   if (j.qt > 0 && j.quip && G.state === 'play') {
     ctx.font = FONT;
     const w = Math.ceil(ctx.measureText(j.quip).width) + 6, bx = clamp(x - w / 2, 2, VW - w - 2), by = clamp(y - 32, 24, VH - 14);
@@ -43,69 +59,71 @@ function drawJon() {
   }
 }
 
-function drawPenguinBody(e, crown) {
-  const sw = Math.round(Math.sin(e.wob));
-  let body = '#1a1a38';
-  if (e.flash > 0) body = '#fff'; else if (e.st === 'wind') body = '#8c1a1a';
-  R(-6, 5, 12, 2, 'rgba(0,0,0,.3)');
-  R(-5 + sw, -6, 10, 12, body); R(-3 + sw, -2, 6, 7, '#f2f2ff'); R(-4 + sw, -5, 8, 3, body);
-  R(-6 + sw, -2, 1, 5, body); R(5 + sw, -2, 1, 5, body);
-  R(-1 + sw, -3, 3, 2, '#ffa61a'); R(-3, 6, 2, 1, '#ffa61a'); R(1, 6, 2, 1, '#ffa61a');
-  R(-3 + sw, -5, 2, 2, '#ff1a1a'); R(1 + sw, -5, 2, 2, '#ff1a1a');
-  if (crown) { R(-4 + sw, -9, 8, 3, '#ffd84a'); R(-4 + sw, -11, 2, 2, '#ffd84a'); R(-1 + sw, -11, 2, 2, '#ffd84a'); R(2 + sw, -11, 2, 2, '#ffd84a'); R(-1 + sw, -8, 2, 1, '#e23'); }
-}
 function drawEnemy(e) {
   const x = Math.round(e.x - G.cam.x), y = Math.round(e.y - G.cam.y);
-  ctx.save(); ctx.translate(x, y);
+  const white = e.flash > 0 || (e.st === 'wind' && Math.floor(G.t * 16) % 2 === 0);
+  const f = Math.floor(e.wob / 2.5) % 2;
   switch (e.type) {
-    case 'penguin': drawPenguinBody(e); break;
-    case 'king':
-      if (e.st === 'wind' || e.st === 'slide') ctx.translate(rnd(-1, 1), 0);
-      ctx.scale(2.4, 2.4); drawPenguinBody(e, true);
-      if (e.st === 'daze') for (let i = 0; i < 3; i++) { const a = G.t * 5 + i * 2.1; R(Math.cos(a) * 6 - 1, -13 + Math.sin(a) * 2, 2, 2, '#ffe066'); }
-      break;
-    case 'knight':
-      ctx.scale(1.5, 1.5); drawPenguinBody(e);
-      R(-5, -8, 10, 4, '#8a8aa0'); R(-5, -8, 10, 1, '#c9c9d9'); R(-1, -10, 2, 3, '#e23');
-      R(Math.round(e.fx * 6) - 3, Math.round(e.fy * 5) - 3, 6, 8, '#6b4322'); R(Math.round(e.fx * 6) - 2, Math.round(e.fy * 5) - 2, 4, 6, '#b8b8c8');
-      break;
+    case 'penguin': case 'knight': case 'king': {
+      const s = e.type === 'king' ? 3 : e.type === 'knight' ? 2 : 1;
+      const { d, flip } = dirOf(e.fx, e.fy);
+      const waddle = e.st === 'daze' || e.st === 'slide' ? 0 : [0, 1, 0, -1][Math.floor(e.wob / 2.5) % 4] * s;
+      const shake = (e.type === 'king' && (e.st === 'wind' || e.st === 'slide') ? Math.round(rnd(-1, 1)) : 0) + waddle;
+      shadowAt(x, y + 5 * s, s);
+      const img = SPR[`peng_${d}_${e.st === 'daze' ? 0 : f}${flip ? '_f' : ''}`];
+      const foot = y + 6 * s;
+      spr(img, x + shake, foot, { scale: s, white });
+      const top = foot - img.height * s + 2 * s;
+      if (e.type === 'king') {
+        spr(SPR.crown, x + shake, top + 3 * s, { scale: s });
+        if (e.st === 'daze') for (let i = 0; i < 3; i++) { const a = G.t * 5 + i * 2.1; drawStar(x + Math.cos(a) * 18, top - 4 + Math.sin(a) * 4); }
+      }
+      if (e.type === 'knight') {
+        spr(SPR.helmet, x, top + 4 * s, { scale: s, white });
+        drawShield(e, x, y - 2 * s, s);
+      }
+      break; }
     case 'draugr': {
-      const sw = Math.round(Math.sin(e.wob * 0.5));
-      const bone = e.flash > 0 ? '#fff' : '#b9c4a8';
-      R(-6, 6, 12, 2, 'rgba(0,0,0,.3)');
-      R(-4, 2 + sw, 3, 5, '#5a5a4a'); R(1, 2 - sw, 3, 5, '#5a5a4a');
-      R(-5, -4, 10, 7, '#4a5a3a'); R(-4, -11, 8, 7, bone); R(-3, -8, 2, 2, '#111'); R(1, -8, 2, 2, '#111'); R(-2, -5, 4, 1, '#111');
-      R(-5, -13, 10, 3, '#7a7a8a'); R(-1, -15, 2, 2, '#7a7a8a');
-      R(Math.round(e.fx * 7) - 4, Math.round(e.fy * 5) - 4, 8, 8, '#8a2a21'); R(Math.round(e.fx * 7) - 1, Math.round(e.fy * 5) - 1, 2, 2, '#ffd84a');
+      const { d, flip } = dirOf(e.fx, e.fy);
+      shadowAt(x, y + 6, 1);
+      const behind = e.fy < -0.5 && Math.abs(e.fx) < 0.6;
+      if (behind) drawShield(e, x, y - 4, 1);
+      spr(SPR[`draugr_${d === 'up' ? 'down' : d}_${f}${flip ? '_f' : ''}`], x, y + 7, { white });
+      if (!behind) drawShield(e, x, y - 4, 1);
       break; }
     case 'wisp': {
       const g = 0.6 + 0.4 * Math.sin(G.t * 6 + e.wob);
-      ctx.globalAlpha = 0.35 * g; R(-7, -7, 14, 14, '#7fd4ff'); ctx.globalAlpha = 1;
-      R(-3, -3, 6, 6, e.flash > 0 ? '#fff' : '#cfefff'); R(-1, -5, 2, 2, '#cfefff'); R(-2, -1, 1, 1, '#123'); R(1, -1, 1, 1, '#123');
+      const gr = ctx.createRadialGradient(x, y, 0, x, y, 12); gr.addColorStop(0, `rgba(160,230,255,${0.55 * g})`); gr.addColorStop(1, 'rgba(160,230,255,0)');
+      ctx.fillStyle = gr; ctx.fillRect(x - 12, y - 12, 24, 24);
+      R(x - 3, y - 3, 6, 6, e.flash > 0 ? '#fff' : '#dff6ff'); R(x - 2, y - 4, 4, 1, '#dff6ff'); R(x - 1, y - 6 - Math.round(g * 2), 2, 2, '#bfeaff');
+      R(x - 2, y - 1, 1, 2, '#123'); R(x + 1, y - 1, 1, 2, '#123');
       break; }
-    case 'bat': {
-      const f = Math.floor(G.t * 12 + e.wob) % 2;
-      const c = e.flash > 0 ? '#fff' : '#3d5a9e';
-      R(-2, -2, 4, 4, c); R(-7, f ? -4 : 0, 5, 2, c); R(2, f ? -4 : 0, 5, 2, c); R(-1, -1, 1, 1, '#ff4'); R(1, -1, 1, 1, '#ff4');
-      break; }
+    case 'bat':
+      shadowAt(x, y + 10, 0.6);
+      spr(SPR['bat_' + (Math.floor(G.t * 10 + e.wob) % 2)], x, y + 4, { white });
+      break;
   }
-  ctx.restore();
   if (e.boss && e.alive) {
-    const w = 60, bx = x - w / 2, by = y - (e.type === 'king' ? 44 : 26);
+    const w = 60, bx = x - w / 2, by = y - (e.type === 'king' ? 54 : 40);
     R(bx - 1, by - 1, w + 2, 5, '#000'); R(bx, by, w * Math.max(0, e.hp / e.max), 3, '#e23');
   }
 }
+function drawShield(e, x, y, s) {
+  const down = e.guardDown > 0;
+  const ox = down ? -e.fy * 9 * s : e.fx * 7 * s, oy = down ? e.fx * 4 * s + 4 : e.fy * 5 * s;
+  ctx.save(); ctx.translate(Math.round(x + ox), Math.round(y + oy));
+  if (down) ctx.rotate(0.6);
+  const img = SPR.shield, w = img.width * s * 0.9, h = img.height * s * 0.9;
+  ctx.drawImage(e.flash > 0 ? whiteOf(img) : img, Math.round(-w / 2), Math.round(-h / 2), w, h);
+  ctx.restore();
+}
+function drawStar(x, y) { R(x - 1, y - 3, 2, 6, '#ffe066'); R(x - 3, y - 1, 6, 2, '#ffe066'); R(x, y, 1, 1, '#fff'); }
 
-function drawPerson(x, y, look, bob) {
+function drawPerson(x, y, id, bob) {
   const b = Math.round(Math.sin(G.t * 2 + bob) * 0.6);
-  R(x - 5, y + 5, 10, 2, 'rgba(0,0,0,.3)');
-  R(x - 4, y + 3, 3, 3, '#3a2a1a'); R(x + 1, y + 3, 3, 3, '#3a2a1a');
-  R(x - 5, y - 3 + b, 10, 7, look.shirt); R(x - 4, y - 9 + b, 8, 7, look.skin || '#f0c49a');
-  R(x - 4, y - 10 + b, 8, 3, look.hair);
-  if (look.long) { R(x - 5, y - 9 + b, 2, 8, look.hair); R(x + 3, y - 9 + b, 2, 8, look.hair); }
-  if (look.beard) R(x - 4, y - 4 + b, 8, 3, look.hair);
-  if (look.hat) { R(x - 5, y - 12 + b, 10, 3, look.hat); }
-  R(x - 3, y - 6 + b, 1, 2, '#111'); R(x + 2, y - 6 + b, 1, 2, '#111');
+  shadowAt(x, y + 6, 1);
+  const blink = (G.t + bob) % 3.6 < 0.13;
+  spr(SPR['npc_' + id + (blink ? '_blink' : '')] || SPR.npc_sven, x, y + 7 + b);
 }
 const LOOKS = {
   astrid: { shirt: '#6b3fa0', hair: '#e8e8e8', long: true },
@@ -134,16 +152,14 @@ function drawThing(e) {
   const x = Math.round(e.x - G.cam.x), y = Math.round(e.y - G.cam.y), t = G.t;
   switch (e.kind) {
     case 'enemy': return drawEnemy(e);
-    case 'npc': return drawPerson(x, y, LOOKS[e.id] || LOOKS.sven, e.bob);
-    case 'sign': R(x - 1, y, 2, 7, '#6b4322'); R(x - 7, y - 7, 14, 9, '#b07a4e'); R(x - 7, y - 7, 14, 1, '#d9a46e'); R(x - 5, y - 4, 10, 1, '#6b4322'); R(x - 5, y - 1, 7, 1, '#6b4322'); break;
+    case 'npc': return drawPerson(x, y, e.id, e.bob);
+    case 'sign': shadowAt(x, y + 6, 0.8); spr(SPR.sign, x, y + 7); break;
     case 'plaque': R(x - 7, y - 4, 14, 7, '#c08a50'); R(x - 6, y - 3, 12, 1, '#6b4322'); R(x - 6, y, 9, 1, '#6b4322'); break;
     case 'runestone': {
-      R(x - 6, y + 5, 12, 2, 'rgba(0,0,0,.3)'); R(x - 5, y - 9, 10, 15, '#7c7c8c'); R(x - 4, y - 11, 8, 3, '#7c7c8c'); R(x - 5, y - 9, 2, 15, '#9a9aaa');
-      ctx.globalAlpha = 0.6 + 0.4 * Math.sin(t * 3); R(x - 1, y - 8, 2, 11, '#7fd4ff'); R(x - 3, y - 6, 6, 2, '#7fd4ff'); R(x - 3, y - 1, 2, 2, '#7fd4ff'); R(x + 1, y + 1, 2, 2, '#7fd4ff'); ctx.globalAlpha = 1;
+      shadowAt(x, y + 6, 1); spr(SPR.runestone, x, y + 7);
+      ctx.globalAlpha = 0.6 + 0.4 * Math.sin(t * 3); R(x - 1, y - 7, 2, 9, '#7fd4ff'); R(x - 3, y - 5, 6, 2, '#7fd4ff'); R(x - 3, y, 2, 2, '#7fd4ff'); R(x + 1, y + 2, 2, 2, '#7fd4ff'); ctx.globalAlpha = 1;
       break; }
-    case 'chest':
-      R(x - 7, y - 5, 14, 11, '#7a4a1f'); R(x - 7, y - 5, 14, 3, e.open ? '#3a2410' : '#9c6431'); R(x - 7, y - 1, 14, 1, '#ffd84a'); R(x - 1, y - 2, 3, 3, e.open ? '#7a4a1f' : '#ffd84a');
-      R(x - 7, y - 5, 1, 11, '#ffd84a'); R(x + 6, y - 5, 1, 11, '#ffd84a'); break;
+    case 'chest': shadowAt(x, y + 6, 1.1); spr(e.open ? SPR.chest_open : SPR.chest, x, y + 6); break;
     case 'shop': drawItemIcon(e.item, x, y - 2); text(String(e.price), x, y + 12, '#fff', 'center'); break;
     case 'pickup': {
       if (e.life !== undefined && e.life < 2 && Math.floor(t * 10) % 2) break;
