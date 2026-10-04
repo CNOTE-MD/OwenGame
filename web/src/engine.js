@@ -13,7 +13,7 @@ const pick = arr => arr[Math.floor(Math.random() * arr.length)];
 // ---------- input ----------
 const ACTIONS = {
   left: ['ArrowLeft', 'KeyA'], right: ['ArrowRight', 'KeyD'], up: ['ArrowUp', 'KeyW'], down: ['ArrowDown', 'KeyS'],
-  a: ['KeyZ', 'Space', 'KeyJ'], b: ['KeyX', 'KeyK', 'ShiftLeft', 'ShiftRight'], c: ['KeyC', 'KeyL'],
+  a: ['KeyZ', 'Space', 'KeyJ'], b: ['KeyX', 'KeyK'], c: ['KeyC', 'KeyL'], dash: ['ShiftLeft', 'ShiftRight', 'KeyF'],
   menu: ['Enter', 'Escape', 'KeyP'], mute: ['KeyM'], music: ['KeyN'], horn: ['KeyV'],
 };
 const keys = {}, virt = {}, edge = {};
@@ -93,6 +93,7 @@ const Sound = {
       case 'scratch': for (let i = 0; i < 4; i++) setTimeout(() => this.noise(0.05 + Math.random() * 0.05, 0.05, 2500 + Math.random() * 2000), i * (90 + Math.random() * 80)); break;
       case 'flicker': this.tone([[60, 0.05, 'square'], [0, 0.04], [60, 0.05, 'square'], [0, 0.08], [55, 0.1, 'square']], 0.05); break;
       case 'horn': this.tone([[98, 0.9, 'sawtooth', 92]], 0.12); this.tone([[147, 0.9, 'sawtooth', 139]], 0.07); break;
+      case 'dash': this.noise(0.18, 0.12, 3000); this.tone([[300, 0.15, 'sawtooth', 900]], 0.04); break;
       case 'creep': this.tone([[70, 1.2, 'sine', 55]], 0.12); this.tone([[1760, 0.6, 'sine', 1700]], 0.012); break;
     }
   },

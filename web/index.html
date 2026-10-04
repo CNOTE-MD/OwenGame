@@ -28,7 +28,6 @@
   .btn:active, .btn.on { background: var(--axe); color: var(--bg); }
   .btn:focus-visible { outline: 3px solid var(--gold); outline-offset: 2px; }
   .ab { display: grid; grid-template-columns: repeat(2, 76px); gap: 10px; }
-  .ab .btn[data-a="horn"] { grid-column: span 2; height: 40px; }
   .ab .btn { width: 76px; height: 56px; border-radius: 28px; font-size: 9px; }
 </style>
 <main>
@@ -36,7 +35,8 @@
   <div class="legend">
     <span><b>Arrows / WASD</b> move</span>
     <span><b>Z / Space</b> swing Jon</span>
-    <span><b>X / Shift</b> throw Jon</span>
+    <span><b>X</b> throw Jon</span>
+    <span><b>Shift / F</b> Voodoo Dash</span>
     <span><b>C</b> Thunder Strike</span>
     <span><b>V</b> Demon Horn</span>
     <span><b>Enter</b> gear and quest</span>
@@ -51,6 +51,7 @@
     </div>
     <div class="ab">
       <button class="btn" data-a="horn" aria-label="Demon Horn">HORN</button>
+      <button class="btn" data-a="dash" aria-label="Voodoo Dash">DASH</button>
       <button class="btn" data-a="menu" aria-label="Gear menu">GEAR</button>
       <button class="btn" data-a="c" aria-label="Thunder Strike">RUNE</button>
       <button class="btn" data-a="b" aria-label="Throw Jon">THROW</button>
@@ -272,6 +273,37 @@ const SCORE = {
    }
   }
  },
+ "barrow": {
+  "name": "Drowned Barrow in Nine",
+  "bpm": 120,
+  "gain": 0.85,
+  "order": [
+   "A",
+   "A",
+   "B"
+  ],
+  "sections": {
+   "A": {
+    "steps": 9,
+    "bass": "D2 . D3 D2 . A2 D2 F2 E2 | D2 . D3 D2 . A2 C3 A#2 A2 | A#1 . A#2 A#1 . F2 A#1 D2 C2 | A1 . A2 A1 . E2 A1 C#2 E2",
+    "pad": "D3+F3+A3 - - - - - - - - | D3+F3+A3 - - - - - - - - | A#2+D3+F3 - - - - - - - - | A2+C#3+E3 - - - - - - - -",
+    "bell": "A4 - - F4 - - D4 - - | . . . . . . E4 F4 G4 | F4 - - D4 - - A#3 - - | C#4 - - E4 - - A4 - -",
+    "k": "x..x..x..|x..x..x..|x..x..x..|x..x..xx.",
+    "s": "...x.....|...x.....|...x.....|...x..x.x",
+    "h": ".x..x..x.|.x..x..x.|.x..x..x.|.x..x..x."
+   },
+   "B": {
+    "steps": 9,
+    "bass": "G2 . G3 G2 . D3 G2 A#2 A2 | F2 . F3 F2 . C3 F2 A2 G2 | E2 . E3 E2 . B2 E2 G2 F2 | A1 . A2 A1 . E2 A1 C#2 E2",
+    "gtr": "G3+D4 - - . . . G3+D4 - - | F3+C4 - - . . . F3+C4 - - | E3+B3 - - . . . E3+B3 - - | A3+E4 - - . . . A3+E4 - -",
+    "lead": "D5 - - A#4 - - G4 - A4 | C5 - - A4 - - F4 - G4 | B4 - - G4 - - E4 - F4 | E4 - - - - - C#5 - -",
+    "k": "x..x..x..|x..x..x..|x..x..x..|x..xx.xxx",
+    "s": "...x..x..|...x..x..|...x..x..|...x..xxx",
+    "h": "xxxxxxxxx|xxxxxxxxx|xxxxxxxxx|xxxxxxxxx",
+    "c": "x........|.........|x........|........."
+   }
+  }
+ },
  "creepy": {
   "name": "Flight 364",
   "bpm": 60,
@@ -456,7 +488,21 @@ const MAPS = {
 7,
 2
 ],
-"text": "seal_barrow"
+"text": "seal_barrow",
+"opensWith": "d1done"
+},
+{
+"t": "runedoor",
+"at": [
+7,
+2
+],
+"needs": "d1done",
+"to": "barrow",
+"dest": [
+24,
+40
+]
 },
 {
 "t": "sealed",
@@ -1275,6 +1321,233 @@ const MAPS = {
 ],
 "dark": true
 },
+"barrow": {
+"name": "The Drowned Barrow",
+"rows": [
+"WWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWW",
+"WWWWWWWWWWWWWWWWWww__________wwWWWWWWWWWWWWWWWWW",
+"WWWWWWWWWWWWWWWWWw____________wWWWWWWWWWWWWWWWWW",
+"WWWWWWWWWWWWWWWWW______________WWWWWWWWWWWWWWWWW",
+"WWWWWWWWWWWWWWWWW______________WWWWWWWWWWWWWWWWW",
+"WWWWWWWWWWWWWWWWW______________WWWWWWWWWWWWWWWWW",
+"WWWWWWWWWWWWWWWWW______________WWWWWWWWWWWWWWWWW",
+"WWWWWWWWWWWWWWWWW______________WWWWWWWWWWWWWWWWW",
+"WWWWWWWWWWWWWWWWW______________WWWWWWWWWWWWWWWWW",
+"WWWWWWWWWWWWWWWWW______________WWWWWWWWWWWWWWWWW",
+"WWWWWWWWWWWWWWWWW______________WWWWWWWWWWWWWWWWW",
+"WWWWWWWWWWWWWWWWWw____________wWWWWWWWWWWWWWWWWW",
+"WWWWWWWWWWWWWWWWWww__________wwWWWWWWWWWWWWWWWWW",
+"WWWWWWWWWWWWWWWWWWWWWWWhhWWWWWWWWWWWWWWWWWWWWWWW",
+"WWWWWWWWWWWWWWWWWWWWWWWKKWWWWWWWWWWWWWWWWWWWWWWW",
+"Wt____________tWWt____________tWWt___vv_______tW",
+"W______________WW______________WW____vv________W",
+"W______________WW______________WW____vv________W",
+"W______________WWwwwwwwwwwwwwwwWW____vv________W",
+"W______________WWwwwwwwwwwwwwwwWW____vv________W",
+"W______________h_______________y_____vv________W",
+"W______________h_______________y_____vv________W",
+"W______________WW______________WW____vv________W",
+"W______________WW______________WW____vv________W",
+"W______________WW______________WW____vv________W",
+"W______________WW______________WW____vv________W",
+"Wt____________tWWt____________tWWt___vv_______tW",
+"WWWWWWWWWWWWWWWWWWWWWWWLLWWWWWWWWWWWWWWWWWWWWWWW",
+"WWWWWWWWWWWWWWWWWWWWWWWLLWWWWWWWWWWWWWWWWWWWWWWW",
+"Wt____________tWWt____________tWWt_______ww___tW",
+"W______________WW______________WW________ww____W",
+"W__w__w________WW______________WW________ww____W",
+"W______________WW______________WW________ww____W",
+"W______________WW______________WW________ww____W",
+"W________________________________________ww____W",
+"W________________________________________ww____W",
+"W______________WW______________WW________ww____W",
+"W__w__w________WW_ww________ww_WW________ww____W",
+"W______________WW_ww________ww_WW________ww____W",
+"W______________WW______________WW________ww____W",
+"Wt____________tWWt____________tWWt_______ww___tW",
+"WWWWWWWWWWWWWWWWWWWWWWW__WWWWWWWWWWWWWWWWWWWWWWW"
+],
+"ents": [
+{
+"t": "warp",
+"at": [
+23,
+41
+],
+"to": "overworld",
+"dest": [
+7,
+3
+]
+},
+{
+"t": "warp",
+"at": [
+24,
+41
+],
+"to": "overworld",
+"dest": [
+7,
+3
+]
+},
+{
+"t": "runestone",
+"at": [
+20,
+34
+]
+},
+{
+"t": "npc",
+"id": "fluffy",
+"at": [
+26,
+34
+]
+},
+{
+"t": "draugr",
+"at": [
+5,
+33
+]
+},
+{
+"t": "draugr",
+"at": [
+10,
+37
+]
+},
+{
+"t": "wisp",
+"at": [
+8,
+31
+]
+},
+{
+"t": "chest",
+"id": "br_key",
+"at": [
+7,
+34
+],
+"item": "key",
+"clear": true
+},
+{
+"t": "bat",
+"at": [
+36,
+32
+]
+},
+{
+"t": "bat",
+"at": [
+37,
+38
+]
+},
+{
+"t": "chest",
+"id": "br_kr",
+"at": [
+45,
+34
+],
+"item": "kr50"
+},
+{
+"t": "draugr",
+"at": [
+21,
+23
+]
+},
+{
+"t": "wisp",
+"at": [
+26,
+16
+]
+},
+{
+"t": "captain",
+"at": [
+6,
+20
+]
+},
+{
+"t": "chest",
+"id": "br_dash",
+"at": [
+8,
+20
+],
+"item": "dash",
+"clear": true
+},
+{
+"t": "wisp",
+"at": [
+43,
+17
+]
+},
+{
+"t": "bat",
+"at": [
+44,
+24
+]
+},
+{
+"t": "chest",
+"id": "br_bigkey",
+"at": [
+44,
+20
+],
+"item": "bigkey"
+},
+{
+"t": "hank",
+"at": [
+24,
+5
+]
+},
+{
+"t": "container",
+"id": "hc_barrow",
+"at": [
+22,
+9
+],
+"clear": true
+},
+{
+"t": "warp",
+"at": [
+26,
+9
+],
+"to": "overworld",
+"dest": [
+7,
+4
+],
+"clear": true,
+"portal": true
+}
+],
+"dungeon": true
+},
 "redeye": {
 "name": "The Red-Eye",
 "rows": [
@@ -1490,9 +1763,17 @@ const STORY = {
   astrid_2: [['Astrid', 'The Ice Cavern is up the Frozen Path, north-east. Mind the slippery floors. Penguins love ice.']],
   astrid_3: [
     ['Astrid', 'The Thunder Rune! Walter carved that rune for the axe himself. Jontuka remembers who he is.'],
-    ['Astrid', 'Chilly will not stop. Three more rune doors are sealed: the Drowned Barrow, Walter\'s Forge, and the Storm Peak.'],
-    ['Astrid', 'They will open when the story is ready to be told.'],
+    ['Astrid', 'And the thunder woke the old runes. The seal on the Drowned Barrow in the north-west foothills has broken.'],
+    ['Astrid', 'That is Hank\'s tomb. Chilly has been sending frost into it. If Hank\'s ghost turns, he will come for the axe he hid.'],
   ],
+  astrid_4: [['Astrid', 'You freed Hank. Then the next door is Walter\'s Forge, on the volcano road. It will open when the story is ready.']],
+  barrow_enter: [['Jon', 'Wet. Dark. Smells like old Viking socks.'], ['Owen', 'This is Hank\'s tomb. The guy who threw you in a lake.'], ['Jon', 'And I am STILL not over it.']],
+  fluffy_1: [['Fluffy', 'Woof!'], ['', 'A ghostly dog wags its whole body. Its tag says FLUFFY.'], ['Jon', 'Hank\'s dog! He wants us to follow him. West, I think. Something big is guarding a treasure that way.']],
+  fluffy_2: [['Fluffy', 'Woof woof!'], ['Jon', 'He says dash across the water to the north. Hank is up there. And he says good job. I added that part.']],
+  fluffy_after: [['Fluffy', '(Fluffy rolls over for belly rubs. Your hand goes right through him. He doesn\'t mind.)']],
+  captain: [['Draugr Captain', 'NONE... SHALL... PASS... the treasure of Hank!'], ['Jon', 'Same trick as the knight: hit, hit! Or get behind him.']],
+  hank: [['Hank', 'WHO... DISTURBS... HANK?'], ['Owen', 'It\'s me. Owen. I have your axe. Well, it has me.'], ['Hank', 'CHILLY\'S... FROST... I... cannot... stop...'], ['Jon', 'He\'s frozen solid. My blade bounces off! Owen, VOODOO DASH right through him to shatter the frost!']],
+  hank_down: [['', 'The frost cracks and falls away. A tired old Viking ghost looks down at you.'], ['Hank', 'Thank you, boy. Chilly froze me to guard this place until the axe came home.'], ['Hank', 'I threw Jontuka in the lake to keep it from him. I am sorry it landed on you.'], ['Jon', 'It landed on HIM? It landed on ME. In a LAKE. For a BIZILLION years.'], ['Hank', 'The smith who forged you knows how to stop Chilly. Go to his forge on the volcano road.'], ['Hank', 'His real name was... no. I swore never to say it. And give Fluffy a pat for me.'], ['Fluffy', 'WOOF!']],
   lars: [['Lars', 'Velkommen! Lingonberry juice, rune shards, hearts. Walk up to a table and press Z to buy.']],
   sven_1: [['Sven', 'My big sister says if you cut bushes with an axe you find kroner. I saw a sparkly thing in the forest behind a ring of bushes.']],
   sven_2: [['Sven', 'There is another sparkly thing in the graveyard. In the far corner. I am NOT going in there.']],
@@ -1566,6 +1847,8 @@ const ITEMS = {
   juice: { name: 'Lingonberry Juice', icon: 'juice', lines: [['', 'LINGONBERRY JUICE! If your hearts run out, you drink it automatically.']] },
   shard: { name: 'Rune Shard', icon: 'shard', lines: [['', 'A RUNE SHARD! Your rune meter fills up.']] },
   heart3: { name: 'Heart Refill', icon: 'heart', lines: [['', 'Hearts refilled!']] },
+  dash: { name: 'Voodoo Dash', icon: 'dash', lines: [['', 'You got the VOODOO DASH!'], ['Jon', 'Our voodoo bond just leveled up. Press Shift (or F) and you zip forward like a zombie rocket.'], ['', 'While dashing you can\'t be hurt. You pass through enemies, purple spirit barriers, and short stretches of water or pits.']] },
+  kr50: { name: '50 Kroner', icon: 'gold', lines: [['', 'You found 50 kroner!']] },
   horn: { name: 'Demon Horn', icon: 'horn', lines: [['', 'You got the DEMON HORN! It came from the flight attendant\'s... luggage.'], ['Jon', 'Blow it with V. Costs half the rune meter. Regular enemies run away screaming. Bosses are too proud to care.']] },
   sheet: { name: 'Sheet Music', icon: 'sheet', lines: [['', 'You found BJARNE\'S SHEET MUSIC! It says "RUSH Ø" at the top. There are WAY too many notes.'], ['Jon', 'Bring it back to Bjarne in Fjordvik. The house on the right.']] },
   ship: { name: 'Toy Longship', icon: 'ship', lines: [['', 'You found SVEN\'S TOY LONGSHIP!'], ['Jon', 'Tiny Vikings. Adorable. Back to Sven at the market.']] },
@@ -1587,7 +1870,7 @@ const pick = arr => arr[Math.floor(Math.random() * arr.length)];
 // ---------- input ----------
 const ACTIONS = {
   left: ['ArrowLeft', 'KeyA'], right: ['ArrowRight', 'KeyD'], up: ['ArrowUp', 'KeyW'], down: ['ArrowDown', 'KeyS'],
-  a: ['KeyZ', 'Space', 'KeyJ'], b: ['KeyX', 'KeyK', 'ShiftLeft', 'ShiftRight'], c: ['KeyC', 'KeyL'],
+  a: ['KeyZ', 'Space', 'KeyJ'], b: ['KeyX', 'KeyK'], c: ['KeyC', 'KeyL'], dash: ['ShiftLeft', 'ShiftRight', 'KeyF'],
   menu: ['Enter', 'Escape', 'KeyP'], mute: ['KeyM'], music: ['KeyN'], horn: ['KeyV'],
 };
 const keys = {}, virt = {}, edge = {};
@@ -1667,6 +1950,7 @@ const Sound = {
       case 'scratch': for (let i = 0; i < 4; i++) setTimeout(() => this.noise(0.05 + Math.random() * 0.05, 0.05, 2500 + Math.random() * 2000), i * (90 + Math.random() * 80)); break;
       case 'flicker': this.tone([[60, 0.05, 'square'], [0, 0.04], [60, 0.05, 'square'], [0, 0.08], [55, 0.1, 'square']], 0.05); break;
       case 'horn': this.tone([[98, 0.9, 'sawtooth', 92]], 0.12); this.tone([[147, 0.9, 'sawtooth', 139]], 0.07); break;
+      case 'dash': this.noise(0.18, 0.12, 3000); this.tone([[300, 0.15, 'sawtooth', 900]], 0.04); break;
       case 'creep': this.tone([[70, 1.2, 'sine', 55]], 0.12); this.tone([[1760, 0.6, 'sine', 1700]], 0.012); break;
     }
   },
@@ -1868,6 +2152,7 @@ function musicFor() {
     return G.ents.some(e => e.type === 'king' && e.alive) ? 'boss' : 'arena';
   }
   if (!G.map) return null;
+  if (G.mapId === 'barrow') return G.ents.some(e => e.boss && e.alive) ? 'boss' : 'barrow';
   if (G.map.redeye) return G.ents.some(e => e.type === 'attendant' && e.alive) ? 'boss' : 'creepy';
   if (G.mapId === 'bjarne_house' && flag('bjarne_done')) return 'bjarne';
   if (G.map.interior) return 'village';
@@ -1911,7 +2196,7 @@ const flag = k => !!G.save.flags[k];
 const setFlag = k => { G.save.flags[k] = true; };
 
 // ---------- tiles ----------
-const SOLID = new Set('T#MwHRDPqX+lWtOYQZxLKbVCkpueAB'.split(''));
+const SOLID = new Set('T#MwHRDPqX+lWtOYQZxLKbVCkpueABy'.split(''));
 function tile(tx, ty) {
   if (tx < 0 || ty < 0 || tx >= G.cols || ty >= G.nrows) return G.map.dungeon ? 'W' : 'T';
   return G.rows[ty][tx];
@@ -1966,8 +2251,10 @@ function loadMap(id, px, py) {
     const t2 = k.match(/^tile:(\w+):(\d+),(\d+):(.)$/);
     if (t2 && t2[1] === id) setTile(+t2[2], +t2[3], t2[4]);
   }
+  // rune doors that have opened become cave mouths
+  for (const d of G.map.ents) if (d.t === 'runedoor' && G.save.flags[d.needs]) setTile(d.at[0], d.at[1], 'E');
   const p = G.player;
-  p.x = px; p.y = py; p.vx = p.vy = p.kx = p.ky = 0; p.launching = false; p.falling = 0; p.hold = null;
+  p.x = px; p.y = py; p.vx = p.vy = p.kx = p.ky = 0; p.launching = false; p.falling = 0; p.hold = null; p.dashing = 0;
   G.jon.x = px + 10; G.jon.y = py - 14; G.jon.mode = 'follow';
   G.scr = screenOf(px, py);
   G.trans = null;
@@ -2015,6 +2302,7 @@ function checkScreenEdge() {
   const dx = Math.sign(s.x - G.scr.x), dy = Math.sign(s.y - G.scr.y);
   G.trans = { from: { ...G.cam }, to: { x: s.x * VW, y: s.y * VH }, t: 0, dx, dy };
   G.ents = G.ents.filter(e => e.keep); G.fx = []; G.roomEnemies = false;
+  p.dashing = 0;   // a dash never carries into the next screen
   G.scr = s;
 }
 function updateTransition(dt) {
@@ -2117,7 +2405,7 @@ function drawMap() {
   for (let ty = y0; ty <= y0 + SH; ty++) for (let tx = x0; tx <= x0 + SW; tx++) {
     if (tx < 0 || ty < 0 || tx >= G.cols || ty >= G.nrows) continue;
     const c = claimedGround(tx, ty) || G.rows[ty][tx], ox = tx * T - cx, oy = ty * T - cy;
-    if (!drawTileRE(c, ox, oy, tx, ty) && !drawTileArt(c, ox, oy, tx, ty) && !drawTileB(c, ox, oy, tx, ty)) drawTile(c, ox, oy, tx, ty);
+    if (!drawTileCh2(c, ox, oy) && !drawTileRE(c, ox, oy, tx, ty) && !drawTileArt(c, ox, oy, tx, ty) && !drawTileB(c, ox, oy, tx, ty)) drawTile(c, ox, oy, tx, ty);
   }
 }
 
@@ -2132,7 +2420,8 @@ function makeEnt(d, x, y) {
     case 'start': return null;
     case 'runestone': return { ...base, solid: true, talk: true };
     case 'sign': case 'plaque': return { ...base, solid: true, talk: true };
-    case 'sealed': case 'cargo': return { ...base, talk: true };
+    case 'sealed': if (d.opensWith && s.flags[d.opensWith]) return null; return { ...base, talk: true };
+    case 'cargo': return { ...base, talk: true };
     case 'npc': return { ...base, solid: true, talk: true, id: d.id, bob: Math.random() * 6 };
     case 'shop': return { ...base, talk: true, item: d.item, price: d.price };
     case 'chest': return { ...base, solid: true, talk: true, open: !!s.flags['chest:' + d.id] };
@@ -2145,6 +2434,7 @@ function makeEnt(d, x, y) {
     case 'qitem': return (s.flags['got:' + d.id] || (d.needs && !s.flags[d.needs])) ? null : { ...base, kind: 'pickup', what: 'qitem', id: d.id, underBush: !!d.underBush, permanent: true };
     case 'switch': return { ...base, solid: true, hittable: true, id: d.id, cd: 0 };
     case 'cart': return { ...base, kind: 'hazard', type: 'cart', dir: 1, wob: 0 };
+    case 'runedoor': return s.flags[d.needs] ? { ...base, kind: 'warp' } : null;
     default: return makeEnemy(d.t, x, y);
   }
 }
@@ -2157,12 +2447,14 @@ const ENEMY = {
   king: { hp: 10, r: 16, touch: 2, speed: 26, boss: true },
   imp: { hp: 2, r: 5, touch: 1, speed: 0 },
   attendant: { hp: 12, r: 8, touch: 2, speed: 0, boss: true },
+  captain: { hp: 6, r: 10, touch: 2, speed: 24, shield: true, boss: true },
+  hank: { hp: 10, r: 14, touch: 2, speed: 0, boss: true, fly: true },
 };
 function makeEnemy(type, x, y) {
   const d = ENEMY[type];
   if (!d) return null;
   return { x, y, kind: 'enemy', enemy: true, alive: true, type, ...d, max: d.hp, flash: 0, kx: 0, ky: 0, t: Math.random() * 2,
-    st: type === 'king' || type === 'knight' || type === 'attendant' ? 'intro' : 'idle', fx: 0, fy: 1, wob: Math.random() * 6, tx: x, ty: y, bounces: 0, summoned: false };
+    st: ['king', 'knight', 'attendant', 'captain', 'hank'].includes(type) ? 'intro' : 'idle', fx: 0, fy: 1, wob: Math.random() * 6, tx: x, ty: y, bounces: 0, summoned: false };
 }
 
 // ---------- particles ----------
@@ -2178,6 +2470,7 @@ function drawFx() {
     if (f.kind === 'text') { text(f.label, f.x - G.cam.x, f.y - G.cam.y - f.t * 12, f.color, 'center'); continue; }
     if (f.kind === 'poof') { const img = POOF[Math.min(3, Math.floor(f.t / f.life * 4))], s = f.scale; ctx.drawImage(img, Math.round(f.x - G.cam.x - 12 * s), Math.round(f.y - G.cam.y - 12 * s), 24 * s, 24 * s); continue; }
     if (f.kind === 'whisper') { drawWhisper(f); continue; }
+    if (f.kind === 'ghost') { drawDashGhost(f); continue; }
     if (f.kind === 'ring') { const k = f.t / f.life; ctx.strokeStyle = `rgba(255,120,90,${1 - k})`; ctx.lineWidth = 2; ctx.beginPath(); ctx.arc(Math.round(f.x - G.cam.x), Math.round(f.y - G.cam.y), 8 + k * 120, 0, Math.PI * 2); ctx.stroke(); continue; }
     if (f.kind === 'ripple') { if (f.t < 0) continue; const k = f.t / f.life; ctx.strokeStyle = `rgba(220,240,255,${1 - k})`; ctx.lineWidth = 1; ctx.beginPath(); ctx.ellipse(Math.round(f.x - G.cam.x), Math.round(f.y - G.cam.y + 4), 4 + k * 14, 2 + k * 6, 0, 0, Math.PI * 2); ctx.stroke(); continue; }
     if (f.kind === 'leaf') { R(f.x - G.cam.x, f.y - G.cam.y, 2, 1, f.color); R(f.x - G.cam.x + 1, f.y - G.cam.y + 1, 1, 1, '#205818'); continue; }
@@ -2209,6 +2502,8 @@ function updatePlayer(dt) {
     }
     return;
   }
+  p.dashCd = Math.max(0, (p.dashCd || 0) - dt);
+  if (p.dashing > 0) return updateDash(dt);
   if (p.launching) {
     p.lp += dt / 0.7;
     const k = Math.min(p.lp, 1);
@@ -2264,6 +2559,8 @@ function updatePlayer(dt) {
     if (G.jon.mode === 'follow') { G.jon.swing(Math.atan2(p.fy, p.fx)); Sound.play('swing'); }
   } else if (just('b') && G.jon.mode === 'follow') {
     G.jon.throw(p.x, p.y, p.fx, p.fy); Sound.play('throw');
+  } else if (just('dash')) {
+    startDash();
   } else if (just('horn')) {
     blowHorn();
   } else if (just('c')) {
@@ -2356,7 +2653,7 @@ function interact(e) {
 function npcLines(id) {
   if (id === 'astrid') {
     if (!flag('met_astrid')) { setFlag('met_astrid'); G.save.kr += 30; return [...STORY.astrid_1, ['', 'Astrid gave you 30 kroner.']]; }
-    return flag('d1done') ? STORY.astrid_3 : STORY.astrid_2;
+    return flag('d2done') ? STORY.astrid_4 : flag('d1done') ? STORY.astrid_3 : STORY.astrid_2;
   }
   if (id === 'sven') {
     if (!flag('met_astrid')) return flag('got:hp_forest') ? STORY.sven_2 : STORY.sven_1;
@@ -2368,6 +2665,7 @@ function npcLines(id) {
     if (!flag('sven_done')) return STORY.sven_waiting;
     return flag('got:hp_forest') ? STORY.sven_2 : STORY.sven_1;
   }
+  if (id === 'fluffy') return flag('d2done') ? STORY.fluffy_after : flag('got:br_dash') || G.save.items.dash ? STORY.fluffy_2 : STORY.fluffy_1;
   if (id === 'bjarne') {
     if (!flag('quest_bjarne')) { setFlag('quest_bjarne'); return STORY.bjarne_quest; }
     if (flag('got:sheet') && !flag('bjarne_done')) {
@@ -2405,6 +2703,8 @@ function applyItem(id) {
     case 'heart3': p.hp = s.maxHp; break;
     case 'sheet': case 'ship': break;
     case 'horn': s.items.horn = true; break;
+    case 'dash': s.items.dash = true; break;
+    case 'kr50': s.kr += 50; break;
   }
 }
 function giveItem(id, after) {
@@ -2523,6 +2823,10 @@ function damageEnemy(e, dmg, from, how) {
     floatText(e.x, e.y - 18, 'STAGGER!', '#ffd84a');
     return true;
   }
+  if (e.type === 'hank' && e.frozen) {
+    if (how === 'thunder') { shatterFrost(e); dmg = 2; }
+    else { if (jonHit) { Sound.play('clank'); floatText(e.x, e.y - 50, 'FROZEN', '#9fe0ff'); } return true; }
+  }
   if ((e.type === 'king' || e.type === 'attendant') && e.st !== 'daze' && how !== 'thunder') {
     if (jonHit) { Sound.play('clank'); floatText(e.x, e.y - 30, 'CLANK', '#ffd84a'); }
     return true;
@@ -2543,6 +2847,7 @@ function killEnemy(e) {
   if (G.mode === 'arena') return arenaKill(e);
   if (!e.boss) maybeDrop(e.x, e.y, 0.65);
   if (e.type === 'king') { G.shake = 0.6; say(STORY.king_down, checkRoomClear); return; }
+  if (e.type === 'hank') { G.shake = 0.6; HK.axes = []; for (const w of G.ents.filter(o => o.type === 'wisp')) killEnemy(w); say(STORY.hank_down, () => { setFlag('d2done'); checkRoomClear(); writeSave(); }); return; }
   if (e.type === 'attendant') { G.shake = 0.6; RE.shots = []; say(STORY.attendant_down, () => { setFlag('redeye_done'); checkRoomClear(); }); return; }
   checkRoomClear();
 }
@@ -2556,7 +2861,7 @@ function spawnEnemy(type, x, y) { const e = makeEnemy(type, x, y); e.st = 'idle'
 
 function updateEnemy(e, dt) {
   e.flash = Math.max(0, e.flash - dt); e.wob += dt * 8; e.t += dt;
-  if (e.guardDown > 0) { e.guardDown -= dt; if (e.type === 'draugr' || e.type === 'knight') { const kl0 = Math.hypot(e.kx, e.ky); if (kl0 > 1) { tryMove(e, e.kx * dt, e.ky * dt, e.r * 0.6, 'walker'); e.kx *= 0.85; e.ky *= 0.85; } return; } }
+  if (e.guardDown > 0) { e.guardDown -= dt; if (e.type === 'draugr' || e.type === 'knight' || e.type === 'captain') { const kl0 = Math.hypot(e.kx, e.ky); if (kl0 > 1) { tryMove(e, e.kx * dt, e.ky * dt, e.r * 0.6, 'walker'); e.kx *= 0.85; e.ky *= 0.85; } return; } }
   const p = G.player, dx = p.x - e.x, dy = p.y - e.y, d = Math.hypot(dx, dy) || 1;
   const who = e.fly ? 'flyer' : 'walker', mr = e.r * 0.6;
   const kl = Math.hypot(e.kx, e.ky);
@@ -2583,7 +2888,8 @@ function updateEnemy(e, dt) {
       if (e.t > 0.7) { e.t = 0; e.tx = p.x + rnd(-40, 40); e.ty = p.y + rnd(-40, 40); }
       { const ax = e.tx - e.x, ay = e.ty - e.y, al = Math.hypot(ax, ay) || 1; tryMove(e, ax / al * e.speed * dt, ay / al * e.speed * dt, mr, who); }
       break;
-    case 'knight':
+    case 'hank': updateHank(e, dt, dx, dy, d); break;
+    case 'knight': case 'captain':
       if (e.st === 'intro') { if (G.state === 'play') { e.st = 'chase'; e.t = 0; } break; }
       if (e.st === 'chase') { e.turnT = (e.turnT || 0) + dt; if (e.turnT > 0.5) { e.turnT = 0; e.fx = dx / d; e.fy = dy / d; } tryMove(e, e.fx * e.speed * dt, e.fy * e.speed * dt, mr, who); if (e.t > 2.8) { e.st = 'wind'; e.t = 0; } }
       else if (e.st === 'wind') { e.fx = dx / d; e.fy = dy / d; if (e.t > 0.5) { e.st = 'charge'; e.t = 0; Sound.play('charge'); } }
@@ -3118,6 +3424,7 @@ function buildAll() {
   SPR.runestone = buildSprite(RUNE_ROWS, PAL_RUNE);
   buildIcons();
   buildRedeyeArt();
+  buildCh2Art();
   buildPoof();
 }
 function shade(hex, k) { const [r, g, b] = hexRgb(hex); const f = v => Math.max(0, Math.min(255, Math.round(v * (1 + k)))); return '#' + [f(r), f(g), f(b)].map(v => v.toString(16).padStart(2, '0')).join(''); }
@@ -4132,6 +4439,145 @@ function drawTileRE(c, ox, oy, tx, ty) {
   return true;
 }
 
+// ===== ch2.js =====
+// Chapter 2 (draft from the story bible): the Drowned Barrow, Voodoo Dash, the Draugr Captain,
+// Fluffy's ghost, and Hank's ghost frozen by Chilly.
+
+// ---------------- Voodoo Dash ----------------
+const DASH_TIME = 0.22, DASH_SPEED = 340;
+function startDash() {
+  const p = G.player, s = G.save;
+  if (!s.items.dash) return floatText(p.x, p.y - 18, 'No dash yet', '#aab');
+  if (p.dashCd > 0 || p.dashing > 0) return;
+  const l = Math.hypot(p.fx, p.fy) || 1;
+  p.dashing = DASH_TIME; p.dashCd = 0.55; p.dx = p.fx / l; p.dy = p.fy / l; p.dashHit = [];
+  p.inv = Math.max(p.inv, DASH_TIME + 0.08);
+  G.jon.mode = 'follow';
+  Sound.play('dash');
+}
+// tiles Owen can pass over while dashing (but not stand on): water, pits, spirit barriers
+const dashSolid = (x, y) => { const c = tileAt(x, y); return c === 'w' || c === 'v' || c === 'y' || c === '~' ? false : solidAt(x, y, 'player') || c === 'y'; };
+function updateDash(dt) {
+  const p = G.player;
+  p.dashing -= dt;
+  const step = DASH_SPEED * dt, r = 5;
+  const free = (x, y) => !(dashSolid(x - r, y - r) || dashSolid(x + r, y - r) || dashSolid(x - r, y + r) || dashSolid(x + r, y + r));
+  const nx = p.x + p.dx * step, ny = p.y + p.dy * step;
+  if (free(nx, p.y)) p.x = nx;
+  if (free(p.x, ny)) p.y = ny;
+  G.fx.push({ kind: 'ghost', x: p.x, y: p.y, vx: 0, vy: 0, t: 0, life: 0.25, fx: p.fx, fy: p.fy });
+  // dash straight through enemies, hurting them (shields don't help); shatters Hank's frost
+  for (const e of G.ents.slice()) {
+    if (!e.enemy || !e.alive || p.dashHit.includes(e) || dist(e, p) > e.r + 7) continue;
+    p.dashHit.push(e);
+    if (e.type === 'hank') { if (e.frozen) shatterFrost(e); continue; }
+    if ((e.type === 'king' || e.type === 'attendant') && e.st !== 'daze') continue;
+    damageEnemy(e, rollDamage(1), p, 'magic');
+  }
+  // never end a dash inside a barrier: keep going until clear
+  if (p.dashing <= 0 && tileAt(p.x, p.y) === 'y') p.dashing = 0.02;
+  if (p.dashing <= 0) {
+    p.dashing = 0;
+    const c = tileAt(p.x, p.y);
+    if (c === 'w') { p.falling = 0.6; Sound.play('splash'); ripple(p.x, p.y); floatText(p.x, p.y - 18, 'Zombies sink...', '#bfe0ff'); }
+  }
+}
+
+// ---------------- Hank's ghost ----------------
+function shatterFrost(e) {
+  e.frozen = false; e.st = 'daze'; e.t = 0;
+  G.shake = 0.3; Sound.play('clank'); Sound.play('secret');
+  for (let i = 0; i < 14; i++) { const a = i / 14 * Math.PI * 2; G.fx.push({ x: e.x, y: e.y - 10, vx: Math.cos(a) * 90, vy: Math.sin(a) * 90, t: 0, life: 0.5, color: i % 2 ? '#ffffff' : '#9fe0ff', size: 2 }); }
+  floatText(e.x, e.y - 50, 'FROST SHATTERED!', '#9fe0ff');
+}
+const HK = { axes: [] };
+function updateHank(e, dt, dx, dy, d) {
+  const p = G.player;
+  switch (e.st) {
+    case 'intro': if (G.state === 'play') { e.st = 'float'; e.t = 0; e.frozen = true; } break;
+    case 'float':
+      tryMove(e, dx / d * 22 * dt + Math.cos(G.t * 1.3) * 18 * dt, dy / d * 22 * dt + Math.sin(G.t * 1.7) * 14 * dt, 8, 'flyer');
+      e.fx = dx / d; e.fy = dy / d;
+      e.throwT = (e.throwT || 0) + dt; e.raiseT = (e.raiseT || 0) + dt;
+      if (e.throwT > 2.4) { e.throwT = 0; HK.axes.push({ x: e.x, y: e.y - 20, vx: dx / d * 150, vy: dy / d * 150, t: 0, home: e, spin: 0 }); Sound.play('throw'); }
+      if (e.raiseT > 7.5 && G.ents.filter(o => o.type === 'wisp' && o.alive).length < 2) { e.raiseT = 0; spawnEnemy('wisp', e.x - 30, e.y); spawnEnemy('wisp', e.x + 30, e.y); Sound.play('creep'); }
+      break;
+    case 'daze': if (e.t > 2.6) { e.st = 'float'; e.t = 0; e.frozen = true; Sound.play('charge'); floatText(e.x, e.y - 50, 'Frost returns!', '#9fe0ff'); } break;
+  }
+}
+function updateHankAxes(dt) {
+  const p = G.player;
+  for (const a of HK.axes) {
+    a.t += dt; a.spin += dt * 20;
+    if (a.t > 0.85) { const dx = a.home.x - a.x, dy = a.home.y - 20 - a.y, d = Math.hypot(dx, dy) || 1; a.vx = dx / d * 170; a.vy = dy / d * 170; if (d < 10) a.done = true; }
+    a.x += a.vx * dt; a.y += a.vy * dt;
+    if (dist(a, p) < 9) { hurtPlayer(1, a); }
+  }
+  HK.axes = HK.axes.filter(a => !a.done && a.t < 3 && a.home.alive);
+}
+
+// ---------------- art ----------------
+const FLUFFY = ['.ee.......', 'eEEe....tt', '.eEEeeee.t', '.eKEEEEEe.', '..eEEEEEe.', '..e.e..e.e', '..e.e..e.e'];
+function buildCh2Art() {
+  SPR.fluffy = buildSprite(FLUFFY, { e: '#9fe0ff', E: '#d8f4ff', K: '#20304a', t: '#9fe0ff' });
+  SPR.fluffy_f = flipped(SPR.fluffy);
+}
+function drawCh2Enemy(e, x, y) {
+  const white = e.flash > 0, f = Math.floor(e.wob / 2.5) % 2;
+  if (e.type === 'captain') {
+    const { d, flip } = dirOf(e.fx, e.fy);
+    shadowAt(x, y + 10, 2);
+    spr(SPR[`draugr_${d === 'up' ? 'down' : d}_${f}${flip ? '_f' : ''}`], x, y + 12, { scale: 2, white });
+    R(x - 9, y - 30, 18, 3, '#c9a227');   // gold helm band: the captain
+    drawShield(e, x, y - 6, 2);
+    return true;
+  }
+  if (e.type === 'hank') {
+    const bob = Math.round(Math.sin(G.t * 2) * 2);
+    shadowAt(x, y + 18, 2.5);
+    ctx.globalAlpha = e.st === 'daze' ? 0.95 : 0.78;
+    spr(SPR[`draugr_down_${f}`], x, y + 18 + bob, { scale: 3, white });
+    ctx.globalAlpha = 0.35; spr(whiteOf(SPR[`draugr_down_${f}`]), x, y + 18 + bob, { scale: 3 }); ctx.globalAlpha = 1;
+    // horned helm and spectral axe
+    R(x - 16, y - 36 + bob, 4, 8, '#f2ebcc'); R(x + 12, y - 36 + bob, 4, 8, '#f2ebcc');
+    if (e.frozen) {
+      ctx.strokeStyle = `rgba(160,230,255,${0.6 + 0.3 * Math.sin(G.t * 6)})`; ctx.lineWidth = 2;
+      ctx.beginPath(); ctx.ellipse(x, y - 6 + bob, 26, 30, 0, 0, Math.PI * 2); ctx.stroke();
+      for (let i = 0; i < 6; i++) { const a = G.t * 1.5 + i * 1.05; R(x + Math.cos(a) * 26 - 1, y - 6 + bob + Math.sin(a) * 30 - 1, 3, 3, '#e8f8ff'); }
+    }
+    if (e.st === 'daze') for (let i = 0; i < 3; i++) { const a = G.t * 5 + i * 2.1; drawStar(x + Math.cos(a) * 18, y - 44 + Math.sin(a) * 4); }
+    R(x - 31, y - 61, 62, 5, '#000'); R(x - 30, y - 60, 60 * Math.max(0, e.hp / e.max), 3, '#e23');
+    return true;
+  }
+  return false;
+}
+function drawHankAxes() {
+  for (const a of HK.axes) { ctx.globalAlpha = 0.8; drawJonSprite(a.x - G.cam.x, a.y - G.cam.y, a.spin); ctx.globalAlpha = 0.35; ctx.fillStyle = '#9fe0ff'; ctx.beginPath(); ctx.arc(a.x - G.cam.x, a.y - G.cam.y, 10, 0, Math.PI * 2); ctx.fill(); ctx.globalAlpha = 1; }
+}
+function drawDashGhost(f) {
+  const { d, flip } = dirOf(f.fx, f.fy);
+  ctx.globalAlpha = 0.45 * (1 - f.t / f.life);
+  spr(purpleOf(SPR[`zombie_${d}_w0${flip ? '_f' : ''}`]), f.x - G.cam.x, f.y - G.cam.y + 7);
+  ctx.globalAlpha = 1;
+}
+const PURPLE = new Map();
+function purpleOf(c) { let p = PURPLE.get(c); if (!p) { p = tinted(c, '#b070ff'); PURPLE.set(c, p); } return p; }
+// spirit barrier tile: shimmering purple wards
+function renderBarrier(frame) {
+  return makeTile((P) => {
+    for (let y = 0; y < T; y++) for (let x = 0; x < T; x++) { const lx = x % 8, ly = y % 8; P(x, y, lx === 0 || ly === 0 ? '#7888b8' : lx === 7 || ly === 7 ? '#48548a' : '#6070a0'); }
+    for (let y = 0; y < T; y++) for (let x = 0; x < T; x++) { const w = Math.sin(x * 0.8 + y * 0.5 + frame * 0.8) + Math.sin(y * 0.9 - frame * 0.6); if (w > 0.4) P(x, y, w > 1.2 ? '#e8c8ff' : '#9a4dd9', w > 1.2 ? 230 : 170); }
+    for (const y of [3, 8, 13]) for (let x = 0; x < T; x++) if ((x + frame) % 4 < 2) P(x, y, '#d8a8ff', 200);
+  });
+}
+function drawTileCh2(c, ox, oy) {
+  if (c !== 'y') return false;
+  const frame = Math.floor(G.t * 6) % 8, key = 'Y|' + frame;
+  let img = TILE_CACHE.get(key); if (!img) { img = renderBarrier(frame); TILE_CACHE.set(key, img); }
+  ctx.drawImage(img, ox, oy);
+  return true;
+}
+
 // ===== sprites.js =====
 // Pixel art drawn in code. Everything is centered on (x, y) = feet-ish center.
 
@@ -4196,6 +4642,7 @@ function drawJon() {
 
 function drawEnemy(e) {
   const x = Math.round(e.x - G.cam.x), y = Math.round(e.y - G.cam.y);
+  if (drawCh2Enemy(e, x, y)) return;
   if (drawRedeyeEnemy(e, x, y)) { if (e.boss && e.alive && attendantVisible(e)) { R(x - 31, y - 41, 62, 5, '#000'); R(x - 30, y - 40, 60 * Math.max(0, e.hp / e.max), 3, '#e23'); } return; }
   const white = e.flash > 0 || (e.st === 'wind' && Math.floor(G.t * 16) % 2 === 0);
   const f = Math.floor(e.wob / 2.5) % 2;
@@ -4292,7 +4739,9 @@ function drawThing(e) {
   switch (e.kind) {
     case 'enemy': return drawEnemy(e);
     case 'hazard': return drawRedeyeEnemy(e, x, y);
-    case 'npc': return drawPerson(x, y, e.id, e.bob);
+    case 'npc':
+      if (e.id === 'fluffy') { const b = Math.round(Math.sin(G.t * 3) * 2); ctx.globalAlpha = 0.75; spr(G.player.x < e.x ? SPR.fluffy_f : SPR.fluffy, x, y + 4 + b); ctx.globalAlpha = 1; return; }
+      return drawPerson(x, y, e.id, e.bob);
     case 'sign': shadowAt(x, y + 6, 0.8); spr(SPR.sign, x, y + 7); break;
     case 'plaque': R(x - 7, y - 4, 14, 7, '#c08a50'); R(x - 6, y - 3, 12, 1, '#6b4322'); R(x - 6, y, 9, 1, '#6b4322'); break;
     case 'runestone': {
@@ -4336,6 +4785,7 @@ const ARENA_CARDS = [
   { id: 'turret', name: 'Rune Turret', desc: 'A runestone that shoots', price: 35, max: 3, apply: () => { A.turrets.push({ x: 0, y: 0, cd: 0 }); placeTurrets(); } },
   { id: 'pal', name: 'Penguin Pal', desc: 'A good penguin. Slides at foes', price: 30, max: 2, apply: () => { A.pals.push({ x: G.player.x, y: G.player.y, cd: 1, dash: 0, dx: 0, dy: 0, wob: 0 }); } },
   { id: 'homing', name: 'Homing Jon', desc: 'Throws lock on, fly far', price: 25, max: 1, apply: () => { G.save.items.homing = true; } },
+  { id: 'dash', name: 'Voodoo Dash', desc: 'Shift/F: dash through foes', price: 30, max: 1, apply: () => { G.save.items.dash = true; } },
   { id: 'thunder', name: 'Thunder Rune', desc: 'C: strike all (full meter)', price: 45, max: 1, apply: () => { G.save.items.thunder = true; G.save.rune = RUNE_MAX; } },
   { id: 'juice', name: 'Lingonberry Juice', desc: 'Auto-revive once', price: 20, max: 3, apply: () => { G.save.potions++; } },
   { id: 'helmet', name: "Hank's Helmet", desc: '+1 armor (10% block)', price: 25, max: 5, apply: () => { G.st.armor++; } },
@@ -4774,8 +5224,12 @@ function objective() {
   if (!flag('met_astrid')) return 'Find Elder Astrid in Fjordvik: west of the airstrip, then north.';
   if (!s.items.homing && !flag('d1done')) return 'Go to the Penguin Ice Cavern on the Frozen Path (north-east). Find the treasure behind the Penguin Knight.';
   if (!flag('d1done')) return 'Defeat whatever is possessing the penguins at the bottom of the Ice Cavern.';
-  if (!flag('redeye_done')) return 'Chapter 1 complete! Optional: something is scratching inside Flight 364\'s cargo hold. Dare to look?';
-  return 'Chapter 1 complete! Three sealed rune doors wait for Owen\'s next chapters.';
+  if (!flag('d2done')) {
+    if (!s.items.dash) return 'Chapter 2: the Drowned Barrow has opened in the north-west foothills. Find what the Draugr Captain guards.';
+    return 'Chapter 2: use the Voodoo Dash to cross the water and barriers. Find the big key and free Hank\'s ghost.' + (flag('redeye_done') ? '' : ' (Optional: Flight 364\'s cargo hold.)');
+  }
+  if (!flag('redeye_done')) return 'Chapter 2 complete! Walter\'s Forge waits for Owen\'s next chapter. Optional: something is scratching inside Flight 364\'s cargo hold.';
+  return 'Chapter 2 complete! Walter\'s Forge and the Storm Peak wait for Owen\'s next chapters.';
 }
 function drawMenu() {
   const s = G.save;
@@ -4788,21 +5242,22 @@ function drawMenu() {
     ['Thunder Rune (C)', 'thunder', !!s.items.thunder],
     ['Lingonberry Juice x' + s.potions, 'juice', s.potions > 0],
     ['Demon Horn (V)', 'horn', !!s.items.horn],
+    ['Voodoo Dash (Shift/F)', 'dash', !!s.items.dash],
   ];
   slots.forEach(([label, icon, have, custom], i) => {
-    const y = 46 + i * 18;
-    R(20, y - 9, 18, 18, '#1a2238');
+    const y = 44 + i * 16;
+    R(20, y - 8, 18, 16, '#1a2238');
     if (have) { if (custom) custom(); else drawItemIcon(icon, 29, y); text(label, 44, y + 4, '#fff'); }
     else text('???', 44, y + 4, '#55577a');
   });
   const sq = (n, start, done) => flag(start) ? n + (flag(done) ? ' ✓' : ' …') : null;
   const side = [sq('Bjarne', 'quest_bjarne', 'bjarne_done'), sq('Sven', 'quest_sven', 'sven_done')].filter(Boolean);
-  if (side.length) text('Side quests: ' + side.join('  '), 20, 136, '#c8e8ff', 'left', false);
-  text('Heart pieces: ' + s.pieces + '/4', 20, 148, '#f2ebcc');
-  text('Voodoo bond: ' + (s.voodoo ? 'ready' : 'used'), 20, 160, s.voodoo ? '#9be08a' : '#c9a0f0');
-  if (G.map.dungeon && !G.map.nokeys) text('Keys ' + (s.keys[G.mapId] || 0) + '   Big key: ' + (s.bigkeys[G.mapId] ? 'yes' : 'no'), 120, 160, '#f2ebcc');
-  text('QUEST', 20, 178, '#ffe64d');
-  wrap(objective(), 214).slice(0, 3).forEach((l, i) => text(l, 20, 190 + i * 10, '#fff', 'left', false));
+  if (side.length) text('Side quests: ' + side.join('  '), 20, 142, '#c8e8ff', 'left', false);
+  text('Heart pieces: ' + s.pieces + '/4', 20, 154, '#f2ebcc');
+  text('Voodoo bond: ' + (s.voodoo ? 'ready' : 'used'), 20, 166, s.voodoo ? '#9be08a' : '#c9a0f0');
+  if (G.map.dungeon && !G.map.nokeys) text('Keys ' + (s.keys[G.mapId] || 0) + '  Big key: ' + (s.bigkeys[G.mapId] ? 'yes' : 'no'), 236, 154, '#f2ebcc', 'right', false);
+  text('QUEST', 20, 180, '#ffe64d');
+  wrap(objective(), 214).slice(0, 3).forEach((l, i) => text(l, 20, 191 + i * 9, '#fff', 'left', false));
   text(Sound.muted ? 'M: sound off' : 'M: sound on', 236, 26, '#8a8ab0', 'right', false);
   text(Music.on ? 'N: music on' : 'N: music off', 236, 38, '#8a8ab0', 'right', false);
 }
@@ -4933,8 +5388,15 @@ function onEnterScreen() {
   if (G.mapId === 'cavern' && !flag('intro:cavern')) { setFlag('intro:cavern'); say(STORY.cavern_enter); }
   if (has('knight') && !flag('intro:knight')) { setFlag('intro:knight'); Sound.play('boss'); say(STORY.knight); }
   if (G.map.redeye) redeyeEnter();
+  HK.axes = [];
+  if (G.mapId === 'barrow' && !flag('intro:barrow')) { setFlag('intro:barrow'); say(STORY.barrow_enter); }
+  if (has('captain') && !flag('intro:captain')) { setFlag('intro:captain'); Sound.play('boss'); say(STORY.captain); }
+  if (has('hank')) { Sound.play('boss'); say(flag('intro:hank') ? [['Hank', 'TURN... BACK...']] : STORY.hank); setFlag('intro:hank'); }
   if (has('attendant') && !flag('intro:attendant')) { setFlag('intro:attendant'); say(STORY.attendant); }
   if (has('king')) { Sound.play('boss'); say(flag('intro:king') ? [['Penguin King', 'AK! Back for more?']] : STORY.king); setFlag('intro:king'); }
+  if (G.mapId === 'overworld' && flag('d2done') && !flag('chapter2_banner') && G.scr.x === 0 && G.scr.y === 0) {
+    setFlag('chapter2_banner'); G.banner = 'CHAPTER 2 COMPLETE'; G.bannerT = 4; Sound.play('secret'); writeSave();
+  }
   if (G.mapId === 'overworld' && flag('d1done') && !flag('chapter1_banner') && G.scr.x === 2 && G.scr.y === 0) {
     setFlag('chapter1_banner'); G.banner = STORY.chapter_done; G.bannerT = 4; Sound.play('secret'); writeSave();
   }
@@ -4991,6 +5453,7 @@ function update(dt) {
   updateJon(dt);
   if (G.mode === 'arena') { updateArena(dt); if (G.state !== 'play') return; }
   if (G.map.redeye) updateRedeye(dt);
+  if (HK.axes.length) updateHankAxes(dt);
   for (const e of G.ents.slice()) {
     if (e.kind === 'enemy' && e.alive) { if (e.slow > 0) { e.slow -= dt; updateEnemy(e, dt * 0.5); } else updateEnemy(e, dt); }
     else if (e.kind === 'pickup') updatePickup(e, dt);
@@ -5015,6 +5478,7 @@ function render() {
   list.push(...bigDrawList());
   list.sort((a, b) => a.y - b.y).forEach(o => o.f());
   if (G.mode === 'arena') drawArenaWorld();
+  drawHankAxes();
   if (!p.hold) drawJon();
   drawFx();
   drawLightning();

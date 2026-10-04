@@ -12,6 +12,7 @@ Tile legend
   F  wood floor   Z interior wall   Y bed   Q table   r rug   d doorway
   a  arena floor  V  arena wall
   k  bookshelf    p  fireplace   C  cave rock   g  cave floor   >  stairs down   <  stairs up
+  y  spirit barrier (only Voodoo Dash passes)
   u  plane wall   e  emergency light   =  cargo grate   m  cabin carpet   A  seat   J  phantom seat (appears in blackouts)   B  crate
 """
 import json, collections, pathlib
@@ -267,7 +268,8 @@ OW_ENT = [
     {"t": "sign", "at": P(0, 1, 10, 7), "text": "sign_fjordvik"},
     {"t": "runestone", "at": P(2, 0, 10, 4)},
     {"t": "sign", "at": P(2, 0, 9, 3), "text": "sign_cavern"},
-    {"t": "sealed", "at": P(0, 0, 7, 2), "text": "seal_barrow"},
+    {"t": "sealed", "at": P(0, 0, 7, 2), "text": "seal_barrow", "opensWith": "d1done"},
+    {"t": "runedoor", "at": P(0, 0, 7, 2), "needs": "d1done", "to": "barrow", "dest": [24, 40]},
     {"t": "sealed", "at": P(3, 0, 7, 2), "text": "seal_peak"},
     {"t": "sealed", "at": P(3, 1, 13, 3), "text": "seal_forge"},
     {"t": "sign", "at": P(2, 2, 6, 9), "text": "sign_beach"},
@@ -375,6 +377,51 @@ CAV_ENT = [
     {"t": "chest", "id": "cv_thunder", "at": P(1, 0, 8, 4), "item": "thunder", "clear": True},
     {"t": "container", "id": "hc_cavern", "at": P(1, 0, 6, 7), "clear": True},
     {"t": "warp", "at": P(1, 0, 10, 7), "to": "overworld", "dest": P(2, 0, 7, 4), "clear": True, "portal": True},
+]
+
+
+# ---------------- Chapter 2: the Drowned Barrow, 3 x 3 rooms ----------------
+BR = {}
+BR[(1, 2)] = room(top="L", bottom="_", left="_", right="_")                       # entrance
+put(BR[(1, 2)], 2, 9, ["ww", "ww"]); put(BR[(1, 2)], 12, 9, ["ww", "ww"])
+BR[(0, 2)] = room(right="_")                                                       # west: key on clear
+put(BR[(0, 2)], 3, 3, ["w  w", "", "", "", "", "", "w  w"])
+BR[(2, 2)] = room(left="_")                                                        # east: flooded, dash for the far side
+put(BR[(2, 2)], 9, 1, ["ww"] * 12)
+BR[(1, 1)] = room(top="K", bottom="L", left="_", right="y")                        # great hall: channel splits it
+put(BR[(1, 1)], 1, 4, ["wwwwwwwwwwwwww", "wwwwwwwwwwwwww"])
+BR[(0, 1)] = room(right="h")                                                       # mini-boss: Draugr Captain
+BR[(2, 1)] = room(left="_")                                                        # big key across the pits
+put(BR[(2, 1)], 5, 1, ["vv"] * 12)
+BR[(1, 0)] = room(bottom="h")                                                      # Hank's ghost
+put(BR[(1, 0)], 1, 1, ["ww", "w"]); put(BR[(1, 0)], 13, 1, ["ww", " w"]); put(BR[(1, 0)], 1, 11, ["w", "ww"]); put(BR[(1, 0)], 13, 11, [" w", "ww"])
+BR[(1, 2)][0][7] = BR[(1, 2)][0][8] = "L"
+br_blocks = {k: ["".join(r) for r in v] for k, v in BR.items()}
+br = [["W"] * (3 * SW) for _ in range(3 * SH)]
+for (sx, sy), b in br_blocks.items():
+    check_block(("barrow", sx, sy), b)
+    for y, r in enumerate(b):
+        for x, c in enumerate(r):
+            br[sy * SH + y][sx * SW + x] = c
+# the spirit barrier only on the hall side of the east door
+br[1 * SH + 6][2 * SW + 0] = br[1 * SH + 7][2 * SW + 0] = "_"
+BR_ENT = [
+    {"t": "warp", "at": P(1, 2, 7, 13), "to": "overworld", "dest": P(0, 0, 7, 3)},
+    {"t": "warp", "at": P(1, 2, 8, 13), "to": "overworld", "dest": P(0, 0, 7, 3)},
+    {"t": "runestone", "at": P(1, 2, 4, 6)},
+    {"t": "npc", "id": "fluffy", "at": P(1, 2, 10, 6)},
+    {"t": "draugr", "at": P(0, 2, 5, 5)}, {"t": "draugr", "at": P(0, 2, 10, 9)}, {"t": "wisp", "at": P(0, 2, 8, 3)},
+    {"t": "chest", "id": "br_key", "at": P(0, 2, 7, 6), "item": "key", "clear": True},
+    {"t": "bat", "at": P(2, 2, 4, 4)}, {"t": "bat", "at": P(2, 2, 5, 10)},
+    {"t": "chest", "id": "br_kr", "at": P(2, 2, 13, 6), "item": "kr50"},
+    {"t": "draugr", "at": P(1, 1, 5, 9)}, {"t": "wisp", "at": P(1, 1, 10, 2)},
+    {"t": "captain", "at": P(0, 1, 6, 6)},
+    {"t": "chest", "id": "br_dash", "at": P(0, 1, 8, 6), "item": "dash", "clear": True},
+    {"t": "wisp", "at": P(2, 1, 11, 3)}, {"t": "bat", "at": P(2, 1, 12, 10)},
+    {"t": "chest", "id": "br_bigkey", "at": P(2, 1, 12, 6), "item": "bigkey"},
+    {"t": "hank", "at": P(1, 0, 8, 5)},
+    {"t": "container", "id": "hc_barrow", "at": P(1, 0, 6, 9), "clear": True},
+    {"t": "warp", "at": P(1, 0, 10, 9), "to": "overworld", "dest": P(0, 0, 7, 4), "clear": True, "portal": True},
 ]
 
 # ---------------- Owen's room (New York) ----------------
@@ -559,6 +606,21 @@ for nm, g, ents, start in (("astrid", ASTRID, ASTRID_ENT, (7, 12)), ("bjarne", B
     for e in ents:
         x, y = e["at"]
         assert any((x + dx, y + dy) in seen for dx, dy in ((0, 0), (1, 0), (-1, 0), (0, 1), (0, -1))), (nm, "unreachable", e)
+# the Barrow: without the dash you can reach the Captain (and his Voodoo Dash) but not the boss;
+# with the dash everything is reachable
+def br_reach(dash):
+    g = [list(r) for r in br]
+    for row in g:
+        for i, c in enumerate(row):
+            if c in "Ly" or (dash and c in "wvyK"): row[i] = "_"
+    return reachable(g, P(1, 2, 7, 12))
+no_dash, with_dash = br_reach(False), br_reach(True)
+near = lambda seen, at: any((at[0] + dx, at[1] + dy) in seen for dx, dy in ((0, 0), (1, 0), (-1, 0), (0, 1), (0, -1)))
+for e in BR_ENT:
+    assert near(with_dash, e["at"]), ("barrow unreachable even with dash", e)
+assert near(no_dash, P(0, 1, 8, 6)), "Voodoo Dash chest must be reachable without the dash"
+assert not near(no_dash, P(1, 0, 8, 5)), "boss must need the dash"
+assert not near(no_dash, P(2, 1, 12, 6)), "big key must need the dash"
 # the Red-Eye must be passable with the phantom seats both gone and present
 for phantom in (False, True):
     g = [list(r.replace("J", "A" if phantom else "m")) for r in RE]
@@ -580,6 +642,7 @@ out = {
     "astrid_house": {"name": "Astrid's House", "rows": ASTRID, "ents": ASTRID_ENT, "interior": True},
     "bjarne_house": {"name": "Bjarne's House", "rows": BJARNE, "ents": BJARNE_ENT, "interior": True},
     "secret_cave": {"name": "Hidden Cave", "rows": CAVE, "ents": CAVE_ENT, "dark": True},
+    "barrow": {"name": "The Drowned Barrow", "rows": ["".join(r) for r in br], "ents": BR_ENT, "dungeon": True},
     "redeye": {"name": "The Red-Eye", "rows": RE, "ents": RE_ENT, "dungeon": True, "dark": True, "redeye": True, "nokeys": True},
 }
 pathlib.Path("web/src/maps.js").write_text(

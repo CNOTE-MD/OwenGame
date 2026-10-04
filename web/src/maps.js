@@ -164,7 +164,21 @@ const MAPS = {
 7,
 2
 ],
-"text": "seal_barrow"
+"text": "seal_barrow",
+"opensWith": "d1done"
+},
+{
+"t": "runedoor",
+"at": [
+7,
+2
+],
+"needs": "d1done",
+"to": "barrow",
+"dest": [
+24,
+40
+]
 },
 {
 "t": "sealed",
@@ -982,6 +996,233 @@ const MAPS = {
 }
 ],
 "dark": true
+},
+"barrow": {
+"name": "The Drowned Barrow",
+"rows": [
+"WWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWW",
+"WWWWWWWWWWWWWWWWWww__________wwWWWWWWWWWWWWWWWWW",
+"WWWWWWWWWWWWWWWWWw____________wWWWWWWWWWWWWWWWWW",
+"WWWWWWWWWWWWWWWWW______________WWWWWWWWWWWWWWWWW",
+"WWWWWWWWWWWWWWWWW______________WWWWWWWWWWWWWWWWW",
+"WWWWWWWWWWWWWWWWW______________WWWWWWWWWWWWWWWWW",
+"WWWWWWWWWWWWWWWWW______________WWWWWWWWWWWWWWWWW",
+"WWWWWWWWWWWWWWWWW______________WWWWWWWWWWWWWWWWW",
+"WWWWWWWWWWWWWWWWW______________WWWWWWWWWWWWWWWWW",
+"WWWWWWWWWWWWWWWWW______________WWWWWWWWWWWWWWWWW",
+"WWWWWWWWWWWWWWWWW______________WWWWWWWWWWWWWWWWW",
+"WWWWWWWWWWWWWWWWWw____________wWWWWWWWWWWWWWWWWW",
+"WWWWWWWWWWWWWWWWWww__________wwWWWWWWWWWWWWWWWWW",
+"WWWWWWWWWWWWWWWWWWWWWWWhhWWWWWWWWWWWWWWWWWWWWWWW",
+"WWWWWWWWWWWWWWWWWWWWWWWKKWWWWWWWWWWWWWWWWWWWWWWW",
+"Wt____________tWWt____________tWWt___vv_______tW",
+"W______________WW______________WW____vv________W",
+"W______________WW______________WW____vv________W",
+"W______________WWwwwwwwwwwwwwwwWW____vv________W",
+"W______________WWwwwwwwwwwwwwwwWW____vv________W",
+"W______________h_______________y_____vv________W",
+"W______________h_______________y_____vv________W",
+"W______________WW______________WW____vv________W",
+"W______________WW______________WW____vv________W",
+"W______________WW______________WW____vv________W",
+"W______________WW______________WW____vv________W",
+"Wt____________tWWt____________tWWt___vv_______tW",
+"WWWWWWWWWWWWWWWWWWWWWWWLLWWWWWWWWWWWWWWWWWWWWWWW",
+"WWWWWWWWWWWWWWWWWWWWWWWLLWWWWWWWWWWWWWWWWWWWWWWW",
+"Wt____________tWWt____________tWWt_______ww___tW",
+"W______________WW______________WW________ww____W",
+"W__w__w________WW______________WW________ww____W",
+"W______________WW______________WW________ww____W",
+"W______________WW______________WW________ww____W",
+"W________________________________________ww____W",
+"W________________________________________ww____W",
+"W______________WW______________WW________ww____W",
+"W__w__w________WW_ww________ww_WW________ww____W",
+"W______________WW_ww________ww_WW________ww____W",
+"W______________WW______________WW________ww____W",
+"Wt____________tWWt____________tWWt_______ww___tW",
+"WWWWWWWWWWWWWWWWWWWWWWW__WWWWWWWWWWWWWWWWWWWWWWW"
+],
+"ents": [
+{
+"t": "warp",
+"at": [
+23,
+41
+],
+"to": "overworld",
+"dest": [
+7,
+3
+]
+},
+{
+"t": "warp",
+"at": [
+24,
+41
+],
+"to": "overworld",
+"dest": [
+7,
+3
+]
+},
+{
+"t": "runestone",
+"at": [
+20,
+34
+]
+},
+{
+"t": "npc",
+"id": "fluffy",
+"at": [
+26,
+34
+]
+},
+{
+"t": "draugr",
+"at": [
+5,
+33
+]
+},
+{
+"t": "draugr",
+"at": [
+10,
+37
+]
+},
+{
+"t": "wisp",
+"at": [
+8,
+31
+]
+},
+{
+"t": "chest",
+"id": "br_key",
+"at": [
+7,
+34
+],
+"item": "key",
+"clear": true
+},
+{
+"t": "bat",
+"at": [
+36,
+32
+]
+},
+{
+"t": "bat",
+"at": [
+37,
+38
+]
+},
+{
+"t": "chest",
+"id": "br_kr",
+"at": [
+45,
+34
+],
+"item": "kr50"
+},
+{
+"t": "draugr",
+"at": [
+21,
+23
+]
+},
+{
+"t": "wisp",
+"at": [
+26,
+16
+]
+},
+{
+"t": "captain",
+"at": [
+6,
+20
+]
+},
+{
+"t": "chest",
+"id": "br_dash",
+"at": [
+8,
+20
+],
+"item": "dash",
+"clear": true
+},
+{
+"t": "wisp",
+"at": [
+43,
+17
+]
+},
+{
+"t": "bat",
+"at": [
+44,
+24
+]
+},
+{
+"t": "chest",
+"id": "br_bigkey",
+"at": [
+44,
+20
+],
+"item": "bigkey"
+},
+{
+"t": "hank",
+"at": [
+24,
+5
+]
+},
+{
+"t": "container",
+"id": "hc_barrow",
+"at": [
+22,
+9
+],
+"clear": true
+},
+{
+"t": "warp",
+"at": [
+26,
+9
+],
+"to": "overworld",
+"dest": [
+7,
+4
+],
+"clear": true,
+"portal": true
+}
+],
+"dungeon": true
 },
 "redeye": {
 "name": "The Red-Eye",

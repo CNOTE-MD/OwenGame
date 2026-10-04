@@ -445,6 +445,7 @@ function buildAll() {
   SPR.runestone = buildSprite(RUNE_ROWS, PAL_RUNE);
   buildIcons();
   buildRedeyeArt();
+  buildCh2Art();
   buildPoof();
 }
 function shade(hex, k) { const [r, g, b] = hexRgb(hex); const f = v => Math.max(0, Math.min(255, Math.round(v * (1 + k)))); return '#' + [f(r), f(g), f(b)].map(v => v.toString(16).padStart(2, '0')).join(''); }

@@ -31,7 +31,7 @@ const flag = k => !!G.save.flags[k];
 const setFlag = k => { G.save.flags[k] = true; };
 
 // ---------- tiles ----------
-const SOLID = new Set('T#MwHRDPqX+lWtOYQZxLKbVCkpueAB'.split(''));
+const SOLID = new Set('T#MwHRDPqX+lWtOYQZxLKbVCkpueABy'.split(''));
 function tile(tx, ty) {
   if (tx < 0 || ty < 0 || tx >= G.cols || ty >= G.nrows) return G.map.dungeon ? 'W' : 'T';
   return G.rows[ty][tx];
@@ -86,8 +86,10 @@ function loadMap(id, px, py) {
     const t2 = k.match(/^tile:(\w+):(\d+),(\d+):(.)$/);
     if (t2 && t2[1] === id) setTile(+t2[2], +t2[3], t2[4]);
   }
+  // rune doors that have opened become cave mouths
+  for (const d of G.map.ents) if (d.t === 'runedoor' && G.save.flags[d.needs]) setTile(d.at[0], d.at[1], 'E');
   const p = G.player;
-  p.x = px; p.y = py; p.vx = p.vy = p.kx = p.ky = 0; p.launching = false; p.falling = 0; p.hold = null;
+  p.x = px; p.y = py; p.vx = p.vy = p.kx = p.ky = 0; p.launching = false; p.falling = 0; p.hold = null; p.dashing = 0;
   G.jon.x = px + 10; G.jon.y = py - 14; G.jon.mode = 'follow';
   G.scr = screenOf(px, py);
   G.trans = null;
@@ -135,6 +137,7 @@ function checkScreenEdge() {
   const dx = Math.sign(s.x - G.scr.x), dy = Math.sign(s.y - G.scr.y);
   G.trans = { from: { ...G.cam }, to: { x: s.x * VW, y: s.y * VH }, t: 0, dx, dy };
   G.ents = G.ents.filter(e => e.keep); G.fx = []; G.roomEnemies = false;
+  p.dashing = 0;   // a dash never carries into the next screen
   G.scr = s;
 }
 function updateTransition(dt) {
@@ -237,6 +240,6 @@ function drawMap() {
   for (let ty = y0; ty <= y0 + SH; ty++) for (let tx = x0; tx <= x0 + SW; tx++) {
     if (tx < 0 || ty < 0 || tx >= G.cols || ty >= G.nrows) continue;
     const c = claimedGround(tx, ty) || G.rows[ty][tx], ox = tx * T - cx, oy = ty * T - cy;
-    if (!drawTileRE(c, ox, oy, tx, ty) && !drawTileArt(c, ox, oy, tx, ty) && !drawTileB(c, ox, oy, tx, ty)) drawTile(c, ox, oy, tx, ty);
+    if (!drawTileCh2(c, ox, oy) && !drawTileRE(c, ox, oy, tx, ty) && !drawTileArt(c, ox, oy, tx, ty) && !drawTileB(c, ox, oy, tx, ty)) drawTile(c, ox, oy, tx, ty);
   }
 }

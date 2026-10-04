@@ -8,7 +8,8 @@ function makeEnt(d, x, y) {
     case 'start': return null;
     case 'runestone': return { ...base, solid: true, talk: true };
     case 'sign': case 'plaque': return { ...base, solid: true, talk: true };
-    case 'sealed': case 'cargo': return { ...base, talk: true };
+    case 'sealed': if (d.opensWith && s.flags[d.opensWith]) return null; return { ...base, talk: true };
+    case 'cargo': return { ...base, talk: true };
     case 'npc': return { ...base, solid: true, talk: true, id: d.id, bob: Math.random() * 6 };
     case 'shop': return { ...base, talk: true, item: d.item, price: d.price };
     case 'chest': return { ...base, solid: true, talk: true, open: !!s.flags['chest:' + d.id] };
@@ -21,6 +22,7 @@ function makeEnt(d, x, y) {
     case 'qitem': return (s.flags['got:' + d.id] || (d.needs && !s.flags[d.needs])) ? null : { ...base, kind: 'pickup', what: 'qitem', id: d.id, underBush: !!d.underBush, permanent: true };
     case 'switch': return { ...base, solid: true, hittable: true, id: d.id, cd: 0 };
     case 'cart': return { ...base, kind: 'hazard', type: 'cart', dir: 1, wob: 0 };
+    case 'runedoor': return s.flags[d.needs] ? { ...base, kind: 'warp' } : null;
     default: return makeEnemy(d.t, x, y);
   }
 }
@@ -33,12 +35,14 @@ const ENEMY = {
   king: { hp: 10, r: 16, touch: 2, speed: 26, boss: true },
   imp: { hp: 2, r: 5, touch: 1, speed: 0 },
   attendant: { hp: 12, r: 8, touch: 2, speed: 0, boss: true },
+  captain: { hp: 6, r: 10, touch: 2, speed: 24, shield: true, boss: true },
+  hank: { hp: 10, r: 14, touch: 2, speed: 0, boss: true, fly: true },
 };
 function makeEnemy(type, x, y) {
   const d = ENEMY[type];
   if (!d) return null;
   return { x, y, kind: 'enemy', enemy: true, alive: true, type, ...d, max: d.hp, flash: 0, kx: 0, ky: 0, t: Math.random() * 2,
-    st: type === 'king' || type === 'knight' || type === 'attendant' ? 'intro' : 'idle', fx: 0, fy: 1, wob: Math.random() * 6, tx: x, ty: y, bounces: 0, summoned: false };
+    st: ['king', 'knight', 'attendant', 'captain', 'hank'].includes(type) ? 'intro' : 'idle', fx: 0, fy: 1, wob: Math.random() * 6, tx: x, ty: y, bounces: 0, summoned: false };
 }
 
 // ---------- particles ----------
@@ -54,6 +58,7 @@ function drawFx() {
     if (f.kind === 'text') { text(f.label, f.x - G.cam.x, f.y - G.cam.y - f.t * 12, f.color, 'center'); continue; }
     if (f.kind === 'poof') { const img = POOF[Math.min(3, Math.floor(f.t / f.life * 4))], s = f.scale; ctx.drawImage(img, Math.round(f.x - G.cam.x - 12 * s), Math.round(f.y - G.cam.y - 12 * s), 24 * s, 24 * s); continue; }
     if (f.kind === 'whisper') { drawWhisper(f); continue; }
+    if (f.kind === 'ghost') { drawDashGhost(f); continue; }
     if (f.kind === 'ring') { const k = f.t / f.life; ctx.strokeStyle = `rgba(255,120,90,${1 - k})`; ctx.lineWidth = 2; ctx.beginPath(); ctx.arc(Math.round(f.x - G.cam.x), Math.round(f.y - G.cam.y), 8 + k * 120, 0, Math.PI * 2); ctx.stroke(); continue; }
     if (f.kind === 'ripple') { if (f.t < 0) continue; const k = f.t / f.life; ctx.strokeStyle = `rgba(220,240,255,${1 - k})`; ctx.lineWidth = 1; ctx.beginPath(); ctx.ellipse(Math.round(f.x - G.cam.x), Math.round(f.y - G.cam.y + 4), 4 + k * 14, 2 + k * 6, 0, 0, Math.PI * 2); ctx.stroke(); continue; }
     if (f.kind === 'leaf') { R(f.x - G.cam.x, f.y - G.cam.y, 2, 1, f.color); R(f.x - G.cam.x + 1, f.y - G.cam.y + 1, 1, 1, '#205818'); continue; }
@@ -85,6 +90,8 @@ function updatePlayer(dt) {
     }
     return;
   }
+  p.dashCd = Math.max(0, (p.dashCd || 0) - dt);
+  if (p.dashing > 0) return updateDash(dt);
   if (p.launching) {
     p.lp += dt / 0.7;
     const k = Math.min(p.lp, 1);
@@ -140,6 +147,8 @@ function updatePlayer(dt) {
     if (G.jon.mode === 'follow') { G.jon.swing(Math.atan2(p.fy, p.fx)); Sound.play('swing'); }
   } else if (just('b') && G.jon.mode === 'follow') {
     G.jon.throw(p.x, p.y, p.fx, p.fy); Sound.play('throw');
+  } else if (just('dash')) {
+    startDash();
   } else if (just('horn')) {
     blowHorn();
   } else if (just('c')) {
@@ -232,7 +241,7 @@ function interact(e) {
 function npcLines(id) {
   if (id === 'astrid') {
     if (!flag('met_astrid')) { setFlag('met_astrid'); G.save.kr += 30; return [...STORY.astrid_1, ['', 'Astrid gave you 30 kroner.']]; }
-    return flag('d1done') ? STORY.astrid_3 : STORY.astrid_2;
+    return flag('d2done') ? STORY.astrid_4 : flag('d1done') ? STORY.astrid_3 : STORY.astrid_2;
   }
   if (id === 'sven') {
     if (!flag('met_astrid')) return flag('got:hp_forest') ? STORY.sven_2 : STORY.sven_1;
@@ -244,6 +253,7 @@ function npcLines(id) {
     if (!flag('sven_done')) return STORY.sven_waiting;
     return flag('got:hp_forest') ? STORY.sven_2 : STORY.sven_1;
   }
+  if (id === 'fluffy') return flag('d2done') ? STORY.fluffy_after : flag('got:br_dash') || G.save.items.dash ? STORY.fluffy_2 : STORY.fluffy_1;
   if (id === 'bjarne') {
     if (!flag('quest_bjarne')) { setFlag('quest_bjarne'); return STORY.bjarne_quest; }
     if (flag('got:sheet') && !flag('bjarne_done')) {
@@ -281,6 +291,8 @@ function applyItem(id) {
     case 'heart3': p.hp = s.maxHp; break;
     case 'sheet': case 'ship': break;
     case 'horn': s.items.horn = true; break;
+    case 'dash': s.items.dash = true; break;
+    case 'kr50': s.kr += 50; break;
   }
 }
 function giveItem(id, after) {
@@ -399,6 +411,10 @@ function damageEnemy(e, dmg, from, how) {
     floatText(e.x, e.y - 18, 'STAGGER!', '#ffd84a');
     return true;
   }
+  if (e.type === 'hank' && e.frozen) {
+    if (how === 'thunder') { shatterFrost(e); dmg = 2; }
+    else { if (jonHit) { Sound.play('clank'); floatText(e.x, e.y - 50, 'FROZEN', '#9fe0ff'); } return true; }
+  }
   if ((e.type === 'king' || e.type === 'attendant') && e.st !== 'daze' && how !== 'thunder') {
     if (jonHit) { Sound.play('clank'); floatText(e.x, e.y - 30, 'CLANK', '#ffd84a'); }
     return true;
@@ -419,6 +435,7 @@ function killEnemy(e) {
   if (G.mode === 'arena') return arenaKill(e);
   if (!e.boss) maybeDrop(e.x, e.y, 0.65);
   if (e.type === 'king') { G.shake = 0.6; say(STORY.king_down, checkRoomClear); return; }
+  if (e.type === 'hank') { G.shake = 0.6; HK.axes = []; for (const w of G.ents.filter(o => o.type === 'wisp')) killEnemy(w); say(STORY.hank_down, () => { setFlag('d2done'); checkRoomClear(); writeSave(); }); return; }
   if (e.type === 'attendant') { G.shake = 0.6; RE.shots = []; say(STORY.attendant_down, () => { setFlag('redeye_done'); checkRoomClear(); }); return; }
   checkRoomClear();
 }
@@ -432,7 +449,7 @@ function spawnEnemy(type, x, y) { const e = makeEnemy(type, x, y); e.st = 'idle'
 
 function updateEnemy(e, dt) {
   e.flash = Math.max(0, e.flash - dt); e.wob += dt * 8; e.t += dt;
-  if (e.guardDown > 0) { e.guardDown -= dt; if (e.type === 'draugr' || e.type === 'knight') { const kl0 = Math.hypot(e.kx, e.ky); if (kl0 > 1) { tryMove(e, e.kx * dt, e.ky * dt, e.r * 0.6, 'walker'); e.kx *= 0.85; e.ky *= 0.85; } return; } }
+  if (e.guardDown > 0) { e.guardDown -= dt; if (e.type === 'draugr' || e.type === 'knight' || e.type === 'captain') { const kl0 = Math.hypot(e.kx, e.ky); if (kl0 > 1) { tryMove(e, e.kx * dt, e.ky * dt, e.r * 0.6, 'walker'); e.kx *= 0.85; e.ky *= 0.85; } return; } }
   const p = G.player, dx = p.x - e.x, dy = p.y - e.y, d = Math.hypot(dx, dy) || 1;
   const who = e.fly ? 'flyer' : 'walker', mr = e.r * 0.6;
   const kl = Math.hypot(e.kx, e.ky);
@@ -459,7 +476,8 @@ function updateEnemy(e, dt) {
       if (e.t > 0.7) { e.t = 0; e.tx = p.x + rnd(-40, 40); e.ty = p.y + rnd(-40, 40); }
       { const ax = e.tx - e.x, ay = e.ty - e.y, al = Math.hypot(ax, ay) || 1; tryMove(e, ax / al * e.speed * dt, ay / al * e.speed * dt, mr, who); }
       break;
-    case 'knight':
+    case 'hank': updateHank(e, dt, dx, dy, d); break;
+    case 'knight': case 'captain':
       if (e.st === 'intro') { if (G.state === 'play') { e.st = 'chase'; e.t = 0; } break; }
       if (e.st === 'chase') { e.turnT = (e.turnT || 0) + dt; if (e.turnT > 0.5) { e.turnT = 0; e.fx = dx / d; e.fy = dy / d; } tryMove(e, e.fx * e.speed * dt, e.fy * e.speed * dt, mr, who); if (e.t > 2.8) { e.st = 'wind'; e.t = 0; } }
       else if (e.st === 'wind') { e.fx = dx / d; e.fy = dy / d; if (e.t > 0.5) { e.st = 'charge'; e.t = 0; Sound.play('charge'); } }

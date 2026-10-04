@@ -13,7 +13,7 @@
 | `tools/score.py` | The music: original Rush-style pieces as step sequences (odd meters, bass, guitar, synth lead, drums). Run it, then `tools/music_to_midi.py` to refresh `music/midi/*.mid` |
 | `STORY_BIBLE.md` | Characters, chapter arc, items, the Red-Eye side quest, Arena mode |
 
-Rebuild: `python3 tools/maps.py && python3 tools/build_web.py`. Test: `NODE_PATH=$(npm root -g) node tests/web_playtest.js`, then `tests/arena_playtest.js`, `tests/ch1_depth_test.js` and `tests/redeye_test.js` the same way.
+Rebuild: `python3 tools/maps.py && python3 tools/build_web.py`. Test: `NODE_PATH=$(npm root -g) node tests/web_playtest.js`, then `tests/arena_playtest.js`, `tests/ch1_depth_test.js`, `tests/redeye_test.js` and `tests/ch2_test.js` the same way.
 
 ## Godot prototype (frozen)
 
