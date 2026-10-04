@@ -22,8 +22,13 @@
   .legend { display: flex; flex-wrap: wrap; gap: 8px 20px; color: var(--muted); }
   .legend b { color: var(--gold); font-weight: normal; }
   .pad { display: none; justify-content: space-between; align-items: center; gap: 16px; user-select: none; -webkit-user-select: none; }
-  @media (pointer: coarse) { .pad { display: flex; } }
-  .dpad { display: grid; grid-template-columns: repeat(3, 56px); grid-template-rows: repeat(3, 56px); gap: 4px; }
+  @media (pointer: coarse) { .pad { display: flex; } .legend { display: none; } }
+  .stick { position: relative; width: 150px; height: 150px; flex: none; border-radius: 50%; touch-action: none;
+    background: radial-gradient(circle, var(--panel) 0 55%, #2c2648 56% 100%); border: 2px solid var(--axe); }
+  .stick::before { content: ''; position: absolute; inset: 22%; border-radius: 50%; border: 1px dashed #4a4570; }
+  .knob { position: absolute; left: 50%; top: 50%; width: 64px; height: 64px; margin: -32px 0 0 -32px; border-radius: 50%;
+    background: radial-gradient(circle at 35% 30%, #cfefff, var(--axe) 45%, #3a6a9a); border: 2px solid #0d0d33; pointer-events: none; }
+  .stick.on .knob { box-shadow: 0 0 0 4px rgba(143,208,255,.35); }
   .btn { background: var(--panel); color: var(--ink); border: 2px solid var(--axe); font-family: var(--pixel); font-size: 12px; touch-action: none; border-radius: 4px; }
   .btn:active, .btn.on { background: var(--axe); color: var(--bg); }
   .btn:focus-visible { outline: 3px solid var(--gold); outline-offset: 2px; }
@@ -44,11 +49,7 @@
     <span><b>N</b> music</span>
   </div>
   <div class="pad" aria-label="Touch controls">
-    <div class="dpad">
-      <span></span><button class="btn" data-a="up" aria-label="Up">▲</button><span></span>
-      <button class="btn" data-a="left" aria-label="Left">◀</button><span></span><button class="btn" data-a="right" aria-label="Right">▶</button>
-      <span></span><button class="btn" data-a="down" aria-label="Down">▼</button><span></span>
-    </div>
+    <div class="stick" id="stick" aria-label="Move: drag the thumbstick"><div class="knob" id="knob"></div></div>
     <div class="ab">
       <button class="btn" data-a="horn" aria-label="Demon Horn">HORN</button>
       <button class="btn" data-a="dash" aria-label="Voodoo Dash">DASH</button>
@@ -1830,6 +1831,37 @@ const STORY = {
   quips: ['da da da... (Rush E)', 'I\'m loyal!', 'World\'s best owner!', 'Ak ak ak', 'You can\'t get rid of me', 'Penguins. Ugh.', 'Bring me THUNDER!'],
 };
 
+// Jon's personality: short lines he says on his own. Jon is based on Owen's real best friend,
+// so he's loyal, funny, bossy, and always on Owen's side. Edit or add lines freely.
+const JON = {
+  idle: ['da da da... (Rush E)', 'Owen. OWEN. We\'re burning daylight.', 'I could carve something while we wait.', 'Did you know I can recite Rush E? Because I can.', 'Standing still is how penguins get you.', 'Best friends don\'t make best friends wait.'],
+  sleepy: ['zzz...', 'zzz... five more minutes... zzz', 'zzz... ak ak ak... zzz'],
+  wake: ['I was NOT asleep.', 'Huh? I was resting my blade.', 'Okay okay, I\'m up!'],
+  kill: ['Got one!', 'Chop!', 'Teamwork!', 'Easy.', 'Ha! Nailed it!', 'That\'s my best friend!'],
+  streak: ['We are UNSTOPPABLE!', 'Three in a row! High five! ...I don\'t have hands.', 'Combo! I\'m counting!'],
+  hurt: ['Hey! Nobody hits my friend!', 'You okay?!', 'Ow ow ow. Wait, that was you.', 'Walk it off, zombie!'],
+  lowhp: ['Owen, you\'re looking extra dead.', 'Maybe drink some juice?', 'Careful! I need you!', 'Hearts. We need hearts.'],
+  thrown: ['WHEEEE!', 'I can FLY!', 'Incoming!', 'Fore!'],
+  wall: ['Ow. Wall.', 'Who put that there?', 'I meant to do that.'],
+  item: ['Ooh, shiny!', 'Put it in the pack!', 'Treasure! I love treasure!'],
+  boss: ['We did it! Best team in Norway!', 'Told you we could do it.', 'That\'s going on the carved sign.'],
+  water: ['Not the lake again...', 'I hate water. Long story.', 'Keep me away from that lake.'],
+  penguin: ['Penguins. In NORWAY.', 'Ak ak ak. Sorry. Reflex.', 'I see a penguin. I hate it.'],
+  levelup: ['I feel STRONGER!', 'Level up! I\'m basically a sword now.', 'Friendship POWER!', 'Did I get shinier? I got shinier.'],
+  spin: ['SPIN TO WIN!', 'Wheeeee-ooo!', 'Tornado mode!'],
+  area: {
+    home: 'Our room! With MY sign in it.',
+    overworld: 'Norway! Smell that? Fjords.',
+    village: 'Fjordvik! Lars has juice.',
+    cavern: 'Brr. Ice. Penguins. Ugh.',
+    barrow: 'Hank\'s tomb. Be cool.',
+    redeye: 'I don\'t like this. At all.',
+    secret_cave: 'Fluffy\'s tunnel! Good boy.',
+    astrid_house: 'Wipe your feet.',
+    bjarne_house: 'It smells like music in here.',
+  },
+};
+
 const ITEMS = {
   key: { name: 'Small Key', icon: 'key', lines: [['', 'You got a SMALL KEY! It opens one locked door in this dungeon.']] },
   bigkey: { name: 'Big Key', icon: 'bigkey', lines: [['', 'You got the BIG KEY! It opens the boss door.']] },
@@ -1876,7 +1908,35 @@ const ACTIONS = {
 const keys = {}, virt = {}, edge = {};
 const held = a => !!virt[a] || ACTIONS[a].some(c => keys[c]);
 const just = a => !!edge[a];
+// on-screen thumbstick: analog direction, plus direction "presses" so it also drives menus
+const stick = { active: false, x: 0, y: 0 };
+(function setupStick() {
+  const base = document.getElementById('stick'), knob = document.getElementById('knob');
+  if (!base) return;
+  let id = null;
+  const dirs = { left: false, right: false, up: false, down: false };
+  const move = e => {
+    const r = base.getBoundingClientRect(), cx = r.left + r.width / 2, cy = r.top + r.height / 2, max = r.width * 0.38;
+    let dx = e.clientX - cx, dy = e.clientY - cy;
+    const m = Math.hypot(dx, dy); if (m > max) { dx *= max / m; dy *= max / m; }
+    knob.style.transform = `translate(${dx}px, ${dy}px)`;
+    const nx = dx / max, ny = dy / max, mag = Math.hypot(nx, ny);
+    stick.active = mag > 0.22; stick.x = stick.active ? nx / mag : 0; stick.y = stick.active ? ny / mag : 0;
+    const want = { left: nx < -0.5, right: nx > 0.5, up: ny < -0.5, down: ny > 0.5 };
+    for (const k in want) { if (want[k] && !dirs[k]) edge[k] = true; dirs[k] = want[k]; virt[k] = want[k]; }
+  };
+  const end = e => {
+    if (e.pointerId !== id) return;
+    id = null; base.classList.remove('on'); knob.style.transform = '';
+    stick.active = false; stick.x = stick.y = 0;
+    for (const k in dirs) { dirs[k] = false; virt[k] = false; }
+  };
+  base.addEventListener('pointerdown', e => { e.preventDefault(); id = e.pointerId; base.setPointerCapture(id); base.classList.add('on'); Sound.unlock(); move(e); });
+  base.addEventListener('pointermove', e => { if (e.pointerId === id) { e.preventDefault(); move(e); } });
+  ['pointerup', 'pointercancel', 'lostpointercapture'].forEach(t => base.addEventListener(t, end));
+})();
 function inputVec() {
+  if (stick.active) return { x: stick.x, y: stick.y };
   let x = (held('right') ? 1 : 0) - (held('left') ? 1 : 0), y = (held('down') ? 1 : 0) - (held('up') ? 1 : 0);
   const m = Math.hypot(x, y);
   return m ? { x: x / m, y: y / m } : { x: 0, y: 0 };
@@ -2177,11 +2237,11 @@ const G = {
 
 function newSave() {
   return { map: 'home', x: 0, y: 0, maxHp: 6, hp: 6, kr: 0, rune: 0, potions: 0, pieces: 0,
-    items: {}, flags: {}, keys: {}, bigkeys: {}, voodoo: true };
+    items: {}, flags: {}, keys: {}, bigkeys: {}, voodoo: true, jon: { lvl: 1, xp: 0, perks: {} } };
 }
 const SAVE_KEY = 'jontuka-save-v1';
 // Stats Owen carries. Story mode uses the defaults; the Arena upgrades them.
-function baseStats() { return { dmg: 1, speed: 1, atk: 1, range: 1, pickup: 28, armor: 0, regen: 0, crit: 0, knock: 1 }; }
+function baseStats() { return { dmg: 1, speed: 1, atk: 1, range: 1, pickup: 28, armor: 0, regen: 0, crit: 0, knock: 1, swing: 1, runeKill: 1, luck: 0 }; }
 G.st = baseStats();
 function writeSave() {
   if (G.mode === 'arena') return;
@@ -2515,7 +2575,8 @@ function updatePlayer(dt) {
   p.moving = !!(v.x || v.y);
   if (p.moving) { p.fx = v.x; p.fy = v.y; p.walk += dt * 14; }
   const onIce = tileAt(p.x, p.y) === 'i';
-  const spd = 72 * G.st.speed;
+  p.boost = Math.max(0, (p.boost || 0) - dt);
+  const spd = 72 * G.st.speed * (p.boost > 0 ? 1.4 : 1);
   if (onIce) { const k = Math.min(1, 2.2 * dt); p.vx += (v.x * spd * 1.1 - p.vx) * k; p.vy += (v.y * spd * 1.1 - p.vy) * k; }
   else { p.vx = v.x * spd; p.vy = v.y * spd; }
   const hit = tryMove(p, p.vx * dt, p.vy * dt, 5, 'player');
@@ -2550,6 +2611,7 @@ function updatePlayer(dt) {
   }
 
   // actions
+  updateSpinCharge(dt);
   if (p.cd > 0) return;
   if (just('a')) {
     const f = facing4(p), px = p.x + f.x * 13, py = p.y + f.y * 13;
@@ -2592,6 +2654,7 @@ function hurtPlayer(dmg, from, force) {
   if (!force && (p.inv > 0 || p.launching || p.falling > 0 || G.state !== 'play')) return;
   if (!force && G.st.armor > 0 && Math.random() < Math.min(0.6, G.st.armor * 0.1)) { p.inv = 0.4; floatText(p.x, p.y - 18, 'BLOCK', '#9fd0ff'); Sound.play('clank'); return; }
   p.hp -= dmg; p.inv = 1; Sound.play('hurt'); G.shake = 0.15;
+  if (G.mode !== 'arena') jonOnHurt();
   if (from) { const d = Math.hypot(p.x - from.x, p.y - from.y) || 1; p.kx = (p.x - from.x) / d * 170; p.ky = (p.y - from.y) / d * 170; }
   if (p.hp > 0) return;
   // A Link to the Past death: Owen spins in place, then juice, voodoo or game over
@@ -2608,8 +2671,9 @@ function updateDying(dt) {
 function finishDeath() {
   const p = G.player, s = G.save;
   G.state = 'play';
-  if (s.potions > 0) { s.potions--; p.hp = s.maxHp; p.inv = 2; Sound.play('heart'); return say(STORY.juice); }
+  if (s.potions > 0) { s.potions--; p.hp = s.maxHp; p.inv = 2; Sound.play('heart'); if (jonHas('pep')) { p.boost = 6; return say([...STORY.juice, ['Jon', 'PEP TALK! You got this! Now RUN!']]); } return say(STORY.juice); }
   if (G.mode === 'arena') return arenaOver(false);
+  if (!s.voodoo && s.voodoo2) { s.voodoo2 = false; p.hp = s.maxHp; p.inv = 2.5; puff(p.x, p.y, '#ffd84a', 16); Sound.play('secret'); return say([['Jon', 'Best friends forever means FOREVER. Get up!']]); }
   if (s.voodoo) { s.voodoo = false; p.hp = s.maxHp; p.inv = 2.5; puff(p.x, p.y, '#9a4dd9', 16); Sound.play('secret'); return say(STORY.revive); }
   G.state = 'over'; G.menuSel = 0;
 }
@@ -2625,7 +2689,7 @@ function interact(e) {
     case 'grave':
       if (flag('grave_open')) return say(STORY.grave_open);
       return say(STORY.grave, () => {
-        setFlag('grave_open');
+        setFlag('grave_open'); jonXP(15);
         const tx = Math.floor(e.x / T), ty = Math.floor(e.y / T);
         setTile(tx, ty, '>'); setFlag(`tile:${G.mapId}:${tx},${ty}:>`);
         G.ents = G.ents.filter(o => o !== e);
@@ -2639,7 +2703,7 @@ function interact(e) {
       Sound.play('creep');
       return say(STORY.cargo_open, () => startWarp('redeye', [2, 7]));
     case 'runestone':
-      p.hp = s.maxHp; s.voodoo = true; s.cp = { map: G.mapId, x: p.x, y: p.y }; writeSave(); Sound.play('save'); puff(e.x, e.y - 6, '#7fd4ff', 12);
+      p.hp = s.maxHp; s.voodoo = true; s.voodoo2 = jonHas('bff'); s.cp = { map: G.mapId, x: p.x, y: p.y }; writeSave(); Sound.play('save'); puff(e.x, e.y - 6, '#7fd4ff', 12);
       return say(STORY.saved);
     case 'npc': { const lines = npcLines(e.id), after = G.afterTalk; G.afterTalk = null; return say(lines, after); }
     case 'shop': return buy(e);
@@ -2659,7 +2723,7 @@ function npcLines(id) {
     if (!flag('met_astrid')) return flag('got:hp_forest') ? STORY.sven_2 : STORY.sven_1;
     if (!flag('quest_sven')) { setFlag('quest_sven'); return STORY.sven_quest; }
     if (flag('got:ship') && !flag('sven_done')) {
-      setFlag('sven_done'); G.save.kr += 30; G.save.potions = Math.min(3, G.save.potions + 1);
+      setFlag('sven_done'); jonXP(20); G.save.kr += 30; G.save.potions = Math.min(3, G.save.potions + 1);
       return [...STORY.sven_thanks, ['', 'Sven gave you 30 kroner and a Lingonberry Juice!']];
     }
     if (!flag('sven_done')) return STORY.sven_waiting;
@@ -2669,7 +2733,7 @@ function npcLines(id) {
   if (id === 'bjarne') {
     if (!flag('quest_bjarne')) { setFlag('quest_bjarne'); return STORY.bjarne_quest; }
     if (flag('got:sheet') && !flag('bjarne_done')) {
-      setFlag('bjarne_done');
+      setFlag('bjarne_done'); jonXP(20);
       G.afterTalk = () => { setFlag('got:hp_bjarne'); giveItem('piece'); };
       return STORY.bjarne_thanks;
     }
@@ -2709,6 +2773,8 @@ function applyItem(id) {
 }
 function giveItem(id, after) {
   applyItem(id);
+  if (['homing', 'thunder', 'dash', 'horn', 'container'].includes(id)) jonXP(15); else jonXP(5);
+  setJonFace('excited', 2.5);
   G.player.hold = { id, t: 1.1 };
   G.state = 'hold'; Sound.play('item');
   G.afterHold = () => say(ITEMS[id].lines, () => { if (after) after(); writeSave(); });
@@ -2719,7 +2785,8 @@ function makeJon() {
   const j = { x: 0, y: 0, mode: 'follow', vx: 0, vy: 0, trav: 0, hit: [], t: 0, st: 0, base: 0, spin: 0, quip: '', qt: 0, nq: 8 };
   j.swing = a => { j.mode = 'swing'; j.st = 0; j.base = a; j.hit = []; };
   j.throw = (x, y, fx, fy) => {
-    j.mode = 'out'; j.x = x; j.y = y; j.trav = 0; j.hit = [];
+    j.mode = 'out'; j.x = x; j.y = y; j.trav = 0; j.hit = []; j.rico = false;
+    if (Math.random() < 0.25) jonSay('thrown', { cooldown: 14 });
     const l = Math.hypot(fx, fy) || 1, sp = 200 * G.st.atk; j.vx = fx / l * sp; j.vy = fy / l * sp;
     j.target = G.save.items.homing ? findTarget(x, y, fx / l, fy / l) : null;
   };
@@ -2740,14 +2807,17 @@ function updateJon(dt) {
   const j = G.jon, p = G.player;
   j.t += dt;
   const range = (G.save.items.homing ? 175 : 88) * G.st.range;
-  if (j.mode === 'follow') {
-    const tx = p.x + 10, ty = p.y - 14 + Math.sin(j.t * 3) * 2, k = Math.min(1, 8 * dt);
-    j.x += (tx - j.x) * k; j.y += (ty - j.y) * k; j.spin = 0;
+  if (j.mode === 'spin') updateSpin(dt);
+  else if (j.mode === 'follow') {
+    // asleep: he lies down next to Owen; excited: he hops
+    const hop = jonFaceNow() === 'excited' ? -Math.abs(Math.sin(j.t * 9)) * 4 : 0;
+    const tx = p.x + 10, ty = JT.asleep ? p.y + 2 : p.y - 14 + Math.sin(j.t * 3) * 2 + hop, k = Math.min(1, 8 * dt);
+    j.x += (tx - j.x) * k; j.y += (ty - j.y) * k; j.spin += ((JT.asleep ? 1.4 : 0) - j.spin) * Math.min(1, 6 * dt);
   } else if (j.mode === 'swing') {
     j.st += dt;
     const k = j.st / (0.2 / G.st.atk), a = j.base + (-1.3 + 2.6 * k);
-    j.x = p.x + Math.cos(a) * 15; j.y = p.y + Math.sin(a) * 15; j.spin = a + Math.PI / 2;
-    jonHits(1, 11, p, 'swing');
+    j.x = p.x + Math.cos(a) * 15 * G.st.swing; j.y = p.y + Math.sin(a) * 15 * G.st.swing; j.spin = a + Math.PI / 2;
+    jonHits(1, 11 * G.st.swing, p, 'swing');
     cutAt(j.x, j.y);
     if (k >= 1) j.mode = 'follow';
   } else if (j.mode === 'out') {
@@ -2757,6 +2827,7 @@ function updateJon(dt) {
     }
     j.x += j.vx * dt; j.y += j.vy * dt; j.trav += Math.hypot(j.vx, j.vy) * dt; j.spin += dt * 22;
     jonHits(1, 9, j, 'throw');
+    if (solidAt(j.x, j.y, 'jon') && Math.random() < 0.5) jonSay('wall', { cooldown: 15, face: 'worried' });
     if (cutAt(j.x, j.y) || j.trav > range || solidAt(j.x, j.y, 'jon')) { j.mode = 'back'; j.hit = []; }
   } else if (j.mode === 'back') {
     const dx = p.x - j.x, dy = p.y - j.y, d = Math.hypot(dx, dy) || 1;
@@ -2770,8 +2841,6 @@ function updateJon(dt) {
   if (j.mode === 'out' || j.mode === 'back') {
     for (const e of G.ents) if (e.kind === 'pickup' && dist(e, j) < 10) { e.x = j.x; e.y = j.y; }   // Jon fetches loot
   }
-  j.nq -= dt; j.qt = Math.max(0, j.qt - dt);
-  if (j.nq <= 0) { j.nq = rnd(12, 20); j.quip = pick(STORY.quips); j.qt = 2.5; }
 }
 function jonHits(dmg, reach, from, how) {
   const j = G.jon;
@@ -2784,6 +2853,11 @@ function jonHits(dmg, reach, from, how) {
       const blockedHit = damageEnemy(e, rollDamage(dmg), from, how);
       if (blockedHit && how === 'throw') j.mode = 'back';
       else if (!blockedHit && G.mode === 'arena') arenaOnHit(e);
+      else if (!blockedHit && how === 'throw' && jonHas('ricochet') && !j.rico) {
+        // Ricochet: bounce on to the nearest other enemy
+        const next = G.ents.filter(o => o.enemy && o.alive && o !== e && dist(o, e) < 110).sort((a, b) => dist(a, e) - dist(b, e))[0];
+        if (next) { j.rico = true; j.target = next; j.trav = 0; j.mode = 'out'; const d = dist(next, j) || 1; j.vx = (next.x - j.x) / d * 210; j.vy = (next.y - j.y) / d * 210; floatText(j.x, j.y - 8, 'RICOCHET', '#ffd84a'); }
+      }
     }
   }
 }
@@ -2843,8 +2917,10 @@ function killEnemy(e) {
   G.ents = G.ents.filter(o => o !== e);
   poof(e.x, e.y, e.boss); Sound.play('kill');
   const s = G.save;
-  if (s.items.thunder) s.rune = Math.min(RUNE_MAX, s.rune + 1);
+  if (s.items.thunder) s.rune = Math.min(RUNE_MAX, s.rune + G.st.runeKill);
   if (G.mode === 'arena') return arenaKill(e);
+  jonXP(e.boss ? 25 : e.shield ? 3 : 2); jonOnKill(e);
+  if (e.boss) setTimeout(() => jonSay('boss', { force: true, face: 'excited' }), 50);
   if (!e.boss) maybeDrop(e.x, e.y, 0.65);
   if (e.type === 'king') { G.shake = 0.6; say(STORY.king_down, checkRoomClear); return; }
   if (e.type === 'hank') { G.shake = 0.6; HK.axes = []; for (const w of G.ents.filter(o => o.type === 'wisp')) killEnemy(w); say(STORY.hank_down, () => { setFlag('d2done'); checkRoomClear(); writeSave(); }); return; }
@@ -2852,7 +2928,7 @@ function killEnemy(e) {
   checkRoomClear();
 }
 function maybeDrop(x, y, chance) {
-  if (Math.random() > chance) return;
+  if (Math.random() > chance * (1 + G.st.luck)) return;
   const r = Math.random();
   const what = r < 0.35 ? 'heart' : r < 0.75 ? 'kr1' : r < 0.9 ? 'kr5' : 'rune';
   G.ents.push({ kind: 'pickup', what, x, y, life: 9 });
@@ -2919,7 +2995,7 @@ function updatePickup(e, dt) {
   if (e.life !== undefined) { e.life -= dt; if (e.life <= 0) { G.ents = G.ents.filter(o => o !== e); return; } }
   if (e.underBush && tileAt(e.x, e.y) === 'b') return;   // still hidden under its bush
   const dp = dist(e, G.player);
-  if (G.mode === 'arena' && (dp < G.st.pickup || e.magnet)) { const k = Math.min(1, 9 * dt); e.x += (G.player.x - e.x) * k; e.y += (G.player.y - e.y) * k; }
+  if ((G.mode === 'arena' || G.st.pickup > 28) && e.kind === 'pickup' && e.what !== 'qitem' && (dp < G.st.pickup || e.magnet)) { const k = Math.min(1, 9 * dt); e.x += (G.player.x - e.x) * k; e.y += (G.player.y - e.y) * k; }
   if (dp > 11) return;
   G.ents = G.ents.filter(o => o !== e);
   const s = G.save, p = G.player;
@@ -3157,6 +3233,12 @@ const JON_ROWS = [
   '................',
 ];
 const JON_BLINK = JON_ROWS.map((r, i) => i === 3 ? '...dd.hhSSSSSSSl' : i === 4 ? '..dDDdhhSmmSmmSl' : r);
+// Jon's faces: excited (big grin), worried (brows up, wobbly mouth), sleepy (eyes shut)
+const JON_FACES = {
+  excited: JON_ROWS.map((r, i) => i === 5 ? '...dd.hhSmmmmmSl' : i === 6 ? '......hhSSmrmSSl' : r),
+  worried: JON_ROWS.map((r, i) => i === 2 ? '......hhlmSSSml.' : i === 6 ? '......hhSmSmSmSl' : r),
+  sleepy: JON_ROWS.map((r, i) => i === 3 ? '...dd.hhSSSSSSSl' : i === 4 ? '..dDDdhhSmmSmmSl' : i === 6 ? '......hhSSSmSSSl' : r),
+};
 
 // ---------------- Penguins (16 x 14) ----------------
 const PENG = {
@@ -3397,6 +3479,7 @@ function buildAll() {
     SPR[`${key}_hold`] = buildSprite(hold, pal);
   }
   SPR.jon = buildSprite(JON_ROWS, PAL_JON); SPR.jon_blink = buildSprite(JON_BLINK, PAL_JON);
+  for (const f in JON_FACES) SPR['jon_' + f] = buildSprite(JON_FACES[f], { ...PAL_JON, r: '#e05a6a' });
   SPR.jon_gold = tinted(SPR.jon, 'rgba(255,216,74,0.0)');
   for (const [key, pal] of [['peng', PAL_PENGUIN], ['pal', PAL_PAL]]) {
     for (const dir of ['down', 'up', 'side']) for (let f = 0; f < 2; f++) {
@@ -4578,6 +4661,216 @@ function drawTileCh2(c, ox, oy) {
   return true;
 }
 
+// ===== jon.js =====
+// Jon: personality (what he says and how his face looks) and growth (XP, levels, perks, milestones).
+// Jon is based on Owen's real best friend, so he grows alongside Owen as the game goes on.
+
+// ---------------- talking ----------------
+const JT = { cd: {}, line: '', t: 0, idle: 0, asleep: false, streak: 0, streakT: 0, face: 'happy', faceT: 0, lastArea: '' };
+function jonSay(cat, opts = {}) {
+  if (G.mode === 'arena' && !opts.arena) return false;
+  const now = G.t;
+  if (!opts.force && (JT.cd[cat] || 0) > now) return false;
+  if (!opts.force && JT.t > 0.6 && !opts.interrupt) return false;   // don't talk over himself
+  const pool = typeof cat === 'string' && JON[cat] ? JON[cat] : null;
+  const line = opts.line || (Array.isArray(pool) ? pick(pool) : null);
+  if (!line) return false;
+  JT.line = line; JT.t = Math.min(4, 1.6 + line.length * 0.05);
+  JT.cd[cat] = now + (opts.cooldown || 10);
+  if (opts.face) setJonFace(opts.face, 2);
+  return true;
+}
+function setJonFace(f, t) { JT.face = f; JT.faceT = t; }
+
+function updateJonTalk(dt) {
+  const p = G.player, s = G.save;
+  JT.t = Math.max(0, JT.t - dt);
+  JT.faceT = Math.max(0, JT.faceT - dt);
+  JT.streakT = Math.max(0, JT.streakT - dt); if (JT.streakT <= 0) JT.streak = 0;
+  if (G.state !== 'play' || G.mode === 'arena') return;
+  // idling: he gets chatty, then bored, then falls asleep
+  if (p.moving || G.jon.mode !== 'follow') {
+    if (JT.asleep) { JT.asleep = false; jonSay('wake', { force: true }); setJonFace('excited', 1.5); }
+    JT.idle = 0;
+  } else {
+    JT.idle += dt;
+    if (JT.idle > 9 && JT.idle - dt <= 9) jonSay('idle', { cooldown: 6 });
+    if (JT.idle > 22 && !JT.asleep) { JT.asleep = true; jonSay('sleepy', { force: true }); }
+    if (JT.asleep && Math.floor(JT.idle) % 6 === 0 && Math.floor(JT.idle - dt) % 6 !== 0) jonSay('sleepy', { force: true });
+  }
+  // worried when Owen is low
+  if (p.hp <= 2 && s.maxHp > 2) { if (JT.faceT <= 0) setJonFace('worried', 0.5); jonSay('lowhp', { cooldown: 25, face: 'worried' }); }
+  // first time in each area
+  const area = G.map.dungeon || G.map.interior || G.map.dark ? G.mapId : (G.scr.y === 1 && G.scr.x <= 1 ? 'village' : 'overworld');
+  if (area !== JT.lastArea) {
+    JT.lastArea = area;
+    const line = JON.area[area];
+    if (line && !flag('jonarea:' + area)) { setFlag('jonarea:' + area); jonSay('area', { line, force: true, face: 'excited' }); }
+  }
+  // near water or a penguin
+  if (G.mapId === 'overworld' && tileAt(p.x + p.fx * 20, p.y + p.fy * 20) === '~') jonSay('water', { cooldown: 40, face: 'worried' });
+  if (G.ents.some(e => e.type === 'penguin' && e.alive && dist(e, p) < 70)) jonSay('penguin', { cooldown: 45 });
+}
+// event hooks used by the rest of the game
+function jonOnKill(e) {
+  JT.streak++; JT.streakT = 2.5;
+  if (e.boss) return;
+  if (JT.streak === 3) jonSay('streak', { force: true, face: 'excited', cooldown: 8 });
+  else if (Math.random() < 0.3) jonSay('kill', { cooldown: 7, face: 'excited' });
+}
+function jonOnHurt() { setJonFace('worried', 1.2); jonSay('hurt', { cooldown: 8, interrupt: true }); }
+
+function jonFaceNow() {
+  if (JT.asleep) return 'sleepy';
+  if (JT.faceT > 0) return JT.face;
+  return 'happy';
+}
+
+function drawJonBubble(x, y) {
+  if (JT.t <= 0 || !JT.line || G.state !== 'play') return;
+  ctx.font = FONT;
+  const lines = wrap(JT.line, 150).slice(0, 3);
+  const w = Math.max(...lines.map(l => Math.ceil(ctx.measureText(l).width))) + 8, h = lines.length * 10 + 4;
+  const bx = clamp(Math.round(x - w / 2), 2, VW - w - 2), by = clamp(Math.round(y - 22 - h), 24, VH - h - 4);
+  ctx.globalAlpha = Math.min(1, JT.t * 3);
+  R(bx - 1, by - 1, w + 2, h + 2, OUTLINE); R(bx, by, w, h, '#fffbe8');
+  const tx = clamp(Math.round(x), bx + 4, bx + w - 6);
+  R(tx, by + h, 4, 2, '#fffbe8'); R(tx + 1, by + h + 2, 2, 2, '#fffbe8'); R(tx - 1, by + h, 1, 2, OUTLINE); R(tx + 4, by + h, 1, 2, OUTLINE);
+  lines.forEach((l, i) => text(l, bx + 4, by + 10 + i * 10, '#2a1a10', 'left', false));
+  ctx.globalAlpha = 1;
+}
+
+// ---------------- growth ----------------
+const JON_MAX = 10;
+const jonNeed = lvl => 20 + (lvl - 1) * 16;
+const JON_PERKS = [
+  { id: 'edge', name: 'Sharper Edge', desc: '+20% damage', max: 3, apply: st => { st.dmg += 0.2; } },
+  { id: 'wide', name: 'Wide Swing', desc: 'Bigger swing arc and reach', max: 2, apply: st => { st.swing += 0.2; } },
+  { id: 'fast', name: 'Fast Hands', desc: '+15% attack speed', max: 3, apply: st => { st.atk += 0.15; } },
+  { id: 'flight', name: 'Long Flight', desc: '+20% throw range', max: 2, apply: st => { st.range += 0.2; } },
+  { id: 'rune', name: 'Rune Buddy', desc: 'Rune meter fills faster', max: 2, apply: st => { st.runeKill += 1; } },
+  { id: 'magnet', name: 'Loot Magnet', desc: 'Grab loot from farther', max: 2, apply: st => { st.pickup += 18; } },
+  { id: 'lucky', name: 'Lucky Axe', desc: 'Enemies drop more', max: 2, apply: st => { st.luck += 0.25; } },
+  { id: 'crit', name: 'Critical Chop', desc: '+8% chance of double damage', max: 3, apply: st => { st.crit += 0.08; } },
+];
+const JON_MILESTONES = [
+  { lvl: 3, id: 'spin', name: 'Spin Attack', desc: 'Hold Z after a swing, then let go' },
+  { lvl: 5, id: 'pep', name: 'Pep Talk', desc: 'Juice heals AND gives a speed boost' },
+  { lvl: 7, id: 'ricochet', name: 'Ricochet', desc: 'Thrown Jon bounces to a 2nd enemy' },
+  { lvl: 10, id: 'bff', name: 'Best Friends Forever', desc: 'A second revive charge' },
+];
+function jonData() { if (!G.save.jon) G.save.jon = { lvl: 1, xp: 0, perks: {} }; return G.save.jon; }
+const jonHas = id => G.mode !== 'arena' && JON_MILESTONES.some(m => m.id === id && jonData().lvl >= m.lvl);
+
+// story-mode stats come from Jon's perks
+function applyJonPerks() {
+  G.st = baseStats();
+  const d = jonData();
+  for (const pk of JON_PERKS) for (let i = 0; i < (d.perks[pk.id] || 0); i++) pk.apply(G.st);
+}
+function jonXP(n) {
+  if (G.mode === 'arena' || !G.save) return;
+  const d = jonData();
+  if (d.lvl >= JON_MAX) return;
+  d.xp += n;
+  floatText(G.jon.x, G.jon.y - 10, '+' + n + ' XP', '#9be08a');
+  if (d.xp >= jonNeed(d.lvl)) { d.pending = (d.pending || 0) + 1; }
+}
+function maybeJonLevelUp() {
+  const d = jonData();
+  if (!d.pending || G.state !== 'play') return;
+  d.pending--; d.xp -= jonNeed(d.lvl); d.lvl++;
+  if (d.lvl >= JON_MAX) d.xp = 0;
+  Sound.play('item'); G.jon.spin = 0;
+  setJonFace('excited', 3);
+  const ms = JON_MILESTONES.find(m => m.lvl === d.lvl);
+  const avail = JON_PERKS.filter(pk => (d.perks[pk.id] || 0) < pk.max);
+  G.jonChoices = [...avail].sort(() => Math.random() - 0.5).slice(0, 3);
+  G.jonMilestone = ms || null;
+  G.menuSel = 0;
+  G.state = G.jonChoices.length ? 'jonlevel' : 'play';
+  if (ms && ms.id === 'bff') G.save.voodoo2 = true;
+}
+function updateJonLevel() {
+  const n = G.jonChoices.length;
+  if (just('up')) { G.menuSel = (G.menuSel + n - 1) % n; Sound.play('menu'); }
+  if (just('down')) { G.menuSel = (G.menuSel + 1) % n; Sound.play('menu'); }
+  if (just('a') || just('tap')) {
+    const pk = G.jonChoices[G.menuSel], d = jonData();
+    d.perks[pk.id] = (d.perks[pk.id] || 0) + 1;
+    applyJonPerks(); Sound.play('secret');
+    G.state = 'play'; G.player.cd = 0.3;
+    jonSay('levelup', { force: true, face: 'excited' });
+    writeSave();
+  }
+}
+function drawJonLevel() {
+  if (G.state !== 'jonlevel') return;
+  const d = jonData();
+  R(0, 0, VW, VH, 'rgba(5,5,20,.88)'); R(10, 14, 236, 196, '#ffd84a'); R(12, 16, 232, 192, '#14102a');
+  drawJonSprite(40, 44, Math.sin(G.t * 6) * 0.4, false, 'excited');
+  text('JON LEVEL UP!', 64, 36, '#ffd84a');
+  text('Jon is now level ' + d.lvl, 64, 50, '#fff', 'left', false);
+  let y = 72;
+  if (G.jonMilestone) { text('NEW: ' + G.jonMilestone.name, 22, y, '#9be08a'); text(G.jonMilestone.desc, 22, y + 11, '#cfe', 'left', false); y += 28; }
+  text('Pick a perk:', 22, y, '#ffe64d'); y += 8;
+  G.jonChoices.forEach((pk, i) => {
+    const yy = y + i * 26, sel = i === G.menuSel, have = d.perks[pk.id] || 0;
+    R(20, yy, 216, 22, sel ? '#3a2e5a' : '#1e1838'); if (sel) R(20, yy, 3, 22, '#9be08a');
+    text(pk.name + (have ? ` (${have + 1}/${pk.max})` : ''), 28, yy + 10, sel ? '#9be08a' : '#fff');
+    text(pk.desc, 28, yy + 19, '#a79fc4', 'left', false);
+  });
+}
+// JON page of the gear menu
+function drawJonPage() {
+  const d = jonData();
+  R(0, 0, VW, VH, 'rgba(5,5,20,.92)'); R(8, 8, 240, 208, '#ffd84a'); R(10, 10, 236, 204, '#0d0d33');
+  text('JON', 20, 26, '#ffe64d'); text('◀ GEAR', 236, 26, '#8a8ab0', 'right', false);
+  drawJonSprite(36, 56, Math.sin(G.t * 2) * 0.2, G.t % 3.2 < 0.14, jonFaceNow());
+  text('Level ' + d.lvl + (d.lvl >= JON_MAX ? ' (max)' : ''), 56, 48, '#fff');
+  text("Owen's best friend", 56, 60, '#c8e8ff', 'left', false);
+  R(56, 66, 120, 6, '#000'); R(57, 67, d.lvl >= JON_MAX ? 118 : Math.round(118 * Math.min(1, d.xp / jonNeed(d.lvl))), 4, '#9be08a');
+  text(d.lvl >= JON_MAX ? 'MAX' : d.xp + '/' + jonNeed(d.lvl) + ' XP', 182, 72, '#9be08a', 'left', false);
+  text('ABILITIES', 20, 92, '#ffe64d');
+  JON_MILESTONES.forEach((m, i) => { const got = d.lvl >= m.lvl; text((got ? '✓ ' : 'Lv' + m.lvl + ' ') + m.name, 20, 104 + i * 11, got ? '#9be08a' : '#55577a', 'left', false); });
+  text('PERKS', 20, 156, '#ffe64d');
+  const owned = JON_PERKS.filter(pk => d.perks[pk.id]).map(pk => pk.name + (d.perks[pk.id] > 1 ? ' x' + d.perks[pk.id] : ''));
+  wrap(owned.join(', ') || 'None yet. Level Jon up by fighting, finding secrets and finishing quests.', 214).slice(0, 4).forEach((l, i) => text(l, 20, 168 + i * 10, '#cfe', 'left', false));
+}
+
+// ---------------- Spin Attack (unlocked at level 3) ----------------
+function updateSpinCharge(dt) {
+  const p = G.player, j = G.jon;
+  if (!jonHas('spin')) return;
+  if (held('a') && j.mode === 'follow' && !p.dashing && p.cd <= 0) {
+    p.charge = (p.charge || 0) + dt;
+    if (p.charge > 0.55 && p.charge - dt <= 0.55) { Sound.play('switch'); setJonFace('excited', 1); }
+  } else {
+    if ((p.charge || 0) > 0.55 && j.mode === 'follow' && !held('a')) {
+      j.mode = 'spin'; j.st = 0; j.hit = []; Sound.play('throw'); Sound.play('swing');
+      if (Math.random() < 0.5) jonSay('spin', { force: true, face: 'excited' });
+    }
+    p.charge = 0;
+  }
+}
+function updateSpin(dt) {
+  const j = G.jon, p = G.player;
+  j.st += dt;
+  const k = j.st / 0.36, a = -Math.PI / 2 + k * Math.PI * 2.2;
+  const r = 17 * G.st.swing;
+  j.x = p.x + Math.cos(a) * r; j.y = p.y + Math.sin(a) * r; j.spin = a + Math.PI / 2;
+  jonHits(2, 12, p, 'swing'); cutAt(j.x, j.y);
+  if (k >= 1) j.mode = 'follow';
+}
+function drawSpinFx() {
+  const p = G.player, j = G.jon;
+  if (j.mode === 'spin') {
+    const x = p.x - G.cam.x, y = p.y - G.cam.y;
+    ctx.strokeStyle = 'rgba(160,220,255,0.6)'; ctx.lineWidth = 6; ctx.beginPath(); ctx.arc(x, y, 17 * G.st.swing, 0, Math.PI * 2); ctx.stroke();
+  }
+  if ((p.charge || 0) > 0.55 && Math.floor(G.t * 12) % 2) { drawTwinkle(j.x - G.cam.x + 6, j.y - G.cam.y - 10, 1); }
+}
+
 // ===== sprites.js =====
 // Pixel art drawn in code. Everything is centered on (x, y) = feet-ish center.
 
@@ -4609,8 +4902,8 @@ function drawTwinkle(x, y, big) {
   R(x, y - (big ? 3 : 2), 1, big ? 7 : 5, '#ffffff'); R(x - (big ? 3 : 2), y, big ? 7 : 5, 1, '#ffffff'); R(x, y, 1, 1, '#ffe066');
 }
 
-function drawJonSprite(x, y, spin, blink) {
-  const img = blink ? SPR.jon_blink : SPR.jon;
+function drawJonSprite(x, y, spin, blink, face) {
+  const img = blink && face !== 'sleepy' ? SPR.jon_blink : (face && SPR['jon_' + face]) || SPR.jon;
   ctx.save(); ctx.translate(Math.round(x), Math.round(y)); ctx.rotate(spin);
   if (G.save && G.save.items.homing) { ctx.globalAlpha = 0.25 + 0.1 * Math.sin(G.t * 6); ctx.fillStyle = '#ffd84a'; ctx.beginPath(); ctx.arc(1, -2, 10, 0, Math.PI * 2); ctx.fill(); ctx.globalAlpha = 1; }
   ctx.drawImage(img, -img.width / 2 + 1, -img.height / 2);
@@ -4632,12 +4925,10 @@ function drawJon() {
   if (j.mode === 'follow') shadowAt(x, y + 18, 0.6);
   (j.trail || []).forEach((tr, i) => { ctx.globalAlpha = 0.12 + i * 0.07; drawJonSprite(tr.x - G.cam.x, tr.y - G.cam.y, tr.spin); });
   ctx.globalAlpha = 1;
-  drawJonSprite(x, y, j.spin, j.t % 3.2 < 0.14);
-  if (j.qt > 0 && j.quip && G.state === 'play') {
-    ctx.font = FONT;
-    const w = Math.ceil(ctx.measureText(j.quip).width) + 6, bx = clamp(x - w / 2, 2, VW - w - 2), by = clamp(y - 32, 24, VH - 14);
-    R(bx, by, w, 12, 'rgba(10,10,32,.85)'); text(j.quip, bx + 3, by + 9, '#ffffb3', 'left', false);
-  }
+  drawSpinFx();
+  drawJonSprite(x, y, j.spin, j.t % 3.2 < 0.14, jonFaceNow());
+  if (JT.asleep && G.state === 'play') { const k = (G.t * 0.7) % 1; text('z', x + 8 + k * 6, y - 8 - k * 12, `rgba(255,255,255,${1 - k})`, 'left', false); }
+  drawJonBubble(x, y);
 }
 
 function drawEnemy(e) {
@@ -5235,9 +5526,9 @@ function drawMenu() {
   const s = G.save;
   R(0, 0, VW, VH, 'rgba(5,5,20,.92)');
   R(8, 8, 240, 208, '#ffd84a'); R(10, 10, 236, 204, '#0d0d33');
-  text('GEAR', 20, 26, '#ffe64d');
+  text('GEAR', 20, 26, '#ffe64d'); text('JON ▶', 236, 38 + 12, '#9be08a', 'right', false);
   const slots = [
-    ['Jon (swing Z)', 'homing', true, () => drawJonSprite(30, 48, 0)],
+    ['Jon Lv' + jonData().lvl + ' (swing Z)', 'homing', true, () => drawJonSprite(30, 44, 0, false, jonFaceNow())],
     ['Homing Jon (throw X)', 'homing', !!s.items.homing],
     ['Thunder Rune (C)', 'thunder', !!s.items.thunder],
     ['Lingonberry Juice x' + s.potions, 'juice', s.potions > 0],
@@ -5350,8 +5641,8 @@ function nextFlightPage() {
 // State machine and main loop.
 
 function newGame() {
-  G.mode = 'story'; G.st = baseStats();
-  G.save = newSave();
+  G.mode = 'story';
+  G.save = newSave(); applyJonPerks();
   G.player = makePlayer(); G.jon = makeJon();
   const st = MAPS.home.ents.find(e => e.t === 'start').at;
   G.state = 'play';
@@ -5359,8 +5650,8 @@ function newGame() {
   say(STORY.intro);
 }
 function continueGame(fromCheckpoint) {
-  G.mode = 'story'; G.st = baseStats();
-  G.save = readSave() || newSave();
+  G.mode = 'story';
+  G.save = readSave() || newSave(); applyJonPerks();
   G.player = makePlayer(); G.jon = makeJon();
   G.player.hp = G.save.maxHp;
   G.state = 'play';
@@ -5435,10 +5726,14 @@ function update(dt) {
       if (G.player.hold.t <= 0) { G.player.hold = null; G.state = 'play'; G.afterHold(); }
       return;
     case 'warp': updateWarp(dt); return;
-    case 'menu': if (just('menu') || just('a') || just('tap')) { G.state = 'play'; Sound.play('menu'); } return;
+    case 'menu':
+      if (just('left') || just('right')) { G.menuPage = G.menuPage ? 0 : 1; Sound.play('menu'); }
+      if (just('menu') || just('a') || just('tap')) { G.state = 'play'; Sound.play('menu'); }
+      return;
     case 'over':
       if (just('a') || just('menu') || just('tap')) { continueGame(true); }
       return;
+    case 'jonlevel': updateJonLevel(); return;
     case 'levelup': case 'shop': case 'arenapause': case 'arenaover': updateArenaMenus(); return;
     case 'thunder': updateThunder(dt); updateFx(dt); return;
     case 'dying': updateDying(dt); updateFx(dt); return;
@@ -5453,6 +5748,9 @@ function update(dt) {
   updateJon(dt);
   if (G.mode === 'arena') { updateArena(dt); if (G.state !== 'play') return; }
   if (G.map.redeye) updateRedeye(dt);
+  updateJonTalk(dt);
+  maybeJonLevelUp();
+  if (G.state !== 'play') return;
   if (HK.axes.length) updateHankAxes(dt);
   for (const e of G.ents.slice()) {
     if (e.kind === 'enemy' && e.alive) { if (e.slow > 0) { e.slow -= dt; updateEnemy(e, dt * 0.5); } else updateEnemy(e, dt); }
@@ -5490,7 +5788,8 @@ function render() {
   if (G.state === 'warp') { ctx.globalAlpha = clamp(1 - Math.abs(G.warp.t - 0.35) / 0.35, 0, 1); R(0, 0, VW, VH, '#000'); ctx.globalAlpha = 1; }
   if (G.bannerT > 0) { R(0, 92, VW, 34, 'rgba(0,0,0,.8)'); text(G.banner, VW / 2, 113, '#ffd84a', 'center'); }
   if (G.state === 'talk') drawTalk();
-  if (G.state === 'menu') drawMenu();
+  if (G.state === 'menu') { if (G.menuPage) drawJonPage(); else drawMenu(); }
+  drawJonLevel();
   drawArenaMenus();
   if (G.state === 'over') {
     R(0, 0, VW, VH, 'rgba(40,0,0,.8)');

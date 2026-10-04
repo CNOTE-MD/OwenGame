@@ -28,8 +28,8 @@ function drawTwinkle(x, y, big) {
   R(x, y - (big ? 3 : 2), 1, big ? 7 : 5, '#ffffff'); R(x - (big ? 3 : 2), y, big ? 7 : 5, 1, '#ffffff'); R(x, y, 1, 1, '#ffe066');
 }
 
-function drawJonSprite(x, y, spin, blink) {
-  const img = blink ? SPR.jon_blink : SPR.jon;
+function drawJonSprite(x, y, spin, blink, face) {
+  const img = blink && face !== 'sleepy' ? SPR.jon_blink : (face && SPR['jon_' + face]) || SPR.jon;
   ctx.save(); ctx.translate(Math.round(x), Math.round(y)); ctx.rotate(spin);
   if (G.save && G.save.items.homing) { ctx.globalAlpha = 0.25 + 0.1 * Math.sin(G.t * 6); ctx.fillStyle = '#ffd84a'; ctx.beginPath(); ctx.arc(1, -2, 10, 0, Math.PI * 2); ctx.fill(); ctx.globalAlpha = 1; }
   ctx.drawImage(img, -img.width / 2 + 1, -img.height / 2);
@@ -51,12 +51,10 @@ function drawJon() {
   if (j.mode === 'follow') shadowAt(x, y + 18, 0.6);
   (j.trail || []).forEach((tr, i) => { ctx.globalAlpha = 0.12 + i * 0.07; drawJonSprite(tr.x - G.cam.x, tr.y - G.cam.y, tr.spin); });
   ctx.globalAlpha = 1;
-  drawJonSprite(x, y, j.spin, j.t % 3.2 < 0.14);
-  if (j.qt > 0 && j.quip && G.state === 'play') {
-    ctx.font = FONT;
-    const w = Math.ceil(ctx.measureText(j.quip).width) + 6, bx = clamp(x - w / 2, 2, VW - w - 2), by = clamp(y - 32, 24, VH - 14);
-    R(bx, by, w, 12, 'rgba(10,10,32,.85)'); text(j.quip, bx + 3, by + 9, '#ffffb3', 'left', false);
-  }
+  drawSpinFx();
+  drawJonSprite(x, y, j.spin, j.t % 3.2 < 0.14, jonFaceNow());
+  if (JT.asleep && G.state === 'play') { const k = (G.t * 0.7) % 1; text('z', x + 8 + k * 6, y - 8 - k * 12, `rgba(255,255,255,${1 - k})`, 'left', false); }
+  drawJonBubble(x, y);
 }
 
 function drawEnemy(e) {

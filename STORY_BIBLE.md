@@ -15,7 +15,7 @@ Owen fell into that lake while running from a possessed penguin, and Jon found h
 | Character | Who they are | Voice |
 |---|---|---|
 | **Owen** | The narrator. Viking blood, undead voodoo zombie, reluctant hero. Keeps trying to get rid of Jon. | Dry, deadpan, panics internally ("DEMON!!" my mind screamed) |
-| **Jon (Jöntuka)** | Flying, talking, singing magical Viking axe. Recites Rush E from memory. Carves gifts. Makes penguin noises at night to wake Owen up. | Bossy, impatient, proud, secretly loyal |
+| **Jon (Jöntuka)** | Flying, talking, singing magical Viking axe, based on Owen's real best friend Jon. Recites Rush E from memory. Carves gifts. Makes penguin noises at night to wake Owen up. Grows with Owen: levels 1–10, perks, and abilities (Spin Attack, Pep Talk, Ricochet, Best Friends Forever). Always on Owen's side; never the butt of the joke. His lines live in `web/src/story.js` under `JON`. | Bossy, impatient, proud, loyal, funny |
 | **Walter the Wonderful** | The smith who forged Jon. Nobody remembers his real name; every NPC guesses a different one. Pays off in Walter's Forge: his real name is **Pickles**. (Secret until chapter 3.) | Only heard in carvings and memories |
 | **Elder Astrid** | Fjordvik's village elder. Keeper of the old stories. | Blunt, a bit spooky |
 | **Lars** | Market seller. Lingonberry juice, rune shards. | Cheerful salesman |

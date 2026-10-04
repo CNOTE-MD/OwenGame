@@ -1,8 +1,8 @@
 // State machine and main loop.
 
 function newGame() {
-  G.mode = 'story'; G.st = baseStats();
-  G.save = newSave();
+  G.mode = 'story';
+  G.save = newSave(); applyJonPerks();
   G.player = makePlayer(); G.jon = makeJon();
   const st = MAPS.home.ents.find(e => e.t === 'start').at;
   G.state = 'play';
@@ -10,8 +10,8 @@ function newGame() {
   say(STORY.intro);
 }
 function continueGame(fromCheckpoint) {
-  G.mode = 'story'; G.st = baseStats();
-  G.save = readSave() || newSave();
+  G.mode = 'story';
+  G.save = readSave() || newSave(); applyJonPerks();
   G.player = makePlayer(); G.jon = makeJon();
   G.player.hp = G.save.maxHp;
   G.state = 'play';
@@ -86,10 +86,14 @@ function update(dt) {
       if (G.player.hold.t <= 0) { G.player.hold = null; G.state = 'play'; G.afterHold(); }
       return;
     case 'warp': updateWarp(dt); return;
-    case 'menu': if (just('menu') || just('a') || just('tap')) { G.state = 'play'; Sound.play('menu'); } return;
+    case 'menu':
+      if (just('left') || just('right')) { G.menuPage = G.menuPage ? 0 : 1; Sound.play('menu'); }
+      if (just('menu') || just('a') || just('tap')) { G.state = 'play'; Sound.play('menu'); }
+      return;
     case 'over':
       if (just('a') || just('menu') || just('tap')) { continueGame(true); }
       return;
+    case 'jonlevel': updateJonLevel(); return;
     case 'levelup': case 'shop': case 'arenapause': case 'arenaover': updateArenaMenus(); return;
     case 'thunder': updateThunder(dt); updateFx(dt); return;
     case 'dying': updateDying(dt); updateFx(dt); return;
@@ -104,6 +108,9 @@ function update(dt) {
   updateJon(dt);
   if (G.mode === 'arena') { updateArena(dt); if (G.state !== 'play') return; }
   if (G.map.redeye) updateRedeye(dt);
+  updateJonTalk(dt);
+  maybeJonLevelUp();
+  if (G.state !== 'play') return;
   if (HK.axes.length) updateHankAxes(dt);
   for (const e of G.ents.slice()) {
     if (e.kind === 'enemy' && e.alive) { if (e.slow > 0) { e.slow -= dt; updateEnemy(e, dt * 0.5); } else updateEnemy(e, dt); }
@@ -141,7 +148,8 @@ function render() {
   if (G.state === 'warp') { ctx.globalAlpha = clamp(1 - Math.abs(G.warp.t - 0.35) / 0.35, 0, 1); R(0, 0, VW, VH, '#000'); ctx.globalAlpha = 1; }
   if (G.bannerT > 0) { R(0, 92, VW, 34, 'rgba(0,0,0,.8)'); text(G.banner, VW / 2, 113, '#ffd84a', 'center'); }
   if (G.state === 'talk') drawTalk();
-  if (G.state === 'menu') drawMenu();
+  if (G.state === 'menu') { if (G.menuPage) drawJonPage(); else drawMenu(); }
+  drawJonLevel();
   drawArenaMenus();
   if (G.state === 'over') {
     R(0, 0, VW, VH, 'rgba(40,0,0,.8)');

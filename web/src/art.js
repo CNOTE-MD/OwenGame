@@ -178,6 +178,12 @@ const JON_ROWS = [
   '................',
 ];
 const JON_BLINK = JON_ROWS.map((r, i) => i === 3 ? '...dd.hhSSSSSSSl' : i === 4 ? '..dDDdhhSmmSmmSl' : r);
+// Jon's faces: excited (big grin), worried (brows up, wobbly mouth), sleepy (eyes shut)
+const JON_FACES = {
+  excited: JON_ROWS.map((r, i) => i === 5 ? '...dd.hhSmmmmmSl' : i === 6 ? '......hhSSmrmSSl' : r),
+  worried: JON_ROWS.map((r, i) => i === 2 ? '......hhlmSSSml.' : i === 6 ? '......hhSmSmSmSl' : r),
+  sleepy: JON_ROWS.map((r, i) => i === 3 ? '...dd.hhSSSSSSSl' : i === 4 ? '..dDDdhhSmmSmmSl' : i === 6 ? '......hhSSSmSSSl' : r),
+};
 
 // ---------------- Penguins (16 x 14) ----------------
 const PENG = {
@@ -418,6 +424,7 @@ function buildAll() {
     SPR[`${key}_hold`] = buildSprite(hold, pal);
   }
   SPR.jon = buildSprite(JON_ROWS, PAL_JON); SPR.jon_blink = buildSprite(JON_BLINK, PAL_JON);
+  for (const f in JON_FACES) SPR['jon_' + f] = buildSprite(JON_FACES[f], { ...PAL_JON, r: '#e05a6a' });
   SPR.jon_gold = tinted(SPR.jon, 'rgba(255,216,74,0.0)');
   for (const [key, pal] of [['peng', PAL_PENGUIN], ['pal', PAL_PAL]]) {
     for (const dir of ['down', 'up', 'side']) for (let f = 0; f < 2; f++) {

@@ -103,7 +103,8 @@ function updatePlayer(dt) {
   p.moving = !!(v.x || v.y);
   if (p.moving) { p.fx = v.x; p.fy = v.y; p.walk += dt * 14; }
   const onIce = tileAt(p.x, p.y) === 'i';
-  const spd = 72 * G.st.speed;
+  p.boost = Math.max(0, (p.boost || 0) - dt);
+  const spd = 72 * G.st.speed * (p.boost > 0 ? 1.4 : 1);
   if (onIce) { const k = Math.min(1, 2.2 * dt); p.vx += (v.x * spd * 1.1 - p.vx) * k; p.vy += (v.y * spd * 1.1 - p.vy) * k; }
   else { p.vx = v.x * spd; p.vy = v.y * spd; }
   const hit = tryMove(p, p.vx * dt, p.vy * dt, 5, 'player');
@@ -138,6 +139,7 @@ function updatePlayer(dt) {
   }
 
   // actions
+  updateSpinCharge(dt);
   if (p.cd > 0) return;
   if (just('a')) {
     const f = facing4(p), px = p.x + f.x * 13, py = p.y + f.y * 13;
@@ -180,6 +182,7 @@ function hurtPlayer(dmg, from, force) {
   if (!force && (p.inv > 0 || p.launching || p.falling > 0 || G.state !== 'play')) return;
   if (!force && G.st.armor > 0 && Math.random() < Math.min(0.6, G.st.armor * 0.1)) { p.inv = 0.4; floatText(p.x, p.y - 18, 'BLOCK', '#9fd0ff'); Sound.play('clank'); return; }
   p.hp -= dmg; p.inv = 1; Sound.play('hurt'); G.shake = 0.15;
+  if (G.mode !== 'arena') jonOnHurt();
   if (from) { const d = Math.hypot(p.x - from.x, p.y - from.y) || 1; p.kx = (p.x - from.x) / d * 170; p.ky = (p.y - from.y) / d * 170; }
   if (p.hp > 0) return;
   // A Link to the Past death: Owen spins in place, then juice, voodoo or game over
@@ -196,8 +199,9 @@ function updateDying(dt) {
 function finishDeath() {
   const p = G.player, s = G.save;
   G.state = 'play';
-  if (s.potions > 0) { s.potions--; p.hp = s.maxHp; p.inv = 2; Sound.play('heart'); return say(STORY.juice); }
+  if (s.potions > 0) { s.potions--; p.hp = s.maxHp; p.inv = 2; Sound.play('heart'); if (jonHas('pep')) { p.boost = 6; return say([...STORY.juice, ['Jon', 'PEP TALK! You got this! Now RUN!']]); } return say(STORY.juice); }
   if (G.mode === 'arena') return arenaOver(false);
+  if (!s.voodoo && s.voodoo2) { s.voodoo2 = false; p.hp = s.maxHp; p.inv = 2.5; puff(p.x, p.y, '#ffd84a', 16); Sound.play('secret'); return say([['Jon', 'Best friends forever means FOREVER. Get up!']]); }
   if (s.voodoo) { s.voodoo = false; p.hp = s.maxHp; p.inv = 2.5; puff(p.x, p.y, '#9a4dd9', 16); Sound.play('secret'); return say(STORY.revive); }
   G.state = 'over'; G.menuSel = 0;
 }
@@ -213,7 +217,7 @@ function interact(e) {
     case 'grave':
       if (flag('grave_open')) return say(STORY.grave_open);
       return say(STORY.grave, () => {
-        setFlag('grave_open');
+        setFlag('grave_open'); jonXP(15);
         const tx = Math.floor(e.x / T), ty = Math.floor(e.y / T);
         setTile(tx, ty, '>'); setFlag(`tile:${G.mapId}:${tx},${ty}:>`);
         G.ents = G.ents.filter(o => o !== e);
@@ -227,7 +231,7 @@ function interact(e) {
       Sound.play('creep');
       return say(STORY.cargo_open, () => startWarp('redeye', [2, 7]));
     case 'runestone':
-      p.hp = s.maxHp; s.voodoo = true; s.cp = { map: G.mapId, x: p.x, y: p.y }; writeSave(); Sound.play('save'); puff(e.x, e.y - 6, '#7fd4ff', 12);
+      p.hp = s.maxHp; s.voodoo = true; s.voodoo2 = jonHas('bff'); s.cp = { map: G.mapId, x: p.x, y: p.y }; writeSave(); Sound.play('save'); puff(e.x, e.y - 6, '#7fd4ff', 12);
       return say(STORY.saved);
     case 'npc': { const lines = npcLines(e.id), after = G.afterTalk; G.afterTalk = null; return say(lines, after); }
     case 'shop': return buy(e);
@@ -247,7 +251,7 @@ function npcLines(id) {
     if (!flag('met_astrid')) return flag('got:hp_forest') ? STORY.sven_2 : STORY.sven_1;
     if (!flag('quest_sven')) { setFlag('quest_sven'); return STORY.sven_quest; }
     if (flag('got:ship') && !flag('sven_done')) {
-      setFlag('sven_done'); G.save.kr += 30; G.save.potions = Math.min(3, G.save.potions + 1);
+      setFlag('sven_done'); jonXP(20); G.save.kr += 30; G.save.potions = Math.min(3, G.save.potions + 1);
       return [...STORY.sven_thanks, ['', 'Sven gave you 30 kroner and a Lingonberry Juice!']];
     }
     if (!flag('sven_done')) return STORY.sven_waiting;
@@ -257,7 +261,7 @@ function npcLines(id) {
   if (id === 'bjarne') {
     if (!flag('quest_bjarne')) { setFlag('quest_bjarne'); return STORY.bjarne_quest; }
     if (flag('got:sheet') && !flag('bjarne_done')) {
-      setFlag('bjarne_done');
+      setFlag('bjarne_done'); jonXP(20);
       G.afterTalk = () => { setFlag('got:hp_bjarne'); giveItem('piece'); };
       return STORY.bjarne_thanks;
     }
@@ -297,6 +301,8 @@ function applyItem(id) {
 }
 function giveItem(id, after) {
   applyItem(id);
+  if (['homing', 'thunder', 'dash', 'horn', 'container'].includes(id)) jonXP(15); else jonXP(5);
+  setJonFace('excited', 2.5);
   G.player.hold = { id, t: 1.1 };
   G.state = 'hold'; Sound.play('item');
   G.afterHold = () => say(ITEMS[id].lines, () => { if (after) after(); writeSave(); });
@@ -307,7 +313,8 @@ function makeJon() {
   const j = { x: 0, y: 0, mode: 'follow', vx: 0, vy: 0, trav: 0, hit: [], t: 0, st: 0, base: 0, spin: 0, quip: '', qt: 0, nq: 8 };
   j.swing = a => { j.mode = 'swing'; j.st = 0; j.base = a; j.hit = []; };
   j.throw = (x, y, fx, fy) => {
-    j.mode = 'out'; j.x = x; j.y = y; j.trav = 0; j.hit = [];
+    j.mode = 'out'; j.x = x; j.y = y; j.trav = 0; j.hit = []; j.rico = false;
+    if (Math.random() < 0.25) jonSay('thrown', { cooldown: 14 });
     const l = Math.hypot(fx, fy) || 1, sp = 200 * G.st.atk; j.vx = fx / l * sp; j.vy = fy / l * sp;
     j.target = G.save.items.homing ? findTarget(x, y, fx / l, fy / l) : null;
   };
@@ -328,14 +335,17 @@ function updateJon(dt) {
   const j = G.jon, p = G.player;
   j.t += dt;
   const range = (G.save.items.homing ? 175 : 88) * G.st.range;
-  if (j.mode === 'follow') {
-    const tx = p.x + 10, ty = p.y - 14 + Math.sin(j.t * 3) * 2, k = Math.min(1, 8 * dt);
-    j.x += (tx - j.x) * k; j.y += (ty - j.y) * k; j.spin = 0;
+  if (j.mode === 'spin') updateSpin(dt);
+  else if (j.mode === 'follow') {
+    // asleep: he lies down next to Owen; excited: he hops
+    const hop = jonFaceNow() === 'excited' ? -Math.abs(Math.sin(j.t * 9)) * 4 : 0;
+    const tx = p.x + 10, ty = JT.asleep ? p.y + 2 : p.y - 14 + Math.sin(j.t * 3) * 2 + hop, k = Math.min(1, 8 * dt);
+    j.x += (tx - j.x) * k; j.y += (ty - j.y) * k; j.spin += ((JT.asleep ? 1.4 : 0) - j.spin) * Math.min(1, 6 * dt);
   } else if (j.mode === 'swing') {
     j.st += dt;
     const k = j.st / (0.2 / G.st.atk), a = j.base + (-1.3 + 2.6 * k);
-    j.x = p.x + Math.cos(a) * 15; j.y = p.y + Math.sin(a) * 15; j.spin = a + Math.PI / 2;
-    jonHits(1, 11, p, 'swing');
+    j.x = p.x + Math.cos(a) * 15 * G.st.swing; j.y = p.y + Math.sin(a) * 15 * G.st.swing; j.spin = a + Math.PI / 2;
+    jonHits(1, 11 * G.st.swing, p, 'swing');
     cutAt(j.x, j.y);
     if (k >= 1) j.mode = 'follow';
   } else if (j.mode === 'out') {
@@ -345,6 +355,7 @@ function updateJon(dt) {
     }
     j.x += j.vx * dt; j.y += j.vy * dt; j.trav += Math.hypot(j.vx, j.vy) * dt; j.spin += dt * 22;
     jonHits(1, 9, j, 'throw');
+    if (solidAt(j.x, j.y, 'jon') && Math.random() < 0.5) jonSay('wall', { cooldown: 15, face: 'worried' });
     if (cutAt(j.x, j.y) || j.trav > range || solidAt(j.x, j.y, 'jon')) { j.mode = 'back'; j.hit = []; }
   } else if (j.mode === 'back') {
     const dx = p.x - j.x, dy = p.y - j.y, d = Math.hypot(dx, dy) || 1;
@@ -358,8 +369,6 @@ function updateJon(dt) {
   if (j.mode === 'out' || j.mode === 'back') {
     for (const e of G.ents) if (e.kind === 'pickup' && dist(e, j) < 10) { e.x = j.x; e.y = j.y; }   // Jon fetches loot
   }
-  j.nq -= dt; j.qt = Math.max(0, j.qt - dt);
-  if (j.nq <= 0) { j.nq = rnd(12, 20); j.quip = pick(STORY.quips); j.qt = 2.5; }
 }
 function jonHits(dmg, reach, from, how) {
   const j = G.jon;
@@ -372,6 +381,11 @@ function jonHits(dmg, reach, from, how) {
       const blockedHit = damageEnemy(e, rollDamage(dmg), from, how);
       if (blockedHit && how === 'throw') j.mode = 'back';
       else if (!blockedHit && G.mode === 'arena') arenaOnHit(e);
+      else if (!blockedHit && how === 'throw' && jonHas('ricochet') && !j.rico) {
+        // Ricochet: bounce on to the nearest other enemy
+        const next = G.ents.filter(o => o.enemy && o.alive && o !== e && dist(o, e) < 110).sort((a, b) => dist(a, e) - dist(b, e))[0];
+        if (next) { j.rico = true; j.target = next; j.trav = 0; j.mode = 'out'; const d = dist(next, j) || 1; j.vx = (next.x - j.x) / d * 210; j.vy = (next.y - j.y) / d * 210; floatText(j.x, j.y - 8, 'RICOCHET', '#ffd84a'); }
+      }
     }
   }
 }
@@ -431,8 +445,10 @@ function killEnemy(e) {
   G.ents = G.ents.filter(o => o !== e);
   poof(e.x, e.y, e.boss); Sound.play('kill');
   const s = G.save;
-  if (s.items.thunder) s.rune = Math.min(RUNE_MAX, s.rune + 1);
+  if (s.items.thunder) s.rune = Math.min(RUNE_MAX, s.rune + G.st.runeKill);
   if (G.mode === 'arena') return arenaKill(e);
+  jonXP(e.boss ? 25 : e.shield ? 3 : 2); jonOnKill(e);
+  if (e.boss) setTimeout(() => jonSay('boss', { force: true, face: 'excited' }), 50);
   if (!e.boss) maybeDrop(e.x, e.y, 0.65);
   if (e.type === 'king') { G.shake = 0.6; say(STORY.king_down, checkRoomClear); return; }
   if (e.type === 'hank') { G.shake = 0.6; HK.axes = []; for (const w of G.ents.filter(o => o.type === 'wisp')) killEnemy(w); say(STORY.hank_down, () => { setFlag('d2done'); checkRoomClear(); writeSave(); }); return; }
@@ -440,7 +456,7 @@ function killEnemy(e) {
   checkRoomClear();
 }
 function maybeDrop(x, y, chance) {
-  if (Math.random() > chance) return;
+  if (Math.random() > chance * (1 + G.st.luck)) return;
   const r = Math.random();
   const what = r < 0.35 ? 'heart' : r < 0.75 ? 'kr1' : r < 0.9 ? 'kr5' : 'rune';
   G.ents.push({ kind: 'pickup', what, x, y, life: 9 });
@@ -507,7 +523,7 @@ function updatePickup(e, dt) {
   if (e.life !== undefined) { e.life -= dt; if (e.life <= 0) { G.ents = G.ents.filter(o => o !== e); return; } }
   if (e.underBush && tileAt(e.x, e.y) === 'b') return;   // still hidden under its bush
   const dp = dist(e, G.player);
-  if (G.mode === 'arena' && (dp < G.st.pickup || e.magnet)) { const k = Math.min(1, 9 * dt); e.x += (G.player.x - e.x) * k; e.y += (G.player.y - e.y) * k; }
+  if ((G.mode === 'arena' || G.st.pickup > 28) && e.kind === 'pickup' && e.what !== 'qitem' && (dp < G.st.pickup || e.magnet)) { const k = Math.min(1, 9 * dt); e.x += (G.player.x - e.x) * k; e.y += (G.player.y - e.y) * k; }
   if (dp > 11) return;
   G.ents = G.ents.filter(o => o !== e);
   const s = G.save, p = G.player;

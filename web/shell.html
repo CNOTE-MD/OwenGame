@@ -22,8 +22,13 @@
   .legend { display: flex; flex-wrap: wrap; gap: 8px 20px; color: var(--muted); }
   .legend b { color: var(--gold); font-weight: normal; }
   .pad { display: none; justify-content: space-between; align-items: center; gap: 16px; user-select: none; -webkit-user-select: none; }
-  @media (pointer: coarse) { .pad { display: flex; } }
-  .dpad { display: grid; grid-template-columns: repeat(3, 56px); grid-template-rows: repeat(3, 56px); gap: 4px; }
+  @media (pointer: coarse) { .pad { display: flex; } .legend { display: none; } }
+  .stick { position: relative; width: 150px; height: 150px; flex: none; border-radius: 50%; touch-action: none;
+    background: radial-gradient(circle, var(--panel) 0 55%, #2c2648 56% 100%); border: 2px solid var(--axe); }
+  .stick::before { content: ''; position: absolute; inset: 22%; border-radius: 50%; border: 1px dashed #4a4570; }
+  .knob { position: absolute; left: 50%; top: 50%; width: 64px; height: 64px; margin: -32px 0 0 -32px; border-radius: 50%;
+    background: radial-gradient(circle at 35% 30%, #cfefff, var(--axe) 45%, #3a6a9a); border: 2px solid #0d0d33; pointer-events: none; }
+  .stick.on .knob { box-shadow: 0 0 0 4px rgba(143,208,255,.35); }
   .btn { background: var(--panel); color: var(--ink); border: 2px solid var(--axe); font-family: var(--pixel); font-size: 12px; touch-action: none; border-radius: 4px; }
   .btn:active, .btn.on { background: var(--axe); color: var(--bg); }
   .btn:focus-visible { outline: 3px solid var(--gold); outline-offset: 2px; }
@@ -44,11 +49,7 @@
     <span><b>N</b> music</span>
   </div>
   <div class="pad" aria-label="Touch controls">
-    <div class="dpad">
-      <span></span><button class="btn" data-a="up" aria-label="Up">▲</button><span></span>
-      <button class="btn" data-a="left" aria-label="Left">◀</button><span></span><button class="btn" data-a="right" aria-label="Right">▶</button>
-      <span></span><button class="btn" data-a="down" aria-label="Down">▼</button><span></span>
-    </div>
+    <div class="stick" id="stick" aria-label="Move: drag the thumbstick"><div class="knob" id="knob"></div></div>
     <div class="ab">
       <button class="btn" data-a="horn" aria-label="Demon Horn">HORN</button>
       <button class="btn" data-a="dash" aria-label="Voodoo Dash">DASH</button>

@@ -77,9 +77,9 @@ function drawMenu() {
   const s = G.save;
   R(0, 0, VW, VH, 'rgba(5,5,20,.92)');
   R(8, 8, 240, 208, '#ffd84a'); R(10, 10, 236, 204, '#0d0d33');
-  text('GEAR', 20, 26, '#ffe64d');
+  text('GEAR', 20, 26, '#ffe64d'); text('JON ▶', 236, 38 + 12, '#9be08a', 'right', false);
   const slots = [
-    ['Jon (swing Z)', 'homing', true, () => drawJonSprite(30, 48, 0)],
+    ['Jon Lv' + jonData().lvl + ' (swing Z)', 'homing', true, () => drawJonSprite(30, 44, 0, false, jonFaceNow())],
     ['Homing Jon (throw X)', 'homing', !!s.items.homing],
     ['Thunder Rune (C)', 'thunder', !!s.items.thunder],
     ['Lingonberry Juice x' + s.potions, 'juice', s.potions > 0],

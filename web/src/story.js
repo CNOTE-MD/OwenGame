@@ -125,6 +125,37 @@ const STORY = {
   quips: ['da da da... (Rush E)', 'I\'m loyal!', 'World\'s best owner!', 'Ak ak ak', 'You can\'t get rid of me', 'Penguins. Ugh.', 'Bring me THUNDER!'],
 };
 
+// Jon's personality: short lines he says on his own. Jon is based on Owen's real best friend,
+// so he's loyal, funny, bossy, and always on Owen's side. Edit or add lines freely.
+const JON = {
+  idle: ['da da da... (Rush E)', 'Owen. OWEN. We\'re burning daylight.', 'I could carve something while we wait.', 'Did you know I can recite Rush E? Because I can.', 'Standing still is how penguins get you.', 'Best friends don\'t make best friends wait.'],
+  sleepy: ['zzz...', 'zzz... five more minutes... zzz', 'zzz... ak ak ak... zzz'],
+  wake: ['I was NOT asleep.', 'Huh? I was resting my blade.', 'Okay okay, I\'m up!'],
+  kill: ['Got one!', 'Chop!', 'Teamwork!', 'Easy.', 'Ha! Nailed it!', 'That\'s my best friend!'],
+  streak: ['We are UNSTOPPABLE!', 'Three in a row! High five! ...I don\'t have hands.', 'Combo! I\'m counting!'],
+  hurt: ['Hey! Nobody hits my friend!', 'You okay?!', 'Ow ow ow. Wait, that was you.', 'Walk it off, zombie!'],
+  lowhp: ['Owen, you\'re looking extra dead.', 'Maybe drink some juice?', 'Careful! I need you!', 'Hearts. We need hearts.'],
+  thrown: ['WHEEEE!', 'I can FLY!', 'Incoming!', 'Fore!'],
+  wall: ['Ow. Wall.', 'Who put that there?', 'I meant to do that.'],
+  item: ['Ooh, shiny!', 'Put it in the pack!', 'Treasure! I love treasure!'],
+  boss: ['We did it! Best team in Norway!', 'Told you we could do it.', 'That\'s going on the carved sign.'],
+  water: ['Not the lake again...', 'I hate water. Long story.', 'Keep me away from that lake.'],
+  penguin: ['Penguins. In NORWAY.', 'Ak ak ak. Sorry. Reflex.', 'I see a penguin. I hate it.'],
+  levelup: ['I feel STRONGER!', 'Level up! I\'m basically a sword now.', 'Friendship POWER!', 'Did I get shinier? I got shinier.'],
+  spin: ['SPIN TO WIN!', 'Wheeeee-ooo!', 'Tornado mode!'],
+  area: {
+    home: 'Our room! With MY sign in it.',
+    overworld: 'Norway! Smell that? Fjords.',
+    village: 'Fjordvik! Lars has juice.',
+    cavern: 'Brr. Ice. Penguins. Ugh.',
+    barrow: 'Hank\'s tomb. Be cool.',
+    redeye: 'I don\'t like this. At all.',
+    secret_cave: 'Fluffy\'s tunnel! Good boy.',
+    astrid_house: 'Wipe your feet.',
+    bjarne_house: 'It smells like music in here.',
+  },
+};
+
 const ITEMS = {
   key: { name: 'Small Key', icon: 'key', lines: [['', 'You got a SMALL KEY! It opens one locked door in this dungeon.']] },
   bigkey: { name: 'Big Key', icon: 'bigkey', lines: [['', 'You got the BIG KEY! It opens the boss door.']] },

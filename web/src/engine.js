@@ -19,7 +19,35 @@ const ACTIONS = {
 const keys = {}, virt = {}, edge = {};
 const held = a => !!virt[a] || ACTIONS[a].some(c => keys[c]);
 const just = a => !!edge[a];
+// on-screen thumbstick: analog direction, plus direction "presses" so it also drives menus
+const stick = { active: false, x: 0, y: 0 };
+(function setupStick() {
+  const base = document.getElementById('stick'), knob = document.getElementById('knob');
+  if (!base) return;
+  let id = null;
+  const dirs = { left: false, right: false, up: false, down: false };
+  const move = e => {
+    const r = base.getBoundingClientRect(), cx = r.left + r.width / 2, cy = r.top + r.height / 2, max = r.width * 0.38;
+    let dx = e.clientX - cx, dy = e.clientY - cy;
+    const m = Math.hypot(dx, dy); if (m > max) { dx *= max / m; dy *= max / m; }
+    knob.style.transform = `translate(${dx}px, ${dy}px)`;
+    const nx = dx / max, ny = dy / max, mag = Math.hypot(nx, ny);
+    stick.active = mag > 0.22; stick.x = stick.active ? nx / mag : 0; stick.y = stick.active ? ny / mag : 0;
+    const want = { left: nx < -0.5, right: nx > 0.5, up: ny < -0.5, down: ny > 0.5 };
+    for (const k in want) { if (want[k] && !dirs[k]) edge[k] = true; dirs[k] = want[k]; virt[k] = want[k]; }
+  };
+  const end = e => {
+    if (e.pointerId !== id) return;
+    id = null; base.classList.remove('on'); knob.style.transform = '';
+    stick.active = false; stick.x = stick.y = 0;
+    for (const k in dirs) { dirs[k] = false; virt[k] = false; }
+  };
+  base.addEventListener('pointerdown', e => { e.preventDefault(); id = e.pointerId; base.setPointerCapture(id); base.classList.add('on'); Sound.unlock(); move(e); });
+  base.addEventListener('pointermove', e => { if (e.pointerId === id) { e.preventDefault(); move(e); } });
+  ['pointerup', 'pointercancel', 'lostpointercapture'].forEach(t => base.addEventListener(t, end));
+})();
 function inputVec() {
+  if (stick.active) return { x: stick.x, y: stick.y };
   let x = (held('right') ? 1 : 0) - (held('left') ? 1 : 0), y = (held('down') ? 1 : 0) - (held('up') ? 1 : 0);
   const m = Math.hypot(x, y);
   return m ? { x: x / m, y: y / m } : { x: 0, y: 0 };
