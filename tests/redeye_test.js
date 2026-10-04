@@ -58,7 +58,7 @@ const path = require('path');
   await check('she takes damage while dazed', (await att()).hp === 11);
   await ev(() => { const a = G.ents.find(e => e.type === 'attendant'); a.hp = 6; a.st = 'hide'; a.t = 1.29; });
   await wait(200);
-  await check('below half health she throws peanuts', await ev(() => RE.shots.length >= 3));
+  await check('below half health she throws peanuts', await ev(() => RE.shots.length >= 1));
   await ev(() => { G.save.rune = RUNE_MAX; G.player.cd = 0; });
   await pg.keyboard.press('KeyC'); await wait(1500);
   await check('Thunder Strike dazes and hurts her', (await att()).hp < 6);

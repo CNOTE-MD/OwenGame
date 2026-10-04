@@ -33,7 +33,7 @@ const setFlag = k => { G.save.flags[k] = true; };
 // ---------- tiles ----------
 const SOLID = new Set('T#MwHRDPqX+lWtOYQZxLKbVCkpueABy'.split(''));
 function tile(tx, ty) {
-  if (tx < 0 || ty < 0 || tx >= G.cols || ty >= G.nrows) return G.map.dungeon ? 'W' : 'T';
+  if (!(tx >= 0 && ty >= 0 && tx < G.cols && ty < G.nrows)) return G.map.dungeon ? 'W' : 'T';   // also catches NaN
   return G.rows[ty][tx];
 }
 const tileAt = (x, y) => tile(Math.floor(x / T), Math.floor(y / T));

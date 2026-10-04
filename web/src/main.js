@@ -1,7 +1,7 @@
 // State machine and main loop.
 
 function newGame() {
-  G.mode = 'story';
+  G.mode = 'story'; resetJon();
   G.save = newSave(); applyJonPerks();
   G.player = makePlayer(); G.jon = makeJon();
   const st = MAPS.home.ents.find(e => e.t === 'start').at;
@@ -10,14 +10,14 @@ function newGame() {
   say(STORY.intro);
 }
 function continueGame(fromCheckpoint) {
-  G.mode = 'story';
+  G.mode = 'story'; resetJon();
   G.save = readSave() || newSave(); applyJonPerks();
   G.player = makePlayer(); G.jon = makeJon();
   G.player.hp = G.save.maxHp;
   G.state = 'play';
   if (!G.save.x) return newGame();
   // after a game over you wake at the last runestone with the voodoo bond recharged
-  if (fromCheckpoint && G.save.cp) { G.save.voodoo = true; loadMap(G.save.cp.map, G.save.cp.x, G.save.cp.y); writeSave(); return; }
+  if (fromCheckpoint && G.save.cp) { G.save.voodoo = true; G.save.voodoo2 = jonHas('bff'); loadMap(G.save.cp.map, G.save.cp.x, G.save.cp.y); writeSave(); return; }
   loadMap(G.save.map, G.save.x, G.save.y);
 }
 
@@ -56,6 +56,7 @@ function onEnterScreen() {
 function update(dt) {
   G.t += dt;
   G.shake = Math.max(0, G.shake - dt); G.flash = Math.max(0, G.flash - dt); G.bannerT = Math.max(0, G.bannerT - dt);
+  if (G.state !== 'play') { JT.t = Math.max(0, JT.t - dt); JT.faceT = Math.max(0, JT.faceT - dt); }
   if (just('mute')) Sound.muted = !Sound.muted;
   if (just('music')) Music.on = !Music.on;
   switch (G.state) {

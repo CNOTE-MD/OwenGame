@@ -9,6 +9,7 @@ function startDash() {
   if (p.dashCd > 0 || p.dashing > 0) return;
   const l = Math.hypot(p.fx, p.fy) || 1;
   p.dashing = DASH_TIME; p.dashCd = 0.55; p.dx = p.fx / l; p.dy = p.fy / l; p.dashHit = [];
+  if (!isFinite(p.dx) || !isFinite(p.dy)) { p.dx = 0; p.dy = 1; }
   p.inv = Math.max(p.inv, DASH_TIME + 0.08);
   G.jon.mode = 'follow';
   Sound.play('dash');
@@ -17,6 +18,7 @@ function startDash() {
 const dashSolid = (x, y) => { const c = tileAt(x, y); return c === 'w' || c === 'v' || c === 'y' || c === '~' ? false : solidAt(x, y, 'player') || c === 'y'; };
 function updateDash(dt) {
   const p = G.player;
+  if (!isFinite(p.x) || !isFinite(p.y)) { p.x = G.entry.x; p.y = G.entry.y; p.dashing = 0; return; }
   p.dashing -= dt;
   const step = DASH_SPEED * dt, r = 5;
   const free = (x, y) => !(dashSolid(x - r, y - r) || dashSolid(x + r, y - r) || dashSolid(x - r, y + r) || dashSolid(x + r, y + r));

@@ -36,7 +36,7 @@ function updateRedeye(dt) {
   // peanuts
   for (const s of RE.shots) {
     s.x += s.vx * dt; s.y += s.vy * dt; s.life -= dt;
-    if (dist(s, p) < 7) { s.life = 0; hurtPlayer(1, s); }
+    if (s.life < 1.85 && dist(s, p) < 7) { s.life = 0; hurtPlayer(1, s); }   // a fresh peanut can't hit on the frame it's thrown
     if (solidAt(s.x, s.y, 'jon')) s.life = 0;
   }
   RE.shots = RE.shots.filter(s => s.life > 0);
@@ -62,7 +62,7 @@ function updateAttendant(e, dt, dx, dy, d, mr) {
     case 'hide':
       if (e.t > 1.3) {
         // reappear somewhere near Owen
-        for (let i = 0; i < 12; i++) {
+        for (let i = 0; i < 40; i++) {
           const a = Math.random() * Math.PI * 2, r = rnd(46, 70), x = p.x + Math.cos(a) * r, y = p.y + Math.sin(a) * r;
           if (!blocked(x, y, 6, 'walker', e) && sameScreen(Math.floor(x / T), Math.floor(y / T))) { e.x = x; e.y = y; break; }
         }

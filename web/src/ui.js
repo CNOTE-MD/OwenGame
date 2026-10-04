@@ -55,7 +55,7 @@ function drawHud() {
   const n = s.maxHp / 2;
   for (let i = 0; i < n; i++) {
     const v = clamp(p.hp - i * 2, 0, 2) / 2, row = Math.floor(i / 10), col = i % 10;
-    drawHeart(144 + col * 9, 12 + row * 8, v, s.voodoo ? '#f22633' : '#9a4dd9');
+    drawHeart(144 + col * 9, 12 + row * 8, v, s.voodoo ? '#f22633' : s.voodoo2 ? '#ffd84a' : '#9a4dd9');
   }
 }
 

@@ -57,7 +57,7 @@ function waveSpec(w) {
 }
 
 function startArena() {
-  G.mode = 'arena';
+  G.mode = 'arena'; resetJon();
   G.save = newSave(); G.save.voodoo = false; G.save.map = 'arena';
   G.st = baseStats();
   G.player = makePlayer(); G.jon = makeJon(); G.player.hp = G.save.maxHp;

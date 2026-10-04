@@ -2258,7 +2258,7 @@ const setFlag = k => { G.save.flags[k] = true; };
 // ---------- tiles ----------
 const SOLID = new Set('T#MwHRDPqX+lWtOYQZxLKbVCkpueABy'.split(''));
 function tile(tx, ty) {
-  if (tx < 0 || ty < 0 || tx >= G.cols || ty >= G.nrows) return G.map.dungeon ? 'W' : 'T';
+  if (!(tx >= 0 && ty >= 0 && tx < G.cols && ty < G.nrows)) return G.map.dungeon ? 'W' : 'T';   // also catches NaN
   return G.rows[ty][tx];
 }
 const tileAt = (x, y) => tile(Math.floor(x / T), Math.floor(y / T));
@@ -2654,7 +2654,7 @@ function hurtPlayer(dmg, from, force) {
   if (!force && (p.inv > 0 || p.launching || p.falling > 0 || G.state !== 'play')) return;
   if (!force && G.st.armor > 0 && Math.random() < Math.min(0.6, G.st.armor * 0.1)) { p.inv = 0.4; floatText(p.x, p.y - 18, 'BLOCK', '#9fd0ff'); Sound.play('clank'); return; }
   p.hp -= dmg; p.inv = 1; Sound.play('hurt'); G.shake = 0.15;
-  if (G.mode !== 'arena') jonOnHurt();
+  if (G.mode !== 'arena') jonOnHurt(from);
   if (from) { const d = Math.hypot(p.x - from.x, p.y - from.y) || 1; p.kx = (p.x - from.x) / d * 170; p.ky = (p.y - from.y) / d * 170; }
   if (p.hp > 0) return;
   // A Link to the Past death: Owen spins in place, then juice, voodoo or game over
@@ -2855,7 +2855,7 @@ function jonHits(dmg, reach, from, how) {
       else if (!blockedHit && G.mode === 'arena') arenaOnHit(e);
       else if (!blockedHit && how === 'throw' && jonHas('ricochet') && !j.rico) {
         // Ricochet: bounce on to the nearest other enemy
-        const next = G.ents.filter(o => o.enemy && o.alive && o !== e && dist(o, e) < 110).sort((a, b) => dist(a, e) - dist(b, e))[0];
+        const next = G.ents.filter(o => o.enemy && o.alive && o !== e && !j.hit.includes(o) && dist(o, e) < 110).sort((a, b) => dist(a, e) - dist(b, e))[0];
         if (next) { j.rico = true; j.target = next; j.trav = 0; j.mode = 'out'; const d = dist(next, j) || 1; j.vx = (next.x - j.x) / d * 210; j.vy = (next.y - j.y) / d * 210; floatText(j.x, j.y - 8, 'RICOCHET', '#ffd84a'); }
       }
     }
@@ -2920,7 +2920,7 @@ function killEnemy(e) {
   if (s.items.thunder) s.rune = Math.min(RUNE_MAX, s.rune + G.st.runeKill);
   if (G.mode === 'arena') return arenaKill(e);
   jonXP(e.boss ? 25 : e.shield ? 3 : 2); jonOnKill(e);
-  if (e.boss) setTimeout(() => jonSay('boss', { force: true, face: 'excited' }), 50);
+  if (e.boss) JT.queued = 'boss';
   if (!e.boss) maybeDrop(e.x, e.y, 0.65);
   if (e.type === 'king') { G.shake = 0.6; say(STORY.king_down, checkRoomClear); return; }
   if (e.type === 'hank') { G.shake = 0.6; HK.axes = []; for (const w of G.ents.filter(o => o.type === 'wisp')) killEnemy(w); say(STORY.hank_down, () => { setFlag('d2done'); checkRoomClear(); writeSave(); }); return; }
@@ -4333,7 +4333,7 @@ function updateRedeye(dt) {
   // peanuts
   for (const s of RE.shots) {
     s.x += s.vx * dt; s.y += s.vy * dt; s.life -= dt;
-    if (dist(s, p) < 7) { s.life = 0; hurtPlayer(1, s); }
+    if (s.life < 1.85 && dist(s, p) < 7) { s.life = 0; hurtPlayer(1, s); }   // a fresh peanut can't hit on the frame it's thrown
     if (solidAt(s.x, s.y, 'jon')) s.life = 0;
   }
   RE.shots = RE.shots.filter(s => s.life > 0);
@@ -4359,7 +4359,7 @@ function updateAttendant(e, dt, dx, dy, d, mr) {
     case 'hide':
       if (e.t > 1.3) {
         // reappear somewhere near Owen
-        for (let i = 0; i < 12; i++) {
+        for (let i = 0; i < 40; i++) {
           const a = Math.random() * Math.PI * 2, r = rnd(46, 70), x = p.x + Math.cos(a) * r, y = p.y + Math.sin(a) * r;
           if (!blocked(x, y, 6, 'walker', e) && sameScreen(Math.floor(x / T), Math.floor(y / T))) { e.x = x; e.y = y; break; }
         }
@@ -4534,6 +4534,7 @@ function startDash() {
   if (p.dashCd > 0 || p.dashing > 0) return;
   const l = Math.hypot(p.fx, p.fy) || 1;
   p.dashing = DASH_TIME; p.dashCd = 0.55; p.dx = p.fx / l; p.dy = p.fy / l; p.dashHit = [];
+  if (!isFinite(p.dx) || !isFinite(p.dy)) { p.dx = 0; p.dy = 1; }
   p.inv = Math.max(p.inv, DASH_TIME + 0.08);
   G.jon.mode = 'follow';
   Sound.play('dash');
@@ -4542,6 +4543,7 @@ function startDash() {
 const dashSolid = (x, y) => { const c = tileAt(x, y); return c === 'w' || c === 'v' || c === 'y' || c === '~' ? false : solidAt(x, y, 'player') || c === 'y'; };
 function updateDash(dt) {
   const p = G.player;
+  if (!isFinite(p.x) || !isFinite(p.y)) { p.x = G.entry.x; p.y = G.entry.y; p.dashing = 0; return; }
   p.dashing -= dt;
   const step = DASH_SPEED * dt, r = 5;
   const free = (x, y) => !(dashSolid(x - r, y - r) || dashSolid(x + r, y - r) || dashSolid(x - r, y + r) || dashSolid(x + r, y + r));
@@ -4666,7 +4668,8 @@ function drawTileCh2(c, ox, oy) {
 // Jon is based on Owen's real best friend, so he grows alongside Owen as the game goes on.
 
 // ---------------- talking ----------------
-const JT = { cd: {}, line: '', t: 0, idle: 0, asleep: false, streak: 0, streakT: 0, face: 'happy', faceT: 0, lastArea: '' };
+const JT = { cd: {}, line: '', t: 0, idle: 0, asleep: false, streak: 0, streakT: 0, face: 'happy', faceT: 0, lastArea: '', queued: null };
+function resetJon() { Object.assign(JT, { cd: {}, line: '', t: 0, idle: 0, asleep: false, streak: 0, streakT: 0, face: 'happy', faceT: 0, lastArea: '', queued: null }); }
 function jonSay(cat, opts = {}) {
   if (G.mode === 'arena' && !opts.arena) return false;
   const now = G.t;
@@ -4688,6 +4691,8 @@ function updateJonTalk(dt) {
   JT.faceT = Math.max(0, JT.faceT - dt);
   JT.streakT = Math.max(0, JT.streakT - dt); if (JT.streakT <= 0) JT.streak = 0;
   if (G.state !== 'play' || G.mode === 'arena') return;
+  // a line queued during a cutscene (boss cheer) plays once we're back in control
+  if (JT.queued) { const q = JT.queued; JT.queued = null; jonSay(q, { force: true, face: 'excited' }); }
   // idling: he gets chatty, then bored, then falls asleep
   if (p.moving || G.jon.mode !== 'follow') {
     if (JT.asleep) { JT.asleep = false; jonSay('wake', { force: true }); setJonFace('excited', 1.5); }
@@ -4718,7 +4723,7 @@ function jonOnKill(e) {
   if (JT.streak === 3) jonSay('streak', { force: true, face: 'excited', cooldown: 8 });
   else if (Math.random() < 0.3) jonSay('kill', { cooldown: 7, face: 'excited' });
 }
-function jonOnHurt() { setJonFace('worried', 1.2); jonSay('hurt', { cooldown: 8, interrupt: true }); }
+function jonOnHurt(from) { setJonFace('worried', 1.2); if (from) jonSay('hurt', { cooldown: 8, interrupt: true }); }
 
 function jonFaceNow() {
   if (JT.asleep) return 'sleepy';
@@ -5120,7 +5125,7 @@ function waveSpec(w) {
 }
 
 function startArena() {
-  G.mode = 'arena';
+  G.mode = 'arena'; resetJon();
   G.save = newSave(); G.save.voodoo = false; G.save.map = 'arena';
   G.st = baseStats();
   G.player = makePlayer(); G.jon = makeJon(); G.player.hp = G.save.maxHp;
@@ -5504,7 +5509,7 @@ function drawHud() {
   const n = s.maxHp / 2;
   for (let i = 0; i < n; i++) {
     const v = clamp(p.hp - i * 2, 0, 2) / 2, row = Math.floor(i / 10), col = i % 10;
-    drawHeart(144 + col * 9, 12 + row * 8, v, s.voodoo ? '#f22633' : '#9a4dd9');
+    drawHeart(144 + col * 9, 12 + row * 8, v, s.voodoo ? '#f22633' : s.voodoo2 ? '#ffd84a' : '#9a4dd9');
   }
 }
 
@@ -5641,7 +5646,7 @@ function nextFlightPage() {
 // State machine and main loop.
 
 function newGame() {
-  G.mode = 'story';
+  G.mode = 'story'; resetJon();
   G.save = newSave(); applyJonPerks();
   G.player = makePlayer(); G.jon = makeJon();
   const st = MAPS.home.ents.find(e => e.t === 'start').at;
@@ -5650,14 +5655,14 @@ function newGame() {
   say(STORY.intro);
 }
 function continueGame(fromCheckpoint) {
-  G.mode = 'story';
+  G.mode = 'story'; resetJon();
   G.save = readSave() || newSave(); applyJonPerks();
   G.player = makePlayer(); G.jon = makeJon();
   G.player.hp = G.save.maxHp;
   G.state = 'play';
   if (!G.save.x) return newGame();
   // after a game over you wake at the last runestone with the voodoo bond recharged
-  if (fromCheckpoint && G.save.cp) { G.save.voodoo = true; loadMap(G.save.cp.map, G.save.cp.x, G.save.cp.y); writeSave(); return; }
+  if (fromCheckpoint && G.save.cp) { G.save.voodoo = true; G.save.voodoo2 = jonHas('bff'); loadMap(G.save.cp.map, G.save.cp.x, G.save.cp.y); writeSave(); return; }
   loadMap(G.save.map, G.save.x, G.save.y);
 }
 
@@ -5696,6 +5701,7 @@ function onEnterScreen() {
 function update(dt) {
   G.t += dt;
   G.shake = Math.max(0, G.shake - dt); G.flash = Math.max(0, G.flash - dt); G.bannerT = Math.max(0, G.bannerT - dt);
+  if (G.state !== 'play') { JT.t = Math.max(0, JT.t - dt); JT.faceT = Math.max(0, JT.faceT - dt); }
   if (just('mute')) Sound.muted = !Sound.muted;
   if (just('music')) Music.on = !Music.on;
   switch (G.state) {

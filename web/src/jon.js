@@ -2,7 +2,8 @@
 // Jon is based on Owen's real best friend, so he grows alongside Owen as the game goes on.
 
 // ---------------- talking ----------------
-const JT = { cd: {}, line: '', t: 0, idle: 0, asleep: false, streak: 0, streakT: 0, face: 'happy', faceT: 0, lastArea: '' };
+const JT = { cd: {}, line: '', t: 0, idle: 0, asleep: false, streak: 0, streakT: 0, face: 'happy', faceT: 0, lastArea: '', queued: null };
+function resetJon() { Object.assign(JT, { cd: {}, line: '', t: 0, idle: 0, asleep: false, streak: 0, streakT: 0, face: 'happy', faceT: 0, lastArea: '', queued: null }); }
 function jonSay(cat, opts = {}) {
   if (G.mode === 'arena' && !opts.arena) return false;
   const now = G.t;
@@ -24,6 +25,8 @@ function updateJonTalk(dt) {
   JT.faceT = Math.max(0, JT.faceT - dt);
   JT.streakT = Math.max(0, JT.streakT - dt); if (JT.streakT <= 0) JT.streak = 0;
   if (G.state !== 'play' || G.mode === 'arena') return;
+  // a line queued during a cutscene (boss cheer) plays once we're back in control
+  if (JT.queued) { const q = JT.queued; JT.queued = null; jonSay(q, { force: true, face: 'excited' }); }
   // idling: he gets chatty, then bored, then falls asleep
   if (p.moving || G.jon.mode !== 'follow') {
     if (JT.asleep) { JT.asleep = false; jonSay('wake', { force: true }); setJonFace('excited', 1.5); }
@@ -54,7 +57,7 @@ function jonOnKill(e) {
   if (JT.streak === 3) jonSay('streak', { force: true, face: 'excited', cooldown: 8 });
   else if (Math.random() < 0.3) jonSay('kill', { cooldown: 7, face: 'excited' });
 }
-function jonOnHurt() { setJonFace('worried', 1.2); jonSay('hurt', { cooldown: 8, interrupt: true }); }
+function jonOnHurt(from) { setJonFace('worried', 1.2); if (from) jonSay('hurt', { cooldown: 8, interrupt: true }); }
 
 function jonFaceNow() {
   if (JT.asleep) return 'sleepy';

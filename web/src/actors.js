@@ -182,7 +182,7 @@ function hurtPlayer(dmg, from, force) {
   if (!force && (p.inv > 0 || p.launching || p.falling > 0 || G.state !== 'play')) return;
   if (!force && G.st.armor > 0 && Math.random() < Math.min(0.6, G.st.armor * 0.1)) { p.inv = 0.4; floatText(p.x, p.y - 18, 'BLOCK', '#9fd0ff'); Sound.play('clank'); return; }
   p.hp -= dmg; p.inv = 1; Sound.play('hurt'); G.shake = 0.15;
-  if (G.mode !== 'arena') jonOnHurt();
+  if (G.mode !== 'arena') jonOnHurt(from);
   if (from) { const d = Math.hypot(p.x - from.x, p.y - from.y) || 1; p.kx = (p.x - from.x) / d * 170; p.ky = (p.y - from.y) / d * 170; }
   if (p.hp > 0) return;
   // A Link to the Past death: Owen spins in place, then juice, voodoo or game over
@@ -383,7 +383,7 @@ function jonHits(dmg, reach, from, how) {
       else if (!blockedHit && G.mode === 'arena') arenaOnHit(e);
       else if (!blockedHit && how === 'throw' && jonHas('ricochet') && !j.rico) {
         // Ricochet: bounce on to the nearest other enemy
-        const next = G.ents.filter(o => o.enemy && o.alive && o !== e && dist(o, e) < 110).sort((a, b) => dist(a, e) - dist(b, e))[0];
+        const next = G.ents.filter(o => o.enemy && o.alive && o !== e && !j.hit.includes(o) && dist(o, e) < 110).sort((a, b) => dist(a, e) - dist(b, e))[0];
         if (next) { j.rico = true; j.target = next; j.trav = 0; j.mode = 'out'; const d = dist(next, j) || 1; j.vx = (next.x - j.x) / d * 210; j.vy = (next.y - j.y) / d * 210; floatText(j.x, j.y - 8, 'RICOCHET', '#ffd84a'); }
       }
     }
@@ -448,7 +448,7 @@ function killEnemy(e) {
   if (s.items.thunder) s.rune = Math.min(RUNE_MAX, s.rune + G.st.runeKill);
   if (G.mode === 'arena') return arenaKill(e);
   jonXP(e.boss ? 25 : e.shield ? 3 : 2); jonOnKill(e);
-  if (e.boss) setTimeout(() => jonSay('boss', { force: true, face: 'excited' }), 50);
+  if (e.boss) JT.queued = 'boss';
   if (!e.boss) maybeDrop(e.x, e.y, 0.65);
   if (e.type === 'king') { G.shake = 0.6; say(STORY.king_down, checkRoomClear); return; }
   if (e.type === 'hank') { G.shake = 0.6; HK.axes = []; for (const w of G.ents.filter(o => o.type === 'wisp')) killEnemy(w); say(STORY.hank_down, () => { setFlag('d2done'); checkRoomClear(); writeSave(); }); return; }
