@@ -38,6 +38,8 @@ function onEnterScreen() {
   const has = type => G.ents.some(e => e.type === type && e.alive);
   if (G.mapId === 'cavern' && !flag('intro:cavern')) { setFlag('intro:cavern'); say(STORY.cavern_enter); }
   if (has('knight') && !flag('intro:knight')) { setFlag('intro:knight'); Sound.play('boss'); say(STORY.knight); }
+  if (G.map.redeye) redeyeEnter();
+  if (has('attendant') && !flag('intro:attendant')) { setFlag('intro:attendant'); say(STORY.attendant); }
   if (has('king')) { Sound.play('boss'); say(flag('intro:king') ? [['Penguin King', 'AK! Back for more?']] : STORY.king); setFlag('intro:king'); }
   if (G.mapId === 'overworld' && flag('d1done') && !flag('chapter1_banner') && G.scr.x === 2 && G.scr.y === 0) {
     setFlag('chapter1_banner'); G.banner = STORY.chapter_done; G.bannerT = 4; Sound.play('secret'); writeSave();
@@ -94,9 +96,11 @@ function update(dt) {
   if (G.state !== 'play') return;
   updateJon(dt);
   if (G.mode === 'arena') { updateArena(dt); if (G.state !== 'play') return; }
+  if (G.map.redeye) updateRedeye(dt);
   for (const e of G.ents.slice()) {
     if (e.kind === 'enemy' && e.alive) { if (e.slow > 0) { e.slow -= dt; updateEnemy(e, dt * 0.5); } else updateEnemy(e, dt); }
     else if (e.kind === 'pickup') updatePickup(e, dt);
+    else if (e.kind === 'hazard') updateCart(e, dt);
     else if (e.kind === 'switch') e.cd = Math.max(0, e.cd - dt);
     if (G.state !== 'play') break;
   }
@@ -122,6 +126,7 @@ function render() {
   drawLightning();
   ctx.setTransform(1, 0, 0, 1, 0, 0);
   if (G.map.dungeon || G.map.dark) drawDungeonLight();
+  drawRedeyeOverlay();
   if (G.flash > 0) { ctx.globalAlpha = Math.min(1, G.flash * 3); R(0, 0, VW, VH, G.flashColor || '#fff'); ctx.globalAlpha = 1; }
   if (G.mode === 'arena') drawArenaHud(); else drawHud();
   if (G.state === 'warp') { ctx.globalAlpha = clamp(1 - Math.abs(G.warp.t - 0.35) / 0.35, 0, 1); R(0, 0, VW, VH, '#000'); ctx.globalAlpha = 1; }

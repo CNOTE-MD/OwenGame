@@ -982,5 +982,157 @@ const MAPS = {
 }
 ],
 "dark": true
+},
+"redeye": {
+"name": "The Red-Eye",
+"rows": [
+"uuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuu",
+"uuuuueuuuuuuuuuuuuuuuuuueuuuuuuuuuuuuuuueuuuuuuuuuuueuuuuuueuuuu",
+"u==============uumAmAmAmAmAmAmmuumBBmmmmmmmmBBmuummmmmmmmmmmmmmu",
+"u===BB======B==uumAmAmAmAmAmAmmuummmmmmmmmmmmmmuummAmmmmmmmmAmmu",
+"u===B=======B==uumAmAmAmAmAmAmmuummmmmmmmmmmmmmuummAmmmmmmmmAmmu",
+"u==============uummmmJmmmmmmJmmuummmmmmmmmmmmmmuummmmmmmmmmmmmmu",
+"d===============mmmmmJmmmmmmmmmmmmmmmmmmmmmmmmmmhmmmmmmmmmmmmmmu",
+"d===============mmmmmmmmmJmmmmmmmmmmmmmmmmmmmmmmhmmmmmmmmmmmmmmu",
+"u======B=======uummmmmmmmJmmmmmuummmmmmmmmmmmmmuummmmmmmmmmmmmmu",
+"u========BB====uumAmAmAmAmAmAmmuummmmmmmmmmmmmmuummAmmmmmmmmAmmu",
+"u==B======B==B=uumAmAmAmAmAmAmmuummmmmmmmmmmmmmuummAmmmmmmmmAmmu",
+"u==============uumAmAmAmAmAmAmmuumBBmmmmmmmmBBmuummmmmmmmmmmmmmu",
+"uuuuueuuuuuuuuuuuuuuuuuueuuuuuuuuuuuuuuueuuuuuuuuuuueuuuuuueuuuu",
+"uuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuu"
+],
+"ents": [
+{
+"t": "warp",
+"at": [
+0,
+6
+],
+"to": "overworld",
+"dest": [
+29,
+34
+]
+},
+{
+"t": "warp",
+"at": [
+0,
+7
+],
+"to": "overworld",
+"dest": [
+29,
+34
+]
+},
+{
+"t": "imp",
+"at": [
+8,
+4
+]
+},
+{
+"t": "imp",
+"at": [
+11,
+7
+]
+},
+{
+"t": "imp",
+"at": [
+23,
+6
+]
+},
+{
+"t": "imp",
+"at": [
+27,
+7
+]
+},
+{
+"t": "wisp",
+"at": [
+19,
+6
+]
+},
+{
+"t": "cart",
+"at": [
+37,
+3
+]
+},
+{
+"t": "cart",
+"at": [
+42,
+10
+]
+},
+{
+"t": "imp",
+"at": [
+39,
+6
+]
+},
+{
+"t": "imp",
+"at": [
+44,
+7
+]
+},
+{
+"t": "attendant",
+"at": [
+56,
+6
+]
+},
+{
+"t": "container",
+"id": "hc_redeye",
+"at": [
+54,
+7
+],
+"clear": true
+},
+{
+"t": "chest",
+"id": "c_horn",
+"at": [
+57,
+7
+],
+"item": "horn",
+"clear": true
+},
+{
+"t": "warp",
+"at": [
+61,
+7
+],
+"to": "overworld",
+"dest": [
+29,
+34
+],
+"clear": true,
+"portal": true
+}
+],
+"dungeon": true,
+"dark": true,
+"redeye": true,
+"nokeys": true
 }
 };

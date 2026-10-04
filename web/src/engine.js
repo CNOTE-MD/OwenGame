@@ -14,7 +14,7 @@ const pick = arr => arr[Math.floor(Math.random() * arr.length)];
 const ACTIONS = {
   left: ['ArrowLeft', 'KeyA'], right: ['ArrowRight', 'KeyD'], up: ['ArrowUp', 'KeyW'], down: ['ArrowDown', 'KeyS'],
   a: ['KeyZ', 'Space', 'KeyJ'], b: ['KeyX', 'KeyK', 'ShiftLeft', 'ShiftRight'], c: ['KeyC', 'KeyL'],
-  menu: ['Enter', 'Escape', 'KeyP'], mute: ['KeyM'], music: ['KeyN'],
+  menu: ['Enter', 'Escape', 'KeyP'], mute: ['KeyM'], music: ['KeyN'], horn: ['KeyV'],
 };
 const keys = {}, virt = {}, edge = {};
 const held = a => !!virt[a] || ACTIONS[a].some(c => keys[c]);
@@ -90,6 +90,9 @@ const Sound = {
       case 'thunder': this.noise(1.2, 0.35, 500); this.tone([[90, 0.9, 'sawtooth', 40]], 0.1); break;
       case 'charge': this.tone([[200, 0.4, 'sawtooth', 900]], 0.04); break;
       case 'boss': this.tone([[110, 0.2, 'sawtooth'], [104, 0.2, 'sawtooth'], [98, 0.5, 'sawtooth']], 0.08); break;
+      case 'scratch': for (let i = 0; i < 4; i++) setTimeout(() => this.noise(0.05 + Math.random() * 0.05, 0.05, 2500 + Math.random() * 2000), i * (90 + Math.random() * 80)); break;
+      case 'flicker': this.tone([[60, 0.05, 'square'], [0, 0.04], [60, 0.05, 'square'], [0, 0.08], [55, 0.1, 'square']], 0.05); break;
+      case 'horn': this.tone([[98, 0.9, 'sawtooth', 92]], 0.12); this.tone([[147, 0.9, 'sawtooth', 139]], 0.07); break;
       case 'creep': this.tone([[70, 1.2, 'sine', 55]], 0.12); this.tone([[1760, 0.6, 'sine', 1700]], 0.012); break;
     }
   },

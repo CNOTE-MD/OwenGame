@@ -28,6 +28,7 @@
   .btn:active, .btn.on { background: var(--axe); color: var(--bg); }
   .btn:focus-visible { outline: 3px solid var(--gold); outline-offset: 2px; }
   .ab { display: grid; grid-template-columns: repeat(2, 76px); gap: 10px; }
+  .ab .btn[data-a="horn"] { grid-column: span 2; height: 40px; }
   .ab .btn { width: 76px; height: 56px; border-radius: 28px; font-size: 9px; }
 </style>
 <main>
@@ -37,6 +38,7 @@
     <span><b>Z / Space</b> swing Jon</span>
     <span><b>X / Shift</b> throw Jon</span>
     <span><b>C</b> Thunder Strike</span>
+    <span><b>V</b> Demon Horn</span>
     <span><b>Enter</b> gear and quest</span>
     <span><b>M</b> all sound</span>
     <span><b>N</b> music</span>
@@ -48,6 +50,7 @@
       <span></span><button class="btn" data-a="down" aria-label="Down">▼</button><span></span>
     </div>
     <div class="ab">
+      <button class="btn" data-a="horn" aria-label="Demon Horn">HORN</button>
       <button class="btn" data-a="menu" aria-label="Gear menu">GEAR</button>
       <button class="btn" data-a="c" aria-label="Thunder Strike">RUNE</button>
       <button class="btn" data-a="b" aria-label="Throw Jon">THROW</button>

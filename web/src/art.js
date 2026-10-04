@@ -444,6 +444,7 @@ function buildAll() {
   SPR.sign = buildSprite(SIGN_ROWS, PAL_SIGN);
   SPR.runestone = buildSprite(RUNE_ROWS, PAL_RUNE);
   buildIcons();
+  buildRedeyeArt();
   buildPoof();
 }
 function shade(hex, k) { const [r, g, b] = hexRgb(hex); const f = v => Math.max(0, Math.min(255, Math.round(v * (1 + k)))); return '#' + [f(r), f(g), f(b)].map(v => v.toString(16).padStart(2, '0')).join(''); }
@@ -713,14 +714,24 @@ function drawDungeonLight() {
   if (!LIGHT) LIGHT = mkCanvas(VW, VH);
   const g = LIGHT.getContext('2d'), p = G.player;
   g.globalCompositeOperation = 'source-over'; g.clearRect(0, 0, VW, VH);
-  g.fillStyle = 'rgba(4,6,24,0.5)'; g.fillRect(0, 0, VW, VH);
+  const red = G.map.redeye;
+  g.fillStyle = red ? 'rgba(6,2,10,0.74)' : 'rgba(4,6,24,0.5)'; g.fillRect(0, 0, VW, VH);
   g.globalCompositeOperation = 'destination-out';
   const hole = (x, y, r) => { const gr = g.createRadialGradient(x, y, 0, x, y, r); gr.addColorStop(0, 'rgba(0,0,0,1)'); gr.addColorStop(0.6, 'rgba(0,0,0,0.6)'); gr.addColorStop(1, 'rgba(0,0,0,0)'); g.fillStyle = gr; g.fillRect(x - r, y - r, r * 2, r * 2); };
-  hole(p.x - G.cam.x, p.y - G.cam.y - 6, 96);
+  hole(p.x - G.cam.x, p.y - G.cam.y - 6, red ? 68 : 96);
   const x0 = Math.floor(G.cam.x / T), y0 = Math.floor(G.cam.y / T);
   const flick = Math.sin(G.t * 9) * 3 + Math.sin(G.t * 23) * 2;
   for (let ty = y0; ty <= y0 + SH; ty++) for (let tx = x0; tx <= x0 + SW; tx++) if (tile(tx, ty) === 't') hole(tx * T + 8 - G.cam.x, ty * T + 6 - G.cam.y, 52 + flick);
+  for (let ty = y0; ty <= y0 + SH; ty++) for (let tx = x0; tx <= x0 + SW; tx++) if (tile(tx, ty) === 'e') hole(tx * T + 8 - G.cam.x, ty * T + 8 - G.cam.y, 34 + flick);
   ctx.drawImage(LIGHT, 0, 0);
+  if (red) {
+    ctx.globalCompositeOperation = 'lighter';
+    for (let ty = y0; ty <= y0 + SH; ty++) for (let tx = x0; tx <= x0 + SW; tx++) if (tile(tx, ty) === 'e') {
+      const x = tx * T + 8 - G.cam.x, y = ty * T + 8 - G.cam.y, gr = ctx.createRadialGradient(x, y, 0, x, y, 40);
+      gr.addColorStop(0, `rgba(255,30,30,${0.28 + 0.1 * Math.sin(G.t * 4)})`); gr.addColorStop(1, 'rgba(255,30,30,0)'); ctx.fillStyle = gr; ctx.fillRect(x - 40, y - 40, 80, 80);
+    }
+    ctx.globalCompositeOperation = 'source-over';
+  }
   // warm glow on top
   ctx.globalCompositeOperation = 'lighter';
   for (let ty = y0; ty <= y0 + SH; ty++) for (let tx = x0; tx <= x0 + SW; tx++) if (tile(tx, ty) === 't') {

@@ -161,6 +161,7 @@ function musicFor() {
     return G.ents.some(e => e.type === 'king' && e.alive) ? 'boss' : 'arena';
   }
   if (!G.map) return null;
+  if (G.map.redeye) return G.ents.some(e => e.type === 'attendant' && e.alive) ? 'boss' : 'creepy';
   if (G.mapId === 'bjarne_house' && flag('bjarne_done')) return 'bjarne';
   if (G.map.interior) return 'village';
   if (G.map.dark) return 'dungeon';

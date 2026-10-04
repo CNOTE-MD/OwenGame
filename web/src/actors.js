@@ -20,6 +20,7 @@ function makeEnt(d, x, y) {
     case 'stairs': return s.flags['grave_open'] ? { ...base, kind: 'warp' } : null;
     case 'qitem': return (s.flags['got:' + d.id] || (d.needs && !s.flags[d.needs])) ? null : { ...base, kind: 'pickup', what: 'qitem', id: d.id, underBush: !!d.underBush, permanent: true };
     case 'switch': return { ...base, solid: true, hittable: true, id: d.id, cd: 0 };
+    case 'cart': return { ...base, kind: 'hazard', type: 'cart', dir: 1, wob: 0 };
     default: return makeEnemy(d.t, x, y);
   }
 }
@@ -30,12 +31,14 @@ const ENEMY = {
   bat: { hp: 1, r: 5, touch: 1, speed: 75, fly: true },
   knight: { hp: 5, r: 10, touch: 2, speed: 28, shield: true, boss: true },
   king: { hp: 10, r: 16, touch: 2, speed: 26, boss: true },
+  imp: { hp: 2, r: 5, touch: 1, speed: 0 },
+  attendant: { hp: 12, r: 8, touch: 2, speed: 0, boss: true },
 };
 function makeEnemy(type, x, y) {
   const d = ENEMY[type];
   if (!d) return null;
   return { x, y, kind: 'enemy', enemy: true, alive: true, type, ...d, max: d.hp, flash: 0, kx: 0, ky: 0, t: Math.random() * 2,
-    st: type === 'king' || type === 'knight' ? 'intro' : 'idle', fx: 0, fy: 1, wob: Math.random() * 6, tx: x, ty: y, bounces: 0, summoned: false };
+    st: type === 'king' || type === 'knight' || type === 'attendant' ? 'intro' : 'idle', fx: 0, fy: 1, wob: Math.random() * 6, tx: x, ty: y, bounces: 0, summoned: false };
 }
 
 // ---------- particles ----------
@@ -50,6 +53,8 @@ function drawFx() {
   for (const f of G.fx) {
     if (f.kind === 'text') { text(f.label, f.x - G.cam.x, f.y - G.cam.y - f.t * 12, f.color, 'center'); continue; }
     if (f.kind === 'poof') { const img = POOF[Math.min(3, Math.floor(f.t / f.life * 4))], s = f.scale; ctx.drawImage(img, Math.round(f.x - G.cam.x - 12 * s), Math.round(f.y - G.cam.y - 12 * s), 24 * s, 24 * s); continue; }
+    if (f.kind === 'whisper') { drawWhisper(f); continue; }
+    if (f.kind === 'ring') { const k = f.t / f.life; ctx.strokeStyle = `rgba(255,120,90,${1 - k})`; ctx.lineWidth = 2; ctx.beginPath(); ctx.arc(Math.round(f.x - G.cam.x), Math.round(f.y - G.cam.y), 8 + k * 120, 0, Math.PI * 2); ctx.stroke(); continue; }
     if (f.kind === 'ripple') { if (f.t < 0) continue; const k = f.t / f.life; ctx.strokeStyle = `rgba(220,240,255,${1 - k})`; ctx.lineWidth = 1; ctx.beginPath(); ctx.ellipse(Math.round(f.x - G.cam.x), Math.round(f.y - G.cam.y + 4), 4 + k * 14, 2 + k * 6, 0, 0, Math.PI * 2); ctx.stroke(); continue; }
     if (f.kind === 'leaf') { R(f.x - G.cam.x, f.y - G.cam.y, 2, 1, f.color); R(f.x - G.cam.x + 1, f.y - G.cam.y + 1, 1, 1, '#205818'); continue; }
     R(f.x - G.cam.x, f.y - G.cam.y, f.size, f.size, f.color);
@@ -135,6 +140,8 @@ function updatePlayer(dt) {
     if (G.jon.mode === 'follow') { G.jon.swing(Math.atan2(p.fy, p.fx)); Sound.play('swing'); }
   } else if (just('b') && G.jon.mode === 'follow') {
     G.jon.throw(p.x, p.y, p.fx, p.fy); Sound.play('throw');
+  } else if (just('horn')) {
+    blowHorn();
   } else if (just('c')) {
     if (!s.items.thunder) floatText(p.x, p.y - 18, 'No rune yet', '#aab');
     else if (s.rune < RUNE_MAX) { floatText(p.x, p.y - 18, 'Rune not full', '#7fd4ff'); }
@@ -206,7 +213,10 @@ function interact(e) {
       });
     case 'cargo':
       if (!flag('cargo')) { setFlag('cargo'); Sound.play('creep'); G.flash = 0.25; G.flashColor = '#5a0000'; return say(STORY.cargo); }
-      return say(STORY.cargo_later);
+      if (!flag('d1done')) return say(STORY.cargo_later);
+      if (flag('redeye_done')) return say(STORY.cargo_done);
+      Sound.play('creep');
+      return say(STORY.cargo_open, () => startWarp('redeye', [2, 7]));
     case 'runestone':
       p.hp = s.maxHp; s.voodoo = true; s.cp = { map: G.mapId, x: p.x, y: p.y }; writeSave(); Sound.play('save'); puff(e.x, e.y - 6, '#7fd4ff', 12);
       return say(STORY.saved);
@@ -270,6 +280,7 @@ function applyItem(id) {
     case 'shard': s.rune = RUNE_MAX; break;
     case 'heart3': p.hp = s.maxHp; break;
     case 'sheet': case 'ship': break;
+    case 'horn': s.items.horn = true; break;
   }
 }
 function giveItem(id, after) {
@@ -388,11 +399,11 @@ function damageEnemy(e, dmg, from, how) {
     floatText(e.x, e.y - 18, 'STAGGER!', '#ffd84a');
     return true;
   }
-  if (e.type === 'king' && e.st !== 'daze' && how !== 'thunder') {
+  if ((e.type === 'king' || e.type === 'attendant') && e.st !== 'daze' && how !== 'thunder') {
     if (jonHit) { Sound.play('clank'); floatText(e.x, e.y - 30, 'CLANK', '#ffd84a'); }
     return true;
   }
-  if (e.type === 'king' && how === 'thunder') { e.st = 'daze'; e.t = 0; dmg = 2; }
+  if ((e.type === 'king' || e.type === 'attendant') && how === 'thunder') { e.st = 'daze'; e.t = 0; dmg = 2; }
   e.hp -= dmg; e.flash = 0.18; Sound.play('hit');
   if (G.mode === 'arena') floatText(e.x, e.y - 12, String(Math.round(dmg * 10) / 10), G.lastCrit ? '#ffd84a' : '#fff');
   const k = (e.boss ? 60 : 150) * G.st.knock; e.kx = -dx / d * k; e.ky = -dy / d * k;
@@ -408,6 +419,7 @@ function killEnemy(e) {
   if (G.mode === 'arena') return arenaKill(e);
   if (!e.boss) maybeDrop(e.x, e.y, 0.65);
   if (e.type === 'king') { G.shake = 0.6; say(STORY.king_down, checkRoomClear); return; }
+  if (e.type === 'attendant') { G.shake = 0.6; RE.shots = []; say(STORY.attendant_down, () => { setFlag('redeye_done'); checkRoomClear(); }); return; }
   checkRoomClear();
 }
 function maybeDrop(x, y, chance) {
@@ -426,7 +438,10 @@ function updateEnemy(e, dt) {
   const kl = Math.hypot(e.kx, e.ky);
   if (kl > 1) { tryMove(e, e.kx * dt, e.ky * dt, mr, who); const nl = Math.max(0, kl - 420 * dt); e.kx *= nl / kl; e.ky *= nl / kl; }
   const toward = sp => tryMove(e, dx / d * sp * dt, dy / d * sp * dt, mr, who);
+  if (e.fear > 0) { e.fear -= dt; tryMove(e, -dx / d * 70 * dt, -dy / d * 70 * dt, mr, who); return; }   // Demon Horn
   switch (e.type) {
+    case 'imp': updateImp(e, dt, dx, dy, d, mr); break;
+    case 'attendant': updateAttendant(e, dt, dx, dy, d, mr); break;
     case 'penguin':
       if (d < 120 || e.aggro) { toward(e.speed); e.fx = dx / d; e.fy = dy / d; }
       break;
@@ -467,7 +482,7 @@ function updateEnemy(e, dt) {
       } else if (e.st === 'daze') { if (e.t > 2.2) { e.st = 'waddle'; e.t = 0; } }
       break;
   }
-  if (d < e.r + 5 && e.st !== 'daze') hurtPlayer(e.touch, e);
+  if (d < e.r + 5 && e.st !== 'daze' && !(e.type === 'attendant' && (e.st === 'hide' || e.st === 'intro'))) hurtPlayer(e.touch, e);
 }
 
 function updatePickup(e, dt) {

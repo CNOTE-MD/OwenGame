@@ -31,7 +31,7 @@ const flag = k => !!G.save.flags[k];
 const setFlag = k => { G.save.flags[k] = true; };
 
 // ---------- tiles ----------
-const SOLID = new Set('T#MwHRDPqX+lWtOYQZxLKbVCkp'.split(''));
+const SOLID = new Set('T#MwHRDPqX+lWtOYQZxLKbVCkpueAB'.split(''));
 function tile(tx, ty) {
   if (tx < 0 || ty < 0 || tx >= G.cols || ty >= G.nrows) return G.map.dungeon ? 'W' : 'T';
   return G.rows[ty][tx];
@@ -47,7 +47,8 @@ function gatesDown() { return flag(G.mapId + ':gates'); }
 function solidTile(tx, ty, who) {
   const c = tile(tx, ty);
   if (c === 'T' && isCanopy(tx, ty)) return false;   // walk behind big tree tops
-  if (who === 'flyer') return c === 'W' || c === 'T' || c === 'M' || c === 'Z' || c === 'V';
+  if (c === 'J') return who !== 'flyer' && who !== 'jon' && phantomSolid();
+  if (who === 'flyer') return c === 'W' || c === 'T' || c === 'M' || c === 'Z' || c === 'V' || c === 'u' || c === 'e';
   if (c === 'h') return shutterClosed(tx, ty);
   if (c === 'G') return !gatesDown();
   if (who === 'jon') return SOLID.has(c) && c !== 'b' && c !== 'O' && c !== 'x' && c !== 'w' && c !== 'Q';
@@ -236,6 +237,6 @@ function drawMap() {
   for (let ty = y0; ty <= y0 + SH; ty++) for (let tx = x0; tx <= x0 + SW; tx++) {
     if (tx < 0 || ty < 0 || tx >= G.cols || ty >= G.nrows) continue;
     const c = claimedGround(tx, ty) || G.rows[ty][tx], ox = tx * T - cx, oy = ty * T - cy;
-    if (!drawTileArt(c, ox, oy, tx, ty) && !drawTileB(c, ox, oy, tx, ty)) drawTile(c, ox, oy, tx, ty);
+    if (!drawTileRE(c, ox, oy, tx, ty) && !drawTileArt(c, ox, oy, tx, ty) && !drawTileB(c, ox, oy, tx, ty)) drawTile(c, ox, oy, tx, ty);
   }
 }

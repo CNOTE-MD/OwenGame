@@ -37,6 +37,10 @@ const STORY = {
     ['', 'A voice whispers your name through the metal. Then it laughs.'],
     ['Jon', 'Nope. Nope nope nope. We are NOT going in there yet. Come back when we are stronger.'],
   ],
+  cargo_open: [['', 'The cargo hold door hangs open. Red light spills out. Something inside is humming the safety announcement.'], ['Jon', 'We are stronger now. I have THUNDER. ...I still don\'t want to go in. Fine. Let\'s go.']],
+  cargo_done: [['Jon', 'Empty now. The seats are back where they belong. I checked twice.']],
+  attendant: [['Attendant', 'Welcome aboard, sir. Please remain seated.'], ['Attendant', 'Any... refreshments?'], ['Jon', 'She only shows up when the lights flicker! Watch for her claws, dodge the dash, then hit her while she\'s dizzy!']],
+  attendant_down: [['Attendant', 'Wonderful... Chilly will... hear about... this...'], ['', 'She folds up like a napkin and blows away through an air vent.'], ['Jon', 'I am never flying coach again.']],
   cargo_later: [['Jon', 'The scratching stopped. That is somehow worse. (The Red-Eye side quest arrives in a later chapter.)']],
   astrid_1: [
     ['Astrid', 'So. The boy who pulled Jontuka out of the lake has come back. And still alive. Mostly.'],
@@ -130,6 +134,7 @@ const ITEMS = {
   juice: { name: 'Lingonberry Juice', icon: 'juice', lines: [['', 'LINGONBERRY JUICE! If your hearts run out, you drink it automatically.']] },
   shard: { name: 'Rune Shard', icon: 'shard', lines: [['', 'A RUNE SHARD! Your rune meter fills up.']] },
   heart3: { name: 'Heart Refill', icon: 'heart', lines: [['', 'Hearts refilled!']] },
+  horn: { name: 'Demon Horn', icon: 'horn', lines: [['', 'You got the DEMON HORN! It came from the flight attendant\'s... luggage.'], ['Jon', 'Blow it with V. Costs half the rune meter. Regular enemies run away screaming. Bosses are too proud to care.']] },
   sheet: { name: 'Sheet Music', icon: 'sheet', lines: [['', 'You found BJARNE\'S SHEET MUSIC! It says "RUSH Ø" at the top. There are WAY too many notes.'], ['Jon', 'Bring it back to Bjarne in Fjordvik. The house on the right.']] },
   ship: { name: 'Toy Longship', icon: 'ship', lines: [['', 'You found SVEN\'S TOY LONGSHIP!'], ['Jon', 'Tiny Vikings. Adorable. Back to Sven at the market.']] },
 };
