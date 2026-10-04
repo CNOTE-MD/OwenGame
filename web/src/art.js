@@ -443,6 +443,7 @@ function buildAll() {
   SPR.chest_open = buildSprite(CHEST_ROWS.map((r, i) => i === 1 || i === 2 ? 'b' + 'k'.repeat(12) + 'b' : r), { ...PAL_CHEST, k: '#1a0c06' });
   SPR.sign = buildSprite(SIGN_ROWS, PAL_SIGN);
   SPR.runestone = buildSprite(RUNE_ROWS, PAL_RUNE);
+  buildIcons();
   buildPoof();
 }
 function shade(hex, k) { const [r, g, b] = hexRgb(hex); const f = v => Math.max(0, Math.min(255, Math.round(v * (1 + k)))); return '#' + [f(r), f(g), f(b)].map(v => v.toString(16).padStart(2, '0')).join(''); }

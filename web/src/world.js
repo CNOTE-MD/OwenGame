@@ -234,6 +234,6 @@ function drawMap() {
   for (let ty = y0; ty <= y0 + SH; ty++) for (let tx = x0; tx <= x0 + SW; tx++) {
     if (tx < 0 || ty < 0 || tx >= G.cols || ty >= G.nrows) continue;
     const c = claimedGround(tx, ty) || G.rows[ty][tx], ox = tx * T - cx, oy = ty * T - cy;
-    if (!drawTileArt(c, ox, oy, tx, ty)) drawTile(c, ox, oy, tx, ty);
+    if (!drawTileArt(c, ox, oy, tx, ty) && !drawTileB(c, ox, oy, tx, ty)) drawTile(c, ox, oy, tx, ty);
   }
 }

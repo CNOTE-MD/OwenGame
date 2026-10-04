@@ -134,7 +134,9 @@ const LOOKS = {
 
 function drawItemIcon(id, x, y) {
   x = Math.round(x); y = Math.round(y);
-  switch (ITEMS[id] ? ITEMS[id].icon : id) {
+  const ic = ITEMS[id] ? ITEMS[id].icon : id;
+  if (ic !== 'homing' && drawIconSpr(ic, x, y)) return;
+  switch (ic) {
     case 'key': R(x - 1, y - 6, 3, 9, '#ffd84a'); R(x - 3, y - 7, 7, 4, '#ffd84a'); R(x - 1, y - 6, 3, 2, '#000'); R(x + 2, y + 1, 2, 2, '#ffd84a'); break;
     case 'bigkey': R(x - 2, y - 7, 4, 13, '#ffd84a'); R(x - 5, y - 8, 10, 6, '#ffd84a'); R(x - 2, y - 7, 4, 3, '#a87a10'); R(x + 2, y + 2, 3, 2, '#ffd84a'); R(x + 2, y - 1, 3, 2, '#ffd84a'); break;
     case 'homing': drawJonSprite(x, y, 0.4); R(x - 8, y - 8, 3, 1, '#ffd84a'); R(x + 6, y + 6, 3, 1, '#ffd84a'); break;
@@ -165,7 +167,8 @@ function drawThing(e) {
       if (e.life !== undefined && e.life < 2 && Math.floor(t * 10) % 2) break;
       const b = Math.round(Math.sin(t * 4 + e.x) * 1.5);
       if (e.what === 'heart') drawHeart(x - 3, y - 3 + b, 1);
-      else if (e.what === 'kr1' || e.what === 'kr5' || e.what === 'krn') { R(x - 3, y - 3 + b, 6, 6, (e.what === 'kr5' || e.value >= 5) ? '#ffd84a' : '#d0d6e0'); R(x - 1, y - 2 + b, 2, 4, (e.what === 'kr5' || e.value >= 5) ? '#a87a10' : '#8a92a0'); }
+      else if (e.what === 'kr1' || e.what === 'kr5' || e.what === 'krn') { drawIconSpr(e.what === 'kr5' || e.value >= 5 ? 'gold' : 'coin', x, y + b); }
+      else if (false) { R(x - 3, y - 3 + b, 6, 6, (e.what === 'kr5' || e.value >= 5) ? '#ffd84a' : '#d0d6e0'); R(x - 1, y - 2 + b, 2, 4, (e.what === 'kr5' || e.value >= 5) ? '#a87a10' : '#8a92a0'); }
       else if (e.what === 'rune') drawItemIcon('shard', x, y + b);
       else drawItemIcon(e.what, x, y + b);
       break; }
