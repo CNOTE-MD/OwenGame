@@ -85,6 +85,9 @@ function drawMenu() {
     if (have) { if (custom) custom(); else drawItemIcon(icon, 29, y); text(label, 44, y + 4, '#fff'); }
     else text('???', 44, y + 4, '#55577a');
   });
+  const sq = (n, start, done) => flag(start) ? n + (flag(done) ? ' ✓' : ' …') : null;
+  const side = [sq('Bjarne', 'quest_bjarne', 'bjarne_done'), sq('Sven', 'quest_sven', 'sven_done')].filter(Boolean);
+  if (side.length) text('Side quests: ' + side.join('  '), 20, 126, '#c8e8ff', 'left', false);
   text('Heart pieces: ' + s.pieces + '/4', 20, 138, '#f2ebcc');
   text('Voodoo bond: ' + (s.voodoo ? 'ready' : 'used'), 20, 150, s.voodoo ? '#9be08a' : '#c9a0f0');
   if (G.map.dungeon) text('Keys ' + (s.keys[G.mapId] || 0) + '   Big key: ' + (s.bigkeys[G.mapId] ? 'yes' : 'no'), 20, 162, '#f2ebcc');

@@ -87,6 +87,17 @@ TRACKS = {
       "k": "x...x..x..x..|x...x..x..x..", "s": "..x..x...x..x|..x..x...xxxx",
       "h": rep("xxxxxxxxxxxxx", 2), "c": "x............|x............", "t": ".............|.........hhml"},
   }},
+  "bjarne": {"name": "Rush Ø (Bjarne's Masterpiece)", "bpm": 200, "gain": 0.8, "order": ["A", "A", "B"], "sections": {
+    "A": {"steps": 8,
+      "pluck": "E4 G4 B4 E5 B4 G4 E4 G4 | F#4 A4 C5 F#5 C5 A4 F#4 A4 | G4 B4 D5 G5 D5 B4 G4 B4 | A4 C5 E5 A5 G5 F#5 E5 D#5",
+      "bass":  "E2 E3 E2 E3 E2 E3 E2 E3 | D2 D3 D2 D3 D2 D3 D2 D3 | G2 G3 G2 G3 G2 G3 G2 G3 | A2 A3 B2 B3 B2 B3 B2 B3",
+      "k": rep("x.x.x.x.", 4), "s": "..x...x.|..x...x.|..x...x.|..x.xxxx", "h": rep("xxxxxxxx", 4)},
+    "B": {"steps": 8,
+      "pluck": "E5 D#5 E5 B4 G4 B4 E5 G5 | F#5 E5 D#5 E5 B4 G4 F#4 G4 | E5 G5 B5 G5 E5 B4 G4 E4 | B4 A#4 B4 C5 B4 A4 G4 F#4",
+      "lead":  "B5 - - - - - - - | A5 - - - - - - - | G5 - - - E6 - - - | D#6 - - - B5 - - -",
+      "bass":  "E2 E3 E2 E3 E2 E3 E2 E3 | C2 C3 C2 C3 C2 C3 C2 C3 | A1 A2 A1 A2 A1 A2 A1 A2 | B1 B2 B1 B2 B1 B2 B1 B2",
+      "k": rep("x.x.x.x.", 4), "s": rep("..x...x.", 4), "h": rep("xxxxxxxx", 4), "c": "x.......|........|x.......|........"},
+  }},
   "creepy": {"name": "Flight 364", "bpm": 60, "gain": 1.8, "order": ["A"], "sections": {
     "A": {"steps": 8,
       "pad":  rep("A2+D#3 - - - - - - -", 4),

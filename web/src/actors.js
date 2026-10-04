@@ -15,6 +15,10 @@ function makeEnt(d, x, y) {
     case 'piece': case 'container': return s.flags['got:' + d.id] ? null : { ...base, kind: 'pickup', what: d.t, id: d.id, permanent: true };
     case 'warp': return { ...base, portal: !!d.portal };
     case 'flight': return { ...base };
+    case 'door': return { ...base, talk: true };
+    case 'grave': return { ...base, talk: true };
+    case 'stairs': return s.flags['grave_open'] ? { ...base, kind: 'warp' } : null;
+    case 'qitem': return (s.flags['got:' + d.id] || (d.needs && !s.flags[d.needs])) ? null : { ...base, kind: 'pickup', what: 'qitem', id: d.id, underBush: !!d.underBush, permanent: true };
     case 'switch': return { ...base, solid: true, hittable: true, id: d.id, cd: 0 };
     default: return makeEnemy(d.t, x, y);
   }
@@ -189,13 +193,24 @@ function interact(e) {
     case 'sign': return say(STORY.signs[e.def.text] || [['', '...']]);
     case 'sealed': return say(STORY.signs[e.def.text]);
     case 'plaque': return say(STORY.plaque, () => setFlag('read_plaque'));
+    case 'door': return startWarp(e.def.to, e.def.dest);
+    case 'grave':
+      if (flag('grave_open')) return say(STORY.grave_open);
+      return say(STORY.grave, () => {
+        setFlag('grave_open');
+        const tx = Math.floor(e.x / T), ty = Math.floor(e.y / T);
+        setTile(tx, ty, '>'); setFlag(`tile:${G.mapId}:${tx},${ty}:>`);
+        G.ents = G.ents.filter(o => o !== e);
+        G.ents.push({ kind: 'warp', x: e.x, y: e.y, def: MAPS[G.mapId].ents.find(d => d.t === 'stairs') });
+        Sound.play('secret'); G.shake = 0.3; puff(e.x, e.y, '#c8c8d8', 14); writeSave();
+      });
     case 'cargo':
       if (!flag('cargo')) { setFlag('cargo'); Sound.play('creep'); G.flash = 0.25; G.flashColor = '#5a0000'; return say(STORY.cargo); }
       return say(STORY.cargo_later);
     case 'runestone':
       p.hp = s.maxHp; s.voodoo = true; s.cp = { map: G.mapId, x: p.x, y: p.y }; writeSave(); Sound.play('save'); puff(e.x, e.y - 6, '#7fd4ff', 12);
       return say(STORY.saved);
-    case 'npc': return say(npcLines(e.id));
+    case 'npc': { const lines = npcLines(e.id), after = G.afterTalk; G.afterTalk = null; return say(lines, after); }
     case 'shop': return buy(e);
     case 'chest':
       if (e.open) return say([['', 'The chest is empty.']]);
@@ -209,7 +224,25 @@ function npcLines(id) {
     if (!flag('met_astrid')) { setFlag('met_astrid'); G.save.kr += 30; return [...STORY.astrid_1, ['', 'Astrid gave you 30 kroner.']]; }
     return flag('d1done') ? STORY.astrid_3 : STORY.astrid_2;
   }
-  if (id === 'sven') return flag('got:hp_forest') ? STORY.sven_2 : STORY.sven_1;
+  if (id === 'sven') {
+    if (!flag('met_astrid')) return flag('got:hp_forest') ? STORY.sven_2 : STORY.sven_1;
+    if (!flag('quest_sven')) { setFlag('quest_sven'); return STORY.sven_quest; }
+    if (flag('got:ship') && !flag('sven_done')) {
+      setFlag('sven_done'); G.save.kr += 30; G.save.potions = Math.min(3, G.save.potions + 1);
+      return [...STORY.sven_thanks, ['', 'Sven gave you 30 kroner and a Lingonberry Juice!']];
+    }
+    if (!flag('sven_done')) return STORY.sven_waiting;
+    return flag('got:hp_forest') ? STORY.sven_2 : STORY.sven_1;
+  }
+  if (id === 'bjarne') {
+    if (!flag('quest_bjarne')) { setFlag('quest_bjarne'); return STORY.bjarne_quest; }
+    if (flag('got:sheet') && !flag('bjarne_done')) {
+      setFlag('bjarne_done');
+      G.afterTalk = () => { setFlag('got:hp_bjarne'); giveItem('piece'); };
+      return STORY.bjarne_thanks;
+    }
+    return flag('bjarne_done') ? STORY.bjarne_after : STORY.bjarne_waiting;
+  }
   return STORY[id] || [['', '...']];
 }
 
@@ -236,6 +269,7 @@ function applyItem(id) {
     case 'juice': s.potions++; break;
     case 'shard': s.rune = RUNE_MAX; break;
     case 'heart3': p.hp = s.maxHp; break;
+    case 'sheet': case 'ship': break;
   }
 }
 function giveItem(id, after) {
@@ -438,6 +472,7 @@ function updateEnemy(e, dt) {
 
 function updatePickup(e, dt) {
   if (e.life !== undefined) { e.life -= dt; if (e.life <= 0) { G.ents = G.ents.filter(o => o !== e); return; } }
+  if (e.underBush && tileAt(e.x, e.y) === 'b') return;   // still hidden under its bush
   const dp = dist(e, G.player);
   if (G.mode === 'arena' && (dp < G.st.pickup || e.magnet)) { const k = Math.min(1, 9 * dt); e.x += (G.player.x - e.x) * k; e.y += (G.player.y - e.y) * k; }
   if (dp > 11) return;
@@ -452,6 +487,10 @@ function updatePickup(e, dt) {
     case 'piece': case 'container':
       setFlag('got:' + e.id);
       giveItem(e.what);
+      break;
+    case 'qitem':
+      setFlag('got:' + e.id);
+      giveItem(e.id);
       break;
   }
 }

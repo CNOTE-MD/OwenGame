@@ -203,6 +203,68 @@ const MAPS = {
 ]
 },
 {
+"t": "door",
+"at": [
+4,
+18
+],
+"to": "astrid_house",
+"dest": [
+7,
+12
+]
+},
+{
+"t": "door",
+"at": [
+13,
+19
+],
+"to": "bjarne_house",
+"dest": [
+7,
+12
+]
+},
+{
+"t": "qitem",
+"id": "sheet",
+"at": [
+43,
+37
+],
+"needs": "quest_bjarne"
+},
+{
+"t": "qitem",
+"id": "ship",
+"at": [
+21,
+9
+],
+"needs": "quest_sven",
+"underBush": true
+},
+{
+"t": "grave",
+"at": [
+61,
+36
+]
+},
+{
+"t": "stairs",
+"at": [
+61,
+36
+],
+"to": "secret_cave",
+"dest": [
+8,
+11
+]
+},
+{
 "t": "piece",
 "id": "hp_forest",
 "at": [
@@ -678,7 +740,8 @@ const MAPS = {
 13
 ]
 }
-]
+],
+"interior": true
 },
 "arena": {
 "name": "Valhalla Arena",
@@ -714,5 +777,210 @@ const MAPS = {
 ],
 "ents": [],
 "arena": true
+},
+"astrid_house": {
+"name": "Astrid's House",
+"rows": [
+"ZZZZZZZZZZZZZZZZ",
+"ZkkFFFppFFFFkkFZ",
+"ZFFFFFFFFFFFFFFZ",
+"ZFFFFFFFFFFFFFFZ",
+"ZFFQQFFFFFFFFYYZ",
+"ZFFFFFFFFFFFFYYZ",
+"ZFFFFrrrrrrFFFFZ",
+"ZFFFFrrrrrrFFFFZ",
+"ZOFFFrrrrrrFFFOZ",
+"ZOFFFFFFFFFFFFFZ",
+"ZFFFFFFFFFFFFFFZ",
+"ZFFFFFFFFFFFFFFZ",
+"ZFFFFFFFFFFFFFFZ",
+"ZZZZZZZddZZZZZZZ"
+],
+"ents": [
+{
+"t": "sign",
+"at": [
+10,
+0
+],
+"text": "tapestry"
+},
+{
+"t": "sign",
+"at": [
+2,
+1
+],
+"text": "bookshelf"
+},
+{
+"t": "chest",
+"id": "c_astrid",
+"at": [
+14,
+10
+],
+"item": "juice"
+},
+{
+"t": "warp",
+"at": [
+7,
+13
+],
+"to": "overworld",
+"dest": [
+4,
+19
+]
+},
+{
+"t": "warp",
+"at": [
+8,
+13
+],
+"to": "overworld",
+"dest": [
+4,
+19
+]
+}
+],
+"interior": true
+},
+"bjarne_house": {
+"name": "Bjarne's House",
+"rows": [
+"ZZZZZZZZZZZZZZZZ",
+"ZkkFFFFFFFFFkkFZ",
+"ZFFFFFFFFFFFFFFZ",
+"ZFFFFFFFFFFFFFFZ",
+"ZFFFFFFFFFFFYYFZ",
+"ZFFQQQFFFFFFYYFZ",
+"ZFFFFFFFFFFFFFFZ",
+"ZFFFFrrrrrrFFFFZ",
+"ZFFFFrrrrrrFFFFZ",
+"ZFFFFrrrrrrFFFFZ",
+"ZFFFFFFFFFFFFFFZ",
+"ZOFFFFFFFFFFFFOZ",
+"ZFFFFFFFFFFFFFFZ",
+"ZZZZZZZddZZZZZZZ"
+],
+"ents": [
+{
+"t": "npc",
+"id": "bjarne",
+"at": [
+7,
+6
+]
+},
+{
+"t": "sign",
+"at": [
+10,
+0
+],
+"text": "rush_poster"
+},
+{
+"t": "warp",
+"at": [
+7,
+13
+],
+"to": "overworld",
+"dest": [
+13,
+20
+]
+},
+{
+"t": "warp",
+"at": [
+8,
+13
+],
+"to": "overworld",
+"dest": [
+13,
+20
+]
+}
+],
+"interior": true
+},
+"secret_cave": {
+"name": "Hidden Cave",
+"rows": [
+"CCCCCCCCCCCCCCCC",
+"CCCggggCCCggggCC",
+"CCggggggggggggCC",
+"CgggCCggggCCgggC",
+"CggggggggggggggC",
+"CggCgggOOgggCggC",
+"CgggggggggggggCC",
+"CCggggCCCCgggggC",
+"CCgggggCCgggggCC",
+"CgggggggggggOggC",
+"CggCCgggggggggCC",
+"CCgggggggggCCgCC",
+"CCCggggg<gggCCCC",
+"CCCCCCCCCCCCCCCC"
+],
+"ents": [
+{
+"t": "chest",
+"id": "c_cave",
+"at": [
+5,
+1
+],
+"item": "piece"
+},
+{
+"t": "bat",
+"at": [
+4,
+4
+]
+},
+{
+"t": "bat",
+"at": [
+11,
+8
+]
+},
+{
+"t": "wisp",
+"at": [
+12,
+2
+]
+},
+{
+"t": "warp",
+"at": [
+8,
+12
+],
+"to": "overworld",
+"dest": [
+61,
+37
+]
+},
+{
+"t": "sign",
+"at": [
+6,
+7
+],
+"text": "cave_carving"
+}
+],
+"dark": true
 }
 };

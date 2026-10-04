@@ -126,6 +126,7 @@ function drawPerson(x, y, id, bob) {
   spr(SPR['npc_' + id + (blink ? '_blink' : '')] || SPR.npc_sven, x, y + 7 + b);
 }
 const LOOKS = {
+  bjarne: { shirt: '#3a7a4a', hair: '#e8e8e8', beard: true, hat: '#7a4a22' },
   astrid: { shirt: '#6b3fa0', hair: '#e8e8e8', long: true },
   lars: { shirt: '#b33a2e', hair: '#d9a441', beard: true },
   sven: { shirt: '#2f8a5a', hair: '#f2d27a' },
@@ -165,6 +166,8 @@ function drawThing(e) {
     case 'shop': drawItemIcon(e.item, x, y - 2); text(String(e.price), x, y + 12, '#fff', 'center'); break;
     case 'pickup': {
       if (e.life !== undefined && e.life < 2 && Math.floor(t * 10) % 2) break;
+      if (e.underBush && tileAt(e.x, e.y) === 'b') break;
+      if (e.what === 'qitem') { const b = Math.round(Math.sin(t * 4) * 1.5); shadowAt(x, y + 6, 0.7); drawItemIcon(e.id, x, y + b); if (Math.floor(t * 3) % 3 === 0) drawTwinkle(x + 6, y - 6 + b, 0); break; }
       const b = Math.round(Math.sin(t * 4 + e.x) * 1.5);
       if (e.what === 'heart') drawHeart(x - 3, y - 3 + b, 1);
       else if (e.what === 'kr1' || e.what === 'kr5' || e.what === 'krn') { drawIconSpr(e.what === 'kr5' || e.value >= 5 ? 'gold' : 'coin', x, y + b); }

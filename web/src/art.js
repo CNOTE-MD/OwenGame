@@ -613,7 +613,7 @@ function renderTile(c, v, mask, shadow, frame, snowy, dungeon) {
         ball(P, 8, 9, 7, 6, ['#d8d8e4', '#a0a0b4', '#74748a', '#4a4a5c'], r, { noise: 0.4 });
         P(6, 8, '#4a4a5c'); P(7, 9, '#4a4a5c'); P(7, 10, '#4a4a5c'); P(10, 7, '#4a4a5c');
         break;
-      case 'O': for (let y = 0; y < T; y++) for (let x = 0; x < T; x++) P(x, y, dungeon ? '#5b6b8c' : COL.grass);
+      case 'O': for (let y = 0; y < T; y++) for (let x = 0; x < T; x++) P(x, y, dungeon ? '#5b6b8c' : G.map.interior ? '#a26c38' : G.map.dark ? '#3a2c22' : COL.grass);
         ball(P, 8, 10, 6, 5, ['#e0a070', '#b8784a', '#8a5432', '#5a3420'], r, { noise: 0.2 });
         for (let x = 5; x < 11; x++) { P(x, 4, OUTLINE); P(x, 5, '#3a2014'); } P(4, 5, OUTLINE); P(11, 5, OUTLINE);
         for (let x = 5; x < 11; x++) P(x, 9, '#5a3420');
@@ -699,7 +699,7 @@ function drawTileArt(c, ox, oy, tx, ty) {
   const v = hash(tx, ty) % 4;
   const animated = '~wUi'.includes(c) || c === 'f';
   const frame = animated ? Math.floor(G.t * (c === 'f' ? 2 : 4)) % 8 : 0;
-  const key = `${c}|${v}|${mask}|${k.shadow}|${frame}|${snowy ? 1 : 0}|${dungeon ? 1 : 0}|${G.map.arena ? 1 : 0}`;
+  const key = `${c}|${v}|${mask}|${k.shadow}|${frame}|${snowy ? 1 : 0}|${dungeon ? 1 : 0}|${G.map.arena ? 1 : 0}|${G.map.interior ? 1 : G.map.dark ? 2 : 0}`;
   let img = TILE_CACHE.get(key);
   if (img === undefined) { img = renderTile(c, v, mask, k.shadow, frame, snowy, dungeon); TILE_CACHE.set(key, img); }
   if (!img) return false;

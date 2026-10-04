@@ -11,6 +11,7 @@ Tile legend
   L  locked door (small key)     K boss door (big key)   h shutter   G gate (lowered by switch)
   F  wood floor   Z interior wall   Y bed   Q table   r rug   d doorway
   a  arena floor  V  arena wall
+  k  bookshelf    p  fireplace   C  cave rock   g  cave floor   >  stairs down   <  stairs up
 """
 import json, collections, pathlib
 
@@ -270,6 +271,12 @@ OW_ENT = [
     {"t": "sealed", "at": P(3, 1, 13, 3), "text": "seal_forge"},
     {"t": "sign", "at": P(2, 2, 6, 9), "text": "sign_beach"},
     {"t": "warp", "at": P(2, 0, 7, 2), "to": "cavern", "dest": [24, 54]},
+    {"t": "door", "at": P(0, 1, 4, 4), "to": "astrid_house", "dest": [7, 12]},
+    {"t": "door", "at": P(0, 1, 13, 5), "to": "bjarne_house", "dest": [7, 12]},
+    {"t": "qitem", "id": "sheet", "at": P(2, 2, 11, 9), "needs": "quest_bjarne"},
+    {"t": "qitem", "id": "ship", "at": P(1, 0, 5, 9), "needs": "quest_sven", "underBush": True},
+    {"t": "grave", "at": P(3, 2, 13, 8)},
+    {"t": "stairs", "at": P(3, 2, 13, 8), "to": "secret_cave", "dest": [8, 11]},
     {"t": "piece", "id": "hp_forest", "at": P(1, 0, 13, 3)},
     {"t": "piece", "id": "hp_grave", "at": P(3, 2, 13, 11)},
     {"t": "chest", "id": "c_coast", "at": P(0, 2, 14, 2), "item": "kr20"},
@@ -405,8 +412,80 @@ for (x, y) in [(7, 7), (24, 7), (7, 20), (24, 20), (15, 5), (16, 5), (15, 22), (
     ARENA[y][x] = "#"
 ARENA = ["".join(r) for r in ARENA]
 
+
+# ---------------- Village interiors and the secret cave ----------------
+ASTRID = [
+    "ZZZZZZZZZZZZZZZZ",
+    "ZkkFFFppFFFFkkFZ",
+    "ZFFFFFFFFFFFFFFZ",
+    "ZFFFFFFFFFFFFFFZ",
+    "ZFFQQFFFFFFFFYYZ",
+    "ZFFFFFFFFFFFFYYZ",
+    "ZFFFFrrrrrrFFFFZ",
+    "ZFFFFrrrrrrFFFFZ",
+    "ZOFFFrrrrrrFFFOZ",
+    "ZOFFFFFFFFFFFFFZ",
+    "ZFFFFFFFFFFFFFFZ",
+    "ZFFFFFFFFFFFFFFZ",
+    "ZFFFFFFFFFFFFFFZ",
+    "ZZZZZZZddZZZZZZZ",
+]
+ASTRID_ENT = [
+    {"t": "sign", "at": [10, 0], "text": "tapestry"},
+    {"t": "sign", "at": [2, 1], "text": "bookshelf"},
+    {"t": "chest", "id": "c_astrid", "at": [14, 10], "item": "juice"},
+    {"t": "warp", "at": [7, 13], "to": "overworld", "dest": P(0, 1, 4, 5)},
+    {"t": "warp", "at": [8, 13], "to": "overworld", "dest": P(0, 1, 4, 5)},
+]
+BJARNE = [
+    "ZZZZZZZZZZZZZZZZ",
+    "ZkkFFFFFFFFFkkFZ",
+    "ZFFFFFFFFFFFFFFZ",
+    "ZFFFFFFFFFFFFFFZ",
+    "ZFFFFFFFFFFFYYFZ",
+    "ZFFQQQFFFFFFYYFZ",
+    "ZFFFFFFFFFFFFFFZ",
+    "ZFFFFrrrrrrFFFFZ",
+    "ZFFFFrrrrrrFFFFZ",
+    "ZFFFFrrrrrrFFFFZ",
+    "ZFFFFFFFFFFFFFFZ",
+    "ZOFFFFFFFFFFFFOZ",
+    "ZFFFFFFFFFFFFFFZ",
+    "ZZZZZZZddZZZZZZZ",
+]
+BJARNE_ENT = [
+    {"t": "npc", "id": "bjarne", "at": [7, 6]},
+    {"t": "sign", "at": [10, 0], "text": "rush_poster"},
+    {"t": "warp", "at": [7, 13], "to": "overworld", "dest": P(0, 1, 13, 6)},
+    {"t": "warp", "at": [8, 13], "to": "overworld", "dest": P(0, 1, 13, 6)},
+]
+CAVE = [
+    "CCCCCCCCCCCCCCCC",
+    "CCCggggCCCggggCC",
+    "CCggggggggggggCC",
+    "CgggCCggggCCgggC",
+    "CggggggggggggggC",
+    "CggCgggOOgggCggC",
+    "CgggggggggggggCC",
+    "CCggggCCCCgggggC",
+    "CCgggggCCgggggCC",
+    "CgggggggggggOggC",
+    "CggCCgggggggggCC",
+    "CCgggggggggCCgCC",
+    "CCCggggg<gggCCCC",
+    "CCCCCCCCCCCCCCCC",
+]
+CAVE_ENT = [
+    {"t": "chest", "id": "c_cave", "at": [5, 1], "item": "piece"},
+    {"t": "bat", "at": [4, 4]}, {"t": "bat", "at": [11, 8]}, {"t": "wisp", "at": [12, 2]},
+    {"t": "warp", "at": [8, 12], "to": "overworld", "dest": P(3, 2, 13, 9)},
+    {"t": "sign", "at": [6, 7], "text": "cave_carving"},
+]
+for nm, g in (("astrid", ASTRID), ("bjarne", BJARNE), ("cave", CAVE)):
+    check_block(nm, g)
+
 # ---------------- reachability check ----------------
-WALK = set(".fsn~iU_vrFDEhLKGtd") - set("t")
+WALK = set(".fsn~iU_vrFDEhLKGtdg<>") - set("t")
 def reachable(grid, start, extra=set()):
     H, W = len(grid), len(grid[0])
     seen = {tuple(start)}
@@ -434,6 +513,11 @@ for e in CAV_ENT:
         continue
     ok = any((x + dx, y + dy) in cav_seen for dx, dy in ((0, 0), (1, 0), (-1, 0), (0, 1), (0, -1)))
     assert ok, ("cavern unreachable", e)
+for nm, g, ents, start in (("astrid", ASTRID, ASTRID_ENT, (7, 12)), ("bjarne", BJARNE, BJARNE_ENT, (7, 12)), ("cave", CAVE, CAVE_ENT, (8, 11))):
+    seen = reachable([list(r) for r in g], start)
+    for e in ents:
+        x, y = e["at"]
+        assert any((x + dx, y + dy) in seen for dx, dy in ((0, 0), (1, 0), (-1, 0), (0, 1), (0, -1))), (nm, "unreachable", e)
 # the switch must be out of plain-throw range from the near side, in homing range
 sw = CAV_ENT[[e["t"] for e in CAV_ENT].index("switch")]["at"]
 near = [(x, y) for (x, y) in cav_seen if P(1, 1, 0, 8)[1] <= y < P(1, 1, 0, 13)[1] and 16 <= x < 32]
@@ -443,8 +527,11 @@ print("switch min distance px:", round(dmin, 1))
 out = {
     "overworld": {"name": "Norway", "rows": ["".join(r) for r in ow], "ents": OW_ENT, "outdoor": True},
     "cavern": {"name": "Penguin Ice Cavern", "rows": ["".join(r) for r in cav], "ents": CAV_ENT, "dungeon": True},
-    "home": {"name": "Owen's Room, New York", "rows": HOME, "ents": HOME_ENT},
+    "home": {"name": "Owen's Room, New York", "rows": HOME, "ents": HOME_ENT, "interior": True},
     "arena": {"name": "Valhalla Arena", "rows": ARENA, "ents": [], "arena": True},
+    "astrid_house": {"name": "Astrid's House", "rows": ASTRID, "ents": ASTRID_ENT, "interior": True},
+    "bjarne_house": {"name": "Bjarne's House", "rows": BJARNE, "ents": BJARNE_ENT, "interior": True},
+    "secret_cave": {"name": "Hidden Cave", "rows": CAVE, "ents": CAVE_ENT, "dark": True},
 }
 pathlib.Path("web/src/maps.js").write_text(
     "// Generated by tools/maps.py. Edit the ASCII there, then rerun it.\nconst MAPS = " + json.dumps(out, indent=0) + ";\n")

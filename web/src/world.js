@@ -31,7 +31,7 @@ const flag = k => !!G.save.flags[k];
 const setFlag = k => { G.save.flags[k] = true; };
 
 // ---------- tiles ----------
-const SOLID = new Set('T#MwHRDPqX+lWtOYQZxLKbV'.split(''));
+const SOLID = new Set('T#MwHRDPqX+lWtOYQZxLKbVCkp'.split(''));
 function tile(tx, ty) {
   if (tx < 0 || ty < 0 || tx >= G.cols || ty >= G.nrows) return G.map.dungeon ? 'W' : 'T';
   return G.rows[ty][tx];
@@ -82,6 +82,8 @@ function loadMap(id, px, py) {
   for (const k in G.save.flags) {
     const m = k.match(/^open:(\w+):(\d+),(\d+)$/);
     if (m && m[1] === id) setTile(+m[2], +m[3], '_');
+    const t2 = k.match(/^tile:(\w+):(\d+),(\d+):(.)$/);
+    if (t2 && t2[1] === id) setTile(+t2[2], +t2[3], t2[4]);
   }
   const p = G.player;
   p.x = px; p.y = py; p.vx = p.vy = p.kx = p.ky = 0; p.launching = false; p.falling = 0; p.hold = null;

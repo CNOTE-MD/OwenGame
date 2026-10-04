@@ -2,7 +2,7 @@
 // Dungeon doors, shutters, peg gates and braziers; cave mouths and rune doors; lava;
 // Owen's bedroom; Valhalla Arena; the Flight 364 airliner; and outlined item icons.
 
-const TILE_B = 'tLKhGEXlFZYQrdaV';
+const TILE_B = 'tLKhGEXlFZYQrdaVkpCg<>';
 
 function renderTileB(c, v, frame, extra, tx, ty, snowy) {
   const r = rng(v * 4513 + c.charCodeAt(0) * 37 + frame);
@@ -95,10 +95,10 @@ function renderTileB(c, v, frame, extra, tx, ty, snowy) {
         if (left) rect(0, 0, 1, 16, OUTLINE); if (right) rect(15, 0, 1, 16, OUTLINE);
         break; }
       case 'Q': {   // table: a desk indoors, a market counter outside
-        if (G.mapId === 'home') fill('#a26c38'); else fill(nb(0, 1) === 's' || nb(-1, 0) === 's' ? '#d8c078' : COL.grass);
+        if (G.map.interior) fill('#a26c38'); else fill(nb(0, 1) === 's' || nb(-1, 0) === 's' ? '#d8c078' : COL.grass);
         rect(0, 3, 16, 9, OUTLINE); rect(0, 4, 16, 7, '#b07840'); rect(0, 4, 16, 2, '#d09858'); rect(0, 10, 16, 1, '#6e4420');
         rect(1, 12, 2, 4, '#6e4420'); rect(13, 12, 2, 4, '#6e4420');
-        if (G.mapId === 'home' && v % 2 === 0) { rect(3, 1, 4, 5, '#2f5aa8'); rect(3, 1, 4, 1, '#fff'); rect(9, 2, 5, 3, '#e8e0d0'); }
+        if (G.map.interior && v % 2 === 0) { rect(3, 1, 4, 5, '#2f5aa8'); rect(3, 1, 4, 1, '#fff'); rect(9, 2, 5, 3, '#e8e0d0'); }
         break; }
       case 'r': {   // patterned rug with a gold border
         fill('#a8302a');
@@ -122,6 +122,40 @@ function renderTileB(c, v, frame, extra, tx, ty, snowy) {
           if (tx % 4 === 0 && ty <= 1) { rect(4, 0, 8, 13, '#b33a2e'); rect(4, 0, 8, 1, '#ffd84a'); rect(5, 13, 2, 2, '#b33a2e'); rect(9, 13, 2, 2, '#b33a2e'); rect(7, 3, 2, 7, '#ffd84a'); rect(6, 4, 4, 2, '#ffd84a'); }
         }
         break; }
+      case 'k': {   // bookshelf against the wall
+        fill('#4a2e18'); rect(1, 1, 14, 15, '#6e4420'); rect(1, 1, 14, 1, '#9a6030');
+        for (const sy of [2, 7, 12]) { rect(2, sy + 4, 12, 1, '#3a2212'); for (let x = 2; x < 14; x += 2) rect(x, sy + (x * 7 + v) % 2, 2, 4 - (x * 7 + v) % 2, ['#b03028', '#2f5aa8', '#3a7a4a', '#c89a18', '#7a4a9a'][(x + sy + v) % 5]); }
+        rect(0, 0, 1, 16, OUTLINE); rect(15, 0, 1, 16, OUTLINE);
+        break; }
+      case 'p': {   // stone fireplace with a crackling fire
+        fill('#4a2e18'); rect(0, 0, 16, 16, '#7a7a8c');
+        for (let y = 0; y < 16; y += 4) for (let x = (y / 4 % 2) * 4; x < 16; x += 8) rect(x, y, 1, 4, '#5a5a6a');
+        for (let y = 0; y < 16; y += 4) rect(0, y, 16, 1, '#5a5a6a');
+        rect(2, 6, 12, 10, '#1a0c06');
+        const f = frame % 4;
+        for (let x = 3; x < 13; x++) { const hgt = 3 + ((x * 5 + f * 3) % 5); for (let y = 15 - hgt; y < 15; y++) P(x, y, y < 15 - hgt + 1 ? '#ff6a1a' : y < 13 ? '#ff9a2a' : '#ffd040'); }
+        rect(3, 14, 10, 2, '#5a3418'); rect(0, 5, 16, 1, '#9a9aac');
+        break; }
+      case 'C': {   // cave rock; a lit face where it meets the floor
+        const face = nb(0, 1) === 'g' || nb(0, 1) === '<' || nb(0, 1) === 'O';
+        for (let y = 0; y < T; y++) for (let x = 0; x < T; x++) { const n = (x * 7 + y * 13 + v * 5) % 11; P(x, y, n < 2 ? '#4a3a2c' : n < 6 ? '#76604a' : '#66523e'); }
+        const open = ch => ch === 'g' || ch === '<' || ch === 'O';
+        if (open(nb(0, -1))) rect(0, 0, 16, 2, '#9a8264');
+        if (open(nb(-1, 0))) rect(0, 0, 1, 16, OUTLINE);
+        if (open(nb(1, 0))) rect(15, 0, 1, 16, OUTLINE);
+        if (face) { for (let y = 8; y < 16; y++) for (let x = 0; x < T; x++) P(x, y, y < 10 ? '#7a6248' : (x + y) % 5 === 0 ? '#4a3a2c' : '#5e4a36'); rect(0, 15, 16, 1, '#1a120c'); }
+        break; }
+      case 'g': fill('#2c2018'); for (let i = 0; i < 6; i++) P((v * 5 + i * 7) % 16, (v * 3 + i * 5) % 16, i % 2 ? '#4e3e30' : '#2a2018'); break;
+      case '>': {   // stairs going down, cut into the ground where the grave stood
+        fill(COL.grass); rect(1, 1, 14, 14, OUTLINE);
+        for (let k = 0; k < 5; k++) rect(2 + k, 2 + k * 2, 12 - k * 2, 2, ['#8a8a9c', '#6a6a7c', '#4a4a5c', '#2a2a3a', '#14141e'][k]);
+        rect(2, 12, 12, 2, '#05050a');
+        break; }
+      case '<': {   // stairs going up out of the cave
+        fill('#3a2c22');
+        for (let k = 0; k < 6; k++) rect(2, 2 + k * 2, 12, 2, k % 2 ? '#6a5a48' : '#8a7a64');
+        rect(1, 1, 1, 13, OUTLINE); rect(14, 1, 1, 13, OUTLINE); rect(2, 0, 12, 2, '#c8d8a8');
+        break; }
       default: return;
     }
   });
@@ -130,9 +164,9 @@ function renderTileB(c, v, frame, extra, tx, ty, snowy) {
 function drawTileB(c, ox, oy, tx, ty) {
   if (!TILE_B.includes(c)) return false;
   const v = hash(tx, ty) % 4, snowy = SNOWY(tx, ty);
-  const frame = c === 't' ? Math.floor(G.t * 9) % 4 : c === 'l' ? Math.floor(G.t * 4) % 8 : c === 'X' ? Math.floor(G.t * 3) % 4 : 0;
+  const frame = c === 't' || c === 'p' ? Math.floor(G.t * 9) % 4 : c === 'l' ? Math.floor(G.t * 4) % 8 : c === 'X' ? Math.floor(G.t * 3) % 4 : 0;
   const extra = c === 'h' ? (shutterClosed(tx, ty) ? 'c' : 'o') : c === 'G' ? (gatesDown() ? 'd' : 'u') : '';
-  const nbKey = 'YrVZQ'.includes(c) ? [tile(tx, ty - 1), tile(tx, ty + 1), tile(tx - 1, ty), tile(tx + 1, ty)].join('') + (ty === 0 ? 't' : '') + (tx % 5) + (tx % 4) + G.mapId : '';
+  const nbKey = 'YrVZQCk'.includes(c) ? [tile(tx, ty - 1), tile(tx, ty + 1), tile(tx - 1, ty), tile(tx + 1, ty)].join('') + (ty === 0 ? 't' : '') + (tx % 5) + (tx % 4) + G.mapId : '';
   const key = `B${c}|${v}|${frame}|${extra}|${snowy ? 1 : 0}|${nbKey}`;
   let img = TILE_CACHE.get(key);
   if (img === undefined) { img = renderTileB(c, v, frame, extra, tx, ty, snowy); TILE_CACHE.set(key, img); }
