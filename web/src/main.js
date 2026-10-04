@@ -166,7 +166,7 @@ G.menuSel = 0;
 buildAll();
 function frame(now) {
   const dt = Math.min(0.05, (now - last) / 1000); last = now;
-  try { update(dt); render(); Music.want(musicFor()); Music.tick(); } catch (err) { console.error(err); }
+  try { pollGamepad(); update(dt); render(); Music.want(musicFor()); Music.tick(); } catch (err) { console.error(err); }
   for (const k in edge) edge[k] = false;
   requestAnimationFrame(frame);
 }

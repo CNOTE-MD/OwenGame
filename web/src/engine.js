@@ -46,7 +46,69 @@ const stick = { active: false, x: 0, y: 0 };
   base.addEventListener('pointermove', e => { if (e.pointerId === id) { e.preventDefault(); move(e); } });
   ['pointerup', 'pointercancel', 'lostpointercapture'].forEach(t => base.addEventListener(t, end));
 })();
+// ---------- gamepad (Xbox / PlayStation / Backbone / Switch Pro, over Bluetooth on iPad) ----------
+const PAD = { on: false, x: 0, y: 0, active: false, prev: {}, idx: null };
+const PAD_MAP = { 0: 'a', 1: 'b', 2: 'c', 3: 'horn', 4: 'dash', 5: 'dash', 6: 'dash', 7: 'dash', 8: 'mute', 9: 'menu', 12: 'up', 13: 'down', 14: 'left', 15: 'right' };
+function pollGamepad() {
+  const pads = navigator.getGamepads ? navigator.getGamepads() : [];
+  let gp = null;
+  for (const p of pads) if (p && p.connected) { gp = p; break; }
+  if (!gp) { if (PAD.on) { PAD.on = false; PAD.active = false; for (const k in PAD.prev) if (PAD.prev[k]) virt[k] = false; PAD.prev = {}; setPadNote(false); } return; }
+  if (!PAD.on) { PAD.on = true; setPadNote(true); Sound.unlock(); }
+  // left stick with a dead zone; the d-pad also moves
+  let x = gp.axes[0] || 0, y = gp.axes[1] || 0;
+  const m = Math.hypot(x, y);
+  if (m < 0.25) { x = 0; y = 0; }
+  if (gp.buttons[14] && gp.buttons[14].pressed) x = -1; if (gp.buttons[15] && gp.buttons[15].pressed) x = 1;
+  if (gp.buttons[12] && gp.buttons[12].pressed) y = -1; if (gp.buttons[13] && gp.buttons[13].pressed) y = 1;
+  const mm = Math.hypot(x, y);
+  PAD.active = mm > 0; PAD.x = PAD.active ? x / mm : 0; PAD.y = PAD.active ? y / mm : 0;
+  // menu stepping from the stick
+  const dirs = { left: x < -0.5, right: x > 0.5, up: y < -0.5, down: y > 0.5 };
+  for (const k in dirs) { if (dirs[k] && !PAD.prev[k]) edge[k] = true; PAD.prev[k] = dirs[k]; virt[k] = dirs[k] || (virt[k] && stick.active); }
+  for (const i in PAD_MAP) {
+    const a = PAD_MAP[i]; if (a === 'up' || a === 'down' || a === 'left' || a === 'right') continue;
+    const down = !!(gp.buttons[i] && (gp.buttons[i].pressed || gp.buttons[i].value > 0.5));
+    const key = 'b' + i;
+    if (down && !PAD.prev[key]) { edge[a] = true; if (a === 'a') edge.tap = edge.tap; }
+    PAD.prev[key] = down;
+    if (down) PAD.held = PAD.held || {}; 
+  }
+  // held state for actions (spin charge uses held('a'))
+  for (const a of ['a', 'b', 'c', 'horn', 'dash', 'menu']) {
+    const anyDown = Object.keys(PAD_MAP).some(i => PAD_MAP[i] === a && gp.buttons[i] && (gp.buttons[i].pressed || gp.buttons[i].value > 0.5));
+    virt[a] = anyDown || (virt[a] && !PAD.prev['v' + a]);
+    PAD.prev['v' + a] = anyDown;
+  }
+}
+function setPadNote(on) { const n = document.getElementById('padnote'); if (n) n.classList.toggle('on', on); document.body.classList.toggle('nopad', on); }
+window.addEventListener('gamepadconnected', () => setPadNote(true));
+
+// ---------- full screen / theater ----------
+function enterTheater() {
+  document.body.classList.add('theater');
+  const el = document.documentElement;
+  const req = el.requestFullscreen || el.webkitRequestFullscreen;
+  if (req) { try { const r = req.call(el); if (r && r.catch) r.catch(() => {}); } catch (e) { /* not allowed here; theater layout still applies */ } }
+  cv.focus();
+}
+function exitTheater() {
+  document.body.classList.remove('theater');
+  const ex = document.exitFullscreen || document.webkitExitFullscreen;
+  if (ex && (document.fullscreenElement || document.webkitFullscreenElement)) { try { const r = ex.call(document); if (r && r.catch) r.catch(() => {}); } catch (e) {} }
+}
+(function setupTheater() {
+  const b = document.getElementById('fsbtn'), x = document.getElementById('exitfs');
+  if (b) b.addEventListener('click', () => { Sound.unlock(); enterTheater(); });
+  if (x) x.addEventListener('click', exitTheater);
+  const onChange = () => { if (!(document.fullscreenElement || document.webkitFullscreenElement) && document.body.classList.contains('theater') && theaterWasFull) exitTheater(); theaterWasFull = !!(document.fullscreenElement || document.webkitFullscreenElement); };
+  let theaterWasFull = false;
+  document.addEventListener('fullscreenchange', onChange); document.addEventListener('webkitfullscreenchange', onChange);
+  window.addEventListener('keydown', e => { if (e.code === 'Escape' && document.body.classList.contains('theater') && !(document.fullscreenElement || document.webkitFullscreenElement)) exitTheater(); });
+})();
+
 function inputVec() {
+  if (PAD.active) return { x: PAD.x, y: PAD.y };
   if (stick.active) return { x: stick.x, y: stick.y };
   let x = (held('right') ? 1 : 0) - (held('left') ? 1 : 0), y = (held('down') ? 1 : 0) - (held('up') ? 1 : 0);
   const m = Math.hypot(x, y);
