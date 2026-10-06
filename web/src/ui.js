@@ -48,14 +48,14 @@ function drawHud() {
   if (s.items.thunder) drawItemIcon('thunder', 27, 12); else if (s.items.homing) drawItemIcon('homing', 27, 12);
   // kroner, keys
   drawItemIcon('coin', 46, 7); text(String(s.kr).padStart(3, '0'), 52, 11, '#fff');
-  if (G.map && G.map.dungeon) { drawItemIcon('key', 46, 17); text('x' + (s.keys[G.mapId] || 0), 52, 20, '#fff'); if (s.bigkeys[G.mapId]) drawItemIcon('bigkey', 82, 15); }
+  if (G.map && G.map.dungeon && !G.map.nokeys) { drawItemIcon('key', 46, 17); text('x' + (s.keys[G.mapId] || 0), 52, 20, '#fff'); if (s.bigkeys[G.mapId]) drawItemIcon('bigkey', 82, 15); }
   if (s.potions) { drawItemIcon('juice', 98, 12); text('x' + s.potions, 104, 16, '#fff'); }
   // life
   text('-LIFE-', 190, 9, '#f2ebcc', 'center');
   const n = s.maxHp / 2;
   for (let i = 0; i < n; i++) {
     const v = clamp(p.hp - i * 2, 0, 2) / 2, row = Math.floor(i / 10), col = i % 10;
-    drawHeart(144 + col * 9, 12 + row * 8, v, s.voodoo ? '#f22633' : '#9a4dd9');
+    drawHeart(144 + col * 9, 12 + row * 8, v, s.voodoo ? '#f22633' : s.voodoo2 ? '#ffd84a' : '#9a4dd9');
   }
 }
 
@@ -66,30 +66,40 @@ function objective() {
   if (!flag('met_astrid')) return 'Find Elder Astrid in Fjordvik: west of the airstrip, then north.';
   if (!s.items.homing && !flag('d1done')) return 'Go to the Penguin Ice Cavern on the Frozen Path (north-east). Find the treasure behind the Penguin Knight.';
   if (!flag('d1done')) return 'Defeat whatever is possessing the penguins at the bottom of the Ice Cavern.';
-  return 'Chapter 1 complete! Talk to Astrid. Three sealed rune doors wait for Owen\'s next chapters.';
+  if (!flag('d2done')) {
+    if (!s.items.dash) return 'Chapter 2: the Drowned Barrow has opened in the north-west foothills. Find what the Draugr Captain guards.';
+    return 'Chapter 2: use the Voodoo Dash to cross the water and barriers. Find the big key and free Hank\'s ghost.' + (flag('redeye_done') ? '' : ' (Optional: Flight 364\'s cargo hold.)');
+  }
+  if (!flag('redeye_done')) return 'Chapter 2 complete! Walter\'s Forge waits for Owen\'s next chapter. Optional: something is scratching inside Flight 364\'s cargo hold.';
+  return 'Chapter 2 complete! Walter\'s Forge and the Storm Peak wait for Owen\'s next chapters.';
 }
 function drawMenu() {
   const s = G.save;
   R(0, 0, VW, VH, 'rgba(5,5,20,.92)');
   R(8, 8, 240, 208, '#ffd84a'); R(10, 10, 236, 204, '#0d0d33');
-  text('GEAR', 20, 26, '#ffe64d');
+  text('GEAR', 20, 26, '#ffe64d'); text('JON ▶', 236, 38 + 12, '#9be08a', 'right', false);
   const slots = [
-    ['Jon (swing Z)', 'homing', true, () => drawJonSprite(30, 48, 0)],
+    ['Jon Lv' + jonData().lvl + ' (swing Z)', 'homing', true, () => drawJonSprite(30, 44, 0, false, jonFaceNow())],
     ['Homing Jon (throw X)', 'homing', !!s.items.homing],
     ['Thunder Rune (C)', 'thunder', !!s.items.thunder],
     ['Lingonberry Juice x' + s.potions, 'juice', s.potions > 0],
+    ['Demon Horn (V)', 'horn', !!s.items.horn],
+    ['Voodoo Dash (Shift/F)', 'dash', !!s.items.dash],
   ];
   slots.forEach(([label, icon, have, custom], i) => {
-    const y = 48 + i * 20;
-    R(20, y - 9, 18, 18, '#1a2238');
+    const y = 44 + i * 16;
+    R(20, y - 8, 18, 16, '#1a2238');
     if (have) { if (custom) custom(); else drawItemIcon(icon, 29, y); text(label, 44, y + 4, '#fff'); }
     else text('???', 44, y + 4, '#55577a');
   });
-  text('Heart pieces: ' + s.pieces + '/4', 20, 138, '#f2ebcc');
-  text('Voodoo bond: ' + (s.voodoo ? 'ready' : 'used'), 20, 150, s.voodoo ? '#9be08a' : '#c9a0f0');
-  if (G.map.dungeon) text('Keys ' + (s.keys[G.mapId] || 0) + '   Big key: ' + (s.bigkeys[G.mapId] ? 'yes' : 'no'), 20, 162, '#f2ebcc');
+  const sq = (n, start, done) => flag(start) ? n + (flag(done) ? ' ✓' : ' …') : null;
+  const side = [sq('Bjarne', 'quest_bjarne', 'bjarne_done'), sq('Sven', 'quest_sven', 'sven_done')].filter(Boolean);
+  if (side.length) text('Side quests: ' + side.join('  '), 20, 142, '#c8e8ff', 'left', false);
+  text('Heart pieces: ' + s.pieces + '/4', 20, 154, '#f2ebcc');
+  text('Voodoo bond: ' + (s.voodoo ? 'ready' : 'used'), 20, 166, s.voodoo ? '#9be08a' : '#c9a0f0');
+  if (G.map.dungeon && !G.map.nokeys) text('Keys ' + (s.keys[G.mapId] || 0) + '  Big key: ' + (s.bigkeys[G.mapId] ? 'yes' : 'no'), 236, 154, '#f2ebcc', 'right', false);
   text('QUEST', 20, 180, '#ffe64d');
-  wrap(objective(), 214).slice(0, 3).forEach((l, i) => text(l, 20, 192 + i * 10, '#fff', 'left', false));
+  wrap(objective(), 214).slice(0, 3).forEach((l, i) => text(l, 20, 191 + i * 9, '#fff', 'left', false));
   text(Sound.muted ? 'M: sound off' : 'M: sound on', 236, 26, '#8a8ab0', 'right', false);
   text(Music.on ? 'N: music on' : 'N: music off', 236, 38, '#8a8ab0', 'right', false);
 }

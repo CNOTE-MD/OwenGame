@@ -22,32 +22,61 @@
   .legend { display: flex; flex-wrap: wrap; gap: 8px 20px; color: var(--muted); }
   .legend b { color: var(--gold); font-weight: normal; }
   .pad { display: none; justify-content: space-between; align-items: center; gap: 16px; user-select: none; -webkit-user-select: none; }
-  @media (pointer: coarse) { .pad { display: flex; } }
-  .dpad { display: grid; grid-template-columns: repeat(3, 56px); grid-template-rows: repeat(3, 56px); gap: 4px; }
+  @media (pointer: coarse) { .pad { display: flex; } .legend { display: none; } }
+  .stick { position: relative; width: 150px; height: 150px; flex: none; border-radius: 50%; touch-action: none;
+    background: radial-gradient(circle, var(--panel) 0 55%, #2c2648 56% 100%); border: 2px solid var(--axe); }
+  .stick::before { content: ''; position: absolute; inset: 22%; border-radius: 50%; border: 1px dashed #4a4570; }
+  .knob { position: absolute; left: 50%; top: 50%; width: 64px; height: 64px; margin: -32px 0 0 -32px; border-radius: 50%;
+    background: radial-gradient(circle at 35% 30%, #cfefff, var(--axe) 45%, #3a6a9a); border: 2px solid #0d0d33; pointer-events: none; }
+  .stick.on .knob { box-shadow: 0 0 0 4px rgba(143,208,255,.35); }
   .btn { background: var(--panel); color: var(--ink); border: 2px solid var(--axe); font-family: var(--pixel); font-size: 12px; touch-action: none; border-radius: 4px; }
   .btn:active, .btn.on { background: var(--axe); color: var(--bg); }
   .btn:focus-visible { outline: 3px solid var(--gold); outline-offset: 2px; }
   .ab { display: grid; grid-template-columns: repeat(2, 76px); gap: 10px; }
   .ab .btn { width: 76px; height: 56px; border-radius: 28px; font-size: 9px; }
+  .bar { display: flex; justify-content: space-between; align-items: center; gap: 12px; color: var(--muted); }
+  .bar .btn { font-size: 9px; padding: 8px 12px; }
+  #padnote { display: none; color: var(--gold); }
+  #padnote.on { display: inline; }
+  /* Theater: fills the whole viewport (and real full screen where the browser allows it).
+     Canvas scales to fit; the thumbstick and buttons float over the bottom corners. */
+  body.theater { padding: 0; overflow: hidden; }
+  body.theater main { max-width: none; position: fixed; inset: 0; display: block; }
+  body.theater .screen { position: absolute; left: 50%; top: 50%; transform: translate(-50%, -50%);
+    width: min(100vw, calc(100vh * 8 / 7)); height: min(100vh, calc(100vw * 7 / 8)); border: 0; outline: 0; }
+  body.theater .legend, body.theater .bar { display: none; }
+  body.theater .pad { display: flex; position: fixed; left: 0; right: 0; bottom: max(12px, env(safe-area-inset-bottom, 0px)); padding: 0 18px; pointer-events: none; }
+  body.theater .pad > * { pointer-events: auto; }
+  body.theater .stick, body.theater .ab .btn { opacity: 0.55; }
+  body.theater .stick.on, body.theater .ab .btn.on { opacity: 0.95; }
+  body.theater #exitfs { display: block; position: fixed; top: max(8px, env(safe-area-inset-top, 0px)); right: 8px; opacity: 0.6; z-index: 2; }
+  #exitfs { display: none; }
+  body.theater.nopad .pad { display: none; }
+  @media (hover: hover) and (pointer: fine) { body.theater .pad { display: none; } }
 </style>
 <main>
   <div class="screen"><canvas id="g" width="256" height="224" tabindex="0" aria-label="Jöntuka game screen"></canvas></div>
+  <div class="bar">
+    <span>Controller: <b>stick</b> move · <b>A</b> swing · <b>B</b> throw · <b>X</b> thunder · <b>Y</b> horn · <b>RB/RT</b> dash · <b>Start</b> gear <span id="padnote">· connected ✓</span></span>
+    <button class="btn" id="fsbtn" aria-label="Play full screen">⛶ FULL SCREEN</button>
+  </div>
+  <button class="btn" id="exitfs" aria-label="Leave full screen">✕</button>
   <div class="legend">
     <span><b>Arrows / WASD</b> move</span>
     <span><b>Z / Space</b> swing Jon</span>
-    <span><b>X / Shift</b> throw Jon</span>
+    <span><b>X</b> throw Jon</span>
+    <span><b>Shift / F</b> Voodoo Dash</span>
     <span><b>C</b> Thunder Strike</span>
+    <span><b>V</b> Demon Horn</span>
     <span><b>Enter</b> gear and quest</span>
     <span><b>M</b> all sound</span>
     <span><b>N</b> music</span>
   </div>
   <div class="pad" aria-label="Touch controls">
-    <div class="dpad">
-      <span></span><button class="btn" data-a="up" aria-label="Up">▲</button><span></span>
-      <button class="btn" data-a="left" aria-label="Left">◀</button><span></span><button class="btn" data-a="right" aria-label="Right">▶</button>
-      <span></span><button class="btn" data-a="down" aria-label="Down">▼</button><span></span>
-    </div>
+    <div class="stick" id="stick" aria-label="Move: drag the thumbstick"><div class="knob" id="knob"></div></div>
     <div class="ab">
+      <button class="btn" data-a="horn" aria-label="Demon Horn">HORN</button>
+      <button class="btn" data-a="dash" aria-label="Voodoo Dash">DASH</button>
       <button class="btn" data-a="menu" aria-label="Gear menu">GEAR</button>
       <button class="btn" data-a="c" aria-label="Thunder Strike">RUNE</button>
       <button class="btn" data-a="b" aria-label="Throw Jon">THROW</button>
@@ -239,6 +268,67 @@ const SCORE = {
    }
   }
  },
+ "bjarne": {
+  "name": "Rush \u00d8 (Bjarne's Masterpiece)",
+  "bpm": 200,
+  "gain": 0.8,
+  "order": [
+   "A",
+   "A",
+   "B"
+  ],
+  "sections": {
+   "A": {
+    "steps": 8,
+    "pluck": "E4 G4 B4 E5 B4 G4 E4 G4 | F#4 A4 C5 F#5 C5 A4 F#4 A4 | G4 B4 D5 G5 D5 B4 G4 B4 | A4 C5 E5 A5 G5 F#5 E5 D#5",
+    "bass": "E2 E3 E2 E3 E2 E3 E2 E3 | D2 D3 D2 D3 D2 D3 D2 D3 | G2 G3 G2 G3 G2 G3 G2 G3 | A2 A3 B2 B3 B2 B3 B2 B3",
+    "k": "x.x.x.x.|x.x.x.x.|x.x.x.x.|x.x.x.x.",
+    "s": "..x...x.|..x...x.|..x...x.|..x.xxxx",
+    "h": "xxxxxxxx|xxxxxxxx|xxxxxxxx|xxxxxxxx"
+   },
+   "B": {
+    "steps": 8,
+    "pluck": "E5 D#5 E5 B4 G4 B4 E5 G5 | F#5 E5 D#5 E5 B4 G4 F#4 G4 | E5 G5 B5 G5 E5 B4 G4 E4 | B4 A#4 B4 C5 B4 A4 G4 F#4",
+    "lead": "B5 - - - - - - - | A5 - - - - - - - | G5 - - - E6 - - - | D#6 - - - B5 - - -",
+    "bass": "E2 E3 E2 E3 E2 E3 E2 E3 | C2 C3 C2 C3 C2 C3 C2 C3 | A1 A2 A1 A2 A1 A2 A1 A2 | B1 B2 B1 B2 B1 B2 B1 B2",
+    "k": "x.x.x.x.|x.x.x.x.|x.x.x.x.|x.x.x.x.",
+    "s": "..x...x.|..x...x.|..x...x.|..x...x.",
+    "h": "xxxxxxxx|xxxxxxxx|xxxxxxxx|xxxxxxxx",
+    "c": "x.......|........|x.......|........"
+   }
+  }
+ },
+ "barrow": {
+  "name": "Drowned Barrow in Nine",
+  "bpm": 120,
+  "gain": 0.85,
+  "order": [
+   "A",
+   "A",
+   "B"
+  ],
+  "sections": {
+   "A": {
+    "steps": 9,
+    "bass": "D2 . D3 D2 . A2 D2 F2 E2 | D2 . D3 D2 . A2 C3 A#2 A2 | A#1 . A#2 A#1 . F2 A#1 D2 C2 | A1 . A2 A1 . E2 A1 C#2 E2",
+    "pad": "D3+F3+A3 - - - - - - - - | D3+F3+A3 - - - - - - - - | A#2+D3+F3 - - - - - - - - | A2+C#3+E3 - - - - - - - -",
+    "bell": "A4 - - F4 - - D4 - - | . . . . . . E4 F4 G4 | F4 - - D4 - - A#3 - - | C#4 - - E4 - - A4 - -",
+    "k": "x..x..x..|x..x..x..|x..x..x..|x..x..xx.",
+    "s": "...x.....|...x.....|...x.....|...x..x.x",
+    "h": ".x..x..x.|.x..x..x.|.x..x..x.|.x..x..x."
+   },
+   "B": {
+    "steps": 9,
+    "bass": "G2 . G3 G2 . D3 G2 A#2 A2 | F2 . F3 F2 . C3 F2 A2 G2 | E2 . E3 E2 . B2 E2 G2 F2 | A1 . A2 A1 . E2 A1 C#2 E2",
+    "gtr": "G3+D4 - - . . . G3+D4 - - | F3+C4 - - . . . F3+C4 - - | E3+B3 - - . . . E3+B3 - - | A3+E4 - - . . . A3+E4 - -",
+    "lead": "D5 - - A#4 - - G4 - A4 | C5 - - A4 - - F4 - G4 | B4 - - G4 - - E4 - F4 | E4 - - - - - C#5 - -",
+    "k": "x..x..x..|x..x..x..|x..x..x..|x..xx.xxx",
+    "s": "...x..x..|...x..x..|...x..x..|...x..xxx",
+    "h": "xxxxxxxxx|xxxxxxxxx|xxxxxxxxx|xxxxxxxxx",
+    "c": "x........|.........|x........|........."
+   }
+  }
+ },
  "creepy": {
   "name": "Flight 364",
   "bpm": 60,
@@ -423,7 +513,21 @@ const MAPS = {
 7,
 2
 ],
-"text": "seal_barrow"
+"text": "seal_barrow",
+"opensWith": "d1done"
+},
+{
+"t": "runedoor",
+"at": [
+7,
+2
+],
+"needs": "d1done",
+"to": "barrow",
+"dest": [
+24,
+40
+]
 },
 {
 "t": "sealed",
@@ -459,6 +563,68 @@ const MAPS = {
 "dest": [
 24,
 54
+]
+},
+{
+"t": "door",
+"at": [
+4,
+18
+],
+"to": "astrid_house",
+"dest": [
+7,
+12
+]
+},
+{
+"t": "door",
+"at": [
+13,
+19
+],
+"to": "bjarne_house",
+"dest": [
+7,
+12
+]
+},
+{
+"t": "qitem",
+"id": "sheet",
+"at": [
+43,
+37
+],
+"needs": "quest_bjarne"
+},
+{
+"t": "qitem",
+"id": "ship",
+"at": [
+21,
+9
+],
+"needs": "quest_sven",
+"underBush": true
+},
+{
+"t": "grave",
+"at": [
+61,
+36
+]
+},
+{
+"t": "stairs",
+"at": [
+61,
+36
+],
+"to": "secret_cave",
+"dest": [
+8,
+11
 ]
 },
 {
@@ -937,7 +1103,8 @@ const MAPS = {
 13
 ]
 }
-]
+],
+"interior": true
 },
 "arena": {
 "name": "Valhalla Arena",
@@ -973,6 +1140,590 @@ const MAPS = {
 ],
 "ents": [],
 "arena": true
+},
+"astrid_house": {
+"name": "Astrid's House",
+"rows": [
+"ZZZZZZZZZZZZZZZZ",
+"ZkkFFFppFFFFkkFZ",
+"ZFFFFFFFFFFFFFFZ",
+"ZFFFFFFFFFFFFFFZ",
+"ZFFQQFFFFFFFFYYZ",
+"ZFFFFFFFFFFFFYYZ",
+"ZFFFFrrrrrrFFFFZ",
+"ZFFFFrrrrrrFFFFZ",
+"ZOFFFrrrrrrFFFOZ",
+"ZOFFFFFFFFFFFFFZ",
+"ZFFFFFFFFFFFFFFZ",
+"ZFFFFFFFFFFFFFFZ",
+"ZFFFFFFFFFFFFFFZ",
+"ZZZZZZZddZZZZZZZ"
+],
+"ents": [
+{
+"t": "sign",
+"at": [
+10,
+0
+],
+"text": "tapestry"
+},
+{
+"t": "sign",
+"at": [
+2,
+1
+],
+"text": "bookshelf"
+},
+{
+"t": "chest",
+"id": "c_astrid",
+"at": [
+14,
+10
+],
+"item": "juice"
+},
+{
+"t": "warp",
+"at": [
+7,
+13
+],
+"to": "overworld",
+"dest": [
+4,
+19
+]
+},
+{
+"t": "warp",
+"at": [
+8,
+13
+],
+"to": "overworld",
+"dest": [
+4,
+19
+]
+}
+],
+"interior": true
+},
+"bjarne_house": {
+"name": "Bjarne's House",
+"rows": [
+"ZZZZZZZZZZZZZZZZ",
+"ZkkFFFFFFFFFkkFZ",
+"ZFFFFFFFFFFFFFFZ",
+"ZFFFFFFFFFFFFFFZ",
+"ZFFFFFFFFFFFYYFZ",
+"ZFFQQQFFFFFFYYFZ",
+"ZFFFFFFFFFFFFFFZ",
+"ZFFFFrrrrrrFFFFZ",
+"ZFFFFrrrrrrFFFFZ",
+"ZFFFFrrrrrrFFFFZ",
+"ZFFFFFFFFFFFFFFZ",
+"ZOFFFFFFFFFFFFOZ",
+"ZFFFFFFFFFFFFFFZ",
+"ZZZZZZZddZZZZZZZ"
+],
+"ents": [
+{
+"t": "npc",
+"id": "bjarne",
+"at": [
+7,
+6
+]
+},
+{
+"t": "sign",
+"at": [
+10,
+0
+],
+"text": "rush_poster"
+},
+{
+"t": "warp",
+"at": [
+7,
+13
+],
+"to": "overworld",
+"dest": [
+13,
+20
+]
+},
+{
+"t": "warp",
+"at": [
+8,
+13
+],
+"to": "overworld",
+"dest": [
+13,
+20
+]
+}
+],
+"interior": true
+},
+"secret_cave": {
+"name": "Hidden Cave",
+"rows": [
+"CCCCCCCCCCCCCCCC",
+"CCCggggCCCggggCC",
+"CCggggggggggggCC",
+"CgggCCggggCCgggC",
+"CggggggggggggggC",
+"CggCgggOOgggCggC",
+"CgggggggggggggCC",
+"CCggggCCCCgggggC",
+"CCgggggCCgggggCC",
+"CgggggggggggOggC",
+"CggCCgggggggggCC",
+"CCgggggggggCCgCC",
+"CCCggggg<gggCCCC",
+"CCCCCCCCCCCCCCCC"
+],
+"ents": [
+{
+"t": "chest",
+"id": "c_cave",
+"at": [
+5,
+1
+],
+"item": "piece"
+},
+{
+"t": "bat",
+"at": [
+4,
+4
+]
+},
+{
+"t": "bat",
+"at": [
+11,
+8
+]
+},
+{
+"t": "wisp",
+"at": [
+12,
+2
+]
+},
+{
+"t": "warp",
+"at": [
+8,
+12
+],
+"to": "overworld",
+"dest": [
+61,
+37
+]
+},
+{
+"t": "sign",
+"at": [
+6,
+7
+],
+"text": "cave_carving"
+}
+],
+"dark": true
+},
+"barrow": {
+"name": "The Drowned Barrow",
+"rows": [
+"WWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWW",
+"WWWWWWWWWWWWWWWWWww__________wwWWWWWWWWWWWWWWWWW",
+"WWWWWWWWWWWWWWWWWw____________wWWWWWWWWWWWWWWWWW",
+"WWWWWWWWWWWWWWWWW______________WWWWWWWWWWWWWWWWW",
+"WWWWWWWWWWWWWWWWW______________WWWWWWWWWWWWWWWWW",
+"WWWWWWWWWWWWWWWWW______________WWWWWWWWWWWWWWWWW",
+"WWWWWWWWWWWWWWWWW______________WWWWWWWWWWWWWWWWW",
+"WWWWWWWWWWWWWWWWW______________WWWWWWWWWWWWWWWWW",
+"WWWWWWWWWWWWWWWWW______________WWWWWWWWWWWWWWWWW",
+"WWWWWWWWWWWWWWWWW______________WWWWWWWWWWWWWWWWW",
+"WWWWWWWWWWWWWWWWW______________WWWWWWWWWWWWWWWWW",
+"WWWWWWWWWWWWWWWWWw____________wWWWWWWWWWWWWWWWWW",
+"WWWWWWWWWWWWWWWWWww__________wwWWWWWWWWWWWWWWWWW",
+"WWWWWWWWWWWWWWWWWWWWWWWhhWWWWWWWWWWWWWWWWWWWWWWW",
+"WWWWWWWWWWWWWWWWWWWWWWWKKWWWWWWWWWWWWWWWWWWWWWWW",
+"Wt____________tWWt____________tWWt___vv_______tW",
+"W______________WW______________WW____vv________W",
+"W______________WW______________WW____vv________W",
+"W______________WWwwwwwwwwwwwwwwWW____vv________W",
+"W______________WWwwwwwwwwwwwwwwWW____vv________W",
+"W______________h_______________y_____vv________W",
+"W______________h_______________y_____vv________W",
+"W______________WW______________WW____vv________W",
+"W______________WW______________WW____vv________W",
+"W______________WW______________WW____vv________W",
+"W______________WW______________WW____vv________W",
+"Wt____________tWWt____________tWWt___vv_______tW",
+"WWWWWWWWWWWWWWWWWWWWWWWLLWWWWWWWWWWWWWWWWWWWWWWW",
+"WWWWWWWWWWWWWWWWWWWWWWWLLWWWWWWWWWWWWWWWWWWWWWWW",
+"Wt____________tWWt____________tWWt_______ww___tW",
+"W______________WW______________WW________ww____W",
+"W__w__w________WW______________WW________ww____W",
+"W______________WW______________WW________ww____W",
+"W______________WW______________WW________ww____W",
+"W________________________________________ww____W",
+"W________________________________________ww____W",
+"W______________WW______________WW________ww____W",
+"W__w__w________WW_ww________ww_WW________ww____W",
+"W______________WW_ww________ww_WW________ww____W",
+"W______________WW______________WW________ww____W",
+"Wt____________tWWt____________tWWt_______ww___tW",
+"WWWWWWWWWWWWWWWWWWWWWWW__WWWWWWWWWWWWWWWWWWWWWWW"
+],
+"ents": [
+{
+"t": "warp",
+"at": [
+23,
+41
+],
+"to": "overworld",
+"dest": [
+7,
+3
+]
+},
+{
+"t": "warp",
+"at": [
+24,
+41
+],
+"to": "overworld",
+"dest": [
+7,
+3
+]
+},
+{
+"t": "runestone",
+"at": [
+20,
+34
+]
+},
+{
+"t": "npc",
+"id": "fluffy",
+"at": [
+26,
+34
+]
+},
+{
+"t": "draugr",
+"at": [
+5,
+33
+]
+},
+{
+"t": "draugr",
+"at": [
+10,
+37
+]
+},
+{
+"t": "wisp",
+"at": [
+8,
+31
+]
+},
+{
+"t": "chest",
+"id": "br_key",
+"at": [
+7,
+34
+],
+"item": "key",
+"clear": true
+},
+{
+"t": "bat",
+"at": [
+36,
+32
+]
+},
+{
+"t": "bat",
+"at": [
+37,
+38
+]
+},
+{
+"t": "chest",
+"id": "br_kr",
+"at": [
+45,
+34
+],
+"item": "kr50"
+},
+{
+"t": "draugr",
+"at": [
+21,
+23
+]
+},
+{
+"t": "wisp",
+"at": [
+26,
+16
+]
+},
+{
+"t": "captain",
+"at": [
+6,
+20
+]
+},
+{
+"t": "chest",
+"id": "br_dash",
+"at": [
+8,
+20
+],
+"item": "dash",
+"clear": true
+},
+{
+"t": "wisp",
+"at": [
+43,
+17
+]
+},
+{
+"t": "bat",
+"at": [
+44,
+24
+]
+},
+{
+"t": "chest",
+"id": "br_bigkey",
+"at": [
+44,
+20
+],
+"item": "bigkey"
+},
+{
+"t": "hank",
+"at": [
+24,
+5
+]
+},
+{
+"t": "container",
+"id": "hc_barrow",
+"at": [
+22,
+9
+],
+"clear": true
+},
+{
+"t": "warp",
+"at": [
+26,
+9
+],
+"to": "overworld",
+"dest": [
+7,
+4
+],
+"clear": true,
+"portal": true
+}
+],
+"dungeon": true
+},
+"redeye": {
+"name": "The Red-Eye",
+"rows": [
+"uuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuu",
+"uuuuueuuuuuuuuuuuuuuuuuueuuuuuuuuuuuuuuueuuuuuuuuuuueuuuuuueuuuu",
+"u==============uumAmAmAmAmAmAmmuumBBmmmmmmmmBBmuummmmmmmmmmmmmmu",
+"u===BB======B==uumAmAmAmAmAmAmmuummmmmmmmmmmmmmuummAmmmmmmmmAmmu",
+"u===B=======B==uumAmAmAmAmAmAmmuummmmmmmmmmmmmmuummAmmmmmmmmAmmu",
+"u==============uummmmJmmmmmmJmmuummmmmmmmmmmmmmuummmmmmmmmmmmmmu",
+"d===============mmmmmJmmmmmmmmmmmmmmmmmmmmmmmmmmhmmmmmmmmmmmmmmu",
+"d===============mmmmmmmmmJmmmmmmmmmmmmmmmmmmmmmmhmmmmmmmmmmmmmmu",
+"u======B=======uummmmmmmmJmmmmmuummmmmmmmmmmmmmuummmmmmmmmmmmmmu",
+"u========BB====uumAmAmAmAmAmAmmuummmmmmmmmmmmmmuummAmmmmmmmmAmmu",
+"u==B======B==B=uumAmAmAmAmAmAmmuummmmmmmmmmmmmmuummAmmmmmmmmAmmu",
+"u==============uumAmAmAmAmAmAmmuumBBmmmmmmmmBBmuummmmmmmmmmmmmmu",
+"uuuuueuuuuuuuuuuuuuuuuuueuuuuuuuuuuuuuuueuuuuuuuuuuueuuuuuueuuuu",
+"uuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuu"
+],
+"ents": [
+{
+"t": "warp",
+"at": [
+0,
+6
+],
+"to": "overworld",
+"dest": [
+29,
+34
+]
+},
+{
+"t": "warp",
+"at": [
+0,
+7
+],
+"to": "overworld",
+"dest": [
+29,
+34
+]
+},
+{
+"t": "imp",
+"at": [
+8,
+4
+]
+},
+{
+"t": "imp",
+"at": [
+11,
+7
+]
+},
+{
+"t": "imp",
+"at": [
+23,
+6
+]
+},
+{
+"t": "imp",
+"at": [
+27,
+7
+]
+},
+{
+"t": "wisp",
+"at": [
+19,
+6
+]
+},
+{
+"t": "cart",
+"at": [
+37,
+3
+]
+},
+{
+"t": "cart",
+"at": [
+42,
+10
+]
+},
+{
+"t": "imp",
+"at": [
+39,
+6
+]
+},
+{
+"t": "imp",
+"at": [
+44,
+7
+]
+},
+{
+"t": "attendant",
+"at": [
+56,
+6
+]
+},
+{
+"t": "container",
+"id": "hc_redeye",
+"at": [
+54,
+7
+],
+"clear": true
+},
+{
+"t": "chest",
+"id": "c_horn",
+"at": [
+57,
+7
+],
+"item": "horn",
+"clear": true
+},
+{
+"t": "warp",
+"at": [
+61,
+7
+],
+"to": "overworld",
+"dest": [
+29,
+34
+],
+"clear": true,
+"portal": true
+}
+],
+"dungeon": true,
+"dark": true,
+"redeye": true,
+"nokeys": true
 }
 };
 
@@ -1016,6 +1767,10 @@ const STORY = {
     ['', 'A voice whispers your name through the metal. Then it laughs.'],
     ['Jon', 'Nope. Nope nope nope. We are NOT going in there yet. Come back when we are stronger.'],
   ],
+  cargo_open: [['', 'The cargo hold door hangs open. Red light spills out. Something inside is humming the safety announcement.'], ['Jon', 'We are stronger now. I have THUNDER. ...I still don\'t want to go in. Fine. Let\'s go.']],
+  cargo_done: [['Jon', 'Empty now. The seats are back where they belong. I checked twice.']],
+  attendant: [['Attendant', 'Welcome aboard, sir. Please remain seated.'], ['Attendant', 'Any... refreshments?'], ['Jon', 'She only shows up when the lights flicker! Watch for her claws, dodge the dash, then hit her while she\'s dizzy!']],
+  attendant_down: [['Attendant', 'Wonderful... Chilly will... hear about... this...'], ['', 'She folds up like a napkin and blows away through an air vent.'], ['Jon', 'I am never flying coach again.']],
   cargo_later: [['Jon', 'The scratching stopped. That is somehow worse. (The Red-Eye side quest arrives in a later chapter.)']],
   astrid_1: [
     ['Astrid', 'So. The boy who pulled Jontuka out of the lake has come back. And still alive. Mostly.'],
@@ -1033,9 +1788,17 @@ const STORY = {
   astrid_2: [['Astrid', 'The Ice Cavern is up the Frozen Path, north-east. Mind the slippery floors. Penguins love ice.']],
   astrid_3: [
     ['Astrid', 'The Thunder Rune! Walter carved that rune for the axe himself. Jontuka remembers who he is.'],
-    ['Astrid', 'Chilly will not stop. Three more rune doors are sealed: the Drowned Barrow, Walter\'s Forge, and the Storm Peak.'],
-    ['Astrid', 'They will open when the story is ready to be told.'],
+    ['Astrid', 'And the thunder woke the old runes. The seal on the Drowned Barrow in the north-west foothills has broken.'],
+    ['Astrid', 'That is Hank\'s tomb. Chilly has been sending frost into it. If Hank\'s ghost turns, he will come for the axe he hid.'],
   ],
+  astrid_4: [['Astrid', 'You freed Hank. Then the next door is Walter\'s Forge, on the volcano road. It will open when the story is ready.']],
+  barrow_enter: [['Jon', 'Wet. Dark. Smells like old Viking socks.'], ['Owen', 'This is Hank\'s tomb. The guy who threw you in a lake.'], ['Jon', 'And I am STILL not over it.']],
+  fluffy_1: [['Fluffy', 'Woof!'], ['', 'A ghostly dog wags its whole body. Its tag says FLUFFY.'], ['Jon', 'Hank\'s dog! He wants us to follow him. West, I think. Something big is guarding a treasure that way.']],
+  fluffy_2: [['Fluffy', 'Woof woof!'], ['Jon', 'He says dash across the water to the north. Hank is up there. And he says good job. I added that part.']],
+  fluffy_after: [['Fluffy', '(Fluffy rolls over for belly rubs. Your hand goes right through him. He doesn\'t mind.)']],
+  captain: [['Draugr Captain', 'NONE... SHALL... PASS... the treasure of Hank!'], ['Jon', 'Same trick as the knight: hit, hit! Or get behind him.']],
+  hank: [['Hank', 'WHO... DISTURBS... HANK?'], ['Owen', 'It\'s me. Owen. I have your axe. Well, it has me.'], ['Hank', 'CHILLY\'S... FROST... I... cannot... stop...'], ['Jon', 'He\'s frozen solid. My blade bounces off! Owen, VOODOO DASH right through him to shatter the frost!']],
+  hank_down: [['', 'The frost cracks and falls away. A tired old Viking ghost looks down at you.'], ['Hank', 'Thank you, boy. Chilly froze me to guard this place until the axe came home.'], ['Hank', 'I threw Jontuka in the lake to keep it from him. I am sorry it landed on you.'], ['Jon', 'It landed on HIM? It landed on ME. In a LAKE. For a BIZILLION years.'], ['Hank', 'The smith who forged you knows how to stop Chilly. Go to his forge on the volcano road.'], ['Hank', 'His real name was... no. I swore never to say it. And give Fluffy a pat for me.'], ['Fluffy', 'WOOF!']],
   lars: [['Lars', 'Velkommen! Lingonberry juice, rune shards, hearts. Walk up to a table and press Z to buy.']],
   sven_1: [['Sven', 'My big sister says if you cut bushes with an axe you find kroner. I saw a sparkly thing in the forest behind a ring of bushes.']],
   sven_2: [['Sven', 'There is another sparkly thing in the graveyard. In the far corner. I am NOT going in there.']],
@@ -1072,11 +1835,55 @@ const STORY = {
     ['', 'The frost spirit flies out of the penguin and shatters. A very confused regular penguin waddles away.'],
     ['Jon', 'And THAT is how we do it in Norway.'],
   ],
+  tapestry: [['', 'A woven tapestry: a huge Viking in a horned helmet hurls a glowing axe into a lake. Stitched underneath: "HANK DID THIS."']],
+  bookshelf: [['', 'A thick book: "WALTER THE WONDERFUL: A Biography." Chapter 1, "His Real Name Was..."'], ['', 'The rest of the page is torn out. Somebody does NOT want you to know.']],
+  rush_poster: [['', 'A hand-painted poster: "RUSH Ø. The fastest song ever written. Do not attempt. (Bjarne attempted.)"']],
+  cave_carving: [['', 'Scratched into the rock: "FLUFFY WAS HERE. FLUFFY WAS A GOOD BOY." Paw prints run off into the dark.']],
+  grave: [['', '"HERE LIES FLUFFY, HANK\'S DOG. GOOD BOY."'], ['Jon', 'Owen. The stone is loose. Push it. Push the dog grave.'], ['', 'The gravestone grinds aside. Stairs lead down into the dark!']],
+  grave_open: [['Jon', 'Fluffy\'s secret tunnel. Good boy.']],
+  sven_quest: [['Sven', 'Owen! I lost my toy longship in the Whispering Forest, north of the village. I hid it under a bush so the penguins wouldn\'t get it...'], ['Sven', '...and then I forgot which bush. Can you find it? Jon can cut bushes, right?']],
+  sven_waiting: [['Sven', 'It\'s under one of the bushes in the forest. I think it\'s near the big path. Probably. Maybe.']],
+  sven_thanks: [['Sven', 'MY LONGSHIP! You found it! Here, take my savings. And this juice. Mom says it\'s for emergencies, but this IS one.']],
+  bjarne_quest: [['Bjarne', 'Ah, a visitor! I am Bjarne, the greatest musician in Fjordvik. Also the only one.'], ['Bjarne', 'I wrote the fastest song in the world: RUSH Ø. But a penguin sneezed and my sheet music blew all the way to the beach!'], ['Jon', 'Rush Ø? I know a song like that. I can recite it note for note.'], ['Bjarne', 'Then you understand! Please, bring back my music. The beach is south-east, past the lake.']],
+  bjarne_waiting: [['Bjarne', 'My sheet music is somewhere on the beach, south-east. Watch out for the penguins. They are music critics.']],
+  bjarne_thanks: [['Bjarne', 'MY MASTERPIECE! You saved RUSH Ø!'], ['Bjarne', 'Listen... (Bjarne plays faster than should be humanly possible.)'], ['Jon', 'That was beautiful. I think I am crying. Can axes cry?'], ['Bjarne', 'Take this. I found it inside my piano. Every hero needs more heart.']],
+  bjarne_after: [['Bjarne', 'RUSH Ø! Again! From the top! (He does not stop playing.)']],
   revive: [['Jon', 'Voodoo bond! Get up, zombie! (Touch a runestone to recharge it.)']],
   juice: [['', 'You drank the Lingonberry Juice. Hearts restored!']],
   saved: [['', 'The runestone glows. Game saved. Hearts and voodoo bond restored.']],
   chapter_done: 'CHAPTER 1 COMPLETE',
   quips: ['da da da... (Rush E)', 'I\'m loyal!', 'World\'s best owner!', 'Ak ak ak', 'You can\'t get rid of me', 'Penguins. Ugh.', 'Bring me THUNDER!'],
+};
+
+// Jon's personality: short lines he says on his own. Jon is based on Owen's real best friend,
+// so he's loyal, funny, bossy, and always on Owen's side. Edit or add lines freely.
+const JON = {
+  idle: ['da da da... (Rush E)', 'Owen. OWEN. We\'re burning daylight.', 'I could carve something while we wait.', 'Did you know I can recite Rush E? Because I can.', 'Standing still is how penguins get you.', 'Best friends don\'t make best friends wait.'],
+  sleepy: ['zzz...', 'zzz... five more minutes... zzz', 'zzz... ak ak ak... zzz'],
+  wake: ['I was NOT asleep.', 'Huh? I was resting my blade.', 'Okay okay, I\'m up!'],
+  kill: ['Got one!', 'Chop!', 'Teamwork!', 'Easy.', 'Ha! Nailed it!', 'That\'s my best friend!'],
+  streak: ['We are UNSTOPPABLE!', 'Three in a row! High five! ...I don\'t have hands.', 'Combo! I\'m counting!'],
+  hurt: ['Hey! Nobody hits my friend!', 'You okay?!', 'Ow ow ow. Wait, that was you.', 'Walk it off, zombie!'],
+  lowhp: ['Owen, you\'re looking extra dead.', 'Maybe drink some juice?', 'Careful! I need you!', 'Hearts. We need hearts.'],
+  thrown: ['WHEEEE!', 'I can FLY!', 'Incoming!', 'Fore!'],
+  wall: ['Ow. Wall.', 'Who put that there?', 'I meant to do that.'],
+  item: ['Ooh, shiny!', 'Put it in the pack!', 'Treasure! I love treasure!'],
+  boss: ['We did it! Best team in Norway!', 'Told you we could do it.', 'That\'s going on the carved sign.'],
+  water: ['Not the lake again...', 'I hate water. Long story.', 'Keep me away from that lake.'],
+  penguin: ['Penguins. In NORWAY.', 'Ak ak ak. Sorry. Reflex.', 'I see a penguin. I hate it.'],
+  levelup: ['I feel STRONGER!', 'Level up! I\'m basically a sword now.', 'Friendship POWER!', 'Did I get shinier? I got shinier.'],
+  spin: ['SPIN TO WIN!', 'Wheeeee-ooo!', 'Tornado mode!'],
+  area: {
+    home: 'Our room! With MY sign in it.',
+    overworld: 'Norway! Smell that? Fjords.',
+    village: 'Fjordvik! Lars has juice.',
+    cavern: 'Brr. Ice. Penguins. Ugh.',
+    barrow: 'Hank\'s tomb. Be cool.',
+    redeye: 'I don\'t like this. At all.',
+    secret_cave: 'Fluffy\'s tunnel! Good boy.',
+    astrid_house: 'Wipe your feet.',
+    bjarne_house: 'It smells like music in here.',
+  },
 };
 
 const ITEMS = {
@@ -1096,6 +1903,11 @@ const ITEMS = {
   juice: { name: 'Lingonberry Juice', icon: 'juice', lines: [['', 'LINGONBERRY JUICE! If your hearts run out, you drink it automatically.']] },
   shard: { name: 'Rune Shard', icon: 'shard', lines: [['', 'A RUNE SHARD! Your rune meter fills up.']] },
   heart3: { name: 'Heart Refill', icon: 'heart', lines: [['', 'Hearts refilled!']] },
+  dash: { name: 'Voodoo Dash', icon: 'dash', lines: [['', 'You got the VOODOO DASH!'], ['Jon', 'Our voodoo bond just leveled up. Press Shift (or F) and you zip forward like a zombie rocket.'], ['', 'While dashing you can\'t be hurt. You pass through enemies, purple spirit barriers, and short stretches of water or pits.']] },
+  kr50: { name: '50 Kroner', icon: 'gold', lines: [['', 'You found 50 kroner!']] },
+  horn: { name: 'Demon Horn', icon: 'horn', lines: [['', 'You got the DEMON HORN! It came from the flight attendant\'s... luggage.'], ['Jon', 'Blow it with V. Costs half the rune meter. Regular enemies run away screaming. Bosses are too proud to care.']] },
+  sheet: { name: 'Sheet Music', icon: 'sheet', lines: [['', 'You found BJARNE\'S SHEET MUSIC! It says "RUSH Ø" at the top. There are WAY too many notes.'], ['Jon', 'Bring it back to Bjarne in Fjordvik. The house on the right.']] },
+  ship: { name: 'Toy Longship', icon: 'ship', lines: [['', 'You found SVEN\'S TOY LONGSHIP!'], ['Jon', 'Tiny Vikings. Adorable. Back to Sven at the market.']] },
 };
 
 // ===== engine.js =====
@@ -1114,13 +1926,103 @@ const pick = arr => arr[Math.floor(Math.random() * arr.length)];
 // ---------- input ----------
 const ACTIONS = {
   left: ['ArrowLeft', 'KeyA'], right: ['ArrowRight', 'KeyD'], up: ['ArrowUp', 'KeyW'], down: ['ArrowDown', 'KeyS'],
-  a: ['KeyZ', 'Space', 'KeyJ'], b: ['KeyX', 'KeyK', 'ShiftLeft', 'ShiftRight'], c: ['KeyC', 'KeyL'],
-  menu: ['Enter', 'Escape', 'KeyP'], mute: ['KeyM'], music: ['KeyN'],
+  a: ['KeyZ', 'Space', 'KeyJ'], b: ['KeyX', 'KeyK'], c: ['KeyC', 'KeyL'], dash: ['ShiftLeft', 'ShiftRight', 'KeyF'],
+  menu: ['Enter', 'Escape', 'KeyP'], mute: ['KeyM'], music: ['KeyN'], horn: ['KeyV'],
 };
 const keys = {}, virt = {}, edge = {};
 const held = a => !!virt[a] || ACTIONS[a].some(c => keys[c]);
 const just = a => !!edge[a];
+// on-screen thumbstick: analog direction, plus direction "presses" so it also drives menus
+const stick = { active: false, x: 0, y: 0 };
+(function setupStick() {
+  const base = document.getElementById('stick'), knob = document.getElementById('knob');
+  if (!base) return;
+  let id = null;
+  const dirs = { left: false, right: false, up: false, down: false };
+  const move = e => {
+    const r = base.getBoundingClientRect(), cx = r.left + r.width / 2, cy = r.top + r.height / 2, max = r.width * 0.38;
+    let dx = e.clientX - cx, dy = e.clientY - cy;
+    const m = Math.hypot(dx, dy); if (m > max) { dx *= max / m; dy *= max / m; }
+    knob.style.transform = `translate(${dx}px, ${dy}px)`;
+    const nx = dx / max, ny = dy / max, mag = Math.hypot(nx, ny);
+    stick.active = mag > 0.22; stick.x = stick.active ? nx / mag : 0; stick.y = stick.active ? ny / mag : 0;
+    const want = { left: nx < -0.5, right: nx > 0.5, up: ny < -0.5, down: ny > 0.5 };
+    for (const k in want) { if (want[k] && !dirs[k]) edge[k] = true; dirs[k] = want[k]; virt[k] = want[k]; }
+  };
+  const end = e => {
+    if (e.pointerId !== id) return;
+    id = null; base.classList.remove('on'); knob.style.transform = '';
+    stick.active = false; stick.x = stick.y = 0;
+    for (const k in dirs) { dirs[k] = false; virt[k] = false; }
+  };
+  base.addEventListener('pointerdown', e => { e.preventDefault(); id = e.pointerId; base.setPointerCapture(id); base.classList.add('on'); Sound.unlock(); move(e); });
+  base.addEventListener('pointermove', e => { if (e.pointerId === id) { e.preventDefault(); move(e); } });
+  ['pointerup', 'pointercancel', 'lostpointercapture'].forEach(t => base.addEventListener(t, end));
+})();
+// ---------- gamepad (Xbox / PlayStation / Backbone / Switch Pro, over Bluetooth on iPad) ----------
+const PAD = { on: false, x: 0, y: 0, active: false, prev: {}, idx: null };
+const PAD_MAP = { 0: 'a', 1: 'b', 2: 'c', 3: 'horn', 4: 'dash', 5: 'dash', 6: 'dash', 7: 'dash', 8: 'mute', 9: 'menu', 12: 'up', 13: 'down', 14: 'left', 15: 'right' };
+function pollGamepad() {
+  const pads = navigator.getGamepads ? navigator.getGamepads() : [];
+  let gp = null;
+  for (const p of pads) if (p && p.connected) { gp = p; break; }
+  if (!gp) { if (PAD.on) { PAD.on = false; PAD.active = false; for (const k in PAD.prev) if (PAD.prev[k]) virt[k] = false; PAD.prev = {}; setPadNote(false); } return; }
+  if (!PAD.on) { PAD.on = true; setPadNote(true); Sound.unlock(); }
+  // left stick with a dead zone; the d-pad also moves
+  let x = gp.axes[0] || 0, y = gp.axes[1] || 0;
+  const m = Math.hypot(x, y);
+  if (m < 0.25) { x = 0; y = 0; }
+  if (gp.buttons[14] && gp.buttons[14].pressed) x = -1; if (gp.buttons[15] && gp.buttons[15].pressed) x = 1;
+  if (gp.buttons[12] && gp.buttons[12].pressed) y = -1; if (gp.buttons[13] && gp.buttons[13].pressed) y = 1;
+  const mm = Math.hypot(x, y);
+  PAD.active = mm > 0; PAD.x = PAD.active ? x / mm : 0; PAD.y = PAD.active ? y / mm : 0;
+  // menu stepping from the stick
+  const dirs = { left: x < -0.5, right: x > 0.5, up: y < -0.5, down: y > 0.5 };
+  for (const k in dirs) { if (dirs[k] && !PAD.prev[k]) edge[k] = true; PAD.prev[k] = dirs[k]; virt[k] = dirs[k] || (virt[k] && stick.active); }
+  for (const i in PAD_MAP) {
+    const a = PAD_MAP[i]; if (a === 'up' || a === 'down' || a === 'left' || a === 'right') continue;
+    const down = !!(gp.buttons[i] && (gp.buttons[i].pressed || gp.buttons[i].value > 0.5));
+    const key = 'b' + i;
+    if (down && !PAD.prev[key]) { edge[a] = true; if (a === 'a') edge.tap = edge.tap; }
+    PAD.prev[key] = down;
+    if (down) PAD.held = PAD.held || {}; 
+  }
+  // held state for actions (spin charge uses held('a'))
+  for (const a of ['a', 'b', 'c', 'horn', 'dash', 'menu']) {
+    const anyDown = Object.keys(PAD_MAP).some(i => PAD_MAP[i] === a && gp.buttons[i] && (gp.buttons[i].pressed || gp.buttons[i].value > 0.5));
+    virt[a] = anyDown || (virt[a] && !PAD.prev['v' + a]);
+    PAD.prev['v' + a] = anyDown;
+  }
+}
+function setPadNote(on) { const n = document.getElementById('padnote'); if (n) n.classList.toggle('on', on); document.body.classList.toggle('nopad', on); }
+window.addEventListener('gamepadconnected', () => setPadNote(true));
+
+// ---------- full screen / theater ----------
+function enterTheater() {
+  document.body.classList.add('theater');
+  const el = document.documentElement;
+  const req = el.requestFullscreen || el.webkitRequestFullscreen;
+  if (req) { try { const r = req.call(el); if (r && r.catch) r.catch(() => {}); } catch (e) { /* not allowed here; theater layout still applies */ } }
+  cv.focus();
+}
+function exitTheater() {
+  document.body.classList.remove('theater');
+  const ex = document.exitFullscreen || document.webkitExitFullscreen;
+  if (ex && (document.fullscreenElement || document.webkitFullscreenElement)) { try { const r = ex.call(document); if (r && r.catch) r.catch(() => {}); } catch (e) {} }
+}
+(function setupTheater() {
+  const b = document.getElementById('fsbtn'), x = document.getElementById('exitfs');
+  if (b) b.addEventListener('click', () => { Sound.unlock(); enterTheater(); });
+  if (x) x.addEventListener('click', exitTheater);
+  const onChange = () => { if (!(document.fullscreenElement || document.webkitFullscreenElement) && document.body.classList.contains('theater') && theaterWasFull) exitTheater(); theaterWasFull = !!(document.fullscreenElement || document.webkitFullscreenElement); };
+  let theaterWasFull = false;
+  document.addEventListener('fullscreenchange', onChange); document.addEventListener('webkitfullscreenchange', onChange);
+  window.addEventListener('keydown', e => { if (e.code === 'Escape' && document.body.classList.contains('theater') && !(document.fullscreenElement || document.webkitFullscreenElement)) exitTheater(); });
+})();
+
 function inputVec() {
+  if (PAD.active) return { x: PAD.x, y: PAD.y };
+  if (stick.active) return { x: stick.x, y: stick.y };
   let x = (held('right') ? 1 : 0) - (held('left') ? 1 : 0), y = (held('down') ? 1 : 0) - (held('up') ? 1 : 0);
   const m = Math.hypot(x, y);
   return m ? { x: x / m, y: y / m } : { x: 0, y: 0 };
@@ -1191,6 +2093,10 @@ const Sound = {
       case 'thunder': this.noise(1.2, 0.35, 500); this.tone([[90, 0.9, 'sawtooth', 40]], 0.1); break;
       case 'charge': this.tone([[200, 0.4, 'sawtooth', 900]], 0.04); break;
       case 'boss': this.tone([[110, 0.2, 'sawtooth'], [104, 0.2, 'sawtooth'], [98, 0.5, 'sawtooth']], 0.08); break;
+      case 'scratch': for (let i = 0; i < 4; i++) setTimeout(() => this.noise(0.05 + Math.random() * 0.05, 0.05, 2500 + Math.random() * 2000), i * (90 + Math.random() * 80)); break;
+      case 'flicker': this.tone([[60, 0.05, 'square'], [0, 0.04], [60, 0.05, 'square'], [0, 0.08], [55, 0.1, 'square']], 0.05); break;
+      case 'horn': this.tone([[98, 0.9, 'sawtooth', 92]], 0.12); this.tone([[147, 0.9, 'sawtooth', 139]], 0.07); break;
+      case 'dash': this.noise(0.18, 0.12, 3000); this.tone([[300, 0.15, 'sawtooth', 900]], 0.04); break;
       case 'creep': this.tone([[70, 1.2, 'sine', 55]], 0.12); this.tone([[1760, 0.6, 'sine', 1700]], 0.012); break;
     }
   },
@@ -1392,7 +2298,11 @@ function musicFor() {
     return G.ents.some(e => e.type === 'king' && e.alive) ? 'boss' : 'arena';
   }
   if (!G.map) return null;
-  if (G.mapId === 'home') return 'village';
+  if (G.mapId === 'barrow') return G.ents.some(e => e.boss && e.alive) ? 'boss' : 'barrow';
+  if (G.map.redeye) return G.ents.some(e => e.type === 'attendant' && e.alive) ? 'boss' : 'creepy';
+  if (G.mapId === 'bjarne_house' && flag('bjarne_done')) return 'bjarne';
+  if (G.map.interior) return 'village';
+  if (G.map.dark) return 'dungeon';
   if (G.map.dungeon) return G.ents.some(e => e.boss && e.alive) ? 'boss' : 'dungeon';
   if (G.scr.y === 1 && G.scr.x <= 1) return 'village';
   return 'overworld';
@@ -1413,11 +2323,11 @@ const G = {
 
 function newSave() {
   return { map: 'home', x: 0, y: 0, maxHp: 6, hp: 6, kr: 0, rune: 0, potions: 0, pieces: 0,
-    items: {}, flags: {}, keys: {}, bigkeys: {}, voodoo: true };
+    items: {}, flags: {}, keys: {}, bigkeys: {}, voodoo: true, jon: { lvl: 1, xp: 0, perks: {} } };
 }
 const SAVE_KEY = 'jontuka-save-v1';
 // Stats Owen carries. Story mode uses the defaults; the Arena upgrades them.
-function baseStats() { return { dmg: 1, speed: 1, atk: 1, range: 1, pickup: 28, armor: 0, regen: 0, crit: 0, knock: 1 }; }
+function baseStats() { return { dmg: 1, speed: 1, atk: 1, range: 1, pickup: 28, armor: 0, regen: 0, crit: 0, knock: 1, swing: 1, runeKill: 1, luck: 0 }; }
 G.st = baseStats();
 function writeSave() {
   if (G.mode === 'arena') return;
@@ -1432,9 +2342,9 @@ const flag = k => !!G.save.flags[k];
 const setFlag = k => { G.save.flags[k] = true; };
 
 // ---------- tiles ----------
-const SOLID = new Set('T#MwHRDPqX+lWtOYQZxLKbV'.split(''));
+const SOLID = new Set('T#MwHRDPqX+lWtOYQZxLKbVCkpueABy'.split(''));
 function tile(tx, ty) {
-  if (tx < 0 || ty < 0 || tx >= G.cols || ty >= G.nrows) return G.map.dungeon ? 'W' : 'T';
+  if (!(tx >= 0 && ty >= 0 && tx < G.cols && ty < G.nrows)) return G.map.dungeon ? 'W' : 'T';   // also catches NaN
   return G.rows[ty][tx];
 }
 const tileAt = (x, y) => tile(Math.floor(x / T), Math.floor(y / T));
@@ -1448,7 +2358,8 @@ function gatesDown() { return flag(G.mapId + ':gates'); }
 function solidTile(tx, ty, who) {
   const c = tile(tx, ty);
   if (c === 'T' && isCanopy(tx, ty)) return false;   // walk behind big tree tops
-  if (who === 'flyer') return c === 'W' || c === 'T' || c === 'M' || c === 'Z' || c === 'V';
+  if (c === 'J') return who !== 'flyer' && who !== 'jon' && phantomSolid();
+  if (who === 'flyer') return c === 'W' || c === 'T' || c === 'M' || c === 'Z' || c === 'V' || c === 'u' || c === 'e';
   if (c === 'h') return shutterClosed(tx, ty);
   if (c === 'G') return !gatesDown();
   if (who === 'jon') return SOLID.has(c) && c !== 'b' && c !== 'O' && c !== 'x' && c !== 'w' && c !== 'Q';
@@ -1483,9 +2394,13 @@ function loadMap(id, px, py) {
   for (const k in G.save.flags) {
     const m = k.match(/^open:(\w+):(\d+),(\d+)$/);
     if (m && m[1] === id) setTile(+m[2], +m[3], '_');
+    const t2 = k.match(/^tile:(\w+):(\d+),(\d+):(.)$/);
+    if (t2 && t2[1] === id) setTile(+t2[2], +t2[3], t2[4]);
   }
+  // rune doors that have opened become cave mouths
+  for (const d of G.map.ents) if (d.t === 'runedoor' && G.save.flags[d.needs]) setTile(d.at[0], d.at[1], 'E');
   const p = G.player;
-  p.x = px; p.y = py; p.vx = p.vy = p.kx = p.ky = 0; p.launching = false; p.falling = 0; p.hold = null;
+  p.x = px; p.y = py; p.vx = p.vy = p.kx = p.ky = 0; p.launching = false; p.falling = 0; p.hold = null; p.dashing = 0;
   G.jon.x = px + 10; G.jon.y = py - 14; G.jon.mode = 'follow';
   G.scr = screenOf(px, py);
   G.trans = null;
@@ -1533,6 +2448,7 @@ function checkScreenEdge() {
   const dx = Math.sign(s.x - G.scr.x), dy = Math.sign(s.y - G.scr.y);
   G.trans = { from: { ...G.cam }, to: { x: s.x * VW, y: s.y * VH }, t: 0, dx, dy };
   G.ents = G.ents.filter(e => e.keep); G.fx = []; G.roomEnemies = false;
+  p.dashing = 0;   // a dash never carries into the next screen
   G.scr = s;
 }
 function updateTransition(dt) {
@@ -1635,7 +2551,7 @@ function drawMap() {
   for (let ty = y0; ty <= y0 + SH; ty++) for (let tx = x0; tx <= x0 + SW; tx++) {
     if (tx < 0 || ty < 0 || tx >= G.cols || ty >= G.nrows) continue;
     const c = claimedGround(tx, ty) || G.rows[ty][tx], ox = tx * T - cx, oy = ty * T - cy;
-    if (!drawTileArt(c, ox, oy, tx, ty)) drawTile(c, ox, oy, tx, ty);
+    if (!drawTileCh2(c, ox, oy) && !drawTileRE(c, ox, oy, tx, ty) && !drawTileArt(c, ox, oy, tx, ty) && !drawTileB(c, ox, oy, tx, ty)) drawTile(c, ox, oy, tx, ty);
   }
 }
 
@@ -1650,14 +2566,21 @@ function makeEnt(d, x, y) {
     case 'start': return null;
     case 'runestone': return { ...base, solid: true, talk: true };
     case 'sign': case 'plaque': return { ...base, solid: true, talk: true };
-    case 'sealed': case 'cargo': return { ...base, talk: true };
+    case 'sealed': if (d.opensWith && s.flags[d.opensWith]) return null; return { ...base, talk: true };
+    case 'cargo': return { ...base, talk: true };
     case 'npc': return { ...base, solid: true, talk: true, id: d.id, bob: Math.random() * 6 };
     case 'shop': return { ...base, talk: true, item: d.item, price: d.price };
     case 'chest': return { ...base, solid: true, talk: true, open: !!s.flags['chest:' + d.id] };
     case 'piece': case 'container': return s.flags['got:' + d.id] ? null : { ...base, kind: 'pickup', what: d.t, id: d.id, permanent: true };
     case 'warp': return { ...base, portal: !!d.portal };
     case 'flight': return { ...base };
+    case 'door': return { ...base, talk: true };
+    case 'grave': return { ...base, talk: true };
+    case 'stairs': return s.flags['grave_open'] ? { ...base, kind: 'warp' } : null;
+    case 'qitem': return (s.flags['got:' + d.id] || (d.needs && !s.flags[d.needs])) ? null : { ...base, kind: 'pickup', what: 'qitem', id: d.id, underBush: !!d.underBush, permanent: true };
     case 'switch': return { ...base, solid: true, hittable: true, id: d.id, cd: 0 };
+    case 'cart': return { ...base, kind: 'hazard', type: 'cart', dir: 1, wob: 0 };
+    case 'runedoor': return s.flags[d.needs] ? { ...base, kind: 'warp' } : null;
     default: return makeEnemy(d.t, x, y);
   }
 }
@@ -1668,12 +2591,16 @@ const ENEMY = {
   bat: { hp: 1, r: 5, touch: 1, speed: 75, fly: true },
   knight: { hp: 5, r: 10, touch: 2, speed: 28, shield: true, boss: true },
   king: { hp: 10, r: 16, touch: 2, speed: 26, boss: true },
+  imp: { hp: 2, r: 5, touch: 1, speed: 0 },
+  attendant: { hp: 12, r: 8, touch: 2, speed: 0, boss: true },
+  captain: { hp: 6, r: 10, touch: 2, speed: 24, shield: true, boss: true },
+  hank: { hp: 10, r: 14, touch: 2, speed: 0, boss: true, fly: true },
 };
 function makeEnemy(type, x, y) {
   const d = ENEMY[type];
   if (!d) return null;
   return { x, y, kind: 'enemy', enemy: true, alive: true, type, ...d, max: d.hp, flash: 0, kx: 0, ky: 0, t: Math.random() * 2,
-    st: type === 'king' || type === 'knight' ? 'intro' : 'idle', fx: 0, fy: 1, wob: Math.random() * 6, tx: x, ty: y, bounces: 0, summoned: false };
+    st: ['king', 'knight', 'attendant', 'captain', 'hank'].includes(type) ? 'intro' : 'idle', fx: 0, fy: 1, wob: Math.random() * 6, tx: x, ty: y, bounces: 0, summoned: false };
 }
 
 // ---------- particles ----------
@@ -1688,6 +2615,9 @@ function drawFx() {
   for (const f of G.fx) {
     if (f.kind === 'text') { text(f.label, f.x - G.cam.x, f.y - G.cam.y - f.t * 12, f.color, 'center'); continue; }
     if (f.kind === 'poof') { const img = POOF[Math.min(3, Math.floor(f.t / f.life * 4))], s = f.scale; ctx.drawImage(img, Math.round(f.x - G.cam.x - 12 * s), Math.round(f.y - G.cam.y - 12 * s), 24 * s, 24 * s); continue; }
+    if (f.kind === 'whisper') { drawWhisper(f); continue; }
+    if (f.kind === 'ghost') { drawDashGhost(f); continue; }
+    if (f.kind === 'ring') { const k = f.t / f.life; ctx.strokeStyle = `rgba(255,120,90,${1 - k})`; ctx.lineWidth = 2; ctx.beginPath(); ctx.arc(Math.round(f.x - G.cam.x), Math.round(f.y - G.cam.y), 8 + k * 120, 0, Math.PI * 2); ctx.stroke(); continue; }
     if (f.kind === 'ripple') { if (f.t < 0) continue; const k = f.t / f.life; ctx.strokeStyle = `rgba(220,240,255,${1 - k})`; ctx.lineWidth = 1; ctx.beginPath(); ctx.ellipse(Math.round(f.x - G.cam.x), Math.round(f.y - G.cam.y + 4), 4 + k * 14, 2 + k * 6, 0, 0, Math.PI * 2); ctx.stroke(); continue; }
     if (f.kind === 'leaf') { R(f.x - G.cam.x, f.y - G.cam.y, 2, 1, f.color); R(f.x - G.cam.x + 1, f.y - G.cam.y + 1, 1, 1, '#205818'); continue; }
     R(f.x - G.cam.x, f.y - G.cam.y, f.size, f.size, f.color);
@@ -1718,6 +2648,8 @@ function updatePlayer(dt) {
     }
     return;
   }
+  p.dashCd = Math.max(0, (p.dashCd || 0) - dt);
+  if (p.dashing > 0) return updateDash(dt);
   if (p.launching) {
     p.lp += dt / 0.7;
     const k = Math.min(p.lp, 1);
@@ -1729,7 +2661,8 @@ function updatePlayer(dt) {
   p.moving = !!(v.x || v.y);
   if (p.moving) { p.fx = v.x; p.fy = v.y; p.walk += dt * 14; }
   const onIce = tileAt(p.x, p.y) === 'i';
-  const spd = 72 * G.st.speed;
+  p.boost = Math.max(0, (p.boost || 0) - dt);
+  const spd = 72 * G.st.speed * (p.boost > 0 ? 1.4 : 1);
   if (onIce) { const k = Math.min(1, 2.2 * dt); p.vx += (v.x * spd * 1.1 - p.vx) * k; p.vy += (v.y * spd * 1.1 - p.vy) * k; }
   else { p.vx = v.x * spd; p.vy = v.y * spd; }
   const hit = tryMove(p, p.vx * dt, p.vy * dt, 5, 'player');
@@ -1764,6 +2697,7 @@ function updatePlayer(dt) {
   }
 
   // actions
+  updateSpinCharge(dt);
   if (p.cd > 0) return;
   if (just('a')) {
     const f = facing4(p), px = p.x + f.x * 13, py = p.y + f.y * 13;
@@ -1773,6 +2707,10 @@ function updatePlayer(dt) {
     if (G.jon.mode === 'follow') { G.jon.swing(Math.atan2(p.fy, p.fx)); Sound.play('swing'); }
   } else if (just('b') && G.jon.mode === 'follow') {
     G.jon.throw(p.x, p.y, p.fx, p.fy); Sound.play('throw');
+  } else if (just('dash')) {
+    startDash();
+  } else if (just('horn')) {
+    blowHorn();
   } else if (just('c')) {
     if (!s.items.thunder) floatText(p.x, p.y - 18, 'No rune yet', '#aab');
     else if (s.rune < RUNE_MAX) { floatText(p.x, p.y - 18, 'Rune not full', '#7fd4ff'); }
@@ -1802,6 +2740,7 @@ function hurtPlayer(dmg, from, force) {
   if (!force && (p.inv > 0 || p.launching || p.falling > 0 || G.state !== 'play')) return;
   if (!force && G.st.armor > 0 && Math.random() < Math.min(0.6, G.st.armor * 0.1)) { p.inv = 0.4; floatText(p.x, p.y - 18, 'BLOCK', '#9fd0ff'); Sound.play('clank'); return; }
   p.hp -= dmg; p.inv = 1; Sound.play('hurt'); G.shake = 0.15;
+  if (G.mode !== 'arena') jonOnHurt(from);
   if (from) { const d = Math.hypot(p.x - from.x, p.y - from.y) || 1; p.kx = (p.x - from.x) / d * 170; p.ky = (p.y - from.y) / d * 170; }
   if (p.hp > 0) return;
   // A Link to the Past death: Owen spins in place, then juice, voodoo or game over
@@ -1818,8 +2757,9 @@ function updateDying(dt) {
 function finishDeath() {
   const p = G.player, s = G.save;
   G.state = 'play';
-  if (s.potions > 0) { s.potions--; p.hp = s.maxHp; p.inv = 2; Sound.play('heart'); return say(STORY.juice); }
+  if (s.potions > 0) { s.potions--; p.hp = s.maxHp; p.inv = 2; Sound.play('heart'); if (jonHas('pep')) { p.boost = 6; return say([...STORY.juice, ['Jon', 'PEP TALK! You got this! Now RUN!']]); } return say(STORY.juice); }
   if (G.mode === 'arena') return arenaOver(false);
+  if (!s.voodoo && s.voodoo2) { s.voodoo2 = false; p.hp = s.maxHp; p.inv = 2.5; puff(p.x, p.y, '#ffd84a', 16); Sound.play('secret'); return say([['Jon', 'Best friends forever means FOREVER. Get up!']]); }
   if (s.voodoo) { s.voodoo = false; p.hp = s.maxHp; p.inv = 2.5; puff(p.x, p.y, '#9a4dd9', 16); Sound.play('secret'); return say(STORY.revive); }
   G.state = 'over'; G.menuSel = 0;
 }
@@ -1831,13 +2771,27 @@ function interact(e) {
     case 'sign': return say(STORY.signs[e.def.text] || [['', '...']]);
     case 'sealed': return say(STORY.signs[e.def.text]);
     case 'plaque': return say(STORY.plaque, () => setFlag('read_plaque'));
+    case 'door': return startWarp(e.def.to, e.def.dest);
+    case 'grave':
+      if (flag('grave_open')) return say(STORY.grave_open);
+      return say(STORY.grave, () => {
+        setFlag('grave_open'); jonXP(15);
+        const tx = Math.floor(e.x / T), ty = Math.floor(e.y / T);
+        setTile(tx, ty, '>'); setFlag(`tile:${G.mapId}:${tx},${ty}:>`);
+        G.ents = G.ents.filter(o => o !== e);
+        G.ents.push({ kind: 'warp', x: e.x, y: e.y, def: MAPS[G.mapId].ents.find(d => d.t === 'stairs') });
+        Sound.play('secret'); G.shake = 0.3; puff(e.x, e.y, '#c8c8d8', 14); writeSave();
+      });
     case 'cargo':
       if (!flag('cargo')) { setFlag('cargo'); Sound.play('creep'); G.flash = 0.25; G.flashColor = '#5a0000'; return say(STORY.cargo); }
-      return say(STORY.cargo_later);
+      if (!flag('d1done')) return say(STORY.cargo_later);
+      if (flag('redeye_done')) return say(STORY.cargo_done);
+      Sound.play('creep');
+      return say(STORY.cargo_open, () => startWarp('redeye', [2, 7]));
     case 'runestone':
-      p.hp = s.maxHp; s.voodoo = true; s.cp = { map: G.mapId, x: p.x, y: p.y }; writeSave(); Sound.play('save'); puff(e.x, e.y - 6, '#7fd4ff', 12);
+      p.hp = s.maxHp; s.voodoo = true; s.voodoo2 = jonHas('bff'); s.cp = { map: G.mapId, x: p.x, y: p.y }; writeSave(); Sound.play('save'); puff(e.x, e.y - 6, '#7fd4ff', 12);
       return say(STORY.saved);
-    case 'npc': return say(npcLines(e.id));
+    case 'npc': { const lines = npcLines(e.id), after = G.afterTalk; G.afterTalk = null; return say(lines, after); }
     case 'shop': return buy(e);
     case 'chest':
       if (e.open) return say([['', 'The chest is empty.']]);
@@ -1849,9 +2803,28 @@ function interact(e) {
 function npcLines(id) {
   if (id === 'astrid') {
     if (!flag('met_astrid')) { setFlag('met_astrid'); G.save.kr += 30; return [...STORY.astrid_1, ['', 'Astrid gave you 30 kroner.']]; }
-    return flag('d1done') ? STORY.astrid_3 : STORY.astrid_2;
+    return flag('d2done') ? STORY.astrid_4 : flag('d1done') ? STORY.astrid_3 : STORY.astrid_2;
   }
-  if (id === 'sven') return flag('got:hp_forest') ? STORY.sven_2 : STORY.sven_1;
+  if (id === 'sven') {
+    if (!flag('met_astrid')) return flag('got:hp_forest') ? STORY.sven_2 : STORY.sven_1;
+    if (!flag('quest_sven')) { setFlag('quest_sven'); return STORY.sven_quest; }
+    if (flag('got:ship') && !flag('sven_done')) {
+      setFlag('sven_done'); jonXP(20); G.save.kr += 30; G.save.potions = Math.min(3, G.save.potions + 1);
+      return [...STORY.sven_thanks, ['', 'Sven gave you 30 kroner and a Lingonberry Juice!']];
+    }
+    if (!flag('sven_done')) return STORY.sven_waiting;
+    return flag('got:hp_forest') ? STORY.sven_2 : STORY.sven_1;
+  }
+  if (id === 'fluffy') return flag('d2done') ? STORY.fluffy_after : flag('got:br_dash') || G.save.items.dash ? STORY.fluffy_2 : STORY.fluffy_1;
+  if (id === 'bjarne') {
+    if (!flag('quest_bjarne')) { setFlag('quest_bjarne'); return STORY.bjarne_quest; }
+    if (flag('got:sheet') && !flag('bjarne_done')) {
+      setFlag('bjarne_done'); jonXP(20);
+      G.afterTalk = () => { setFlag('got:hp_bjarne'); giveItem('piece'); };
+      return STORY.bjarne_thanks;
+    }
+    return flag('bjarne_done') ? STORY.bjarne_after : STORY.bjarne_waiting;
+  }
   return STORY[id] || [['', '...']];
 }
 
@@ -1878,10 +2851,16 @@ function applyItem(id) {
     case 'juice': s.potions++; break;
     case 'shard': s.rune = RUNE_MAX; break;
     case 'heart3': p.hp = s.maxHp; break;
+    case 'sheet': case 'ship': break;
+    case 'horn': s.items.horn = true; break;
+    case 'dash': s.items.dash = true; break;
+    case 'kr50': s.kr += 50; break;
   }
 }
 function giveItem(id, after) {
   applyItem(id);
+  if (['homing', 'thunder', 'dash', 'horn', 'container'].includes(id)) jonXP(15); else jonXP(5);
+  setJonFace('excited', 2.5);
   G.player.hold = { id, t: 1.1 };
   G.state = 'hold'; Sound.play('item');
   G.afterHold = () => say(ITEMS[id].lines, () => { if (after) after(); writeSave(); });
@@ -1892,7 +2871,8 @@ function makeJon() {
   const j = { x: 0, y: 0, mode: 'follow', vx: 0, vy: 0, trav: 0, hit: [], t: 0, st: 0, base: 0, spin: 0, quip: '', qt: 0, nq: 8 };
   j.swing = a => { j.mode = 'swing'; j.st = 0; j.base = a; j.hit = []; };
   j.throw = (x, y, fx, fy) => {
-    j.mode = 'out'; j.x = x; j.y = y; j.trav = 0; j.hit = [];
+    j.mode = 'out'; j.x = x; j.y = y; j.trav = 0; j.hit = []; j.rico = false;
+    if (Math.random() < 0.25) jonSay('thrown', { cooldown: 14 });
     const l = Math.hypot(fx, fy) || 1, sp = 200 * G.st.atk; j.vx = fx / l * sp; j.vy = fy / l * sp;
     j.target = G.save.items.homing ? findTarget(x, y, fx / l, fy / l) : null;
   };
@@ -1913,14 +2893,17 @@ function updateJon(dt) {
   const j = G.jon, p = G.player;
   j.t += dt;
   const range = (G.save.items.homing ? 175 : 88) * G.st.range;
-  if (j.mode === 'follow') {
-    const tx = p.x + 10, ty = p.y - 14 + Math.sin(j.t * 3) * 2, k = Math.min(1, 8 * dt);
-    j.x += (tx - j.x) * k; j.y += (ty - j.y) * k; j.spin = 0;
+  if (j.mode === 'spin') updateSpin(dt);
+  else if (j.mode === 'follow') {
+    // asleep: he lies down next to Owen; excited: he hops
+    const hop = jonFaceNow() === 'excited' ? -Math.abs(Math.sin(j.t * 9)) * 4 : 0;
+    const tx = p.x + 10, ty = JT.asleep ? p.y + 2 : p.y - 14 + Math.sin(j.t * 3) * 2 + hop, k = Math.min(1, 8 * dt);
+    j.x += (tx - j.x) * k; j.y += (ty - j.y) * k; j.spin += ((JT.asleep ? 1.4 : 0) - j.spin) * Math.min(1, 6 * dt);
   } else if (j.mode === 'swing') {
     j.st += dt;
     const k = j.st / (0.2 / G.st.atk), a = j.base + (-1.3 + 2.6 * k);
-    j.x = p.x + Math.cos(a) * 15; j.y = p.y + Math.sin(a) * 15; j.spin = a + Math.PI / 2;
-    jonHits(1, 11, p, 'swing');
+    j.x = p.x + Math.cos(a) * 15 * G.st.swing; j.y = p.y + Math.sin(a) * 15 * G.st.swing; j.spin = a + Math.PI / 2;
+    jonHits(1, 11 * G.st.swing, p, 'swing');
     cutAt(j.x, j.y);
     if (k >= 1) j.mode = 'follow';
   } else if (j.mode === 'out') {
@@ -1930,6 +2913,7 @@ function updateJon(dt) {
     }
     j.x += j.vx * dt; j.y += j.vy * dt; j.trav += Math.hypot(j.vx, j.vy) * dt; j.spin += dt * 22;
     jonHits(1, 9, j, 'throw');
+    if (solidAt(j.x, j.y, 'jon') && Math.random() < 0.5) jonSay('wall', { cooldown: 15, face: 'worried' });
     if (cutAt(j.x, j.y) || j.trav > range || solidAt(j.x, j.y, 'jon')) { j.mode = 'back'; j.hit = []; }
   } else if (j.mode === 'back') {
     const dx = p.x - j.x, dy = p.y - j.y, d = Math.hypot(dx, dy) || 1;
@@ -1943,8 +2927,6 @@ function updateJon(dt) {
   if (j.mode === 'out' || j.mode === 'back') {
     for (const e of G.ents) if (e.kind === 'pickup' && dist(e, j) < 10) { e.x = j.x; e.y = j.y; }   // Jon fetches loot
   }
-  j.nq -= dt; j.qt = Math.max(0, j.qt - dt);
-  if (j.nq <= 0) { j.nq = rnd(12, 20); j.quip = pick(STORY.quips); j.qt = 2.5; }
 }
 function jonHits(dmg, reach, from, how) {
   const j = G.jon;
@@ -1957,6 +2939,11 @@ function jonHits(dmg, reach, from, how) {
       const blockedHit = damageEnemy(e, rollDamage(dmg), from, how);
       if (blockedHit && how === 'throw') j.mode = 'back';
       else if (!blockedHit && G.mode === 'arena') arenaOnHit(e);
+      else if (!blockedHit && how === 'throw' && jonHas('ricochet') && !j.rico) {
+        // Ricochet: bounce on to the nearest other enemy
+        const next = G.ents.filter(o => o.enemy && o.alive && o !== e && !j.hit.includes(o) && dist(o, e) < 110).sort((a, b) => dist(a, e) - dist(b, e))[0];
+        if (next) { j.rico = true; j.target = next; j.trav = 0; j.mode = 'out'; const d = dist(next, j) || 1; j.vx = (next.x - j.x) / d * 210; j.vy = (next.y - j.y) / d * 210; floatText(j.x, j.y - 8, 'RICOCHET', '#ffd84a'); }
+      }
     }
   }
 }
@@ -1996,11 +2983,15 @@ function damageEnemy(e, dmg, from, how) {
     floatText(e.x, e.y - 18, 'STAGGER!', '#ffd84a');
     return true;
   }
-  if (e.type === 'king' && e.st !== 'daze' && how !== 'thunder') {
+  if (e.type === 'hank' && e.frozen) {
+    if (how === 'thunder') { shatterFrost(e); dmg = 2; }
+    else { if (jonHit) { Sound.play('clank'); floatText(e.x, e.y - 50, 'FROZEN', '#9fe0ff'); } return true; }
+  }
+  if ((e.type === 'king' || e.type === 'attendant') && e.st !== 'daze' && how !== 'thunder') {
     if (jonHit) { Sound.play('clank'); floatText(e.x, e.y - 30, 'CLANK', '#ffd84a'); }
     return true;
   }
-  if (e.type === 'king' && how === 'thunder') { e.st = 'daze'; e.t = 0; dmg = 2; }
+  if ((e.type === 'king' || e.type === 'attendant') && how === 'thunder') { e.st = 'daze'; e.t = 0; dmg = 2; }
   e.hp -= dmg; e.flash = 0.18; Sound.play('hit');
   if (G.mode === 'arena') floatText(e.x, e.y - 12, String(Math.round(dmg * 10) / 10), G.lastCrit ? '#ffd84a' : '#fff');
   const k = (e.boss ? 60 : 150) * G.st.knock; e.kx = -dx / d * k; e.ky = -dy / d * k;
@@ -2012,14 +3003,18 @@ function killEnemy(e) {
   G.ents = G.ents.filter(o => o !== e);
   poof(e.x, e.y, e.boss); Sound.play('kill');
   const s = G.save;
-  if (s.items.thunder) s.rune = Math.min(RUNE_MAX, s.rune + 1);
+  if (s.items.thunder) s.rune = Math.min(RUNE_MAX, s.rune + G.st.runeKill);
   if (G.mode === 'arena') return arenaKill(e);
+  jonXP(e.boss ? 25 : e.shield ? 3 : 2); jonOnKill(e);
+  if (e.boss) JT.queued = 'boss';
   if (!e.boss) maybeDrop(e.x, e.y, 0.65);
   if (e.type === 'king') { G.shake = 0.6; say(STORY.king_down, checkRoomClear); return; }
+  if (e.type === 'hank') { G.shake = 0.6; HK.axes = []; for (const w of G.ents.filter(o => o.type === 'wisp')) killEnemy(w); say(STORY.hank_down, () => { setFlag('d2done'); checkRoomClear(); writeSave(); }); return; }
+  if (e.type === 'attendant') { G.shake = 0.6; RE.shots = []; say(STORY.attendant_down, () => { setFlag('redeye_done'); checkRoomClear(); }); return; }
   checkRoomClear();
 }
 function maybeDrop(x, y, chance) {
-  if (Math.random() > chance) return;
+  if (Math.random() > chance * (1 + G.st.luck)) return;
   const r = Math.random();
   const what = r < 0.35 ? 'heart' : r < 0.75 ? 'kr1' : r < 0.9 ? 'kr5' : 'rune';
   G.ents.push({ kind: 'pickup', what, x, y, life: 9 });
@@ -2028,13 +3023,16 @@ function spawnEnemy(type, x, y) { const e = makeEnemy(type, x, y); e.st = 'idle'
 
 function updateEnemy(e, dt) {
   e.flash = Math.max(0, e.flash - dt); e.wob += dt * 8; e.t += dt;
-  if (e.guardDown > 0) { e.guardDown -= dt; if (e.type === 'draugr' || e.type === 'knight') { const kl0 = Math.hypot(e.kx, e.ky); if (kl0 > 1) { tryMove(e, e.kx * dt, e.ky * dt, e.r * 0.6, 'walker'); e.kx *= 0.85; e.ky *= 0.85; } return; } }
+  if (e.guardDown > 0) { e.guardDown -= dt; if (e.type === 'draugr' || e.type === 'knight' || e.type === 'captain') { const kl0 = Math.hypot(e.kx, e.ky); if (kl0 > 1) { tryMove(e, e.kx * dt, e.ky * dt, e.r * 0.6, 'walker'); e.kx *= 0.85; e.ky *= 0.85; } return; } }
   const p = G.player, dx = p.x - e.x, dy = p.y - e.y, d = Math.hypot(dx, dy) || 1;
   const who = e.fly ? 'flyer' : 'walker', mr = e.r * 0.6;
   const kl = Math.hypot(e.kx, e.ky);
   if (kl > 1) { tryMove(e, e.kx * dt, e.ky * dt, mr, who); const nl = Math.max(0, kl - 420 * dt); e.kx *= nl / kl; e.ky *= nl / kl; }
   const toward = sp => tryMove(e, dx / d * sp * dt, dy / d * sp * dt, mr, who);
+  if (e.fear > 0) { e.fear -= dt; tryMove(e, -dx / d * 70 * dt, -dy / d * 70 * dt, mr, who); return; }   // Demon Horn
   switch (e.type) {
+    case 'imp': updateImp(e, dt, dx, dy, d, mr); break;
+    case 'attendant': updateAttendant(e, dt, dx, dy, d, mr); break;
     case 'penguin':
       if (d < 120 || e.aggro) { toward(e.speed); e.fx = dx / d; e.fy = dy / d; }
       break;
@@ -2052,7 +3050,8 @@ function updateEnemy(e, dt) {
       if (e.t > 0.7) { e.t = 0; e.tx = p.x + rnd(-40, 40); e.ty = p.y + rnd(-40, 40); }
       { const ax = e.tx - e.x, ay = e.ty - e.y, al = Math.hypot(ax, ay) || 1; tryMove(e, ax / al * e.speed * dt, ay / al * e.speed * dt, mr, who); }
       break;
-    case 'knight':
+    case 'hank': updateHank(e, dt, dx, dy, d); break;
+    case 'knight': case 'captain':
       if (e.st === 'intro') { if (G.state === 'play') { e.st = 'chase'; e.t = 0; } break; }
       if (e.st === 'chase') { e.turnT = (e.turnT || 0) + dt; if (e.turnT > 0.5) { e.turnT = 0; e.fx = dx / d; e.fy = dy / d; } tryMove(e, e.fx * e.speed * dt, e.fy * e.speed * dt, mr, who); if (e.t > 2.8) { e.st = 'wind'; e.t = 0; } }
       else if (e.st === 'wind') { e.fx = dx / d; e.fy = dy / d; if (e.t > 0.5) { e.st = 'charge'; e.t = 0; Sound.play('charge'); } }
@@ -2075,13 +3074,14 @@ function updateEnemy(e, dt) {
       } else if (e.st === 'daze') { if (e.t > 2.2) { e.st = 'waddle'; e.t = 0; } }
       break;
   }
-  if (d < e.r + 5 && e.st !== 'daze') hurtPlayer(e.touch, e);
+  if (d < e.r + 5 && e.st !== 'daze' && !(e.type === 'attendant' && (e.st === 'hide' || e.st === 'intro'))) hurtPlayer(e.touch, e);
 }
 
 function updatePickup(e, dt) {
   if (e.life !== undefined) { e.life -= dt; if (e.life <= 0) { G.ents = G.ents.filter(o => o !== e); return; } }
+  if (e.underBush && tileAt(e.x, e.y) === 'b') return;   // still hidden under its bush
   const dp = dist(e, G.player);
-  if (G.mode === 'arena' && (dp < G.st.pickup || e.magnet)) { const k = Math.min(1, 9 * dt); e.x += (G.player.x - e.x) * k; e.y += (G.player.y - e.y) * k; }
+  if ((G.mode === 'arena' || G.st.pickup > 28) && e.kind === 'pickup' && e.what !== 'qitem' && (dp < G.st.pickup || e.magnet)) { const k = Math.min(1, 9 * dt); e.x += (G.player.x - e.x) * k; e.y += (G.player.y - e.y) * k; }
   if (dp > 11) return;
   G.ents = G.ents.filter(o => o !== e);
   const s = G.save, p = G.player;
@@ -2094,6 +3094,10 @@ function updatePickup(e, dt) {
     case 'piece': case 'container':
       setFlag('got:' + e.id);
       giveItem(e.what);
+      break;
+    case 'qitem':
+      setFlag('got:' + e.id);
+      giveItem(e.id);
       break;
   }
 }
@@ -2315,6 +3319,12 @@ const JON_ROWS = [
   '................',
 ];
 const JON_BLINK = JON_ROWS.map((r, i) => i === 3 ? '...dd.hhSSSSSSSl' : i === 4 ? '..dDDdhhSmmSmmSl' : r);
+// Jon's faces: excited (big grin), worried (brows up, wobbly mouth), sleepy (eyes shut)
+const JON_FACES = {
+  excited: JON_ROWS.map((r, i) => i === 5 ? '...dd.hhSmmmmmSl' : i === 6 ? '......hhSSmrmSSl' : r),
+  worried: JON_ROWS.map((r, i) => i === 2 ? '......hhlmSSSml.' : i === 6 ? '......hhSmSmSmSl' : r),
+  sleepy: JON_ROWS.map((r, i) => i === 3 ? '...dd.hhSSSSSSSl' : i === 4 ? '..dDDdhhSmmSmmSl' : i === 6 ? '......hhSSSmSSSl' : r),
+};
 
 // ---------------- Penguins (16 x 14) ----------------
 const PENG = {
@@ -2555,6 +3565,7 @@ function buildAll() {
     SPR[`${key}_hold`] = buildSprite(hold, pal);
   }
   SPR.jon = buildSprite(JON_ROWS, PAL_JON); SPR.jon_blink = buildSprite(JON_BLINK, PAL_JON);
+  for (const f in JON_FACES) SPR['jon_' + f] = buildSprite(JON_FACES[f], { ...PAL_JON, r: '#e05a6a' });
   SPR.jon_gold = tinted(SPR.jon, 'rgba(255,216,74,0.0)');
   for (const [key, pal] of [['peng', PAL_PENGUIN], ['pal', PAL_PAL]]) {
     for (const dir of ['down', 'up', 'side']) for (let f = 0; f < 2; f++) {
@@ -2580,6 +3591,9 @@ function buildAll() {
   SPR.chest_open = buildSprite(CHEST_ROWS.map((r, i) => i === 1 || i === 2 ? 'b' + 'k'.repeat(12) + 'b' : r), { ...PAL_CHEST, k: '#1a0c06' });
   SPR.sign = buildSprite(SIGN_ROWS, PAL_SIGN);
   SPR.runestone = buildSprite(RUNE_ROWS, PAL_RUNE);
+  buildIcons();
+  buildRedeyeArt();
+  buildCh2Art();
   buildPoof();
 }
 function shade(hex, k) { const [r, g, b] = hexRgb(hex); const f = v => Math.max(0, Math.min(255, Math.round(v * (1 + k)))); return '#' + [f(r), f(g), f(b)].map(v => v.toString(16).padStart(2, '0')).join(''); }
@@ -2749,7 +3763,7 @@ function renderTile(c, v, mask, shadow, frame, snowy, dungeon) {
         ball(P, 8, 9, 7, 6, ['#d8d8e4', '#a0a0b4', '#74748a', '#4a4a5c'], r, { noise: 0.4 });
         P(6, 8, '#4a4a5c'); P(7, 9, '#4a4a5c'); P(7, 10, '#4a4a5c'); P(10, 7, '#4a4a5c');
         break;
-      case 'O': for (let y = 0; y < T; y++) for (let x = 0; x < T; x++) P(x, y, dungeon ? '#5b6b8c' : COL.grass);
+      case 'O': for (let y = 0; y < T; y++) for (let x = 0; x < T; x++) P(x, y, dungeon ? '#5b6b8c' : G.map.interior ? '#a26c38' : G.map.dark ? '#3a2c22' : COL.grass);
         ball(P, 8, 10, 6, 5, ['#e0a070', '#b8784a', '#8a5432', '#5a3420'], r, { noise: 0.2 });
         for (let x = 5; x < 11; x++) { P(x, 4, OUTLINE); P(x, 5, '#3a2014'); } P(4, 5, OUTLINE); P(11, 5, OUTLINE);
         for (let x = 5; x < 11; x++) P(x, 9, '#5a3420');
@@ -2835,7 +3849,7 @@ function drawTileArt(c, ox, oy, tx, ty) {
   const v = hash(tx, ty) % 4;
   const animated = '~wUi'.includes(c) || c === 'f';
   const frame = animated ? Math.floor(G.t * (c === 'f' ? 2 : 4)) % 8 : 0;
-  const key = `${c}|${v}|${mask}|${k.shadow}|${frame}|${snowy ? 1 : 0}|${dungeon ? 1 : 0}|${G.map.arena ? 1 : 0}`;
+  const key = `${c}|${v}|${mask}|${k.shadow}|${frame}|${snowy ? 1 : 0}|${dungeon ? 1 : 0}|${G.map.arena ? 1 : 0}|${G.map.interior ? 1 : G.map.dark ? 2 : 0}`;
   let img = TILE_CACHE.get(key);
   if (img === undefined) { img = renderTile(c, v, mask, k.shadow, frame, snowy, dungeon); TILE_CACHE.set(key, img); }
   if (!img) return false;
@@ -2849,14 +3863,24 @@ function drawDungeonLight() {
   if (!LIGHT) LIGHT = mkCanvas(VW, VH);
   const g = LIGHT.getContext('2d'), p = G.player;
   g.globalCompositeOperation = 'source-over'; g.clearRect(0, 0, VW, VH);
-  g.fillStyle = 'rgba(4,6,24,0.5)'; g.fillRect(0, 0, VW, VH);
+  const red = G.map.redeye;
+  g.fillStyle = red ? 'rgba(6,2,10,0.74)' : 'rgba(4,6,24,0.5)'; g.fillRect(0, 0, VW, VH);
   g.globalCompositeOperation = 'destination-out';
   const hole = (x, y, r) => { const gr = g.createRadialGradient(x, y, 0, x, y, r); gr.addColorStop(0, 'rgba(0,0,0,1)'); gr.addColorStop(0.6, 'rgba(0,0,0,0.6)'); gr.addColorStop(1, 'rgba(0,0,0,0)'); g.fillStyle = gr; g.fillRect(x - r, y - r, r * 2, r * 2); };
-  hole(p.x - G.cam.x, p.y - G.cam.y - 6, 96);
+  hole(p.x - G.cam.x, p.y - G.cam.y - 6, red ? 68 : 96);
   const x0 = Math.floor(G.cam.x / T), y0 = Math.floor(G.cam.y / T);
   const flick = Math.sin(G.t * 9) * 3 + Math.sin(G.t * 23) * 2;
   for (let ty = y0; ty <= y0 + SH; ty++) for (let tx = x0; tx <= x0 + SW; tx++) if (tile(tx, ty) === 't') hole(tx * T + 8 - G.cam.x, ty * T + 6 - G.cam.y, 52 + flick);
+  for (let ty = y0; ty <= y0 + SH; ty++) for (let tx = x0; tx <= x0 + SW; tx++) if (tile(tx, ty) === 'e') hole(tx * T + 8 - G.cam.x, ty * T + 8 - G.cam.y, 34 + flick);
   ctx.drawImage(LIGHT, 0, 0);
+  if (red) {
+    ctx.globalCompositeOperation = 'lighter';
+    for (let ty = y0; ty <= y0 + SH; ty++) for (let tx = x0; tx <= x0 + SW; tx++) if (tile(tx, ty) === 'e') {
+      const x = tx * T + 8 - G.cam.x, y = ty * T + 8 - G.cam.y, gr = ctx.createRadialGradient(x, y, 0, x, y, 40);
+      gr.addColorStop(0, `rgba(255,30,30,${0.28 + 0.1 * Math.sin(G.t * 4)})`); gr.addColorStop(1, 'rgba(255,30,30,0)'); ctx.fillStyle = gr; ctx.fillRect(x - 40, y - 40, 80, 80);
+    }
+    ctx.globalCompositeOperation = 'source-over';
+  }
   // warm glow on top
   ctx.globalCompositeOperation = 'lighter';
   for (let ty = y0; ty <= y0 + SH; ty++) for (let tx = x0; tx <= x0 + SW; tx++) if (tile(tx, ty) === 't') {
@@ -2864,6 +3888,255 @@ function drawDungeonLight() {
     gr.addColorStop(0, 'rgba(255,150,40,0.22)'); gr.addColorStop(1, 'rgba(255,150,40,0)'); ctx.fillStyle = gr; ctx.fillRect(x - 40, y - 40, 80, 80);
   }
   ctx.globalCompositeOperation = 'source-over';
+}
+
+// ===== art2.js =====
+// Second art pass: the tiles and objects that were still drawn as plain rectangles.
+// Dungeon doors, shutters, peg gates and braziers; cave mouths and rune doors; lava;
+// Owen's bedroom; Valhalla Arena; the Flight 364 airliner; and outlined item icons.
+
+const TILE_B = 'tLKhGEXlFZYQrdaVkpCg<>';
+
+function renderTileB(c, v, frame, extra, tx, ty, snowy) {
+  const r = rng(v * 4513 + c.charCodeAt(0) * 37 + frame);
+  const nb = (dx, dy) => tile(tx + dx, ty + dy);
+  return makeTile((P) => {
+    const fill = (col) => { for (let y = 0; y < T; y++) for (let x = 0; x < T; x++) P(x, y, col); };
+    const rect = (x, y, w, h, col, a) => { for (let yy = y; yy < y + h; yy++) for (let xx = x; xx < x + w; xx++) P(xx, yy, col, a); };
+    const slab = () => { for (let y = 0; y < T; y++) for (let x = 0; x < T; x++) { const lx = x % 8, ly = y % 8; P(x, y, lx === 0 || ly === 0 ? '#7888b8' : lx === 7 || ly === 7 ? '#48548a' : '#6070a0'); } };
+    const wallTop = () => { for (let y = 0; y < T; y++) for (let x = 0; x < T; x++) P(x, y, (x + y * 3) % 7 === 0 ? '#222c48' : '#2a3656'); };
+    const cliff = () => {
+      for (let y = 0; y < T; y++) for (let x = 0; x < T; x++) { const band = (y + Math.floor((x + v * 3) / 6) * 2) % 6; P(x, y, band === 0 ? '#c09868' : band === 1 ? '#5a3c22' : band === 2 ? '#7a5634' : '#94704a'); }
+    };
+    switch (c) {
+      case 't': {   // stone brazier with a living flame
+        slab();
+        rect(5, 10, 6, 6, '#5a5a6c'); rect(5, 10, 2, 6, '#7a7a8c'); rect(4, 15, 8, 1, OUTLINE);
+        rect(3, 8, 10, 3, '#3a3a4a'); rect(3, 8, 10, 1, '#6a6a7c'); rect(2, 8, 1, 3, OUTLINE); rect(13, 8, 1, 3, OUTLINE);
+        const f = frame % 4, sway = [0, 1, 0, -1][f];
+        const flame = [[8 + sway, 1], [7, 2], [9 + sway, 2], [6, 3], [7, 3], [8, 3], [9, 3], [10, 3], [6, 4], [7, 4], [8, 4], [9, 4], [10, 4], [5, 5], [6, 5], [7, 5], [8, 5], [9, 5], [10, 5], [11, 5], [5, 6], [6, 6], [7, 6], [8, 6], [9, 6], [10, 6], [11, 6], [5, 7], [6, 7], [7, 7], [8, 7], [9, 7], [10, 7], [11, 7]];
+        for (const [x, y] of flame) P(x + (y < 4 ? sway : 0), y + (f === 2 ? 1 : 0), y < 3 ? '#ff6a1a' : y < 5 ? '#ff9a2a' : '#ffc040');
+        for (const [x, y] of [[8, 5], [7, 6], [8, 6], [9, 6], [8, 7]]) P(x, y, '#fff2a0');
+        if (f % 2) P(4 + (frame * 3) % 8, 0, '#ffd040');
+        break; }
+      case 'L': case 'K': {   // wooden door in the wall: small-key lock, or the ornate boss door
+        wallTop();
+        const boss = c === 'K';
+        rect(1, 1, 14, 15, boss ? '#c9a227' : '#7888b8'); rect(0, 0, 16, 1, OUTLINE);
+        rect(2, 2, 12, 14, boss ? '#5a2a6a' : '#7a4a22');
+        for (let x = 2; x < 14; x += 3) rect(x, 2, 1, 14, boss ? '#3a1848' : '#5a3418');
+        rect(2, 5, 12, 1, '#3a3a4a'); rect(2, 12, 12, 1, '#3a3a4a');
+        if (boss) {
+          rect(4, 6, 8, 7, '#ffd84a'); rect(5, 3, 6, 4, '#c9a227'); rect(6, 4, 4, 3, '#5a2a6a'); rect(4, 6, 8, 1, '#fff2a0');
+          rect(7, 8, 2, 2, OUTLINE); rect(7, 10, 2, 2, OUTLINE); rect(3, 6, 1, 7, OUTLINE); rect(12, 6, 1, 7, OUTLINE);
+        } else {
+          rect(6, 7, 4, 5, '#ffd84a'); rect(6, 7, 4, 1, '#fff2a0'); rect(7, 8, 2, 2, OUTLINE); rect(7, 10, 1, 1, OUTLINE);
+        }
+        break; }
+      case 'h':     // shutter: iron bars when closed, plain floor when open
+        if (extra === 'o') { slab(); break; }
+        wallTop(); rect(0, 0, 16, 2, '#7888b8');
+        for (let x = 1; x < 16; x += 4) { rect(x, 2, 2, 14, '#9aa0b4'); rect(x, 2, 1, 14, '#d0d4e0'); rect(x + 2, 2, 1, 14, '#141a2c'); }
+        rect(0, 8, 16, 2, '#6a7088'); rect(0, 8, 16, 1, '#b0b6c8');
+        break;
+      case 'G':     // A Link to the Past peg block: up = solid orange block, down = flat outline
+        slab();
+        if (extra === 'u') {
+          rect(1, 1, 14, 14, OUTLINE); rect(2, 2, 12, 9, '#f08a2a'); rect(2, 2, 12, 2, '#ffc070'); rect(2, 11, 12, 3, '#9c4f0d');
+          rect(5, 4, 6, 5, '#e07b1a'); rect(6, 5, 4, 3, '#ffb15c');
+        } else { rect(2, 2, 12, 12, '#cf6f12'); rect(3, 3, 10, 10, '#6070a0'); rect(3, 3, 10, 1, '#48548a'); }
+        break;
+      case 'E': {   // cave mouth in the cliff
+        cliff();
+        for (let y = 2; y < 16; y++) for (let x = 1; x < 15; x++) {
+          const arch = y >= 6 || (x - 7.5) * (x - 7.5) / 42 + (y - 6) * (y - 6) / 16 <= 1;
+          if (arch) P(x, y, y < 8 ? '#120c08' : '#050403');
+        }
+        for (const [x, y] of [[2, 6], [13, 6], [3, 4], [12, 4], [5, 2], [10, 2]]) P(x, y, '#c09868');
+        if (snowy) for (const x of [3, 6, 9, 12]) { P(x, 4, '#ffffff'); P(x, 5, '#d8eef8'); P(x, 6, '#bfe0f0'); }
+        break; }
+      case 'X': {   // stone door sealed by a glowing rune
+        cliff();
+        rect(1, 1, 14, 15, OUTLINE); rect(2, 2, 12, 14, '#7c7c8c'); rect(2, 2, 12, 2, '#a0a0b0'); rect(3, 4, 10, 11, '#6a6a7a');
+        rect(3, 4, 10, 1, '#5a5a6a'); rect(3, 14, 10, 1, '#8a8a9a');
+        const glow = ['#5ab8ff', '#7fd4ff', '#bfeaff', '#7fd4ff'][frame % 4];
+        for (const [x, y] of [[8, 5], [8, 6], [8, 7], [8, 8], [8, 9], [8, 10], [8, 11], [8, 12], [6, 6], [7, 7], [10, 6], [9, 7], [6, 11], [7, 10], [10, 11], [9, 10]]) P(x - 0.5, y, glow);
+        break; }
+      case 'l': {   // lava: churning swirls and popping bubbles
+        fill('#c8380c');
+        for (let y = 0; y < T; y++) for (let x = 0; x < T; x++) { const w = Math.sin((x + frame * 1.5) * 0.7 + y * 0.9 + v) + Math.sin(y * 0.5 - frame); if (w > 1.1) P(x, y, '#ff7a1a'); else if (w > 0.6) P(x, y, '#ea5a12'); }
+        const bx = (v * 5 + 3) % 12 + 2, by = (v * 7 + 4) % 10 + 3;
+        if (frame % 4 < 2) { P(bx, by, '#ffd040'); P(bx + 1, by, '#ffd040'); P(bx, by - 1, '#fff2a0'); } else { P(bx, by, '#ff9a2a'); P(bx - 1, by + 1, '#ffd040'); P(bx + 2, by + 1, '#ffd040'); }
+        break; }
+      case 'F':     // wooden floorboards
+        for (let y = 0; y < T; y++) for (let x = 0; x < T; x++) { const board = Math.floor(y / 4), seam = y % 4 === 3, joint = (x + board * 5 + v * 3) % 16 === 0; P(x, y, seam || joint ? '#6e4420' : board % 2 ? '#b07840' : '#a26c38'); }
+        P((v * 5 + 2) % 16, 1, '#d09858'); P((v * 3 + 9) % 16, 9, '#d09858');
+        break;
+      case 'Z': {
+        if (ty === 0) {   // back wall: wallpaper, wainscot, windows
+          for (let y = 0; y < T; y++) for (let x = 0; x < T; x++) P(x, y, x % 4 === 0 ? '#a8bce0' : '#c4d4f0');
+          rect(0, 11, 16, 5, '#8a5a2e'); rect(0, 11, 16, 1, '#c08a50'); rect(0, 15, 16, 1, '#4a2a12');
+          if (tx % 5 === 2) { rect(3, 2, 10, 8, OUTLINE); rect(4, 3, 8, 6, '#7fc4ff'); rect(4, 3, 8, 2, '#bfe4ff'); rect(7, 3, 2, 6, '#e8e0d0'); rect(4, 5, 8, 1, '#e8e0d0'); }
+        } else { fill('#4a2e18'); for (let y = 0; y < T; y += 4) rect(0, y, 16, 1, '#3a2212'); rect(0, 0, 16, 1, '#6a4428'); }
+        break; }
+      case 'Y': {   // bed: headboard and pillow on top, quilt below
+        for (let y = 0; y < T; y++) for (let x = 0; x < T; x++) P(x, y, '#a26c38');
+        const top = nb(0, -1) !== 'Y', left = nb(-1, 0) !== 'Y', right = nb(1, 0) !== 'Y';
+        const x0 = left ? 1 : 0, x1 = right ? 15 : 16;
+        if (top) { rect(x0, 0, x1 - x0, 4, '#6a3c1a'); rect(x0, 0, x1 - x0, 1, '#9a6030'); rect(x0 + 1, 5, x1 - x0 - 2, 6, '#f4f4f8'); rect(x0 + 1, 10, x1 - x0 - 2, 1, '#c8c8d8'); rect(x0, 12, x1 - x0, 4, '#2f5aa8'); rect(x0, 12, x1 - x0, 1, '#5a88e0'); }
+        else { for (let y = 0; y < 15; y++) for (let x = x0; x < x1; x++) P(x, y, ((x >> 2) + (y >> 2)) % 2 ? '#2f5aa8' : '#3e6cc8'); rect(x0, 14, x1 - x0, 2, '#1e3a78'); }
+        if (left) rect(0, 0, 1, 16, OUTLINE); if (right) rect(15, 0, 1, 16, OUTLINE);
+        break; }
+      case 'Q': {   // table: a desk indoors, a market counter outside
+        if (G.map.interior) fill('#a26c38'); else fill(nb(0, 1) === 's' || nb(-1, 0) === 's' ? '#d8c078' : COL.grass);
+        rect(0, 3, 16, 9, OUTLINE); rect(0, 4, 16, 7, '#b07840'); rect(0, 4, 16, 2, '#d09858'); rect(0, 10, 16, 1, '#6e4420');
+        rect(1, 12, 2, 4, '#6e4420'); rect(13, 12, 2, 4, '#6e4420');
+        if (G.map.interior && v % 2 === 0) { rect(3, 1, 4, 5, '#2f5aa8'); rect(3, 1, 4, 1, '#fff'); rect(9, 2, 5, 3, '#e8e0d0'); }
+        break; }
+      case 'r': {   // patterned rug with a gold border
+        fill('#a8302a');
+        for (let y = 0; y < T; y++) for (let x = 0; x < T; x++) if ((x + y) % 6 === 0 || (x - y + 18) % 6 === 0) P(x, y, '#c8503a');
+        if (nb(0, -1) !== 'r') rect(0, 0, 16, 2, '#ffd84a'); if (nb(0, 1) !== 'r') rect(0, 14, 16, 2, '#ffd84a');
+        if (nb(-1, 0) !== 'r') rect(0, 0, 2, 16, '#ffd84a'); if (nb(1, 0) !== 'r') rect(14, 0, 2, 16, '#ffd84a');
+        break; }
+      case 'd': fill('#2a1a10'); rect(1, 0, 14, 16, '#3a2414'); rect(2, 10, 12, 6, '#7a2a24'); rect(2, 10, 12, 1, '#a84a3a'); break;
+      case 'a': {   // sandstone arena flags
+        fill('#9a8660');
+        const off = (ty % 2) * 8;
+        for (let y = 0; y < T; y++) for (let x = 0; x < T; x++) { if (y % 8 === 0 || (x + off) % 16 === 0) P(x, y, '#6e5e40'); else if (y % 8 === 1 || (x + off) % 16 === 1) P(x, y, '#b4a074'); }
+        if (v === 1) { P(5, 4, '#6e5e40'); P(6, 5, '#6e5e40'); P(6, 6, '#6e5e40'); }
+        if (v === 3) { P(11, 12, '#857350'); P(12, 12, '#857350'); }
+        break; }
+      case 'V': {   // arena walls: gold-banded stone, red banners along the top
+        const face = nb(0, 1) === 'a' || nb(0, 1) === '#';
+        for (let y = 0; y < T; y++) for (let x = 0; x < T; x++) { const row = y >> 2, bx = (x + (row % 2) * 4) % 8; P(x, y, y % 4 === 3 || bx === 0 ? '#3a2e1e' : face ? '#6a5638' : '#4a3c26'); }
+        if (face) {
+          rect(0, 6, 16, 2, '#c9a227'); rect(0, 6, 16, 1, '#ffe066'); rect(0, 15, 16, 1, '#1e160c');
+          if (tx % 4 === 0 && ty <= 1) { rect(4, 0, 8, 13, '#b33a2e'); rect(4, 0, 8, 1, '#ffd84a'); rect(5, 13, 2, 2, '#b33a2e'); rect(9, 13, 2, 2, '#b33a2e'); rect(7, 3, 2, 7, '#ffd84a'); rect(6, 4, 4, 2, '#ffd84a'); }
+        }
+        break; }
+      case 'k': {   // bookshelf against the wall
+        fill('#4a2e18'); rect(1, 1, 14, 15, '#6e4420'); rect(1, 1, 14, 1, '#9a6030');
+        for (const sy of [2, 7, 12]) { rect(2, sy + 4, 12, 1, '#3a2212'); for (let x = 2; x < 14; x += 2) rect(x, sy + (x * 7 + v) % 2, 2, 4 - (x * 7 + v) % 2, ['#b03028', '#2f5aa8', '#3a7a4a', '#c89a18', '#7a4a9a'][(x + sy + v) % 5]); }
+        rect(0, 0, 1, 16, OUTLINE); rect(15, 0, 1, 16, OUTLINE);
+        break; }
+      case 'p': {   // stone fireplace with a crackling fire
+        fill('#4a2e18'); rect(0, 0, 16, 16, '#7a7a8c');
+        for (let y = 0; y < 16; y += 4) for (let x = (y / 4 % 2) * 4; x < 16; x += 8) rect(x, y, 1, 4, '#5a5a6a');
+        for (let y = 0; y < 16; y += 4) rect(0, y, 16, 1, '#5a5a6a');
+        rect(2, 6, 12, 10, '#1a0c06');
+        const f = frame % 4;
+        for (let x = 3; x < 13; x++) { const hgt = 3 + ((x * 5 + f * 3) % 5); for (let y = 15 - hgt; y < 15; y++) P(x, y, y < 15 - hgt + 1 ? '#ff6a1a' : y < 13 ? '#ff9a2a' : '#ffd040'); }
+        rect(3, 14, 10, 2, '#5a3418'); rect(0, 5, 16, 1, '#9a9aac');
+        break; }
+      case 'C': {   // cave rock; a lit face where it meets the floor
+        const face = nb(0, 1) === 'g' || nb(0, 1) === '<' || nb(0, 1) === 'O';
+        for (let y = 0; y < T; y++) for (let x = 0; x < T; x++) { const n = (x * 7 + y * 13 + v * 5) % 11; P(x, y, n < 2 ? '#4a3a2c' : n < 6 ? '#76604a' : '#66523e'); }
+        const open = ch => ch === 'g' || ch === '<' || ch === 'O';
+        if (open(nb(0, -1))) rect(0, 0, 16, 2, '#9a8264');
+        if (open(nb(-1, 0))) rect(0, 0, 1, 16, OUTLINE);
+        if (open(nb(1, 0))) rect(15, 0, 1, 16, OUTLINE);
+        if (face) { for (let y = 8; y < 16; y++) for (let x = 0; x < T; x++) P(x, y, y < 10 ? '#7a6248' : (x + y) % 5 === 0 ? '#4a3a2c' : '#5e4a36'); rect(0, 15, 16, 1, '#1a120c'); }
+        break; }
+      case 'g': fill('#2c2018'); for (let i = 0; i < 6; i++) P((v * 5 + i * 7) % 16, (v * 3 + i * 5) % 16, i % 2 ? '#4e3e30' : '#2a2018'); break;
+      case '>': {   // stairs going down, cut into the ground where the grave stood
+        fill(COL.grass); rect(1, 1, 14, 14, OUTLINE);
+        for (let k = 0; k < 5; k++) rect(2 + k, 2 + k * 2, 12 - k * 2, 2, ['#8a8a9c', '#6a6a7c', '#4a4a5c', '#2a2a3a', '#14141e'][k]);
+        rect(2, 12, 12, 2, '#05050a');
+        break; }
+      case '<': {   // stairs going up out of the cave
+        fill('#3a2c22');
+        for (let k = 0; k < 6; k++) rect(2, 2 + k * 2, 12, 2, k % 2 ? '#6a5a48' : '#8a7a64');
+        rect(1, 1, 1, 13, OUTLINE); rect(14, 1, 1, 13, OUTLINE); rect(2, 0, 12, 2, '#c8d8a8');
+        break; }
+      default: return;
+    }
+  });
+}
+
+function drawTileB(c, ox, oy, tx, ty) {
+  if (!TILE_B.includes(c)) return false;
+  const v = hash(tx, ty) % 4, snowy = SNOWY(tx, ty);
+  const frame = c === 't' || c === 'p' ? Math.floor(G.t * 9) % 4 : c === 'l' ? Math.floor(G.t * 4) % 8 : c === 'X' ? Math.floor(G.t * 3) % 4 : 0;
+  const extra = c === 'h' ? (shutterClosed(tx, ty) ? 'c' : 'o') : c === 'G' ? (gatesDown() ? 'd' : 'u') : '';
+  const nbKey = 'YrVZQCk'.includes(c) ? [tile(tx, ty - 1), tile(tx, ty + 1), tile(tx - 1, ty), tile(tx + 1, ty)].join('') + (ty === 0 ? 't' : '') + (tx % 5) + (tx % 4) + G.mapId : '';
+  const key = `B${c}|${v}|${frame}|${extra}|${snowy ? 1 : 0}|${nbKey}`;
+  let img = TILE_CACHE.get(key);
+  if (img === undefined) { img = renderTileB(c, v, frame, extra, tx, ty, snowy); TILE_CACHE.set(key, img); }
+  ctx.drawImage(img, ox, oy);
+  return true;
+}
+
+// ---------------- Flight 364 on the airstrip ----------------
+function planeImage(h) {
+  const W = (h.x1 - h.x0 + 1) * T + 12, H = (h.y1 - h.y0 + 1) * T + 16;
+  const fx0 = 6, fx1 = W - 6, fy0 = (h.fy0 - h.y0) * T + 8 + 2, fy1 = (h.fy1 - h.y0 + 1) * T + 8 - 2;
+  const mid = (fy0 + fy1) / 2, rad = (fy1 - fy0) / 2;
+  return makeImg(W, H, (P, has) => {
+    const rect = (x, y, w, hh, c, a) => { for (let yy = y; yy < y + hh; yy++) for (let xx = x; xx < x + w; xx++) P(xx, yy, c, a); };
+    // shadow on the ground
+    for (let y = fy1 + 2; y < fy1 + 8; y++) for (let x = fx0 + 10; x < fx1; x++) P(x, y, '#000000', 50);
+    // wings (swept back) with engines, top and bottom
+    const wx = (h.wingX - h.x0) * T + 6;
+    for (const dir of [-1, 1]) {
+      for (let k = 0; k < 22; k++) {
+        const y = dir < 0 ? fy0 - 1 - k : fy1 + k, x0 = wx + Math.round(k * 0.8), x1 = x0 + 26 - Math.round(k * 0.5);
+        if (y < 0 || y >= H) continue;
+        for (let x = x0; x < x1; x++) P(x, y, k > 18 ? '#9aa2ae' : x < x0 + 2 ? '#e8ecf2' : '#c4cad4');
+        P(x0 - 1, y, OUTLINE); P(x1, y, OUTLINE);
+      }
+      const ey = dir < 0 ? fy0 - 12 : fy1 + 6;
+      rect(wx + 6, ey, 12, 6, '#7a808c'); rect(wx + 6, ey, 12, 2, '#a8aeba'); rect(wx + 5, ey + 1, 2, 4, '#20242c'); rect(wx + 5, ey - 1, 14, 1, OUTLINE); rect(wx + 5, ey + 6, 14, 1, OUTLINE);
+    }
+    // tail stabilizers and the red fin
+    for (const dir of [-1, 1]) for (let k = 0; k < 9; k++) { const y = dir < 0 ? fy0 - 1 - k : fy1 + k; for (let x = fx1 - 22 + k; x < fx1 - 8; x++) P(x, y, '#c4cad4'); P(fx1 - 23 + k, y, OUTLINE); }
+    // fuselage: a long capsule, white on top shading to grey
+    for (let y = fy0; y <= fy1; y++) for (let x = fx0; x <= fx1; x++) {
+      const dy = (y - mid) / rad;
+      const capL = x < fx0 + rad * 1.6 ? Math.pow((x - (fx0 + rad * 1.6)) / (rad * 1.6), 2) + dy * dy > 1 : false;
+      const capR = x > fx1 - rad * 0.8 ? Math.pow((x - (fx1 - rad * 0.8)) / (rad * 0.8), 2) + dy * dy > 1 : false;
+      if (capL || capR) continue;
+      P(x, y, dy < -0.6 ? '#ffffff' : dy < 0.2 ? '#eef0f4' : dy < 0.65 ? '#cfd4dc' : '#a8aeb8');
+    }
+    for (let x = fx0 + 6; x < fx1 - 4; x++) { if (has(x, Math.round(mid) + 2)) P(x, Math.round(mid) + 2, '#c0392b'); if (has(x, Math.round(mid) + 3)) P(x, Math.round(mid) + 3, '#2a4a8a'); }
+    for (let x = fx0 + 20; x < fx1 - 18; x += 6) { P(x, Math.round(mid) - 3, '#3a5a8a'); P(x + 1, Math.round(mid) - 3, '#3a5a8a'); P(x, Math.round(mid) - 2, '#5a7aaa'); }
+    for (const [x, y] of [[fx0 + 4, mid - 3], [fx0 + 5, mid - 3], [fx0 + 7, mid - 4], [fx0 + 8, mid - 4], [fx0 + 10, mid - 4]]) P(x, y, '#1a2a4a');
+    for (let y = fy0 - 10; y < fy0 + 2; y++) for (let x = fx1 - 14 + (fy0 - y) / 2; x < fx1 - 4; x++) P(x, y, y < fy0 - 7 ? '#e05040' : '#c0392b');
+    // outline the hull
+    const edge = [];
+    for (let y = 0; y < H; y++) for (let x = 0; x < W; x++) if (!has(x, y) && (has(x + 1, y) || has(x - 1, y) || has(x, y + 1) || has(x, y - 1))) edge.push([x, y]);
+    for (const [x, y] of edge) P(x, y, OUTLINE);
+  });
+}
+
+// ---------------- item icons ----------------
+const ICONS = {
+  key: [['..ggg...', '.gG.Gg..', '.g...g..', '.gG.Gg..', '..ggg...', '...g....', '...g....', '...gg...', '...g....', '...ggg..', '...g....'], { g: '#ffd84a', G: '#c89a18' }],
+  bigkey: [['..gggggg..', '.gGGrrGGg.', '.gG.rr.Gg.', '.gGGGGGGg.', '..gggggg..', '....gg....', '....gg....', '....gggg..', '....gg....', '....gggg..', '....gg....', '....gggg..'], { g: '#ffd84a', G: '#c89a18', r: '#e02838' }],
+  juice: [['..ccc...', '..www...', '..w.w...', '.wwwww..', 'wrrrrrw.', 'wrLrrrw.', 'wrLrrrw.', 'wrrrrrw.', 'wRRRRRw.', '.wwwww..'], { c: '#a0703c', w: '#d8e8f0', r: '#c0182b', R: '#801020', L: '#ff8090' }],
+  shard: [['...l...', '..lLb..', '.lLbbb.', '.lLbbB.', 'lLbbbBB', '.lbbbB.', '.lbbBB.', '..bBB..', '...B...'], { l: '#ffffff', L: '#cfefff', b: '#7fd4ff', B: '#3a8ac8' }],
+  heart: [['.rr...rr.', 'rLrr.rrrr', 'rLrrrrrrr', 'rrrrrrrrr', '.rrrrrrr.', '..rrrrr..', '...rrr...', '....r....'], { r: '#f02838', L: '#ffa0a8' }],
+  coin: [['.sss.', 'sllSs', 'slsSs', 'slsSs', 'slsSs', 'sSSSs', '.sss.'], { s: '#a8b0c0', l: '#f0f4fa', S: '#7a8494' }],
+  gold: [['.sss.', 'sllSs', 'slsSs', 'slsSs', 'slsSs', 'sSSSs', '.sss.'], { s: '#d8a820', l: '#fff2a0', S: '#a87a10' }],
+  thunder: [['..ssssss..', '.sSSSSSSs.', 'sSSSSySSSs', 'sSSSyySSSs', 'sSSyySSSSs', 'sSyyyyySSs', 'sSSSSyySSs', 'sSSSyySSSs', 'sSSSySSSSs', '.sSSSSSSs.', '..ssssss..'], { s: '#5a5a6a', S: '#8a8a9c', y: '#ffe066' }],
+  horn: [['........hh..', '......hhHh..', '....hhhHh...', '..hhhhHh....', 'bbhhhHh.....', 'bbbhHh......', '.bb.........'], { h: '#e8dcc0', H: '#b8a888', b: '#8a2a1a' }],
+  dash: [['..vvvv.....', '.vVVVVv....', 'vVVvvVVv...', '.vv..vVVv..', '......vVVvv', '.......vVVv', '........vv.'], { v: '#9a4dd9', V: '#d8a8ff' }],
+  sheet: [['wwwwwwww', 'wkkkkkkw', 'wwwwwwww', 'wk.kk.kw', 'wwwwwwww', 'wkk.kkkw', 'wwwwwwww', 'wk.k.kkw', 'wwwwwwww'], { w: '#f4ecd0', k: '#3a2a1a' }],
+  ship: [['....r.....', '....rr....', '....rrr...', '....r.....', 'bbbbbbbbbb', '.bBBBBBBb.', '..bbbbbb..'], { r: '#e02838', b: '#8a5428', B: '#c08040' }],
+};
+function buildIcons() {
+  for (const k in ICONS) SPR['icon_' + k] = buildSprite(ICONS[k][0], ICONS[k][1]);
+  const piece = ICONS.heart[0].map((row, y) => [...row].map((ch, x) => ch === '.' ? '.' : (x < 5 && y < 4) ? ch : 'd').join(''));
+  SPR.icon_piece = buildSprite(piece, { r: '#f02838', L: '#ffa0a8', d: '#5a2028' });
+  const cont = Array.from({ length: 12 }, (_, y) => Array.from({ length: 13 }, (_, x) => (x === 0 || y === 0 || x === 12 || y === 11) ? 'g' : (x === 1 || y === 1 || x === 11 || y === 10) ? 'G' : 'k').join(''));
+  ICONS.heart[0].forEach((row, y) => [...row].forEach((ch, x) => { if (ch !== '.') cont[y + 2] = cont[y + 2].slice(0, x + 2) + ch + cont[y + 2].slice(x + 3); }));
+  SPR.icon_container = buildSprite(cont, { g: '#ffd84a', G: '#c89a18', k: '#1a2238', r: '#f02838', L: '#ffa0a8' });
+}
+function drawIconSpr(name, x, y) {
+  const img = SPR['icon_' + name];
+  if (!img) return false;
+  ctx.drawImage(img, Math.round(x - img.width / 2), Math.round(y - img.height / 2));
+  return true;
 }
 
 // ===== bigart.js =====
@@ -3047,6 +4320,17 @@ function computeBigs() {
     if (!BIG_CACHE.has(ck)) BIG_CACHE.set(ck, treeImage(v, snowy));
     G.bigs.push({ kind: 'tree', img: BIG_CACHE.get(ck), x: tx * T - 2, y: ty * T + 2 * T - BIG_TREE_H, sortY: ty * T + 2 * T - 2, tx, ty, w: 2, h: 2 });
   }
+  // the airliner on the airstrip: plane body (P) and wings (q)
+  const pc = [];
+  for (let ty = 0; ty < G.nrows; ty++) for (let tx = 0; tx < G.cols; tx++) if ('Pq'.includes(G.rows[ty][tx])) pc.push([tx, ty]);
+  if (pc.length) {
+    const xs = pc.map(c => c[0]), ys = pc.map(c => c[1]), body = pc.filter(([x, y]) => G.rows[y][x] === 'P');
+    const pl = { kind: 'plane', x0: Math.min(...xs), x1: Math.max(...xs), y0: Math.min(...ys), y1: Math.max(...ys),
+      fy0: Math.min(...body.map(c => c[1])), fy1: Math.max(...body.map(c => c[1])), wingX: Math.min(...pc.filter(([x, y]) => G.rows[y][x] === 'q').map(c => c[0])) };
+    for (const [x, y] of pc) G.claim.set(key(x, y), G.rows[y][x] === 'q' && (G.rows[y][x - 1] === 's' || G.rows[y][x + 1] === 's') ? 's' : '.');
+    pl.img = planeImage(pl); pl.x = pl.x0 * T - 6; pl.y = pl.y0 * T - 8; pl.sortY = (pl.fy1 + 1) * T;
+    G.bigs.push(pl);
+  }
   // buildings: connected roof/wall/door tiles
   const seen = new Set();
   for (let ty = 0; ty < G.nrows; ty++) for (let tx = 0; tx < G.cols; tx++) {
@@ -3096,6 +4380,588 @@ function bigDrawList() {
   return out;
 }
 
+// ===== redeye.js =====
+// The Red-Eye: optional side dungeon inside Flight 364. Creepy, not gory: darkness, flicker,
+// scratching, seats that move while the lights are out, and a flight attendant you only see
+// in the flashes. Reward: a heart container and the Demon Horn (V: enemies flee).
+
+const RE = { blackout: 0, nextBlack: 4, scratchT: 3, whisperT: 6, scare: 0, layout: 0, shots: [] };
+
+function redeyeEnter() {
+  Object.assign(RE, { blackout: 0, nextBlack: 3 + Math.random() * 3, scratchT: 2, whisperT: 5, shots: [] });
+  if (G.ents.some(e => e.type === 'attendant' && e.alive)) { RE.scare = 0.22; Sound.play('creep'); Sound.play('scratch'); }
+}
+
+function phantomSolid() { return RE.layout === 1; }
+
+function updateRedeye(dt) {
+  const p = G.player;
+  // blackouts: the lights cut out, and when they come back the phantom seats may have moved
+  RE.nextBlack -= dt;
+  if (RE.nextBlack <= 0 && RE.blackout <= 0) { RE.blackout = 0.7; RE.nextBlack = 4 + Math.random() * 4; Sound.play('flicker'); }
+  if (RE.blackout > 0) {
+    RE.blackout -= dt;
+    if (RE.blackout <= 0) {
+      const next = 1 - RE.layout;
+      // never close a seat on top of Owen or an enemy
+      const blocked = next === 1 && [p, ...G.ents.filter(e => e.enemy)].some(a => tile(Math.floor(a.x / T), Math.floor(a.y / T)) === 'J');
+      if (!blocked) RE.layout = next;
+    }
+  }
+  RE.scratchT -= dt;
+  if (RE.scratchT <= 0) { RE.scratchT = 3 + Math.random() * 4; Sound.play('scratch'); }
+  RE.whisperT -= dt;
+  if (RE.whisperT <= 0) {
+    RE.whisperT = 7 + Math.random() * 6;
+    G.fx.push({ kind: 'whisper', x: G.cam.x + rnd(40, VW - 40), y: G.cam.y + rnd(50, VH - 40), vx: 0, vy: -4, t: 0, life: 2.4, label: pick(['any refreshments?', 'sir...', 'please remain seated', 'wonderful...']) });
+  }
+  RE.scare = Math.max(0, RE.scare - dt);
+  // peanuts
+  for (const s of RE.shots) {
+    s.x += s.vx * dt; s.y += s.vy * dt; s.life -= dt;
+    if (s.life < 1.85 && dist(s, p) < 7) { s.life = 0; hurtPlayer(1, s); }   // a fresh peanut can't hit on the frame it's thrown
+    if (solidAt(s.x, s.y, 'jon')) s.life = 0;
+  }
+  RE.shots = RE.shots.filter(s => s.life > 0);
+}
+
+// ---------------- enemies ----------------
+function updateImp(e, dt, dx, dy, d, mr) {
+  // darts in bursts, pauses, darts again
+  if (e.t > (e.st === 'dart' ? 0.35 : 0.8)) { e.t = 0; e.st = e.st === 'dart' ? 'pause' : 'dart'; e.fx = dx / d; e.fy = dy / d; }
+  if (e.st === 'dart') tryMove(e, e.fx * 120 * dt, e.fy * 120 * dt, mr, 'walker');
+}
+function updateCart(e, dt) {
+  // rolls up and down the galley on its own; can't be stopped
+  const h = tryMove(e, 0, e.dir * 62 * dt, 6, 'walker');
+  if (h.hitY) e.dir *= -1;
+  e.wob += dt * 12;
+  if (dist(e, G.player) < 12) hurtPlayer(2, e);
+}
+function updateAttendant(e, dt, dx, dy, d, mr) {
+  const p = G.player;
+  switch (e.st) {
+    case 'intro': if (G.state === 'play') { e.st = 'hide'; e.t = 0; } break;
+    case 'hide':
+      if (e.t > 1.3) {
+        // reappear somewhere near Owen
+        for (let i = 0; i < 40; i++) {
+          const a = Math.random() * Math.PI * 2, r = rnd(46, 70), x = p.x + Math.cos(a) * r, y = p.y + Math.sin(a) * r;
+          if (!blocked(x, y, 6, 'walker', e) && sameScreen(Math.floor(x / T), Math.floor(y / T))) { e.x = x; e.y = y; break; }
+        }
+        e.st = 'reveal'; e.t = 0; Sound.play('creep');
+        if (e.hp <= e.max / 2) for (const k of [-0.35, 0, 0.35]) { const a = Math.atan2(p.y - e.y, p.x - e.x) + k; RE.shots.push({ x: e.x, y: e.y, vx: Math.cos(a) * 95, vy: Math.sin(a) * 95, life: 2 }); }
+      }
+      break;
+    case 'reveal': e.fx = dx / d; e.fy = dy / d; if (e.t > 0.7) { e.st = 'dash'; e.t = 0; Sound.play('charge'); } break;
+    case 'dash': {
+      const h = tryMove(e, e.fx * 175 * dt, e.fy * 175 * dt, mr, 'walker');
+      if (e.t > 0.5 || h.hitX || h.hitY) { e.st = 'daze'; e.t = 0; }
+      break; }
+    case 'daze': if (e.t > 1.4) { e.st = 'hide'; e.t = 0; } break;
+  }
+}
+const attendantVisible = e => e.st !== 'hide' || Math.random() < 0.06 || RE.blackout > 0.5;
+
+// ---------------- Demon Horn ----------------
+function blowHorn() {
+  const s = G.save, p = G.player;
+  if (!s.items.horn) return floatText(p.x, p.y - 18, 'No horn yet', '#aab');
+  if (s.rune < RUNE_MAX / 2) return floatText(p.x, p.y - 18, 'Need half a rune meter', '#7fd4ff');
+  s.rune -= RUNE_MAX / 2;
+  Sound.play('horn'); G.shake = 0.3;
+  for (const e of G.ents) if (e.enemy && e.alive && !e.boss) e.fear = 4;
+  G.fx.push({ kind: 'ring', x: p.x, y: p.y, vx: 0, vy: 0, t: 0, life: 0.6 });
+  floatText(p.x, p.y - 26, 'BWAAAMP!', '#ff8a6a');
+}
+
+// ---------------- art ----------------
+const PAL_ATT = { h: '#2a1a12', s: '#e8d0c0', S: '#c0a090', e: '#20141c', u: '#1e2a5a', U: '#141c40', r: '#c0182b', w: '#f4f4f8', f: '#1a1a1a', R: '#ff2020', t: '#d8d8e8' };
+const ATT_ROWS = [
+  '.....hhhh.....',
+  '....hhhhhh....',
+  '...hhhhhhhh...',
+  '...hsssssshh..',
+  '...hsessess...',
+  '....ssssss....',
+  '.....sSSs.....',
+  '....rrwwrr....',
+  '...uuurruuu...',
+  '..suuuuuuuus..',
+  '..suUuuuuUus..',
+  '..s.uuuuuu.s..',
+  '....uuuuuu....',
+  '....UUUUUU....',
+  '....ss..ss....',
+  '....ff..ff....',
+];
+const ATT_DEMON = ATT_ROWS.map((r, i) => i === 4 ? '...hsRssRss...' : i === 6 ? '.....stttS.....'.slice(0, 14) : i === 9 ? '.tsuuuuuuuust.' : i === 10 ? 't.suUuuuuUus.t' : i === 11 ? 't.s.uuuuuu.s.t' : r);
+const IMP = [[
+  '.h......h...',
+  '.hh....hh...',
+  '..rrrrrr....',
+  '.rrYrrYrr...',
+  '.rrrrrrrr...',
+  'wwrrmmrrww..',
+  'w.rrrrrr.w..',
+  '...rrrr.....',
+  '...r..r.....',
+], [
+  '.h......h...',
+  '.hh....hh...',
+  '..rrrrrr....',
+  'wrrYrrYrrw..',
+  'wwrrrrrrww..',
+  '..rrmmrr....',
+  '..rrrrrr....',
+  '...rrrr.....',
+  '..r....r....',
+]];
+const PAL_IMP = { h: '#e8dcc0', r: '#a8203a', Y: '#ffe066', m: '#2a0a10', w: '#5a1020' };
+const CART = ['cccccccccccc', 'cCCCCCCCCCCc', 'cddddddddddc', 'cCCCCCCCCCCc', 'cddddddddddc', 'cCCCCCCCCCCc', 'cddddddddddc', 'cCCCCCCCCCCc', 'cccccccccccc', '.k........k.'];
+const PAL_CART = { c: '#9aa0ac', C: '#c8ced8', d: '#6a7080', k: '#202020' };
+
+function buildRedeyeArt() {
+  SPR.att = buildSprite(ATT_ROWS, PAL_ATT); SPR.att_demon = buildSprite(ATT_DEMON, PAL_ATT);
+  SPR.imp_0 = buildSprite(IMP[0], PAL_IMP); SPR.imp_1 = buildSprite(IMP[1], PAL_IMP);
+  SPR.cart = buildSprite(CART, PAL_CART);
+}
+
+function drawRedeyeEnemy(e, x, y) {
+  const white = e.flash > 0;
+  if (e.type === 'imp') { shadowAt(x, y + 6, 0.8); spr(SPR['imp_' + (Math.floor(G.t * 10 + e.wob) % 2)], x, y + 6 + Math.round(Math.sin(G.t * 8 + e.wob)), { white }); return true; }
+  if (e.type === 'cart') { shadowAt(x, y + 7, 1.1); spr(SPR.cart, x + Math.round(Math.sin(e.wob)), y + 7); return true; }
+  if (e.type === 'attendant') {
+    if (!attendantVisible(e)) return true;
+    const demon = e.st === 'reveal' || e.st === 'dash';
+    shadowAt(x, y + 7, 1);
+    ctx.globalAlpha = e.st === 'hide' ? 0.45 : 1;
+    spr(demon ? SPR.att_demon : SPR.att, x + (e.st === 'reveal' ? Math.round(rnd(-1, 1)) : 0), y + 10, { scale: 2, white });
+    ctx.globalAlpha = 1;
+    if (e.st === 'daze') for (let i = 0; i < 3; i++) { const a = G.t * 5 + i * 2.1; drawStar(x + Math.cos(a) * 14, y - 30 + Math.sin(a) * 3); }
+    return true;
+  }
+  return false;
+}
+
+function drawRedeyeOverlay() {
+  if (!G.map || !G.map.redeye) return;
+  for (const s of RE.shots) { R(s.x - G.cam.x - 2, s.y - G.cam.y - 1, 4, 3, '#c8a060'); R(s.x - G.cam.x - 1, s.y - G.cam.y - 1, 1, 1, '#f0d8a0'); }
+  if (RE.blackout > 0) { ctx.fillStyle = `rgba(0,0,0,${RE.blackout > 0.6 || RE.blackout < 0.1 ? 0.6 : 0.88})`; ctx.fillRect(0, 0, VW, VH); }
+  if (RE.scare > 0) {
+    // the jump scare: her face fills the screen for a moment
+    ctx.fillStyle = 'rgba(40,0,0,0.85)'; ctx.fillRect(0, 0, VW, VH);
+    spr(SPR.att_demon, VW / 2, VH - 10, { scale: 9 });
+  }
+}
+
+function drawWhisper(f) {
+  ctx.globalAlpha = Math.sin(Math.PI * f.t / f.life) * 0.55;
+  text(f.label, f.x - G.cam.x, f.y - G.cam.y, '#ffb0b0', 'center', false);
+  ctx.globalAlpha = 1;
+}
+
+// red-eye tiles: plane walls with windows, emergency lights, cargo grate, carpet, seats, crates
+function renderTileRE(c, v, frame, extra, tx, ty) {
+  const nb = (dx, dy) => tile(tx + dx, ty + dy);
+  return makeTile((P) => {
+    const rect = (x, y, w, h, col, a) => { for (let yy = y; yy < y + h; yy++) for (let xx = x; xx < x + w; xx++) P(xx, yy, col, a); };
+    const carpet = () => { for (let y = 0; y < T; y++) for (let x = 0; x < T; x++) P(x, y, (x + y) % 8 === 0 || (x - y + 16) % 8 === 0 ? '#2a2050' : '#1e1840'); };
+    switch (c) {
+      case 'u': case 'e': {
+        const face = nb(0, 1) !== 'u' && nb(0, 1) !== 'e';
+        rect(0, 0, 16, 16, '#3a3a48');
+        if (face) {
+          rect(0, 4, 16, 12, '#c8c4bc'); rect(0, 4, 16, 1, '#e8e4dc'); rect(0, 15, 16, 1, '#5a5650');
+          if (c === 'u' && (tx % 3 === 0)) { rect(5, 6, 6, 7, OUTLINE); rect(6, 7, 4, 5, extra === 'L' ? '#e8f0ff' : '#0a0c1a'); if (extra !== 'L' && v % 2) P(7, 8, '#ffffff'); }
+          if (c === 'e') { rect(5, 7, 6, 5, OUTLINE); rect(6, 8, 4, 3, frame % 2 ? '#ff2020' : '#a01010'); }
+        }
+        break; }
+      case '=': for (let y = 0; y < T; y++) for (let x = 0; x < T; x++) P(x, y, x % 4 === 0 || y % 4 === 0 ? '#2a2c34' : '#4a4e58'); break;
+      case 'm': carpet(); break;
+      case 'A': case 'J': {
+        carpet();
+        if (c === 'J' && extra !== 'on') break;
+        const ghost = c === 'J';
+        rect(2, 1, 12, 14, OUTLINE); rect(3, 2, 10, 12, ghost ? '#4a3a6a' : '#2f5aa8'); rect(3, 2, 10, 3, ghost ? '#6a5a8a' : '#5a88e0');
+        rect(3, 5, 10, 1, ghost ? '#2a2040' : '#1e3a78'); rect(1, 6, 2, 8, '#8a8a9c'); rect(13, 6, 2, 8, '#8a8a9c'); rect(5, 2, 6, 2, '#e8e8f0');
+        break; }
+      case 'B':
+        rect(0, 0, 16, 16, nb(0, 0) && tx < 16 ? '#4a4e58' : '#1e1840');
+        rect(1, 1, 14, 14, OUTLINE); rect(2, 2, 12, 12, '#a8703c'); rect(2, 2, 12, 2, '#c89058');
+        for (let k = 2; k < 14; k++) { P(k, k, '#6a4422'); P(15 - k, k, '#6a4422'); }
+        rect(2, 13, 12, 1, '#6a4422');
+        break;
+      default: return;
+    }
+  });
+}
+function drawTileRE(c, ox, oy, tx, ty) {
+  if (!G.map || !G.map.redeye || !'ue=mAJB'.includes(c)) return false;
+  const v = hash(tx, ty) % 4;
+  const frame = c === 'e' ? Math.floor(G.t * 2) % 2 : 0;
+  const extra = c === 'J' ? (phantomSolid() ? 'on' : 'off') : c === 'u' ? (RE.blackout > 0.55 ? 'L' : '') : '';
+  const key = `RE${c}|${v}|${frame}|${extra}|${tile(tx, ty + 1)}|${tx % 3}`;
+  let img = TILE_CACHE.get(key);
+  if (img === undefined) { img = renderTileRE(c, v, frame, extra, tx, ty); TILE_CACHE.set(key, img); }
+  ctx.drawImage(img, ox, oy);
+  return true;
+}
+
+// ===== ch2.js =====
+// Chapter 2 (draft from the story bible): the Drowned Barrow, Voodoo Dash, the Draugr Captain,
+// Fluffy's ghost, and Hank's ghost frozen by Chilly.
+
+// ---------------- Voodoo Dash ----------------
+const DASH_TIME = 0.22, DASH_SPEED = 340;
+function startDash() {
+  const p = G.player, s = G.save;
+  if (!s.items.dash) return floatText(p.x, p.y - 18, 'No dash yet', '#aab');
+  if (p.dashCd > 0 || p.dashing > 0) return;
+  const l = Math.hypot(p.fx, p.fy) || 1;
+  p.dashing = DASH_TIME; p.dashCd = 0.55; p.dx = p.fx / l; p.dy = p.fy / l; p.dashHit = [];
+  if (!isFinite(p.dx) || !isFinite(p.dy)) { p.dx = 0; p.dy = 1; }
+  p.inv = Math.max(p.inv, DASH_TIME + 0.08);
+  G.jon.mode = 'follow';
+  Sound.play('dash');
+}
+// tiles Owen can pass over while dashing (but not stand on): water, pits, spirit barriers
+const dashSolid = (x, y) => { const c = tileAt(x, y); return c === 'w' || c === 'v' || c === 'y' || c === '~' ? false : solidAt(x, y, 'player') || c === 'y'; };
+function updateDash(dt) {
+  const p = G.player;
+  if (!isFinite(p.x) || !isFinite(p.y)) { p.x = G.entry.x; p.y = G.entry.y; p.dashing = 0; return; }
+  p.dashing -= dt;
+  const step = DASH_SPEED * dt, r = 5;
+  const free = (x, y) => !(dashSolid(x - r, y - r) || dashSolid(x + r, y - r) || dashSolid(x - r, y + r) || dashSolid(x + r, y + r));
+  const nx = p.x + p.dx * step, ny = p.y + p.dy * step;
+  if (free(nx, p.y)) p.x = nx;
+  if (free(p.x, ny)) p.y = ny;
+  G.fx.push({ kind: 'ghost', x: p.x, y: p.y, vx: 0, vy: 0, t: 0, life: 0.25, fx: p.fx, fy: p.fy });
+  // dash straight through enemies, hurting them (shields don't help); shatters Hank's frost
+  for (const e of G.ents.slice()) {
+    if (!e.enemy || !e.alive || p.dashHit.includes(e) || dist(e, p) > e.r + 7) continue;
+    p.dashHit.push(e);
+    if (e.type === 'hank') { if (e.frozen) shatterFrost(e); continue; }
+    if ((e.type === 'king' || e.type === 'attendant') && e.st !== 'daze') continue;
+    damageEnemy(e, rollDamage(1), p, 'magic');
+  }
+  // never end a dash inside a barrier: keep going until clear
+  if (p.dashing <= 0 && tileAt(p.x, p.y) === 'y') p.dashing = 0.02;
+  if (p.dashing <= 0) {
+    p.dashing = 0;
+    const c = tileAt(p.x, p.y);
+    if (c === 'w') { p.falling = 0.6; Sound.play('splash'); ripple(p.x, p.y); floatText(p.x, p.y - 18, 'Zombies sink...', '#bfe0ff'); }
+  }
+}
+
+// ---------------- Hank's ghost ----------------
+function shatterFrost(e) {
+  e.frozen = false; e.st = 'daze'; e.t = 0;
+  G.shake = 0.3; Sound.play('clank'); Sound.play('secret');
+  for (let i = 0; i < 14; i++) { const a = i / 14 * Math.PI * 2; G.fx.push({ x: e.x, y: e.y - 10, vx: Math.cos(a) * 90, vy: Math.sin(a) * 90, t: 0, life: 0.5, color: i % 2 ? '#ffffff' : '#9fe0ff', size: 2 }); }
+  floatText(e.x, e.y - 50, 'FROST SHATTERED!', '#9fe0ff');
+}
+const HK = { axes: [] };
+function updateHank(e, dt, dx, dy, d) {
+  const p = G.player;
+  switch (e.st) {
+    case 'intro': if (G.state === 'play') { e.st = 'float'; e.t = 0; e.frozen = true; } break;
+    case 'float':
+      tryMove(e, dx / d * 22 * dt + Math.cos(G.t * 1.3) * 18 * dt, dy / d * 22 * dt + Math.sin(G.t * 1.7) * 14 * dt, 8, 'flyer');
+      e.fx = dx / d; e.fy = dy / d;
+      e.throwT = (e.throwT || 0) + dt; e.raiseT = (e.raiseT || 0) + dt;
+      if (e.throwT > 2.4) { e.throwT = 0; HK.axes.push({ x: e.x, y: e.y - 20, vx: dx / d * 150, vy: dy / d * 150, t: 0, home: e, spin: 0 }); Sound.play('throw'); }
+      if (e.raiseT > 7.5 && G.ents.filter(o => o.type === 'wisp' && o.alive).length < 2) { e.raiseT = 0; spawnEnemy('wisp', e.x - 30, e.y); spawnEnemy('wisp', e.x + 30, e.y); Sound.play('creep'); }
+      break;
+    case 'daze': if (e.t > 2.6) { e.st = 'float'; e.t = 0; e.frozen = true; Sound.play('charge'); floatText(e.x, e.y - 50, 'Frost returns!', '#9fe0ff'); } break;
+  }
+}
+function updateHankAxes(dt) {
+  const p = G.player;
+  for (const a of HK.axes) {
+    a.t += dt; a.spin += dt * 20;
+    if (a.t > 0.85) { const dx = a.home.x - a.x, dy = a.home.y - 20 - a.y, d = Math.hypot(dx, dy) || 1; a.vx = dx / d * 170; a.vy = dy / d * 170; if (d < 10) a.done = true; }
+    a.x += a.vx * dt; a.y += a.vy * dt;
+    if (dist(a, p) < 9) { hurtPlayer(1, a); }
+  }
+  HK.axes = HK.axes.filter(a => !a.done && a.t < 3 && a.home.alive);
+}
+
+// ---------------- art ----------------
+const FLUFFY = ['.ee.......', 'eEEe....tt', '.eEEeeee.t', '.eKEEEEEe.', '..eEEEEEe.', '..e.e..e.e', '..e.e..e.e'];
+function buildCh2Art() {
+  SPR.fluffy = buildSprite(FLUFFY, { e: '#9fe0ff', E: '#d8f4ff', K: '#20304a', t: '#9fe0ff' });
+  SPR.fluffy_f = flipped(SPR.fluffy);
+}
+function drawCh2Enemy(e, x, y) {
+  const white = e.flash > 0, f = Math.floor(e.wob / 2.5) % 2;
+  if (e.type === 'captain') {
+    const { d, flip } = dirOf(e.fx, e.fy);
+    shadowAt(x, y + 10, 2);
+    spr(SPR[`draugr_${d === 'up' ? 'down' : d}_${f}${flip ? '_f' : ''}`], x, y + 12, { scale: 2, white });
+    R(x - 9, y - 30, 18, 3, '#c9a227');   // gold helm band: the captain
+    drawShield(e, x, y - 6, 2);
+    return true;
+  }
+  if (e.type === 'hank') {
+    const bob = Math.round(Math.sin(G.t * 2) * 2);
+    shadowAt(x, y + 18, 2.5);
+    ctx.globalAlpha = e.st === 'daze' ? 0.95 : 0.78;
+    spr(SPR[`draugr_down_${f}`], x, y + 18 + bob, { scale: 3, white });
+    ctx.globalAlpha = 0.35; spr(whiteOf(SPR[`draugr_down_${f}`]), x, y + 18 + bob, { scale: 3 }); ctx.globalAlpha = 1;
+    // horned helm and spectral axe
+    R(x - 16, y - 36 + bob, 4, 8, '#f2ebcc'); R(x + 12, y - 36 + bob, 4, 8, '#f2ebcc');
+    if (e.frozen) {
+      ctx.strokeStyle = `rgba(160,230,255,${0.6 + 0.3 * Math.sin(G.t * 6)})`; ctx.lineWidth = 2;
+      ctx.beginPath(); ctx.ellipse(x, y - 6 + bob, 26, 30, 0, 0, Math.PI * 2); ctx.stroke();
+      for (let i = 0; i < 6; i++) { const a = G.t * 1.5 + i * 1.05; R(x + Math.cos(a) * 26 - 1, y - 6 + bob + Math.sin(a) * 30 - 1, 3, 3, '#e8f8ff'); }
+    }
+    if (e.st === 'daze') for (let i = 0; i < 3; i++) { const a = G.t * 5 + i * 2.1; drawStar(x + Math.cos(a) * 18, y - 44 + Math.sin(a) * 4); }
+    R(x - 31, y - 61, 62, 5, '#000'); R(x - 30, y - 60, 60 * Math.max(0, e.hp / e.max), 3, '#e23');
+    return true;
+  }
+  return false;
+}
+function drawHankAxes() {
+  for (const a of HK.axes) { ctx.globalAlpha = 0.8; drawJonSprite(a.x - G.cam.x, a.y - G.cam.y, a.spin); ctx.globalAlpha = 0.35; ctx.fillStyle = '#9fe0ff'; ctx.beginPath(); ctx.arc(a.x - G.cam.x, a.y - G.cam.y, 10, 0, Math.PI * 2); ctx.fill(); ctx.globalAlpha = 1; }
+}
+function drawDashGhost(f) {
+  const { d, flip } = dirOf(f.fx, f.fy);
+  ctx.globalAlpha = 0.45 * (1 - f.t / f.life);
+  spr(purpleOf(SPR[`zombie_${d}_w0${flip ? '_f' : ''}`]), f.x - G.cam.x, f.y - G.cam.y + 7);
+  ctx.globalAlpha = 1;
+}
+const PURPLE = new Map();
+function purpleOf(c) { let p = PURPLE.get(c); if (!p) { p = tinted(c, '#b070ff'); PURPLE.set(c, p); } return p; }
+// spirit barrier tile: shimmering purple wards
+function renderBarrier(frame) {
+  return makeTile((P) => {
+    for (let y = 0; y < T; y++) for (let x = 0; x < T; x++) { const lx = x % 8, ly = y % 8; P(x, y, lx === 0 || ly === 0 ? '#7888b8' : lx === 7 || ly === 7 ? '#48548a' : '#6070a0'); }
+    for (let y = 0; y < T; y++) for (let x = 0; x < T; x++) { const w = Math.sin(x * 0.8 + y * 0.5 + frame * 0.8) + Math.sin(y * 0.9 - frame * 0.6); if (w > 0.4) P(x, y, w > 1.2 ? '#e8c8ff' : '#9a4dd9', w > 1.2 ? 230 : 170); }
+    for (const y of [3, 8, 13]) for (let x = 0; x < T; x++) if ((x + frame) % 4 < 2) P(x, y, '#d8a8ff', 200);
+  });
+}
+function drawTileCh2(c, ox, oy) {
+  if (c !== 'y') return false;
+  const frame = Math.floor(G.t * 6) % 8, key = 'Y|' + frame;
+  let img = TILE_CACHE.get(key); if (!img) { img = renderBarrier(frame); TILE_CACHE.set(key, img); }
+  ctx.drawImage(img, ox, oy);
+  return true;
+}
+
+// ===== jon.js =====
+// Jon: personality (what he says and how his face looks) and growth (XP, levels, perks, milestones).
+// Jon is based on Owen's real best friend, so he grows alongside Owen as the game goes on.
+
+// ---------------- talking ----------------
+const JT = { cd: {}, line: '', t: 0, idle: 0, asleep: false, streak: 0, streakT: 0, face: 'happy', faceT: 0, lastArea: '', queued: null };
+function resetJon() { Object.assign(JT, { cd: {}, line: '', t: 0, idle: 0, asleep: false, streak: 0, streakT: 0, face: 'happy', faceT: 0, lastArea: '', queued: null }); }
+function jonSay(cat, opts = {}) {
+  if (G.mode === 'arena' && !opts.arena) return false;
+  const now = G.t;
+  if (!opts.force && (JT.cd[cat] || 0) > now) return false;
+  if (!opts.force && JT.t > 0.6 && !opts.interrupt) return false;   // don't talk over himself
+  const pool = typeof cat === 'string' && JON[cat] ? JON[cat] : null;
+  const line = opts.line || (Array.isArray(pool) ? pick(pool) : null);
+  if (!line) return false;
+  JT.line = line; JT.t = Math.min(4, 1.6 + line.length * 0.05);
+  JT.cd[cat] = now + (opts.cooldown || 10);
+  if (opts.face) setJonFace(opts.face, 2);
+  return true;
+}
+function setJonFace(f, t) { JT.face = f; JT.faceT = t; }
+
+function updateJonTalk(dt) {
+  const p = G.player, s = G.save;
+  JT.t = Math.max(0, JT.t - dt);
+  JT.faceT = Math.max(0, JT.faceT - dt);
+  JT.streakT = Math.max(0, JT.streakT - dt); if (JT.streakT <= 0) JT.streak = 0;
+  if (G.state !== 'play' || G.mode === 'arena') return;
+  // a line queued during a cutscene (boss cheer) plays once we're back in control
+  if (JT.queued) { const q = JT.queued; JT.queued = null; jonSay(q, { force: true, face: 'excited' }); }
+  // idling: he gets chatty, then bored, then falls asleep
+  if (p.moving || G.jon.mode !== 'follow') {
+    if (JT.asleep) { JT.asleep = false; jonSay('wake', { force: true }); setJonFace('excited', 1.5); }
+    JT.idle = 0;
+  } else {
+    JT.idle += dt;
+    if (JT.idle > 9 && JT.idle - dt <= 9) jonSay('idle', { cooldown: 6 });
+    if (JT.idle > 22 && !JT.asleep) { JT.asleep = true; jonSay('sleepy', { force: true }); }
+    if (JT.asleep && Math.floor(JT.idle) % 6 === 0 && Math.floor(JT.idle - dt) % 6 !== 0) jonSay('sleepy', { force: true });
+  }
+  // worried when Owen is low
+  if (p.hp <= 2 && s.maxHp > 2) { if (JT.faceT <= 0) setJonFace('worried', 0.5); jonSay('lowhp', { cooldown: 25, face: 'worried' }); }
+  // first time in each area
+  const area = G.map.dungeon || G.map.interior || G.map.dark ? G.mapId : (G.scr.y === 1 && G.scr.x <= 1 ? 'village' : 'overworld');
+  if (area !== JT.lastArea) {
+    JT.lastArea = area;
+    const line = JON.area[area];
+    if (line && !flag('jonarea:' + area)) { setFlag('jonarea:' + area); jonSay('area', { line, force: true, face: 'excited' }); }
+  }
+  // near water or a penguin
+  if (G.mapId === 'overworld' && tileAt(p.x + p.fx * 20, p.y + p.fy * 20) === '~') jonSay('water', { cooldown: 40, face: 'worried' });
+  if (G.ents.some(e => e.type === 'penguin' && e.alive && dist(e, p) < 70)) jonSay('penguin', { cooldown: 45 });
+}
+// event hooks used by the rest of the game
+function jonOnKill(e) {
+  JT.streak++; JT.streakT = 2.5;
+  if (e.boss) return;
+  if (JT.streak === 3) jonSay('streak', { force: true, face: 'excited', cooldown: 8 });
+  else if (Math.random() < 0.3) jonSay('kill', { cooldown: 7, face: 'excited' });
+}
+function jonOnHurt(from) { setJonFace('worried', 1.2); if (from) jonSay('hurt', { cooldown: 8, interrupt: true }); }
+
+function jonFaceNow() {
+  if (JT.asleep) return 'sleepy';
+  if (JT.faceT > 0) return JT.face;
+  return 'happy';
+}
+
+function drawJonBubble(x, y) {
+  if (JT.t <= 0 || !JT.line || G.state !== 'play') return;
+  ctx.font = FONT;
+  const lines = wrap(JT.line, 150).slice(0, 3);
+  const w = Math.max(...lines.map(l => Math.ceil(ctx.measureText(l).width))) + 8, h = lines.length * 10 + 4;
+  const bx = clamp(Math.round(x - w / 2), 2, VW - w - 2), by = clamp(Math.round(y - 22 - h), 24, VH - h - 4);
+  ctx.globalAlpha = Math.min(1, JT.t * 3);
+  R(bx - 1, by - 1, w + 2, h + 2, OUTLINE); R(bx, by, w, h, '#fffbe8');
+  const tx = clamp(Math.round(x), bx + 4, bx + w - 6);
+  R(tx, by + h, 4, 2, '#fffbe8'); R(tx + 1, by + h + 2, 2, 2, '#fffbe8'); R(tx - 1, by + h, 1, 2, OUTLINE); R(tx + 4, by + h, 1, 2, OUTLINE);
+  lines.forEach((l, i) => text(l, bx + 4, by + 10 + i * 10, '#2a1a10', 'left', false));
+  ctx.globalAlpha = 1;
+}
+
+// ---------------- growth ----------------
+const JON_MAX = 10;
+const jonNeed = lvl => 20 + (lvl - 1) * 16;
+const JON_PERKS = [
+  { id: 'edge', name: 'Sharper Edge', desc: '+20% damage', max: 3, apply: st => { st.dmg += 0.2; } },
+  { id: 'wide', name: 'Wide Swing', desc: 'Bigger swing arc and reach', max: 2, apply: st => { st.swing += 0.2; } },
+  { id: 'fast', name: 'Fast Hands', desc: '+15% attack speed', max: 3, apply: st => { st.atk += 0.15; } },
+  { id: 'flight', name: 'Long Flight', desc: '+20% throw range', max: 2, apply: st => { st.range += 0.2; } },
+  { id: 'rune', name: 'Rune Buddy', desc: 'Rune meter fills faster', max: 2, apply: st => { st.runeKill += 1; } },
+  { id: 'magnet', name: 'Loot Magnet', desc: 'Grab loot from farther', max: 2, apply: st => { st.pickup += 18; } },
+  { id: 'lucky', name: 'Lucky Axe', desc: 'Enemies drop more', max: 2, apply: st => { st.luck += 0.25; } },
+  { id: 'crit', name: 'Critical Chop', desc: '+8% chance of double damage', max: 3, apply: st => { st.crit += 0.08; } },
+];
+const JON_MILESTONES = [
+  { lvl: 3, id: 'spin', name: 'Spin Attack', desc: 'Hold Z after a swing, then let go' },
+  { lvl: 5, id: 'pep', name: 'Pep Talk', desc: 'Juice heals AND gives a speed boost' },
+  { lvl: 7, id: 'ricochet', name: 'Ricochet', desc: 'Thrown Jon bounces to a 2nd enemy' },
+  { lvl: 10, id: 'bff', name: 'Best Friends Forever', desc: 'A second revive charge' },
+];
+function jonData() { if (!G.save.jon) G.save.jon = { lvl: 1, xp: 0, perks: {} }; return G.save.jon; }
+const jonHas = id => G.mode !== 'arena' && JON_MILESTONES.some(m => m.id === id && jonData().lvl >= m.lvl);
+
+// story-mode stats come from Jon's perks
+function applyJonPerks() {
+  G.st = baseStats();
+  const d = jonData();
+  for (const pk of JON_PERKS) for (let i = 0; i < (d.perks[pk.id] || 0); i++) pk.apply(G.st);
+}
+function jonXP(n) {
+  if (G.mode === 'arena' || !G.save) return;
+  const d = jonData();
+  if (d.lvl >= JON_MAX) return;
+  d.xp += n;
+  floatText(G.jon.x, G.jon.y - 10, '+' + n + ' XP', '#9be08a');
+  if (d.xp >= jonNeed(d.lvl)) { d.pending = (d.pending || 0) + 1; }
+}
+function maybeJonLevelUp() {
+  const d = jonData();
+  if (!d.pending || G.state !== 'play') return;
+  d.pending--; d.xp -= jonNeed(d.lvl); d.lvl++;
+  if (d.lvl >= JON_MAX) d.xp = 0;
+  Sound.play('item'); G.jon.spin = 0;
+  setJonFace('excited', 3);
+  const ms = JON_MILESTONES.find(m => m.lvl === d.lvl);
+  const avail = JON_PERKS.filter(pk => (d.perks[pk.id] || 0) < pk.max);
+  G.jonChoices = [...avail].sort(() => Math.random() - 0.5).slice(0, 3);
+  G.jonMilestone = ms || null;
+  G.menuSel = 0;
+  G.state = G.jonChoices.length ? 'jonlevel' : 'play';
+  if (ms && ms.id === 'bff') G.save.voodoo2 = true;
+}
+function updateJonLevel() {
+  const n = G.jonChoices.length;
+  if (just('up')) { G.menuSel = (G.menuSel + n - 1) % n; Sound.play('menu'); }
+  if (just('down')) { G.menuSel = (G.menuSel + 1) % n; Sound.play('menu'); }
+  if (just('a') || just('tap')) {
+    const pk = G.jonChoices[G.menuSel], d = jonData();
+    d.perks[pk.id] = (d.perks[pk.id] || 0) + 1;
+    applyJonPerks(); Sound.play('secret');
+    G.state = 'play'; G.player.cd = 0.3;
+    jonSay('levelup', { force: true, face: 'excited' });
+    writeSave();
+  }
+}
+function drawJonLevel() {
+  if (G.state !== 'jonlevel') return;
+  const d = jonData();
+  R(0, 0, VW, VH, 'rgba(5,5,20,.88)'); R(10, 14, 236, 196, '#ffd84a'); R(12, 16, 232, 192, '#14102a');
+  drawJonSprite(40, 44, Math.sin(G.t * 6) * 0.4, false, 'excited');
+  text('JON LEVEL UP!', 64, 36, '#ffd84a');
+  text('Jon is now level ' + d.lvl, 64, 50, '#fff', 'left', false);
+  let y = 72;
+  if (G.jonMilestone) { text('NEW: ' + G.jonMilestone.name, 22, y, '#9be08a'); text(G.jonMilestone.desc, 22, y + 11, '#cfe', 'left', false); y += 28; }
+  text('Pick a perk:', 22, y, '#ffe64d'); y += 8;
+  G.jonChoices.forEach((pk, i) => {
+    const yy = y + i * 26, sel = i === G.menuSel, have = d.perks[pk.id] || 0;
+    R(20, yy, 216, 22, sel ? '#3a2e5a' : '#1e1838'); if (sel) R(20, yy, 3, 22, '#9be08a');
+    text(pk.name + (have ? ` (${have + 1}/${pk.max})` : ''), 28, yy + 10, sel ? '#9be08a' : '#fff');
+    text(pk.desc, 28, yy + 19, '#a79fc4', 'left', false);
+  });
+}
+// JON page of the gear menu
+function drawJonPage() {
+  const d = jonData();
+  R(0, 0, VW, VH, 'rgba(5,5,20,.92)'); R(8, 8, 240, 208, '#ffd84a'); R(10, 10, 236, 204, '#0d0d33');
+  text('JON', 20, 26, '#ffe64d'); text('◀ GEAR', 236, 26, '#8a8ab0', 'right', false);
+  drawJonSprite(36, 56, Math.sin(G.t * 2) * 0.2, G.t % 3.2 < 0.14, jonFaceNow());
+  text('Level ' + d.lvl + (d.lvl >= JON_MAX ? ' (max)' : ''), 56, 48, '#fff');
+  text("Owen's best friend", 56, 60, '#c8e8ff', 'left', false);
+  R(56, 66, 120, 6, '#000'); R(57, 67, d.lvl >= JON_MAX ? 118 : Math.round(118 * Math.min(1, d.xp / jonNeed(d.lvl))), 4, '#9be08a');
+  text(d.lvl >= JON_MAX ? 'MAX' : d.xp + '/' + jonNeed(d.lvl) + ' XP', 182, 72, '#9be08a', 'left', false);
+  text('ABILITIES', 20, 92, '#ffe64d');
+  JON_MILESTONES.forEach((m, i) => { const got = d.lvl >= m.lvl; text((got ? '✓ ' : 'Lv' + m.lvl + ' ') + m.name, 20, 104 + i * 11, got ? '#9be08a' : '#55577a', 'left', false); });
+  text('PERKS', 20, 156, '#ffe64d');
+  const owned = JON_PERKS.filter(pk => d.perks[pk.id]).map(pk => pk.name + (d.perks[pk.id] > 1 ? ' x' + d.perks[pk.id] : ''));
+  wrap(owned.join(', ') || 'None yet. Level Jon up by fighting, finding secrets and finishing quests.', 214).slice(0, 4).forEach((l, i) => text(l, 20, 168 + i * 10, '#cfe', 'left', false));
+}
+
+// ---------------- Spin Attack (unlocked at level 3) ----------------
+function updateSpinCharge(dt) {
+  const p = G.player, j = G.jon;
+  if (!jonHas('spin')) return;
+  if (held('a') && j.mode === 'follow' && !p.dashing && p.cd <= 0) {
+    p.charge = (p.charge || 0) + dt;
+    if (p.charge > 0.55 && p.charge - dt <= 0.55) { Sound.play('switch'); setJonFace('excited', 1); }
+  } else {
+    if ((p.charge || 0) > 0.55 && j.mode === 'follow' && !held('a')) {
+      j.mode = 'spin'; j.st = 0; j.hit = []; Sound.play('throw'); Sound.play('swing');
+      if (Math.random() < 0.5) jonSay('spin', { force: true, face: 'excited' });
+    }
+    p.charge = 0;
+  }
+}
+function updateSpin(dt) {
+  const j = G.jon, p = G.player;
+  j.st += dt;
+  const k = j.st / 0.36, a = -Math.PI / 2 + k * Math.PI * 2.2;
+  const r = 17 * G.st.swing;
+  j.x = p.x + Math.cos(a) * r; j.y = p.y + Math.sin(a) * r; j.spin = a + Math.PI / 2;
+  jonHits(2, 12, p, 'swing'); cutAt(j.x, j.y);
+  if (k >= 1) j.mode = 'follow';
+}
+function drawSpinFx() {
+  const p = G.player, j = G.jon;
+  if (j.mode === 'spin') {
+    const x = p.x - G.cam.x, y = p.y - G.cam.y;
+    ctx.strokeStyle = 'rgba(160,220,255,0.6)'; ctx.lineWidth = 6; ctx.beginPath(); ctx.arc(x, y, 17 * G.st.swing, 0, Math.PI * 2); ctx.stroke();
+  }
+  if ((p.charge || 0) > 0.55 && Math.floor(G.t * 12) % 2) { drawTwinkle(j.x - G.cam.x + 6, j.y - G.cam.y - 10, 1); }
+}
+
 // ===== sprites.js =====
 // Pixel art drawn in code. Everything is centered on (x, y) = feet-ish center.
 
@@ -3127,8 +4993,8 @@ function drawTwinkle(x, y, big) {
   R(x, y - (big ? 3 : 2), 1, big ? 7 : 5, '#ffffff'); R(x - (big ? 3 : 2), y, big ? 7 : 5, 1, '#ffffff'); R(x, y, 1, 1, '#ffe066');
 }
 
-function drawJonSprite(x, y, spin, blink) {
-  const img = blink ? SPR.jon_blink : SPR.jon;
+function drawJonSprite(x, y, spin, blink, face) {
+  const img = blink && face !== 'sleepy' ? SPR.jon_blink : (face && SPR['jon_' + face]) || SPR.jon;
   ctx.save(); ctx.translate(Math.round(x), Math.round(y)); ctx.rotate(spin);
   if (G.save && G.save.items.homing) { ctx.globalAlpha = 0.25 + 0.1 * Math.sin(G.t * 6); ctx.fillStyle = '#ffd84a'; ctx.beginPath(); ctx.arc(1, -2, 10, 0, Math.PI * 2); ctx.fill(); ctx.globalAlpha = 1; }
   ctx.drawImage(img, -img.width / 2 + 1, -img.height / 2);
@@ -3150,16 +5016,16 @@ function drawJon() {
   if (j.mode === 'follow') shadowAt(x, y + 18, 0.6);
   (j.trail || []).forEach((tr, i) => { ctx.globalAlpha = 0.12 + i * 0.07; drawJonSprite(tr.x - G.cam.x, tr.y - G.cam.y, tr.spin); });
   ctx.globalAlpha = 1;
-  drawJonSprite(x, y, j.spin, j.t % 3.2 < 0.14);
-  if (j.qt > 0 && j.quip && G.state === 'play') {
-    ctx.font = FONT;
-    const w = Math.ceil(ctx.measureText(j.quip).width) + 6, bx = clamp(x - w / 2, 2, VW - w - 2), by = clamp(y - 32, 24, VH - 14);
-    R(bx, by, w, 12, 'rgba(10,10,32,.85)'); text(j.quip, bx + 3, by + 9, '#ffffb3', 'left', false);
-  }
+  drawSpinFx();
+  drawJonSprite(x, y, j.spin, j.t % 3.2 < 0.14, jonFaceNow());
+  if (JT.asleep && G.state === 'play') { const k = (G.t * 0.7) % 1; text('z', x + 8 + k * 6, y - 8 - k * 12, `rgba(255,255,255,${1 - k})`, 'left', false); }
+  drawJonBubble(x, y);
 }
 
 function drawEnemy(e) {
   const x = Math.round(e.x - G.cam.x), y = Math.round(e.y - G.cam.y);
+  if (drawCh2Enemy(e, x, y)) return;
+  if (drawRedeyeEnemy(e, x, y)) { if (e.boss && e.alive && attendantVisible(e)) { R(x - 31, y - 41, 62, 5, '#000'); R(x - 30, y - 40, 60 * Math.max(0, e.hp / e.max), 3, '#e23'); } return; }
   const white = e.flash > 0 || (e.st === 'wind' && Math.floor(G.t * 16) % 2 === 0);
   const f = Math.floor(e.wob / 2.5) % 2;
   switch (e.type) {
@@ -3225,6 +5091,7 @@ function drawPerson(x, y, id, bob) {
   spr(SPR['npc_' + id + (blink ? '_blink' : '')] || SPR.npc_sven, x, y + 7 + b);
 }
 const LOOKS = {
+  bjarne: { shirt: '#3a7a4a', hair: '#e8e8e8', beard: true, hat: '#7a4a22' },
   astrid: { shirt: '#6b3fa0', hair: '#e8e8e8', long: true },
   lars: { shirt: '#b33a2e', hair: '#d9a441', beard: true },
   sven: { shirt: '#2f8a5a', hair: '#f2d27a' },
@@ -3233,7 +5100,9 @@ const LOOKS = {
 
 function drawItemIcon(id, x, y) {
   x = Math.round(x); y = Math.round(y);
-  switch (ITEMS[id] ? ITEMS[id].icon : id) {
+  const ic = ITEMS[id] ? ITEMS[id].icon : id;
+  if (ic !== 'homing' && drawIconSpr(ic, x, y)) return;
+  switch (ic) {
     case 'key': R(x - 1, y - 6, 3, 9, '#ffd84a'); R(x - 3, y - 7, 7, 4, '#ffd84a'); R(x - 1, y - 6, 3, 2, '#000'); R(x + 2, y + 1, 2, 2, '#ffd84a'); break;
     case 'bigkey': R(x - 2, y - 7, 4, 13, '#ffd84a'); R(x - 5, y - 8, 10, 6, '#ffd84a'); R(x - 2, y - 7, 4, 3, '#a87a10'); R(x + 2, y + 2, 3, 2, '#ffd84a'); R(x + 2, y - 1, 3, 2, '#ffd84a'); break;
     case 'homing': drawJonSprite(x, y, 0.4); R(x - 8, y - 8, 3, 1, '#ffd84a'); R(x + 6, y + 6, 3, 1, '#ffd84a'); break;
@@ -3251,7 +5120,10 @@ function drawThing(e) {
   const x = Math.round(e.x - G.cam.x), y = Math.round(e.y - G.cam.y), t = G.t;
   switch (e.kind) {
     case 'enemy': return drawEnemy(e);
-    case 'npc': return drawPerson(x, y, e.id, e.bob);
+    case 'hazard': return drawRedeyeEnemy(e, x, y);
+    case 'npc':
+      if (e.id === 'fluffy') { const b = Math.round(Math.sin(G.t * 3) * 2); ctx.globalAlpha = 0.75; spr(G.player.x < e.x ? SPR.fluffy_f : SPR.fluffy, x, y + 4 + b); ctx.globalAlpha = 1; return; }
+      return drawPerson(x, y, e.id, e.bob);
     case 'sign': shadowAt(x, y + 6, 0.8); spr(SPR.sign, x, y + 7); break;
     case 'plaque': R(x - 7, y - 4, 14, 7, '#c08a50'); R(x - 6, y - 3, 12, 1, '#6b4322'); R(x - 6, y, 9, 1, '#6b4322'); break;
     case 'runestone': {
@@ -3262,9 +5134,12 @@ function drawThing(e) {
     case 'shop': drawItemIcon(e.item, x, y - 2); text(String(e.price), x, y + 12, '#fff', 'center'); break;
     case 'pickup': {
       if (e.life !== undefined && e.life < 2 && Math.floor(t * 10) % 2) break;
+      if (e.underBush && tileAt(e.x, e.y) === 'b') break;
+      if (e.what === 'qitem') { const b = Math.round(Math.sin(t * 4) * 1.5); shadowAt(x, y + 6, 0.7); drawItemIcon(e.id, x, y + b); if (Math.floor(t * 3) % 3 === 0) drawTwinkle(x + 6, y - 6 + b, 0); break; }
       const b = Math.round(Math.sin(t * 4 + e.x) * 1.5);
       if (e.what === 'heart') drawHeart(x - 3, y - 3 + b, 1);
-      else if (e.what === 'kr1' || e.what === 'kr5' || e.what === 'krn') { R(x - 3, y - 3 + b, 6, 6, (e.what === 'kr5' || e.value >= 5) ? '#ffd84a' : '#d0d6e0'); R(x - 1, y - 2 + b, 2, 4, (e.what === 'kr5' || e.value >= 5) ? '#a87a10' : '#8a92a0'); }
+      else if (e.what === 'kr1' || e.what === 'kr5' || e.what === 'krn') { drawIconSpr(e.what === 'kr5' || e.value >= 5 ? 'gold' : 'coin', x, y + b); }
+      else if (false) { R(x - 3, y - 3 + b, 6, 6, (e.what === 'kr5' || e.value >= 5) ? '#ffd84a' : '#d0d6e0'); R(x - 1, y - 2 + b, 2, 4, (e.what === 'kr5' || e.value >= 5) ? '#a87a10' : '#8a92a0'); }
       else if (e.what === 'rune') drawItemIcon('shard', x, y + b);
       else drawItemIcon(e.what, x, y + b);
       break; }
@@ -3292,6 +5167,7 @@ const ARENA_CARDS = [
   { id: 'turret', name: 'Rune Turret', desc: 'A runestone that shoots', price: 35, max: 3, apply: () => { A.turrets.push({ x: 0, y: 0, cd: 0 }); placeTurrets(); } },
   { id: 'pal', name: 'Penguin Pal', desc: 'A good penguin. Slides at foes', price: 30, max: 2, apply: () => { A.pals.push({ x: G.player.x, y: G.player.y, cd: 1, dash: 0, dx: 0, dy: 0, wob: 0 }); } },
   { id: 'homing', name: 'Homing Jon', desc: 'Throws lock on, fly far', price: 25, max: 1, apply: () => { G.save.items.homing = true; } },
+  { id: 'dash', name: 'Voodoo Dash', desc: 'Shift/F: dash through foes', price: 30, max: 1, apply: () => { G.save.items.dash = true; } },
   { id: 'thunder', name: 'Thunder Rune', desc: 'C: strike all (full meter)', price: 45, max: 1, apply: () => { G.save.items.thunder = true; G.save.rune = RUNE_MAX; } },
   { id: 'juice', name: 'Lingonberry Juice', desc: 'Auto-revive once', price: 20, max: 3, apply: () => { G.save.potions++; } },
   { id: 'helmet', name: "Hank's Helmet", desc: '+1 armor (10% block)', price: 25, max: 5, apply: () => { G.st.armor++; } },
@@ -3335,7 +5211,7 @@ function waveSpec(w) {
 }
 
 function startArena() {
-  G.mode = 'arena';
+  G.mode = 'arena'; resetJon();
   G.save = newSave(); G.save.voodoo = false; G.save.map = 'arena';
   G.st = baseStats();
   G.player = makePlayer(); G.jon = makeJon(); G.player.hp = G.save.maxHp;
@@ -3712,14 +5588,14 @@ function drawHud() {
   if (s.items.thunder) drawItemIcon('thunder', 27, 12); else if (s.items.homing) drawItemIcon('homing', 27, 12);
   // kroner, keys
   drawItemIcon('coin', 46, 7); text(String(s.kr).padStart(3, '0'), 52, 11, '#fff');
-  if (G.map && G.map.dungeon) { drawItemIcon('key', 46, 17); text('x' + (s.keys[G.mapId] || 0), 52, 20, '#fff'); if (s.bigkeys[G.mapId]) drawItemIcon('bigkey', 82, 15); }
+  if (G.map && G.map.dungeon && !G.map.nokeys) { drawItemIcon('key', 46, 17); text('x' + (s.keys[G.mapId] || 0), 52, 20, '#fff'); if (s.bigkeys[G.mapId]) drawItemIcon('bigkey', 82, 15); }
   if (s.potions) { drawItemIcon('juice', 98, 12); text('x' + s.potions, 104, 16, '#fff'); }
   // life
   text('-LIFE-', 190, 9, '#f2ebcc', 'center');
   const n = s.maxHp / 2;
   for (let i = 0; i < n; i++) {
     const v = clamp(p.hp - i * 2, 0, 2) / 2, row = Math.floor(i / 10), col = i % 10;
-    drawHeart(144 + col * 9, 12 + row * 8, v, s.voodoo ? '#f22633' : '#9a4dd9');
+    drawHeart(144 + col * 9, 12 + row * 8, v, s.voodoo ? '#f22633' : s.voodoo2 ? '#ffd84a' : '#9a4dd9');
   }
 }
 
@@ -3730,30 +5606,40 @@ function objective() {
   if (!flag('met_astrid')) return 'Find Elder Astrid in Fjordvik: west of the airstrip, then north.';
   if (!s.items.homing && !flag('d1done')) return 'Go to the Penguin Ice Cavern on the Frozen Path (north-east). Find the treasure behind the Penguin Knight.';
   if (!flag('d1done')) return 'Defeat whatever is possessing the penguins at the bottom of the Ice Cavern.';
-  return 'Chapter 1 complete! Talk to Astrid. Three sealed rune doors wait for Owen\'s next chapters.';
+  if (!flag('d2done')) {
+    if (!s.items.dash) return 'Chapter 2: the Drowned Barrow has opened in the north-west foothills. Find what the Draugr Captain guards.';
+    return 'Chapter 2: use the Voodoo Dash to cross the water and barriers. Find the big key and free Hank\'s ghost.' + (flag('redeye_done') ? '' : ' (Optional: Flight 364\'s cargo hold.)');
+  }
+  if (!flag('redeye_done')) return 'Chapter 2 complete! Walter\'s Forge waits for Owen\'s next chapter. Optional: something is scratching inside Flight 364\'s cargo hold.';
+  return 'Chapter 2 complete! Walter\'s Forge and the Storm Peak wait for Owen\'s next chapters.';
 }
 function drawMenu() {
   const s = G.save;
   R(0, 0, VW, VH, 'rgba(5,5,20,.92)');
   R(8, 8, 240, 208, '#ffd84a'); R(10, 10, 236, 204, '#0d0d33');
-  text('GEAR', 20, 26, '#ffe64d');
+  text('GEAR', 20, 26, '#ffe64d'); text('JON ▶', 236, 38 + 12, '#9be08a', 'right', false);
   const slots = [
-    ['Jon (swing Z)', 'homing', true, () => drawJonSprite(30, 48, 0)],
+    ['Jon Lv' + jonData().lvl + ' (swing Z)', 'homing', true, () => drawJonSprite(30, 44, 0, false, jonFaceNow())],
     ['Homing Jon (throw X)', 'homing', !!s.items.homing],
     ['Thunder Rune (C)', 'thunder', !!s.items.thunder],
     ['Lingonberry Juice x' + s.potions, 'juice', s.potions > 0],
+    ['Demon Horn (V)', 'horn', !!s.items.horn],
+    ['Voodoo Dash (Shift/F)', 'dash', !!s.items.dash],
   ];
   slots.forEach(([label, icon, have, custom], i) => {
-    const y = 48 + i * 20;
-    R(20, y - 9, 18, 18, '#1a2238');
+    const y = 44 + i * 16;
+    R(20, y - 8, 18, 16, '#1a2238');
     if (have) { if (custom) custom(); else drawItemIcon(icon, 29, y); text(label, 44, y + 4, '#fff'); }
     else text('???', 44, y + 4, '#55577a');
   });
-  text('Heart pieces: ' + s.pieces + '/4', 20, 138, '#f2ebcc');
-  text('Voodoo bond: ' + (s.voodoo ? 'ready' : 'used'), 20, 150, s.voodoo ? '#9be08a' : '#c9a0f0');
-  if (G.map.dungeon) text('Keys ' + (s.keys[G.mapId] || 0) + '   Big key: ' + (s.bigkeys[G.mapId] ? 'yes' : 'no'), 20, 162, '#f2ebcc');
+  const sq = (n, start, done) => flag(start) ? n + (flag(done) ? ' ✓' : ' …') : null;
+  const side = [sq('Bjarne', 'quest_bjarne', 'bjarne_done'), sq('Sven', 'quest_sven', 'sven_done')].filter(Boolean);
+  if (side.length) text('Side quests: ' + side.join('  '), 20, 142, '#c8e8ff', 'left', false);
+  text('Heart pieces: ' + s.pieces + '/4', 20, 154, '#f2ebcc');
+  text('Voodoo bond: ' + (s.voodoo ? 'ready' : 'used'), 20, 166, s.voodoo ? '#9be08a' : '#c9a0f0');
+  if (G.map.dungeon && !G.map.nokeys) text('Keys ' + (s.keys[G.mapId] || 0) + '  Big key: ' + (s.bigkeys[G.mapId] ? 'yes' : 'no'), 236, 154, '#f2ebcc', 'right', false);
   text('QUEST', 20, 180, '#ffe64d');
-  wrap(objective(), 214).slice(0, 3).forEach((l, i) => text(l, 20, 192 + i * 10, '#fff', 'left', false));
+  wrap(objective(), 214).slice(0, 3).forEach((l, i) => text(l, 20, 191 + i * 9, '#fff', 'left', false));
   text(Sound.muted ? 'M: sound off' : 'M: sound on', 236, 26, '#8a8ab0', 'right', false);
   text(Music.on ? 'N: music on' : 'N: music off', 236, 38, '#8a8ab0', 'right', false);
 }
@@ -3846,8 +5732,8 @@ function nextFlightPage() {
 // State machine and main loop.
 
 function newGame() {
-  G.mode = 'story'; G.st = baseStats();
-  G.save = newSave();
+  G.mode = 'story'; resetJon();
+  G.save = newSave(); applyJonPerks();
   G.player = makePlayer(); G.jon = makeJon();
   const st = MAPS.home.ents.find(e => e.t === 'start').at;
   G.state = 'play';
@@ -3855,14 +5741,14 @@ function newGame() {
   say(STORY.intro);
 }
 function continueGame(fromCheckpoint) {
-  G.mode = 'story'; G.st = baseStats();
-  G.save = readSave() || newSave();
+  G.mode = 'story'; resetJon();
+  G.save = readSave() || newSave(); applyJonPerks();
   G.player = makePlayer(); G.jon = makeJon();
   G.player.hp = G.save.maxHp;
   G.state = 'play';
   if (!G.save.x) return newGame();
   // after a game over you wake at the last runestone with the voodoo bond recharged
-  if (fromCheckpoint && G.save.cp) { G.save.voodoo = true; loadMap(G.save.cp.map, G.save.cp.x, G.save.cp.y); writeSave(); return; }
+  if (fromCheckpoint && G.save.cp) { G.save.voodoo = true; G.save.voodoo2 = jonHas('bff'); loadMap(G.save.cp.map, G.save.cp.x, G.save.cp.y); writeSave(); return; }
   loadMap(G.save.map, G.save.x, G.save.y);
 }
 
@@ -3883,7 +5769,16 @@ function onEnterScreen() {
   const has = type => G.ents.some(e => e.type === type && e.alive);
   if (G.mapId === 'cavern' && !flag('intro:cavern')) { setFlag('intro:cavern'); say(STORY.cavern_enter); }
   if (has('knight') && !flag('intro:knight')) { setFlag('intro:knight'); Sound.play('boss'); say(STORY.knight); }
+  if (G.map.redeye) redeyeEnter();
+  HK.axes = [];
+  if (G.mapId === 'barrow' && !flag('intro:barrow')) { setFlag('intro:barrow'); say(STORY.barrow_enter); }
+  if (has('captain') && !flag('intro:captain')) { setFlag('intro:captain'); Sound.play('boss'); say(STORY.captain); }
+  if (has('hank')) { Sound.play('boss'); say(flag('intro:hank') ? [['Hank', 'TURN... BACK...']] : STORY.hank); setFlag('intro:hank'); }
+  if (has('attendant') && !flag('intro:attendant')) { setFlag('intro:attendant'); say(STORY.attendant); }
   if (has('king')) { Sound.play('boss'); say(flag('intro:king') ? [['Penguin King', 'AK! Back for more?']] : STORY.king); setFlag('intro:king'); }
+  if (G.mapId === 'overworld' && flag('d2done') && !flag('chapter2_banner') && G.scr.x === 0 && G.scr.y === 0) {
+    setFlag('chapter2_banner'); G.banner = 'CHAPTER 2 COMPLETE'; G.bannerT = 4; Sound.play('secret'); writeSave();
+  }
   if (G.mapId === 'overworld' && flag('d1done') && !flag('chapter1_banner') && G.scr.x === 2 && G.scr.y === 0) {
     setFlag('chapter1_banner'); G.banner = STORY.chapter_done; G.bannerT = 4; Sound.play('secret'); writeSave();
   }
@@ -3892,6 +5787,7 @@ function onEnterScreen() {
 function update(dt) {
   G.t += dt;
   G.shake = Math.max(0, G.shake - dt); G.flash = Math.max(0, G.flash - dt); G.bannerT = Math.max(0, G.bannerT - dt);
+  if (G.state !== 'play') { JT.t = Math.max(0, JT.t - dt); JT.faceT = Math.max(0, JT.faceT - dt); }
   if (just('mute')) Sound.muted = !Sound.muted;
   if (just('music')) Music.on = !Music.on;
   switch (G.state) {
@@ -3922,10 +5818,14 @@ function update(dt) {
       if (G.player.hold.t <= 0) { G.player.hold = null; G.state = 'play'; G.afterHold(); }
       return;
     case 'warp': updateWarp(dt); return;
-    case 'menu': if (just('menu') || just('a') || just('tap')) { G.state = 'play'; Sound.play('menu'); } return;
+    case 'menu':
+      if (just('left') || just('right')) { G.menuPage = G.menuPage ? 0 : 1; Sound.play('menu'); }
+      if (just('menu') || just('a') || just('tap')) { G.state = 'play'; Sound.play('menu'); }
+      return;
     case 'over':
       if (just('a') || just('menu') || just('tap')) { continueGame(true); }
       return;
+    case 'jonlevel': updateJonLevel(); return;
     case 'levelup': case 'shop': case 'arenapause': case 'arenaover': updateArenaMenus(); return;
     case 'thunder': updateThunder(dt); updateFx(dt); return;
     case 'dying': updateDying(dt); updateFx(dt); return;
@@ -3939,9 +5839,15 @@ function update(dt) {
   if (G.state !== 'play') return;
   updateJon(dt);
   if (G.mode === 'arena') { updateArena(dt); if (G.state !== 'play') return; }
+  if (G.map.redeye) updateRedeye(dt);
+  updateJonTalk(dt);
+  maybeJonLevelUp();
+  if (G.state !== 'play') return;
+  if (HK.axes.length) updateHankAxes(dt);
   for (const e of G.ents.slice()) {
     if (e.kind === 'enemy' && e.alive) { if (e.slow > 0) { e.slow -= dt; updateEnemy(e, dt * 0.5); } else updateEnemy(e, dt); }
     else if (e.kind === 'pickup') updatePickup(e, dt);
+    else if (e.kind === 'hazard') updateCart(e, dt);
     else if (e.kind === 'switch') e.cd = Math.max(0, e.cd - dt);
     if (G.state !== 'play') break;
   }
@@ -3962,17 +5868,20 @@ function render() {
   list.push(...bigDrawList());
   list.sort((a, b) => a.y - b.y).forEach(o => o.f());
   if (G.mode === 'arena') drawArenaWorld();
+  drawHankAxes();
   if (!p.hold) drawJon();
   drawFx();
   drawLightning();
   ctx.setTransform(1, 0, 0, 1, 0, 0);
-  if (G.map.dungeon) drawDungeonLight();
+  if (G.map.dungeon || G.map.dark) drawDungeonLight();
+  drawRedeyeOverlay();
   if (G.flash > 0) { ctx.globalAlpha = Math.min(1, G.flash * 3); R(0, 0, VW, VH, G.flashColor || '#fff'); ctx.globalAlpha = 1; }
   if (G.mode === 'arena') drawArenaHud(); else drawHud();
   if (G.state === 'warp') { ctx.globalAlpha = clamp(1 - Math.abs(G.warp.t - 0.35) / 0.35, 0, 1); R(0, 0, VW, VH, '#000'); ctx.globalAlpha = 1; }
   if (G.bannerT > 0) { R(0, 92, VW, 34, 'rgba(0,0,0,.8)'); text(G.banner, VW / 2, 113, '#ffd84a', 'center'); }
   if (G.state === 'talk') drawTalk();
-  if (G.state === 'menu') drawMenu();
+  if (G.state === 'menu') { if (G.menuPage) drawJonPage(); else drawMenu(); }
+  drawJonLevel();
   drawArenaMenus();
   if (G.state === 'over') {
     R(0, 0, VW, VH, 'rgba(40,0,0,.8)');
@@ -3988,7 +5897,7 @@ G.menuSel = 0;
 buildAll();
 function frame(now) {
   const dt = Math.min(0.05, (now - last) / 1000); last = now;
-  try { update(dt); render(); Music.want(musicFor()); Music.tick(); } catch (err) { console.error(err); }
+  try { pollGamepad(); update(dt); render(); Music.want(musicFor()); Music.tick(); } catch (err) { console.error(err); }
   for (const k in edge) edge[k] = false;
   requestAnimationFrame(frame);
 }

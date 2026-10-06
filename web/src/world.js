@@ -12,11 +12,11 @@ const G = {
 
 function newSave() {
   return { map: 'home', x: 0, y: 0, maxHp: 6, hp: 6, kr: 0, rune: 0, potions: 0, pieces: 0,
-    items: {}, flags: {}, keys: {}, bigkeys: {}, voodoo: true };
+    items: {}, flags: {}, keys: {}, bigkeys: {}, voodoo: true, jon: { lvl: 1, xp: 0, perks: {} } };
 }
 const SAVE_KEY = 'jontuka-save-v1';
 // Stats Owen carries. Story mode uses the defaults; the Arena upgrades them.
-function baseStats() { return { dmg: 1, speed: 1, atk: 1, range: 1, pickup: 28, armor: 0, regen: 0, crit: 0, knock: 1 }; }
+function baseStats() { return { dmg: 1, speed: 1, atk: 1, range: 1, pickup: 28, armor: 0, regen: 0, crit: 0, knock: 1, swing: 1, runeKill: 1, luck: 0 }; }
 G.st = baseStats();
 function writeSave() {
   if (G.mode === 'arena') return;
@@ -31,9 +31,9 @@ const flag = k => !!G.save.flags[k];
 const setFlag = k => { G.save.flags[k] = true; };
 
 // ---------- tiles ----------
-const SOLID = new Set('T#MwHRDPqX+lWtOYQZxLKbV'.split(''));
+const SOLID = new Set('T#MwHRDPqX+lWtOYQZxLKbVCkpueABy'.split(''));
 function tile(tx, ty) {
-  if (tx < 0 || ty < 0 || tx >= G.cols || ty >= G.nrows) return G.map.dungeon ? 'W' : 'T';
+  if (!(tx >= 0 && ty >= 0 && tx < G.cols && ty < G.nrows)) return G.map.dungeon ? 'W' : 'T';   // also catches NaN
   return G.rows[ty][tx];
 }
 const tileAt = (x, y) => tile(Math.floor(x / T), Math.floor(y / T));
@@ -47,7 +47,8 @@ function gatesDown() { return flag(G.mapId + ':gates'); }
 function solidTile(tx, ty, who) {
   const c = tile(tx, ty);
   if (c === 'T' && isCanopy(tx, ty)) return false;   // walk behind big tree tops
-  if (who === 'flyer') return c === 'W' || c === 'T' || c === 'M' || c === 'Z' || c === 'V';
+  if (c === 'J') return who !== 'flyer' && who !== 'jon' && phantomSolid();
+  if (who === 'flyer') return c === 'W' || c === 'T' || c === 'M' || c === 'Z' || c === 'V' || c === 'u' || c === 'e';
   if (c === 'h') return shutterClosed(tx, ty);
   if (c === 'G') return !gatesDown();
   if (who === 'jon') return SOLID.has(c) && c !== 'b' && c !== 'O' && c !== 'x' && c !== 'w' && c !== 'Q';
@@ -82,9 +83,13 @@ function loadMap(id, px, py) {
   for (const k in G.save.flags) {
     const m = k.match(/^open:(\w+):(\d+),(\d+)$/);
     if (m && m[1] === id) setTile(+m[2], +m[3], '_');
+    const t2 = k.match(/^tile:(\w+):(\d+),(\d+):(.)$/);
+    if (t2 && t2[1] === id) setTile(+t2[2], +t2[3], t2[4]);
   }
+  // rune doors that have opened become cave mouths
+  for (const d of G.map.ents) if (d.t === 'runedoor' && G.save.flags[d.needs]) setTile(d.at[0], d.at[1], 'E');
   const p = G.player;
-  p.x = px; p.y = py; p.vx = p.vy = p.kx = p.ky = 0; p.launching = false; p.falling = 0; p.hold = null;
+  p.x = px; p.y = py; p.vx = p.vy = p.kx = p.ky = 0; p.launching = false; p.falling = 0; p.hold = null; p.dashing = 0;
   G.jon.x = px + 10; G.jon.y = py - 14; G.jon.mode = 'follow';
   G.scr = screenOf(px, py);
   G.trans = null;
@@ -132,6 +137,7 @@ function checkScreenEdge() {
   const dx = Math.sign(s.x - G.scr.x), dy = Math.sign(s.y - G.scr.y);
   G.trans = { from: { ...G.cam }, to: { x: s.x * VW, y: s.y * VH }, t: 0, dx, dy };
   G.ents = G.ents.filter(e => e.keep); G.fx = []; G.roomEnemies = false;
+  p.dashing = 0;   // a dash never carries into the next screen
   G.scr = s;
 }
 function updateTransition(dt) {
@@ -234,6 +240,6 @@ function drawMap() {
   for (let ty = y0; ty <= y0 + SH; ty++) for (let tx = x0; tx <= x0 + SW; tx++) {
     if (tx < 0 || ty < 0 || tx >= G.cols || ty >= G.nrows) continue;
     const c = claimedGround(tx, ty) || G.rows[ty][tx], ox = tx * T - cx, oy = ty * T - cy;
-    if (!drawTileArt(c, ox, oy, tx, ty)) drawTile(c, ox, oy, tx, ty);
+    if (!drawTileCh2(c, ox, oy) && !drawTileRE(c, ox, oy, tx, ty) && !drawTileArt(c, ox, oy, tx, ty) && !drawTileB(c, ox, oy, tx, ty)) drawTile(c, ox, oy, tx, ty);
   }
 }

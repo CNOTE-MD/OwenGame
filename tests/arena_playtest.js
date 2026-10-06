@@ -49,8 +49,9 @@ const SHOTS = process.env.SHOTS || '/tmp';
   await pg.keyboard.press('Enter'); await wait(100);
   check('wave 2 starts', await ev(() => A.wave === 2 && G.state === 'play'));
   await ev(() => { G.player.inv = 999; for (let i = 0; i < 6; i++) arenaSpawn('penguin', G.player.x + 30 + i * 6, G.player.y + 10, true); });
-  await wait(2500);
   await pg.screenshot({ path: SHOTS + '/a3_weapons.png' });
+  // weapons fight on their own; give them up to 6 seconds to finish 4 penguins
+  await pg.waitForFunction(() => A.kills >= 4, null, { timeout: 6000 }).catch(() => {});
   check('weapons kill enemies on their own', await ev(() => A.kills) >= 4);
   // boss wave
   await ev(() => { A.wave = 4; A.t = A.len; });

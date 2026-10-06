@@ -13,6 +13,7 @@ const ARENA_CARDS = [
   { id: 'turret', name: 'Rune Turret', desc: 'A runestone that shoots', price: 35, max: 3, apply: () => { A.turrets.push({ x: 0, y: 0, cd: 0 }); placeTurrets(); } },
   { id: 'pal', name: 'Penguin Pal', desc: 'A good penguin. Slides at foes', price: 30, max: 2, apply: () => { A.pals.push({ x: G.player.x, y: G.player.y, cd: 1, dash: 0, dx: 0, dy: 0, wob: 0 }); } },
   { id: 'homing', name: 'Homing Jon', desc: 'Throws lock on, fly far', price: 25, max: 1, apply: () => { G.save.items.homing = true; } },
+  { id: 'dash', name: 'Voodoo Dash', desc: 'Shift/F: dash through foes', price: 30, max: 1, apply: () => { G.save.items.dash = true; } },
   { id: 'thunder', name: 'Thunder Rune', desc: 'C: strike all (full meter)', price: 45, max: 1, apply: () => { G.save.items.thunder = true; G.save.rune = RUNE_MAX; } },
   { id: 'juice', name: 'Lingonberry Juice', desc: 'Auto-revive once', price: 20, max: 3, apply: () => { G.save.potions++; } },
   { id: 'helmet', name: "Hank's Helmet", desc: '+1 armor (10% block)', price: 25, max: 5, apply: () => { G.st.armor++; } },
@@ -56,7 +57,7 @@ function waveSpec(w) {
 }
 
 function startArena() {
-  G.mode = 'arena';
+  G.mode = 'arena'; resetJon();
   G.save = newSave(); G.save.voodoo = false; G.save.map = 'arena';
   G.st = baseStats();
   G.player = makePlayer(); G.jon = makeJon(); G.player.hp = G.save.maxHp;

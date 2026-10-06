@@ -164,7 +164,21 @@ const MAPS = {
 7,
 2
 ],
-"text": "seal_barrow"
+"text": "seal_barrow",
+"opensWith": "d1done"
+},
+{
+"t": "runedoor",
+"at": [
+7,
+2
+],
+"needs": "d1done",
+"to": "barrow",
+"dest": [
+24,
+40
+]
 },
 {
 "t": "sealed",
@@ -200,6 +214,68 @@ const MAPS = {
 "dest": [
 24,
 54
+]
+},
+{
+"t": "door",
+"at": [
+4,
+18
+],
+"to": "astrid_house",
+"dest": [
+7,
+12
+]
+},
+{
+"t": "door",
+"at": [
+13,
+19
+],
+"to": "bjarne_house",
+"dest": [
+7,
+12
+]
+},
+{
+"t": "qitem",
+"id": "sheet",
+"at": [
+43,
+37
+],
+"needs": "quest_bjarne"
+},
+{
+"t": "qitem",
+"id": "ship",
+"at": [
+21,
+9
+],
+"needs": "quest_sven",
+"underBush": true
+},
+{
+"t": "grave",
+"at": [
+61,
+36
+]
+},
+{
+"t": "stairs",
+"at": [
+61,
+36
+],
+"to": "secret_cave",
+"dest": [
+8,
+11
 ]
 },
 {
@@ -678,7 +754,8 @@ const MAPS = {
 13
 ]
 }
-]
+],
+"interior": true
 },
 "arena": {
 "name": "Valhalla Arena",
@@ -714,5 +791,589 @@ const MAPS = {
 ],
 "ents": [],
 "arena": true
+},
+"astrid_house": {
+"name": "Astrid's House",
+"rows": [
+"ZZZZZZZZZZZZZZZZ",
+"ZkkFFFppFFFFkkFZ",
+"ZFFFFFFFFFFFFFFZ",
+"ZFFFFFFFFFFFFFFZ",
+"ZFFQQFFFFFFFFYYZ",
+"ZFFFFFFFFFFFFYYZ",
+"ZFFFFrrrrrrFFFFZ",
+"ZFFFFrrrrrrFFFFZ",
+"ZOFFFrrrrrrFFFOZ",
+"ZOFFFFFFFFFFFFFZ",
+"ZFFFFFFFFFFFFFFZ",
+"ZFFFFFFFFFFFFFFZ",
+"ZFFFFFFFFFFFFFFZ",
+"ZZZZZZZddZZZZZZZ"
+],
+"ents": [
+{
+"t": "sign",
+"at": [
+10,
+0
+],
+"text": "tapestry"
+},
+{
+"t": "sign",
+"at": [
+2,
+1
+],
+"text": "bookshelf"
+},
+{
+"t": "chest",
+"id": "c_astrid",
+"at": [
+14,
+10
+],
+"item": "juice"
+},
+{
+"t": "warp",
+"at": [
+7,
+13
+],
+"to": "overworld",
+"dest": [
+4,
+19
+]
+},
+{
+"t": "warp",
+"at": [
+8,
+13
+],
+"to": "overworld",
+"dest": [
+4,
+19
+]
+}
+],
+"interior": true
+},
+"bjarne_house": {
+"name": "Bjarne's House",
+"rows": [
+"ZZZZZZZZZZZZZZZZ",
+"ZkkFFFFFFFFFkkFZ",
+"ZFFFFFFFFFFFFFFZ",
+"ZFFFFFFFFFFFFFFZ",
+"ZFFFFFFFFFFFYYFZ",
+"ZFFQQQFFFFFFYYFZ",
+"ZFFFFFFFFFFFFFFZ",
+"ZFFFFrrrrrrFFFFZ",
+"ZFFFFrrrrrrFFFFZ",
+"ZFFFFrrrrrrFFFFZ",
+"ZFFFFFFFFFFFFFFZ",
+"ZOFFFFFFFFFFFFOZ",
+"ZFFFFFFFFFFFFFFZ",
+"ZZZZZZZddZZZZZZZ"
+],
+"ents": [
+{
+"t": "npc",
+"id": "bjarne",
+"at": [
+7,
+6
+]
+},
+{
+"t": "sign",
+"at": [
+10,
+0
+],
+"text": "rush_poster"
+},
+{
+"t": "warp",
+"at": [
+7,
+13
+],
+"to": "overworld",
+"dest": [
+13,
+20
+]
+},
+{
+"t": "warp",
+"at": [
+8,
+13
+],
+"to": "overworld",
+"dest": [
+13,
+20
+]
+}
+],
+"interior": true
+},
+"secret_cave": {
+"name": "Hidden Cave",
+"rows": [
+"CCCCCCCCCCCCCCCC",
+"CCCggggCCCggggCC",
+"CCggggggggggggCC",
+"CgggCCggggCCgggC",
+"CggggggggggggggC",
+"CggCgggOOgggCggC",
+"CgggggggggggggCC",
+"CCggggCCCCgggggC",
+"CCgggggCCgggggCC",
+"CgggggggggggOggC",
+"CggCCgggggggggCC",
+"CCgggggggggCCgCC",
+"CCCggggg<gggCCCC",
+"CCCCCCCCCCCCCCCC"
+],
+"ents": [
+{
+"t": "chest",
+"id": "c_cave",
+"at": [
+5,
+1
+],
+"item": "piece"
+},
+{
+"t": "bat",
+"at": [
+4,
+4
+]
+},
+{
+"t": "bat",
+"at": [
+11,
+8
+]
+},
+{
+"t": "wisp",
+"at": [
+12,
+2
+]
+},
+{
+"t": "warp",
+"at": [
+8,
+12
+],
+"to": "overworld",
+"dest": [
+61,
+37
+]
+},
+{
+"t": "sign",
+"at": [
+6,
+7
+],
+"text": "cave_carving"
+}
+],
+"dark": true
+},
+"barrow": {
+"name": "The Drowned Barrow",
+"rows": [
+"WWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWW",
+"WWWWWWWWWWWWWWWWWww__________wwWWWWWWWWWWWWWWWWW",
+"WWWWWWWWWWWWWWWWWw____________wWWWWWWWWWWWWWWWWW",
+"WWWWWWWWWWWWWWWWW______________WWWWWWWWWWWWWWWWW",
+"WWWWWWWWWWWWWWWWW______________WWWWWWWWWWWWWWWWW",
+"WWWWWWWWWWWWWWWWW______________WWWWWWWWWWWWWWWWW",
+"WWWWWWWWWWWWWWWWW______________WWWWWWWWWWWWWWWWW",
+"WWWWWWWWWWWWWWWWW______________WWWWWWWWWWWWWWWWW",
+"WWWWWWWWWWWWWWWWW______________WWWWWWWWWWWWWWWWW",
+"WWWWWWWWWWWWWWWWW______________WWWWWWWWWWWWWWWWW",
+"WWWWWWWWWWWWWWWWW______________WWWWWWWWWWWWWWWWW",
+"WWWWWWWWWWWWWWWWWw____________wWWWWWWWWWWWWWWWWW",
+"WWWWWWWWWWWWWWWWWww__________wwWWWWWWWWWWWWWWWWW",
+"WWWWWWWWWWWWWWWWWWWWWWWhhWWWWWWWWWWWWWWWWWWWWWWW",
+"WWWWWWWWWWWWWWWWWWWWWWWKKWWWWWWWWWWWWWWWWWWWWWWW",
+"Wt____________tWWt____________tWWt___vv_______tW",
+"W______________WW______________WW____vv________W",
+"W______________WW______________WW____vv________W",
+"W______________WWwwwwwwwwwwwwwwWW____vv________W",
+"W______________WWwwwwwwwwwwwwwwWW____vv________W",
+"W______________h_______________y_____vv________W",
+"W______________h_______________y_____vv________W",
+"W______________WW______________WW____vv________W",
+"W______________WW______________WW____vv________W",
+"W______________WW______________WW____vv________W",
+"W______________WW______________WW____vv________W",
+"Wt____________tWWt____________tWWt___vv_______tW",
+"WWWWWWWWWWWWWWWWWWWWWWWLLWWWWWWWWWWWWWWWWWWWWWWW",
+"WWWWWWWWWWWWWWWWWWWWWWWLLWWWWWWWWWWWWWWWWWWWWWWW",
+"Wt____________tWWt____________tWWt_______ww___tW",
+"W______________WW______________WW________ww____W",
+"W__w__w________WW______________WW________ww____W",
+"W______________WW______________WW________ww____W",
+"W______________WW______________WW________ww____W",
+"W________________________________________ww____W",
+"W________________________________________ww____W",
+"W______________WW______________WW________ww____W",
+"W__w__w________WW_ww________ww_WW________ww____W",
+"W______________WW_ww________ww_WW________ww____W",
+"W______________WW______________WW________ww____W",
+"Wt____________tWWt____________tWWt_______ww___tW",
+"WWWWWWWWWWWWWWWWWWWWWWW__WWWWWWWWWWWWWWWWWWWWWWW"
+],
+"ents": [
+{
+"t": "warp",
+"at": [
+23,
+41
+],
+"to": "overworld",
+"dest": [
+7,
+3
+]
+},
+{
+"t": "warp",
+"at": [
+24,
+41
+],
+"to": "overworld",
+"dest": [
+7,
+3
+]
+},
+{
+"t": "runestone",
+"at": [
+20,
+34
+]
+},
+{
+"t": "npc",
+"id": "fluffy",
+"at": [
+26,
+34
+]
+},
+{
+"t": "draugr",
+"at": [
+5,
+33
+]
+},
+{
+"t": "draugr",
+"at": [
+10,
+37
+]
+},
+{
+"t": "wisp",
+"at": [
+8,
+31
+]
+},
+{
+"t": "chest",
+"id": "br_key",
+"at": [
+7,
+34
+],
+"item": "key",
+"clear": true
+},
+{
+"t": "bat",
+"at": [
+36,
+32
+]
+},
+{
+"t": "bat",
+"at": [
+37,
+38
+]
+},
+{
+"t": "chest",
+"id": "br_kr",
+"at": [
+45,
+34
+],
+"item": "kr50"
+},
+{
+"t": "draugr",
+"at": [
+21,
+23
+]
+},
+{
+"t": "wisp",
+"at": [
+26,
+16
+]
+},
+{
+"t": "captain",
+"at": [
+6,
+20
+]
+},
+{
+"t": "chest",
+"id": "br_dash",
+"at": [
+8,
+20
+],
+"item": "dash",
+"clear": true
+},
+{
+"t": "wisp",
+"at": [
+43,
+17
+]
+},
+{
+"t": "bat",
+"at": [
+44,
+24
+]
+},
+{
+"t": "chest",
+"id": "br_bigkey",
+"at": [
+44,
+20
+],
+"item": "bigkey"
+},
+{
+"t": "hank",
+"at": [
+24,
+5
+]
+},
+{
+"t": "container",
+"id": "hc_barrow",
+"at": [
+22,
+9
+],
+"clear": true
+},
+{
+"t": "warp",
+"at": [
+26,
+9
+],
+"to": "overworld",
+"dest": [
+7,
+4
+],
+"clear": true,
+"portal": true
+}
+],
+"dungeon": true
+},
+"redeye": {
+"name": "The Red-Eye",
+"rows": [
+"uuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuu",
+"uuuuueuuuuuuuuuuuuuuuuuueuuuuuuuuuuuuuuueuuuuuuuuuuueuuuuuueuuuu",
+"u==============uumAmAmAmAmAmAmmuumBBmmmmmmmmBBmuummmmmmmmmmmmmmu",
+"u===BB======B==uumAmAmAmAmAmAmmuummmmmmmmmmmmmmuummAmmmmmmmmAmmu",
+"u===B=======B==uumAmAmAmAmAmAmmuummmmmmmmmmmmmmuummAmmmmmmmmAmmu",
+"u==============uummmmJmmmmmmJmmuummmmmmmmmmmmmmuummmmmmmmmmmmmmu",
+"d===============mmmmmJmmmmmmmmmmmmmmmmmmmmmmmmmmhmmmmmmmmmmmmmmu",
+"d===============mmmmmmmmmJmmmmmmmmmmmmmmmmmmmmmmhmmmmmmmmmmmmmmu",
+"u======B=======uummmmmmmmJmmmmmuummmmmmmmmmmmmmuummmmmmmmmmmmmmu",
+"u========BB====uumAmAmAmAmAmAmmuummmmmmmmmmmmmmuummAmmmmmmmmAmmu",
+"u==B======B==B=uumAmAmAmAmAmAmmuummmmmmmmmmmmmmuummAmmmmmmmmAmmu",
+"u==============uumAmAmAmAmAmAmmuumBBmmmmmmmmBBmuummmmmmmmmmmmmmu",
+"uuuuueuuuuuuuuuuuuuuuuuueuuuuuuuuuuuuuuueuuuuuuuuuuueuuuuuueuuuu",
+"uuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuu"
+],
+"ents": [
+{
+"t": "warp",
+"at": [
+0,
+6
+],
+"to": "overworld",
+"dest": [
+29,
+34
+]
+},
+{
+"t": "warp",
+"at": [
+0,
+7
+],
+"to": "overworld",
+"dest": [
+29,
+34
+]
+},
+{
+"t": "imp",
+"at": [
+8,
+4
+]
+},
+{
+"t": "imp",
+"at": [
+11,
+7
+]
+},
+{
+"t": "imp",
+"at": [
+23,
+6
+]
+},
+{
+"t": "imp",
+"at": [
+27,
+7
+]
+},
+{
+"t": "wisp",
+"at": [
+19,
+6
+]
+},
+{
+"t": "cart",
+"at": [
+37,
+3
+]
+},
+{
+"t": "cart",
+"at": [
+42,
+10
+]
+},
+{
+"t": "imp",
+"at": [
+39,
+6
+]
+},
+{
+"t": "imp",
+"at": [
+44,
+7
+]
+},
+{
+"t": "attendant",
+"at": [
+56,
+6
+]
+},
+{
+"t": "container",
+"id": "hc_redeye",
+"at": [
+54,
+7
+],
+"clear": true
+},
+{
+"t": "chest",
+"id": "c_horn",
+"at": [
+57,
+7
+],
+"item": "horn",
+"clear": true
+},
+{
+"t": "warp",
+"at": [
+61,
+7
+],
+"to": "overworld",
+"dest": [
+29,
+34
+],
+"clear": true,
+"portal": true
+}
+],
+"dungeon": true,
+"dark": true,
+"redeye": true,
+"nokeys": true
 }
 };

@@ -22,32 +22,61 @@
   .legend { display: flex; flex-wrap: wrap; gap: 8px 20px; color: var(--muted); }
   .legend b { color: var(--gold); font-weight: normal; }
   .pad { display: none; justify-content: space-between; align-items: center; gap: 16px; user-select: none; -webkit-user-select: none; }
-  @media (pointer: coarse) { .pad { display: flex; } }
-  .dpad { display: grid; grid-template-columns: repeat(3, 56px); grid-template-rows: repeat(3, 56px); gap: 4px; }
+  @media (pointer: coarse) { .pad { display: flex; } .legend { display: none; } }
+  .stick { position: relative; width: 150px; height: 150px; flex: none; border-radius: 50%; touch-action: none;
+    background: radial-gradient(circle, var(--panel) 0 55%, #2c2648 56% 100%); border: 2px solid var(--axe); }
+  .stick::before { content: ''; position: absolute; inset: 22%; border-radius: 50%; border: 1px dashed #4a4570; }
+  .knob { position: absolute; left: 50%; top: 50%; width: 64px; height: 64px; margin: -32px 0 0 -32px; border-radius: 50%;
+    background: radial-gradient(circle at 35% 30%, #cfefff, var(--axe) 45%, #3a6a9a); border: 2px solid #0d0d33; pointer-events: none; }
+  .stick.on .knob { box-shadow: 0 0 0 4px rgba(143,208,255,.35); }
   .btn { background: var(--panel); color: var(--ink); border: 2px solid var(--axe); font-family: var(--pixel); font-size: 12px; touch-action: none; border-radius: 4px; }
   .btn:active, .btn.on { background: var(--axe); color: var(--bg); }
   .btn:focus-visible { outline: 3px solid var(--gold); outline-offset: 2px; }
   .ab { display: grid; grid-template-columns: repeat(2, 76px); gap: 10px; }
   .ab .btn { width: 76px; height: 56px; border-radius: 28px; font-size: 9px; }
+  .bar { display: flex; justify-content: space-between; align-items: center; gap: 12px; color: var(--muted); }
+  .bar .btn { font-size: 9px; padding: 8px 12px; }
+  #padnote { display: none; color: var(--gold); }
+  #padnote.on { display: inline; }
+  /* Theater: fills the whole viewport (and real full screen where the browser allows it).
+     Canvas scales to fit; the thumbstick and buttons float over the bottom corners. */
+  body.theater { padding: 0; overflow: hidden; }
+  body.theater main { max-width: none; position: fixed; inset: 0; display: block; }
+  body.theater .screen { position: absolute; left: 50%; top: 50%; transform: translate(-50%, -50%);
+    width: min(100vw, calc(100vh * 8 / 7)); height: min(100vh, calc(100vw * 7 / 8)); border: 0; outline: 0; }
+  body.theater .legend, body.theater .bar { display: none; }
+  body.theater .pad { display: flex; position: fixed; left: 0; right: 0; bottom: max(12px, env(safe-area-inset-bottom, 0px)); padding: 0 18px; pointer-events: none; }
+  body.theater .pad > * { pointer-events: auto; }
+  body.theater .stick, body.theater .ab .btn { opacity: 0.55; }
+  body.theater .stick.on, body.theater .ab .btn.on { opacity: 0.95; }
+  body.theater #exitfs { display: block; position: fixed; top: max(8px, env(safe-area-inset-top, 0px)); right: 8px; opacity: 0.6; z-index: 2; }
+  #exitfs { display: none; }
+  body.theater.nopad .pad { display: none; }
+  @media (hover: hover) and (pointer: fine) { body.theater .pad { display: none; } }
 </style>
 <main>
   <div class="screen"><canvas id="g" width="256" height="224" tabindex="0" aria-label="Jöntuka game screen"></canvas></div>
+  <div class="bar">
+    <span>Controller: <b>stick</b> move · <b>A</b> swing · <b>B</b> throw · <b>X</b> thunder · <b>Y</b> horn · <b>RB/RT</b> dash · <b>Start</b> gear <span id="padnote">· connected ✓</span></span>
+    <button class="btn" id="fsbtn" aria-label="Play full screen">⛶ FULL SCREEN</button>
+  </div>
+  <button class="btn" id="exitfs" aria-label="Leave full screen">✕</button>
   <div class="legend">
     <span><b>Arrows / WASD</b> move</span>
     <span><b>Z / Space</b> swing Jon</span>
-    <span><b>X / Shift</b> throw Jon</span>
+    <span><b>X</b> throw Jon</span>
+    <span><b>Shift / F</b> Voodoo Dash</span>
     <span><b>C</b> Thunder Strike</span>
+    <span><b>V</b> Demon Horn</span>
     <span><b>Enter</b> gear and quest</span>
     <span><b>M</b> all sound</span>
     <span><b>N</b> music</span>
   </div>
   <div class="pad" aria-label="Touch controls">
-    <div class="dpad">
-      <span></span><button class="btn" data-a="up" aria-label="Up">▲</button><span></span>
-      <button class="btn" data-a="left" aria-label="Left">◀</button><span></span><button class="btn" data-a="right" aria-label="Right">▶</button>
-      <span></span><button class="btn" data-a="down" aria-label="Down">▼</button><span></span>
-    </div>
+    <div class="stick" id="stick" aria-label="Move: drag the thumbstick"><div class="knob" id="knob"></div></div>
     <div class="ab">
+      <button class="btn" data-a="horn" aria-label="Demon Horn">HORN</button>
+      <button class="btn" data-a="dash" aria-label="Voodoo Dash">DASH</button>
       <button class="btn" data-a="menu" aria-label="Gear menu">GEAR</button>
       <button class="btn" data-a="c" aria-label="Thunder Strike">RUNE</button>
       <button class="btn" data-a="b" aria-label="Throw Jon">THROW</button>

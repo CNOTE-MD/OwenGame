@@ -178,6 +178,12 @@ const JON_ROWS = [
   '................',
 ];
 const JON_BLINK = JON_ROWS.map((r, i) => i === 3 ? '...dd.hhSSSSSSSl' : i === 4 ? '..dDDdhhSmmSmmSl' : r);
+// Jon's faces: excited (big grin), worried (brows up, wobbly mouth), sleepy (eyes shut)
+const JON_FACES = {
+  excited: JON_ROWS.map((r, i) => i === 5 ? '...dd.hhSmmmmmSl' : i === 6 ? '......hhSSmrmSSl' : r),
+  worried: JON_ROWS.map((r, i) => i === 2 ? '......hhlmSSSml.' : i === 6 ? '......hhSmSmSmSl' : r),
+  sleepy: JON_ROWS.map((r, i) => i === 3 ? '...dd.hhSSSSSSSl' : i === 4 ? '..dDDdhhSmmSmmSl' : i === 6 ? '......hhSSSmSSSl' : r),
+};
 
 // ---------------- Penguins (16 x 14) ----------------
 const PENG = {
@@ -418,6 +424,7 @@ function buildAll() {
     SPR[`${key}_hold`] = buildSprite(hold, pal);
   }
   SPR.jon = buildSprite(JON_ROWS, PAL_JON); SPR.jon_blink = buildSprite(JON_BLINK, PAL_JON);
+  for (const f in JON_FACES) SPR['jon_' + f] = buildSprite(JON_FACES[f], { ...PAL_JON, r: '#e05a6a' });
   SPR.jon_gold = tinted(SPR.jon, 'rgba(255,216,74,0.0)');
   for (const [key, pal] of [['peng', PAL_PENGUIN], ['pal', PAL_PAL]]) {
     for (const dir of ['down', 'up', 'side']) for (let f = 0; f < 2; f++) {
@@ -443,6 +450,9 @@ function buildAll() {
   SPR.chest_open = buildSprite(CHEST_ROWS.map((r, i) => i === 1 || i === 2 ? 'b' + 'k'.repeat(12) + 'b' : r), { ...PAL_CHEST, k: '#1a0c06' });
   SPR.sign = buildSprite(SIGN_ROWS, PAL_SIGN);
   SPR.runestone = buildSprite(RUNE_ROWS, PAL_RUNE);
+  buildIcons();
+  buildRedeyeArt();
+  buildCh2Art();
   buildPoof();
 }
 function shade(hex, k) { const [r, g, b] = hexRgb(hex); const f = v => Math.max(0, Math.min(255, Math.round(v * (1 + k)))); return '#' + [f(r), f(g), f(b)].map(v => v.toString(16).padStart(2, '0')).join(''); }
@@ -612,7 +622,7 @@ function renderTile(c, v, mask, shadow, frame, snowy, dungeon) {
         ball(P, 8, 9, 7, 6, ['#d8d8e4', '#a0a0b4', '#74748a', '#4a4a5c'], r, { noise: 0.4 });
         P(6, 8, '#4a4a5c'); P(7, 9, '#4a4a5c'); P(7, 10, '#4a4a5c'); P(10, 7, '#4a4a5c');
         break;
-      case 'O': for (let y = 0; y < T; y++) for (let x = 0; x < T; x++) P(x, y, dungeon ? '#5b6b8c' : COL.grass);
+      case 'O': for (let y = 0; y < T; y++) for (let x = 0; x < T; x++) P(x, y, dungeon ? '#5b6b8c' : G.map.interior ? '#a26c38' : G.map.dark ? '#3a2c22' : COL.grass);
         ball(P, 8, 10, 6, 5, ['#e0a070', '#b8784a', '#8a5432', '#5a3420'], r, { noise: 0.2 });
         for (let x = 5; x < 11; x++) { P(x, 4, OUTLINE); P(x, 5, '#3a2014'); } P(4, 5, OUTLINE); P(11, 5, OUTLINE);
         for (let x = 5; x < 11; x++) P(x, 9, '#5a3420');
@@ -698,7 +708,7 @@ function drawTileArt(c, ox, oy, tx, ty) {
   const v = hash(tx, ty) % 4;
   const animated = '~wUi'.includes(c) || c === 'f';
   const frame = animated ? Math.floor(G.t * (c === 'f' ? 2 : 4)) % 8 : 0;
-  const key = `${c}|${v}|${mask}|${k.shadow}|${frame}|${snowy ? 1 : 0}|${dungeon ? 1 : 0}|${G.map.arena ? 1 : 0}`;
+  const key = `${c}|${v}|${mask}|${k.shadow}|${frame}|${snowy ? 1 : 0}|${dungeon ? 1 : 0}|${G.map.arena ? 1 : 0}|${G.map.interior ? 1 : G.map.dark ? 2 : 0}`;
   let img = TILE_CACHE.get(key);
   if (img === undefined) { img = renderTile(c, v, mask, k.shadow, frame, snowy, dungeon); TILE_CACHE.set(key, img); }
   if (!img) return false;
@@ -712,14 +722,24 @@ function drawDungeonLight() {
   if (!LIGHT) LIGHT = mkCanvas(VW, VH);
   const g = LIGHT.getContext('2d'), p = G.player;
   g.globalCompositeOperation = 'source-over'; g.clearRect(0, 0, VW, VH);
-  g.fillStyle = 'rgba(4,6,24,0.5)'; g.fillRect(0, 0, VW, VH);
+  const red = G.map.redeye;
+  g.fillStyle = red ? 'rgba(6,2,10,0.74)' : 'rgba(4,6,24,0.5)'; g.fillRect(0, 0, VW, VH);
   g.globalCompositeOperation = 'destination-out';
   const hole = (x, y, r) => { const gr = g.createRadialGradient(x, y, 0, x, y, r); gr.addColorStop(0, 'rgba(0,0,0,1)'); gr.addColorStop(0.6, 'rgba(0,0,0,0.6)'); gr.addColorStop(1, 'rgba(0,0,0,0)'); g.fillStyle = gr; g.fillRect(x - r, y - r, r * 2, r * 2); };
-  hole(p.x - G.cam.x, p.y - G.cam.y - 6, 96);
+  hole(p.x - G.cam.x, p.y - G.cam.y - 6, red ? 68 : 96);
   const x0 = Math.floor(G.cam.x / T), y0 = Math.floor(G.cam.y / T);
   const flick = Math.sin(G.t * 9) * 3 + Math.sin(G.t * 23) * 2;
   for (let ty = y0; ty <= y0 + SH; ty++) for (let tx = x0; tx <= x0 + SW; tx++) if (tile(tx, ty) === 't') hole(tx * T + 8 - G.cam.x, ty * T + 6 - G.cam.y, 52 + flick);
+  for (let ty = y0; ty <= y0 + SH; ty++) for (let tx = x0; tx <= x0 + SW; tx++) if (tile(tx, ty) === 'e') hole(tx * T + 8 - G.cam.x, ty * T + 8 - G.cam.y, 34 + flick);
   ctx.drawImage(LIGHT, 0, 0);
+  if (red) {
+    ctx.globalCompositeOperation = 'lighter';
+    for (let ty = y0; ty <= y0 + SH; ty++) for (let tx = x0; tx <= x0 + SW; tx++) if (tile(tx, ty) === 'e') {
+      const x = tx * T + 8 - G.cam.x, y = ty * T + 8 - G.cam.y, gr = ctx.createRadialGradient(x, y, 0, x, y, 40);
+      gr.addColorStop(0, `rgba(255,30,30,${0.28 + 0.1 * Math.sin(G.t * 4)})`); gr.addColorStop(1, 'rgba(255,30,30,0)'); ctx.fillStyle = gr; ctx.fillRect(x - 40, y - 40, 80, 80);
+    }
+    ctx.globalCompositeOperation = 'source-over';
+  }
   // warm glow on top
   ctx.globalCompositeOperation = 'lighter';
   for (let ty = y0; ty <= y0 + SH; ty++) for (let tx = x0; tx <= x0 + SW; tx++) if (tile(tx, ty) === 't') {

@@ -1,8 +1,8 @@
 // State machine and main loop.
 
 function newGame() {
-  G.mode = 'story'; G.st = baseStats();
-  G.save = newSave();
+  G.mode = 'story'; resetJon();
+  G.save = newSave(); applyJonPerks();
   G.player = makePlayer(); G.jon = makeJon();
   const st = MAPS.home.ents.find(e => e.t === 'start').at;
   G.state = 'play';
@@ -10,14 +10,14 @@ function newGame() {
   say(STORY.intro);
 }
 function continueGame(fromCheckpoint) {
-  G.mode = 'story'; G.st = baseStats();
-  G.save = readSave() || newSave();
+  G.mode = 'story'; resetJon();
+  G.save = readSave() || newSave(); applyJonPerks();
   G.player = makePlayer(); G.jon = makeJon();
   G.player.hp = G.save.maxHp;
   G.state = 'play';
   if (!G.save.x) return newGame();
   // after a game over you wake at the last runestone with the voodoo bond recharged
-  if (fromCheckpoint && G.save.cp) { G.save.voodoo = true; loadMap(G.save.cp.map, G.save.cp.x, G.save.cp.y); writeSave(); return; }
+  if (fromCheckpoint && G.save.cp) { G.save.voodoo = true; G.save.voodoo2 = jonHas('bff'); loadMap(G.save.cp.map, G.save.cp.x, G.save.cp.y); writeSave(); return; }
   loadMap(G.save.map, G.save.x, G.save.y);
 }
 
@@ -38,7 +38,16 @@ function onEnterScreen() {
   const has = type => G.ents.some(e => e.type === type && e.alive);
   if (G.mapId === 'cavern' && !flag('intro:cavern')) { setFlag('intro:cavern'); say(STORY.cavern_enter); }
   if (has('knight') && !flag('intro:knight')) { setFlag('intro:knight'); Sound.play('boss'); say(STORY.knight); }
+  if (G.map.redeye) redeyeEnter();
+  HK.axes = [];
+  if (G.mapId === 'barrow' && !flag('intro:barrow')) { setFlag('intro:barrow'); say(STORY.barrow_enter); }
+  if (has('captain') && !flag('intro:captain')) { setFlag('intro:captain'); Sound.play('boss'); say(STORY.captain); }
+  if (has('hank')) { Sound.play('boss'); say(flag('intro:hank') ? [['Hank', 'TURN... BACK...']] : STORY.hank); setFlag('intro:hank'); }
+  if (has('attendant') && !flag('intro:attendant')) { setFlag('intro:attendant'); say(STORY.attendant); }
   if (has('king')) { Sound.play('boss'); say(flag('intro:king') ? [['Penguin King', 'AK! Back for more?']] : STORY.king); setFlag('intro:king'); }
+  if (G.mapId === 'overworld' && flag('d2done') && !flag('chapter2_banner') && G.scr.x === 0 && G.scr.y === 0) {
+    setFlag('chapter2_banner'); G.banner = 'CHAPTER 2 COMPLETE'; G.bannerT = 4; Sound.play('secret'); writeSave();
+  }
   if (G.mapId === 'overworld' && flag('d1done') && !flag('chapter1_banner') && G.scr.x === 2 && G.scr.y === 0) {
     setFlag('chapter1_banner'); G.banner = STORY.chapter_done; G.bannerT = 4; Sound.play('secret'); writeSave();
   }
@@ -47,6 +56,7 @@ function onEnterScreen() {
 function update(dt) {
   G.t += dt;
   G.shake = Math.max(0, G.shake - dt); G.flash = Math.max(0, G.flash - dt); G.bannerT = Math.max(0, G.bannerT - dt);
+  if (G.state !== 'play') { JT.t = Math.max(0, JT.t - dt); JT.faceT = Math.max(0, JT.faceT - dt); }
   if (just('mute')) Sound.muted = !Sound.muted;
   if (just('music')) Music.on = !Music.on;
   switch (G.state) {
@@ -77,10 +87,14 @@ function update(dt) {
       if (G.player.hold.t <= 0) { G.player.hold = null; G.state = 'play'; G.afterHold(); }
       return;
     case 'warp': updateWarp(dt); return;
-    case 'menu': if (just('menu') || just('a') || just('tap')) { G.state = 'play'; Sound.play('menu'); } return;
+    case 'menu':
+      if (just('left') || just('right')) { G.menuPage = G.menuPage ? 0 : 1; Sound.play('menu'); }
+      if (just('menu') || just('a') || just('tap')) { G.state = 'play'; Sound.play('menu'); }
+      return;
     case 'over':
       if (just('a') || just('menu') || just('tap')) { continueGame(true); }
       return;
+    case 'jonlevel': updateJonLevel(); return;
     case 'levelup': case 'shop': case 'arenapause': case 'arenaover': updateArenaMenus(); return;
     case 'thunder': updateThunder(dt); updateFx(dt); return;
     case 'dying': updateDying(dt); updateFx(dt); return;
@@ -94,9 +108,15 @@ function update(dt) {
   if (G.state !== 'play') return;
   updateJon(dt);
   if (G.mode === 'arena') { updateArena(dt); if (G.state !== 'play') return; }
+  if (G.map.redeye) updateRedeye(dt);
+  updateJonTalk(dt);
+  maybeJonLevelUp();
+  if (G.state !== 'play') return;
+  if (HK.axes.length) updateHankAxes(dt);
   for (const e of G.ents.slice()) {
     if (e.kind === 'enemy' && e.alive) { if (e.slow > 0) { e.slow -= dt; updateEnemy(e, dt * 0.5); } else updateEnemy(e, dt); }
     else if (e.kind === 'pickup') updatePickup(e, dt);
+    else if (e.kind === 'hazard') updateCart(e, dt);
     else if (e.kind === 'switch') e.cd = Math.max(0, e.cd - dt);
     if (G.state !== 'play') break;
   }
@@ -117,17 +137,20 @@ function render() {
   list.push(...bigDrawList());
   list.sort((a, b) => a.y - b.y).forEach(o => o.f());
   if (G.mode === 'arena') drawArenaWorld();
+  drawHankAxes();
   if (!p.hold) drawJon();
   drawFx();
   drawLightning();
   ctx.setTransform(1, 0, 0, 1, 0, 0);
-  if (G.map.dungeon) drawDungeonLight();
+  if (G.map.dungeon || G.map.dark) drawDungeonLight();
+  drawRedeyeOverlay();
   if (G.flash > 0) { ctx.globalAlpha = Math.min(1, G.flash * 3); R(0, 0, VW, VH, G.flashColor || '#fff'); ctx.globalAlpha = 1; }
   if (G.mode === 'arena') drawArenaHud(); else drawHud();
   if (G.state === 'warp') { ctx.globalAlpha = clamp(1 - Math.abs(G.warp.t - 0.35) / 0.35, 0, 1); R(0, 0, VW, VH, '#000'); ctx.globalAlpha = 1; }
   if (G.bannerT > 0) { R(0, 92, VW, 34, 'rgba(0,0,0,.8)'); text(G.banner, VW / 2, 113, '#ffd84a', 'center'); }
   if (G.state === 'talk') drawTalk();
-  if (G.state === 'menu') drawMenu();
+  if (G.state === 'menu') { if (G.menuPage) drawJonPage(); else drawMenu(); }
+  drawJonLevel();
   drawArenaMenus();
   if (G.state === 'over') {
     R(0, 0, VW, VH, 'rgba(40,0,0,.8)');
@@ -143,7 +166,7 @@ G.menuSel = 0;
 buildAll();
 function frame(now) {
   const dt = Math.min(0.05, (now - last) / 1000); last = now;
-  try { update(dt); render(); Music.want(musicFor()); Music.tick(); } catch (err) { console.error(err); }
+  try { pollGamepad(); update(dt); render(); Music.want(musicFor()); Music.tick(); } catch (err) { console.error(err); }
   for (const k in edge) edge[k] = false;
   requestAnimationFrame(frame);
 }

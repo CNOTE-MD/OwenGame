@@ -6,14 +6,16 @@
 
 | Path | What it is |
 |---|---|
-| `web/src/story.js` | Every word in the game. Owen can edit this. |
+| `web/src/story.js` | Every word in the game, including everything Jon says on his own (`JON`). Owen can edit this. |
+| `web/src/jon.js` | Jon's personality (faces, when he talks) and growth (XP, levels, perks, abilities) |
 | `tools/maps.py` | ASCII maps for Norway, the Ice Cavern and Owen's room, plus a reachability checker |
 | `web/src/*.js` | Engine, world, actors, sprites, UI, main loop |
 | `web/src/arena.js` | Valhalla Arena: waves, shop cards, level-ups (tune or add cards here) |
 | `tools/score.py` | The music: original Rush-style pieces as step sequences (odd meters, bass, guitar, synth lead, drums). Run it, then `tools/music_to_midi.py` to refresh `music/midi/*.mid` |
+| `OWEN_QUESTIONS.md` | Prompts to ask Owen after he plays; his answers drive the next build |
 | `STORY_BIBLE.md` | Characters, chapter arc, items, the Red-Eye side quest, Arena mode |
 
-Rebuild: `python3 tools/maps.py && python3 tools/build_web.py`. Test: `NODE_PATH=$(npm root -g) node tests/web_playtest.js` and `node tests/arena_playtest.js` (same NODE_PATH).
+Rebuild: `python3 tools/maps.py && python3 tools/build_web.py`. Test: `NODE_PATH=$(npm root -g) node tests/web_playtest.js`, then `tests/arena_playtest.js`, `tests/ch1_depth_test.js`, `tests/redeye_test.js`, `tests/ch2_test.js`, `tests/jon_test.js` and `tests/pad_test.js` the same way.
 
 ## Godot prototype (frozen)
 
@@ -28,7 +30,8 @@ A top-down action game in the style of SNES *A Link to the Past*, based on Owen'
 
 | Key | Action |
 |---|---|
-| Arrows / WASD | Move |
+| Arrows / WASD, left stick, or the on-screen thumbstick | Move |
+| ⛶ FULL SCREEN button | Fills the screen (iPad: tap it, then rotate to landscape). Controllers over Bluetooth: A swing, B throw, X thunder, Y horn, RB/RT dash, Start gear |
 | Z / Space / J | Swing Jon (sword); also advances dialogue |
 | X / K / Shift | Throw Jon (boomerang) |
 

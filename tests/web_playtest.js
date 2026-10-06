@@ -18,7 +18,7 @@ const SHOTS = process.env.SHOTS || '/tmp';
   async function talkThrough(max = 80) {
     for (let i = 0; i < max; i++) {
       const st = await ev(() => G.state);
-      if (st !== 'talk' && st !== 'hold' && st !== 'cutscene') return;
+      if (st !== 'talk' && st !== 'hold' && st !== 'cutscene' && st !== 'jonlevel') return;
       await pg.keyboard.press('KeyZ'); await wait(40);
     }
   }

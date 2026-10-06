@@ -178,6 +178,17 @@ function computeBigs() {
     if (!BIG_CACHE.has(ck)) BIG_CACHE.set(ck, treeImage(v, snowy));
     G.bigs.push({ kind: 'tree', img: BIG_CACHE.get(ck), x: tx * T - 2, y: ty * T + 2 * T - BIG_TREE_H, sortY: ty * T + 2 * T - 2, tx, ty, w: 2, h: 2 });
   }
+  // the airliner on the airstrip: plane body (P) and wings (q)
+  const pc = [];
+  for (let ty = 0; ty < G.nrows; ty++) for (let tx = 0; tx < G.cols; tx++) if ('Pq'.includes(G.rows[ty][tx])) pc.push([tx, ty]);
+  if (pc.length) {
+    const xs = pc.map(c => c[0]), ys = pc.map(c => c[1]), body = pc.filter(([x, y]) => G.rows[y][x] === 'P');
+    const pl = { kind: 'plane', x0: Math.min(...xs), x1: Math.max(...xs), y0: Math.min(...ys), y1: Math.max(...ys),
+      fy0: Math.min(...body.map(c => c[1])), fy1: Math.max(...body.map(c => c[1])), wingX: Math.min(...pc.filter(([x, y]) => G.rows[y][x] === 'q').map(c => c[0])) };
+    for (const [x, y] of pc) G.claim.set(key(x, y), G.rows[y][x] === 'q' && (G.rows[y][x - 1] === 's' || G.rows[y][x + 1] === 's') ? 's' : '.');
+    pl.img = planeImage(pl); pl.x = pl.x0 * T - 6; pl.y = pl.y0 * T - 8; pl.sortY = (pl.fy1 + 1) * T;
+    G.bigs.push(pl);
+  }
   // buildings: connected roof/wall/door tiles
   const seen = new Set();
   for (let ty = 0; ty < G.nrows; ty++) for (let tx = 0; tx < G.cols; tx++) {
