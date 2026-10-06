@@ -5,18 +5,18 @@ const MAPS = {
 "rows": [
 "TTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTT",
 "TMMMMMMMMMMMMMMTTTTTTTTTTTTTTTTTTMMMMMMMMMMMMMMTTMMMMMMMMMMMMMMT",
-"TMMMMMMXMMMMMMMTT....b..T...bbbTTMMMMMMEMMMMMMMTTMMMMMMXMMMMMMMT",
-"TT.....s.......TT.T.......T.b.bTTnnnnnnsnnnnnn#TTnnnnnnsnnnnnnnT",
-"TT.T...s...b...TT....TT.....bbbTTnTnnnnsnnnnnnnTTnn#nnnsnnnnTnnT",
-"TT.....s................T.......nnnnnnnsnnnTnnnnnnnnnnnsnnnnnnnT",
-"TT.b...ssssssssssssssssssssssssssssssssssnnnnnnnnnnnnnnsnnnnnnnT",
-"TT.....s..............f.........nnnnnnnsnnnnnnnnnnnnnnnsnn#nnnnT",
-"TTT....s....T.....T......TT.....nnTnnnnsnnnn#nnnnnnnnnnsnnnnnnnT",
-"TT.....s.....b.TT....b.......T.TTnnnnnnsnnnnnn#TTnnTnnnsnnnnnnnT",
-"TTbb...s.......TT..TT....b.....TTnn#nnnsnnnTnnnTTnnnnnnsnnnnnTnT",
-"TT.....s..T....TT.......T...T..TTnnnnnnsnnnnnnnTTnnn#nnsnnnnnnnT",
-"TT.....s.......TTT..b..........TTnnnnnTsnnnnnnnTTnnnnnnsnnnnnnnT",
-"TTTTTT.s..TTTTTTTTTTTT.s..TTTTTTTTTTTT.s..TTTTTTTTTTTT.s..TTTTTT",
+"TMMMMMMXMMMMMMMTT,,,,b%%%%,,bbbTTMMMMMMEMMMMMMMTTMMMMMMXMMMMMMMT",
+"TT.....s.......TT,T,,%%%%%,T,b,TTnnnnnnsnnnnnn#TTnnnnnnsnnnnnnnT",
+"TT.T...s...b...TT,,,,TT%%%,,bbbTTnTnnnnsnnnnnnnTTnn#nnnsnnnnTnnT",
+"TT.....s........,,%%%%%%%%,,,,,onnnnnnnsnnnTnnnnnnnnnnnsnnnnnnnT",
+"TT.b...sssssssssss%%%%%%%%sssssosssssssssnnnnnnnnnnnnnnsnnnnnnnT",
+"TT.....s........%%%%%%%f%%%%,,,Tnnnnnnnsnnnnnnnnnnnnnnnsnn#nnnnT",
+"TTT....s....T...%%T%%%%%%TT%%,,,nnTnnnnsnnnn#nnnnnnnnnnsnnnnnnnT",
+"TT.....s.....b.TT%%%%b%%%%%%%T,TTnnnnnnsnnnnnn#TTnnTnnnsnnnnnnnT",
+"TTbb...s.......TT,,TT%%%%b,,,,,TTnn#nnnsnnnTnnnTTnnnnnnsnnnnnTnT",
+"TT.....s..T....TT,,,,,%%T,,,T,,TTnnnnnnsnnnnnnnTTnnn#nnsnnnnnnnT",
+"TT.....s.......TTT,,b,,,,,,,,,,TTnnnnnTsnnnnnnnTTnnnnnnsnnnnnnnT",
+"TTTTTT.s..TTTTTTTTTTTT,s,,TTTTTTTTTTTT.s..TTTTTTTTTTTT.s..TTTTTT",
 "TTTTTT.s..TTTTTTTTTTTT.s..TTTTTTTTTTTT.s..TTTTTTTTTTTT.s..TTTTTT",
 "TT.....s.......TT......s.......TT.....ss.......TT#.....s....lllT",
 "TTRRRRR.s......TT..RRRRRR......TT..sssssssssss.TT..#...s...lMMMT",
@@ -26,10 +26,10 @@ const MAPS = {
 "TTff....sssssssssssssssssssssss.ssss~~~~~~~~~sssssssssssssssssTT",
 "TT......s...............s..........s~~~~~~~~~s.........s......TT",
 "TT.x.x..s..f.......f....s..........s~~~~~~~~~s.....#...s...#..TT",
-"TT......s.......T.......s....b.TT..s~~~~~~~~~s.TT......s......TT",
-"TT.b....s....b.TT..b....s......TT..sssssssssss.TT.#....s....#.TT",
-"TT......s......TT.......s......TT......s.......TT......s......TT",
-"TT......s......TT.......s......TT..T...s....T..TT......s..#...TT",
+"TT......s....,,.T.......s....b.TT..s~~~~~~~~~s.TT......s......TT",
+"TT.b....s....b,TT..b....s......TT..sssssssssss.TT.#....s....#.TT",
+"T,,.....s....,,TT.......s......TT......s.......TT......s......TT",
+"T,,,....s......TT.......s......TT..T...s....T..TT......s..#...TT",
 "TTTTTT.s..TTTTTTTTTTTT.s..TTTTTTTTTTTT.s..TTTTTTTTTTTT.s..TTTTTT",
 "TTTTTT.s..TTTTTTTTTTTT.s..TTTTTTTTTTTT.s..TTTTTTTTTTTT.s..TTTTTT",
 "TT.....s.......TT......s.......TT..ss..s..ss...TT......s......TT",
@@ -40,10 +40,10 @@ const MAPS = {
 "TT.....ssssssssssssssssssqqssss.sssssssssssssss.sssssssss.....TT",
 "Twwwww.s..................s.......sssssssssss...T......s......TT",
 "TwwwwwUUU......T....ssssssss....T.sssssssssss..TT.+.+..s..+.+.TT",
-"Twwwwwwww.b....TT..............TT.sssssssssss..TT......s......TT",
-"TwwwwwwwwwT....TT..b....f......TT..sssssssss...TT.+.+..s..+.+.+T",
+"Twwwwwwww.b....TT..s...........TT.sssssssssss..TT......s......TT",
+"TwwwwwwwwwT....TT..>....f......TT..sssssssss...TT.+.+..s..+.+.+T",
 "TwwwwwwwwwwT...TT......T.......TT..............TT......s......TT",
-"TwwwwwwwwwwwTTTTTTTTTTTTTTTbTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTT",
+"TwwwwwwwwwwwTTTTTTTTTTTTTTTbTTTTTTTTTTTTTTTTTTTTT.TTTTTTTTTTTTTT",
 "TTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTT"
 ],
 "ents": [
@@ -74,6 +74,148 @@ const MAPS = {
 "at": [
 29,
 33
+]
+},
+{
+"t": "npc",
+"id": "attendant_ok",
+"at": [
+21,
+35
+]
+},
+{
+"t": "warp",
+"at": [
+19,
+38
+],
+"to": "subway",
+"dest": [
+8,
+3
+]
+},
+{
+"t": "sign",
+"at": [
+18,
+37
+],
+"text": "sign_subway"
+},
+{
+"t": "taxi",
+"at": [
+23,
+12
+],
+"to": "airport"
+},
+{
+"t": "log",
+"id": "biglog",
+"at": [
+31,
+5
+]
+},
+{
+"t": "spore",
+"at": [
+22,
+3
+]
+},
+{
+"t": "spore",
+"at": [
+27,
+8
+]
+},
+{
+"t": "slime",
+"at": [
+20,
+7
+]
+},
+{
+"t": "slime",
+"at": [
+28,
+10
+]
+},
+{
+"t": "beetle",
+"at": [
+52,
+9
+]
+},
+{
+"t": "beetle",
+"at": [
+55,
+35
+]
+},
+{
+"t": "tablet",
+"id": "tab_coast",
+"at": [
+2,
+31
+]
+},
+{
+"t": "tablet",
+"id": "tab_hills",
+"at": [
+13,
+11
+]
+},
+{
+"t": "tablet",
+"id": "tab_lake",
+"at": [
+46,
+15
+]
+},
+{
+"t": "tablet",
+"id": "tab_grave",
+"at": [
+49,
+40
+]
+},
+{
+"t": "tablet",
+"id": "tab_volcano",
+"at": [
+49,
+15
+]
+},
+{
+"t": "tablet",
+"id": "tab_snow",
+"at": [
+61,
+12
+]
+},
+{
+"t": "tablet",
+"id": "tab_village",
+"at": [
+2,
+26
 ]
 },
 {
@@ -426,7 +568,7 @@ const MAPS = {
 "outdoor": true
 },
 "cavern": {
-"name": "Penguin Ice Cavern",
+"name": "Penguin Palace",
 "rows": [
 "WWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWW",
 "WWWWWWWWWWWWWWWWWt____________tWWWWWWWWWWWWWWWWW",
@@ -664,6 +806,21 @@ const MAPS = {
 ]
 },
 {
+"t": "throne",
+"at": [
+24,
+2
+]
+},
+{
+"t": "tablet",
+"id": "tab_palace",
+"at": [
+2,
+16
+]
+},
+{
 "t": "chest",
 "id": "cv_thunder",
 "at": [
@@ -697,7 +854,8 @@ const MAPS = {
 "portal": true
 }
 ],
-"dungeon": true
+"dungeon": true,
+"palace": true
 },
 "home": {
 "name": "Owen's Room, New York",
@@ -996,6 +1154,78 @@ const MAPS = {
 }
 ],
 "dark": true
+},
+"subway": {
+"name": "Fjordvik T-bane",
+"rows": [
+"IIIIIIIIIIIIIIII",
+"IjjjjjjjjjjjjjjI",
+"IjjjjjjjjjjjjjjI",
+"IjjjjjjjjjjjjjjI",
+"IjjjjjjjjjjjjjjI",
+"IjjjjjjjjjjjjjjI",
+"IjjjjjjjjjjjjjjI",
+"IjjjjjjjjjjjjjjI",
+"IjjjjjjjjjjjjjjI",
+"IIIIIIIIIIIIIIII",
+"::::::::::::::::",
+"::::::::::::::::",
+"IIIIIIIIIIIIIIII",
+"IIIIIIIIIIIIIIII"
+],
+"ents": [
+{
+"t": "warp",
+"at": [
+8,
+1
+],
+"to": "overworld",
+"dest": [
+19,
+37
+]
+},
+{
+"t": "exchange",
+"at": [
+3,
+1
+]
+},
+{
+"t": "sign",
+"at": [
+12,
+1
+],
+"text": "sign_tbane"
+},
+{
+"t": "taxi",
+"at": [
+14,
+5
+],
+"to": "forest"
+},
+{
+"t": "npc",
+"id": "commuter",
+"at": [
+10,
+6
+]
+},
+{
+"t": "runestone",
+"at": [
+6,
+7
+]
+}
+],
+"interior": true
 },
 "barrow": {
 "name": "The Drowned Barrow",

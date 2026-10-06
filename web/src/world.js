@@ -31,7 +31,7 @@ const flag = k => !!G.save.flags[k];
 const setFlag = k => { G.save.flags[k] = true; };
 
 // ---------- tiles ----------
-const SOLID = new Set('T#MwHRDPqX+lWtOYQZxLKbVCkpueABy'.split(''));
+const SOLID = new Set('T#MwHRDPqX+lWtOYQZxLKbVCkpueAByoI:'.split(''));
 function tile(tx, ty) {
   if (!(tx >= 0 && ty >= 0 && tx < G.cols && ty < G.nrows)) return G.map.dungeon ? 'W' : 'T';   // also catches NaN
   return G.rows[ty][tx];
@@ -240,6 +240,6 @@ function drawMap() {
   for (let ty = y0; ty <= y0 + SH; ty++) for (let tx = x0; tx <= x0 + SW; tx++) {
     if (tx < 0 || ty < 0 || tx >= G.cols || ty >= G.nrows) continue;
     const c = claimedGround(tx, ty) || G.rows[ty][tx], ox = tx * T - cx, oy = ty * T - cy;
-    if (!drawTileCh2(c, ox, oy) && !drawTileRE(c, ox, oy, tx, ty) && !drawTileArt(c, ox, oy, tx, ty) && !drawTileB(c, ox, oy, tx, ty)) drawTile(c, ox, oy, tx, ty);
+    if (!drawTileSnes(c, ox, oy, tx, ty) && !drawTileCh2(c, ox, oy) && !drawTileRE(c, ox, oy, tx, ty) && !drawTileArt(c, ox, oy, tx, ty) && !drawTileB(c, ox, oy, tx, ty)) drawTile(c, ox, oy, tx, ty);
   }
 }

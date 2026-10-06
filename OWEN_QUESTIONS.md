@@ -66,7 +66,16 @@ Rules of thumb: his journal pages always win over anything already in the game. 
 37. Jon can recite Rush E. Should the real "Rush E" vibe show up more? Where?
 38. Bjarne's song is called Rush Ø. What's Bjarne's next song called?
 
+## Your page 5 (the subway, the taxi, the log) is in the game
+
+41. The flight attendant was a dream. Do you still want the scary plane dream in the game as an optional nightmare, or should it go?
+42. What does the Penguin Palace look like inside? Ice? Fish? A throne? What does the King say when you walk in?
+43. After Jon chops the log, what happens next? Does the forest fight back?
+44. The game turned the muck into slow mud and added tall grass. Right or wrong?
+45. New enemies: a spitting mushroom, a slime that splits, and an armored beetle Jon flips. Which one is from your story and which should go?
+46. Hidden rune tablets tell secrets about Hank, Walter and Chilly. What secret should one of them say?
+
 ## For the next journal pages
 
-39. What's the next scene you want to write? (That's the one I build next.)
-40. Draw the map of Norway the way you picture it. Even a rough sketch changes the game.
+47. What's the next scene you want to write? (That's the one I build next.)
+48. Draw the map of Norway the way you picture it. Even a rough sketch changes the game.

@@ -29,3 +29,9 @@ As I boarded the plane (Jon was in a checked bag down below) I tried not to thin
 - The story stops mid-scene on page 4 ("I tried to call Jon."). There is no ending yet.
 - Page order: page 3 (the death flashback) is dated and reads as written between pages 1 and 2, or after page 2's "Anyway, as I was saying last time". I've used it as a flashback after page 2. Owen to confirm.
 - A fifth photo in the same folder (IMG_3144) is unrelated to the story and was not used.
+
+## Page 5 (chapter two, received 2026-10-06)
+
+When I got off the plane, the perfectly normal (it was a dream) flight attendant sent me off to the nearby subway station where I could exchange U.S. dollars for kroner and hitch a ride for the forest to search for a palace filled with penguins (I know, right?) and destroy it. When I got to the subway station, I found one of those exchangy doohickeys and worked it for a couple hundred kroner (some of which I used for an uber/taxicab). Once I got to the forest, I truged through the muck and grime on the floor. After about 2 hours of this, I got to a log that was too high to step over and too low to duck under. Naturally, Jon took this as a golden oppurtunity and flew out "Hello Señor! Ooh, that's a big log, want me to chop it?" "Jon..."
+
+Notes: the flight attendant was a dream (so the Red-Eye is a nightmare, not real); Owen's plan is to find and destroy a palace filled with penguins; the forest floor is muck and grime; Jon says "Hello Señor!"

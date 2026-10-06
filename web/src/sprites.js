@@ -61,6 +61,7 @@ function drawEnemy(e) {
   const x = Math.round(e.x - G.cam.x), y = Math.round(e.y - G.cam.y);
   if (drawCh2Enemy(e, x, y)) return;
   if (drawRedeyeEnemy(e, x, y)) { if (e.boss && e.alive && attendantVisible(e)) { R(x - 31, y - 41, 62, 5, '#000'); R(x - 30, y - 40, 60 * Math.max(0, e.hp / e.max), 3, '#e23'); } return; }
+  if (drawSnesEnemy(e, x, y)) return;
   const white = e.flash > 0 || (e.st === 'wind' && Math.floor(G.t * 16) % 2 === 0);
   const f = Math.floor(e.wob / 2.5) % 2;
   switch (e.type) {
@@ -131,6 +132,8 @@ const LOOKS = {
   lars: { shirt: '#b33a2e', hair: '#d9a441', beard: true },
   sven: { shirt: '#2f8a5a', hair: '#f2d27a' },
   ingrid: { shirt: '#2f5aa8', hair: '#a0522d', long: true, hat: '#e0c040' },
+  attendant_ok: { shirt: '#1b2a55', hair: '#3a2a1a', long: true, hat: '#c0392b' },
+  commuter: { shirt: '#6a6a7a', hair: '#8a5a2a', hat: '#2a2a2a' },
 };
 
 function drawItemIcon(id, x, y) {
@@ -155,6 +158,11 @@ function drawThing(e) {
   const x = Math.round(e.x - G.cam.x), y = Math.round(e.y - G.cam.y), t = G.t;
   switch (e.kind) {
     case 'enemy': return drawEnemy(e);
+    case 'tablet': shadowAt(x, y + 6, 0.8); spr(SPR.tablet, x, y + 7 + Math.round(Math.sin(t * 2) * 1)); if (Math.floor(t * 3) % 3 === 0) drawTwinkle(x + 5, y - 6, 0); return;
+    case 'throne': spr(SPR.throne, x, y + 8); return;
+    case 'exchange': spr(SPR.machine, x, y + 8); if (Math.floor(t * 2) % 2) R(x - 1, y - 4, 2, 1, '#5fdc8a'); return;
+    case 'taxi': shadowAt(x, y + 6, 1.4); spr(SPR.taxi, x, y + 8 + (Math.floor(t * 12) % 2)); return;
+    case 'log': return;
     case 'hazard': return drawRedeyeEnemy(e, x, y);
     case 'npc':
       if (e.id === 'fluffy') { const b = Math.round(Math.sin(G.t * 3) * 2); ctx.globalAlpha = 0.75; spr(G.player.x < e.x ? SPR.fluffy_f : SPR.fluffy, x, y + 4 + b); ctx.globalAlpha = 1; return; }

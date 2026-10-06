@@ -162,6 +162,10 @@ function drawJonLevel() {
 }
 // JON page of the gear menu
 function drawJonPage() {
+  drawJonPageBody();
+  text('◀ GEAR', 20, 206, '#8a8ab0', 'left', false); text('MAP ▶', 236, 206, '#8a8ab0', 'right', false);
+}
+function drawJonPageBody() {
   const d = jonData();
   R(0, 0, VW, VH, 'rgba(5,5,20,.92)'); R(8, 8, 240, 208, '#ffd84a'); R(10, 10, 236, 204, '#0d0d33');
   text('JON', 20, 26, '#ffe64d'); text('◀ GEAR', 236, 26, '#8a8ab0', 'right', false);
