@@ -64,20 +64,22 @@ function objective() {
   const s = G.save;
   if (G.mapId === 'home') return 'Read what Jon carved, then leave through the door.';
   if (!flag('met_astrid')) return 'Find Elder Astrid in Fjordvik: west of the airstrip, then north.';
-  if (!s.items.homing && !flag('d1done')) return 'Go to the Penguin Ice Cavern on the Frozen Path (north-east). Find the treasure behind the Penguin Knight.';
-  if (!flag('d1done')) return 'Defeat whatever is possessing the penguins at the bottom of the Ice Cavern.';
+  if (!flag('exchanged') && !flag('d1done')) return 'Chapter 2: find the subway station south-west of the airstrip. Exchange your dollars for kroner.';
+  if (!flag('log_chopped') && !flag('d1done')) return 'Chapter 2: take a taxi (or walk) to the Muck Forest. Trudge east. Something is in the way.';
+  if (!s.items.homing && !flag('d1done')) return 'Chapter 2: the Penguin Palace is up the Frozen Path, east of the forest. Find the treasure behind the Penguin Knight.';
+  if (!flag('d1done')) return 'Chapter 2: destroy the Penguin Palace. Whatever rules it sits on the throne at the top.';
   if (!flag('d2done')) {
-    if (!s.items.dash) return 'Chapter 2: the Drowned Barrow has opened in the north-west foothills. Find what the Draugr Captain guards.';
-    return 'Chapter 2: use the Voodoo Dash to cross the water and barriers. Find the big key and free Hank\'s ghost.' + (flag('redeye_done') ? '' : ' (Optional: Flight 364\'s cargo hold.)');
+    if (!s.items.dash) return 'Chapter 3: the Drowned Barrow has opened in the north-west foothills. Find what the Draugr Captain guards.';
+    return 'Chapter 3: use the Voodoo Dash to cross the water and barriers. Find the big key and free Hank\'s ghost.' + (flag('redeye_done') ? '' : ' (Optional: a nap on the bench by Flight 364.)');
   }
-  if (!flag('redeye_done')) return 'Chapter 2 complete! Walter\'s Forge waits for Owen\'s next chapter. Optional: something is scratching inside Flight 364\'s cargo hold.';
-  return 'Chapter 2 complete! Walter\'s Forge and the Storm Peak wait for Owen\'s next chapters.';
+  if (!flag('redeye_done')) return 'Chapter 3 complete! Walter\'s Forge waits for Owen\'s next chapter. Optional: you keep dreaming about Flight 364. Sit on the bench by the plane.';
+  return 'Chapter 3 complete! Walter\'s Forge and the Storm Peak wait for Owen\'s next chapters.';
 }
 function drawMenu() {
   const s = G.save;
   R(0, 0, VW, VH, 'rgba(5,5,20,.92)');
   R(8, 8, 240, 208, '#ffd84a'); R(10, 10, 236, 204, '#0d0d33');
-  text('GEAR', 20, 26, '#ffe64d'); text('JON ▶', 236, 38 + 12, '#9be08a', 'right', false);
+  text('GEAR', 20, 26, '#ffe64d'); text('JON ▶', 236, 26, '#9be08a', 'right', false); text('◀ MAP', 20, 26 + 180, '#8a8ab0', 'left', false);
   const slots = [
     ['Jon Lv' + jonData().lvl + ' (swing Z)', 'homing', true, () => drawJonSprite(30, 44, 0, false, jonFaceNow())],
     ['Homing Jon (throw X)', 'homing', !!s.items.homing],
@@ -134,8 +136,9 @@ function titleOptions() {
 
 // ---------- Flight 364 ----------
 function drawCutscene() {
-  const c = G.cut, page = STORY.flight[c.i], t = G.t;
+  const c = G.cut, page = (G.cutPages || STORY.flight)[c.i], t = G.t;
   R(0, 0, VW, VH, '#000');
+  if (page.art && page.art.startsWith('taxi')) return drawTaxiScene(page);
   switch (page.art) {
     case 'plane':
       R(0, 0, VW, 140, '#1b2a55'); for (let i = 0; i < 30; i++) R((i * 71) % VW, (i * 37) % 120, 1, 1, '#8899cc');
@@ -169,7 +172,7 @@ function drawCutscene() {
   text('FLIGHT 364  ·  NEW YORK → NORWAY', VW / 2, 12, '#888', 'center', false);
 }
 function startFlight() {
-  G.state = 'cutscene'; G.cut = { i: 0 };
+  G.state = 'cutscene'; G.cut = { i: 0 }; G.cutPages = null;
   Sound.play('door');
   say(STORY.flight[0].lines, nextFlightPage);
 }

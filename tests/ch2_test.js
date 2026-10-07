@@ -91,7 +91,7 @@ const path = require('path');
   await check('freeing Hank completes chapter 2', await ev(() => flag('d2done') && G.ents.some(e => e.what === 'container')));
   await check('objective moves on to Walter\'s Forge', await ev(() => /Forge/.test(objective())));
   await go('overworld', 7, 5);
-  await check('CHAPTER 2 COMPLETE banner', await ev(() => G.banner === 'CHAPTER 2 COMPLETE'));
+  await check('CHAPTER 3 COMPLETE banner (Barrow is journal chapter 3)', await ev(() => G.banner === 'CHAPTER 3 COMPLETE'));
 
   console.log('errors:', JSON.stringify(errs));
   console.log('FAILS:', fails + errs.length);

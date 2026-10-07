@@ -25,22 +25,33 @@ Owen fell into that lake while running from a possessed penguin, and Jon found h
 | **The Flight Attendant** | Chilly's servant on Flight 364. Talons, fangs, "Wonderful..." | Polite and wrong |
 | **Chilly the Frost Demon** | The big villain (named by Owen). Can't walk in daylight, so he possesses creatures that don't belong. | Unseen until late |
 
-## The arc: four chapters and a secret one
+## The arc: Owen's chapters and a secret one
+
+Chapter numbers follow Owen's journal: chapter 1 is New York and the plane, chapter 2 starts when he lands.
 
 | Ch. | Dungeon | Where | Boss | Jon gains | Status |
 |---|---|---|---|---|---|
-| 1 | Penguin Ice Cavern | Frozen Path, NE | Penguin King (mini-boss: Penguin Knight) | **Homing Jon** (locks on, flies farther), **Thunder Rune** (Thunder Strike) | **Built** |
-| 2 | Drowned Barrow | Foothills, NW | Hank's ghost, frozen by Chilly (mini-boss: Draugr Captain) | **Voodoo Dash** (zombie dash through enemies, water, pits and spirit barriers) | **Built as a draft**; Owen's pages override it |
-| 3 | Walter's Forge | Volcano road, E | Forge golem | **Rune Shield** (Jon spins around Owen and blocks) + Walter's real name revealed | Sealed door in game |
-| 4 | Storm Peak | North-east summit | Chilly's herald | **Thunder Strike II** (lightning chains between enemies) | Sealed door in game |
-| ★ | **The Red-Eye** (optional) | Flight 364's cargo hold, at the airstrip | The Flight Attendant | Demon Horn (V: regular enemies flee) | **Built**; opens after chapter 1 |
+| 1 | New York, Flight 364 | Owen's room, the plane | (the attendant dream) | Jon | **Built** |
+| 2 | **Penguin Palace** (Owen's page 5: the subway, the exchangy doohickey, a taxi, the Muck Forest, the big log) | Frozen Path, NE, past the Muck Forest | Penguin King (mini-boss: Penguin Knight) | **Homing Jon** (locks on, flies farther), **Thunder Rune** (Thunder Strike) | **Built** |
+| 3 | Drowned Barrow | Foothills, NW | Hank's ghost, frozen by Chilly (mini-boss: Draugr Captain) | **Voodoo Dash** (zombie dash through enemies, water, pits and spirit barriers) | **Built as a draft**; Owen's pages override it |
+| 4 | Walter's Forge | Volcano road, E | Forge golem | **Rune Shield** (Jon spins around Owen and blocks) + Walter's real name revealed | Sealed door in game |
+| 5 | Storm Peak | North-east summit | Chilly's herald | **Thunder Strike II** (lightning chains between enemies) | Sealed door in game |
+| ★ | **The Red-Eye** (optional, a nightmare) | Fall asleep on the bench by Flight 364 | The Flight Attendant | Demon Horn (V: regular enemies flee) | **Built**; opens after the Penguin Palace |
 | Finale | The Frozen Heart | Inside the volcano | Chilly | Ending | Owen writes it |
 
 **Thunder Strike** is Jon's big moment, modeled on Thor's entrance in *Avengers: Infinity War*: the screen darkens, lightning strikes Jon from the sky, and every enemy on screen gets hit. It costs a full rune meter.
 
+## Chapter 2 as Owen wrote it (page 5, built)
+
+The flight attendant was "perfectly normal (it was a dream)", so the Red-Eye is now a nightmare Owen can choose to have later. She points Owen to the subway station south-west of the airstrip. In the Fjordvik T-bane he works the exchangy doohickey for 200 kroner, then pays a taxi 20 kr to the forest (walking is still allowed). The old Whispering Forest is now the **Muck Forest**: muck slows Owen and splashes, tall grass rustles and hides drops, and a fallen log blocks the way east. When Owen reaches it, Jon flies out: "Hello Señor! Ooh, that's a big log, want me to chop it?" "Jon..." Three swings clear the log for good and the Frozen Path leads to the **Penguin Palace** (renamed from the Ice Cavern; it has a throne behind the King). Beating it shows CHAPTER 2 COMPLETE.
+
+## The SNES pass (built)
+
+What the classics do that the game now does too: a day/night cycle with dusk and dawn tints, stars and fireflies (20 real minutes per day); drifting cloud shadows; snow on the frozen screens; damage numbers in story mode (*Secret of Mana*); a MAP OF NORWAY page in the gear menu that fills in as you explore and tracks hearts, tablets, side quests and chapters; eight hidden **rune tablets** with lore (Hank, Walter's name, Chilly's weakness) that grant a heart container; and three enemies with distinct rules: the **Spore Cap** (spits from range, hides under its cap up close so swings bounce), the **Slime** (hops; big ones split into two minis) and the **Beetle** (armored; a thrown Jon flips it, then chop the belly before it rights itself).
+
 ## The Red-Eye (optional, genuinely creepy)
 
-You don't have to do it. You go back to the plane at the airstrip and the cargo hold is open. Inside:
+You don't have to do it. After the Penguin Palace you can sit on the bench by the plane and fall asleep; the dream puts you in the cargo hold. Inside:
 
 - **Darkness.** You can only see in a small circle around Jon's glow, and the lights flicker.
 - **Scratching that follows you.** You hear it move between rooms before you see anything.
@@ -56,7 +67,7 @@ You don't have to do it. You go back to the plane at the airstrip and the cargo 
 - **Sven's toy longship:** hidden under one forest bush. Reward: 30 kroner and a juice.
 - **Fluffy's grave:** Hank's dog. Reading it opens stairs to a hidden cave with a heart piece. Fluffy's ghost shows up again in the Drowned Barrow.
 
-## Chapter 2 draft notes (for Owen to change)
+## Chapter 3 draft notes (the Drowned Barrow; for Owen to change)
 
 Chilly froze Hank's ghost to guard the barrow until the axe came home. Fluffy's ghost points the way. Hank, freed, apologizes for throwing Jon in a lake, sends Owen to Walter's Forge, and almost says Walter's real name.
 
@@ -65,7 +76,7 @@ Chilly froze Hank's ghost to guard the barrow until the axe came home. Fluffy's 
 - **Waves:** 20 timed waves of mixed enemies (penguins, draugr, wisps, bats, knights, then elites). Every fifth wave is a boss.
 - **Between waves:** a shop offers random weapon and skill cards paid for with kroner dropped in the arena. Examples: a second Jon, frost aura, chain lightning, a lingonberry regen tick, a bigger swing arc, and penguin repellent.
 - **Builds stack:** cards combine, for example Homing plus Chain Lightning, or Voodoo Dash plus dash damage.
-- **Unlocks:** the arena unlocks after Chapter 1. Story items show up as rare arena cards.
+- **Unlocks:** the arena unlocks after the Penguin Palace. Story items show up as rare arena cards.
 
 ## Things Owen decides
 

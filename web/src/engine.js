@@ -163,6 +163,7 @@ const Sound = {
       case 'swing': this.tone([[700, 0.07, 'square', 200]], 0.04); break;
       case 'throw': this.tone([[300, 0.06, 'triangle', 600], [600, 0.06, 'triangle', 300]], 0.06); break;
       case 'hit': this.tone([[240, 0.06, 'square', 120]], 0.07); break;
+      case 'mud': this.tone([[140, 0.08, 'triangle', 60]], 0.04); break;
       case 'clank': this.tone([[1400, 0.04, 'triangle'], [900, 0.06, 'triangle']], 0.07); break;
       case 'hurt': this.tone([[420, 0.18, 'sawtooth', 90]], 0.07); break;
       case 'kill': this.noise(0.15, 0.1, 2000); break;

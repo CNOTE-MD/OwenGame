@@ -13,6 +13,8 @@ Tile legend
   a  arena floor  V  arena wall
   k  bookshelf    p  fireplace   C  cave rock   g  cave floor   >  stairs down   <  stairs up
   y  spirit barrier (only Voodoo Dash passes)
+  ,  tall grass (rustles, cut it)   %  muck (slows you)   o  fallen log (Jon chops it)
+  I  subway wall   j  subway floor   :  subway tracks
   u  plane wall   e  emergency light   =  cargo grate   m  cabin carpet   A  seat   J  phantom seat (appears in blackouts)   B  crate
 """
 import json, collections, pathlib
@@ -42,21 +44,21 @@ OW[(0, 0)] = [  # Foothills: sealed Drowned Barrow (dungeon 2)
     "T......s.......T",
     "TTTTTT.s..TTTTTT",
 ]
-OW[(1, 0)] = [  # Whispering Forest: heart piece in the bush ring
+OW[(1, 0)] = [  # Muck Forest (Owen's page 5): muck and grime, tall grass, and the big log on the way east
     "TTTTTTTTTTTTTTTT",
-    "TTT..T....T..TTT",
-    "T....b..T...bbbT",
-    "T.T.......T.b.bT",
-    "T....TT.....bbbT",
-    "........T.......",
-    "ssssssssssssssss",
-    "......f.........",
-    "..T......TT.....",
-    "T....b.......T.T",
-    "T..TT....b.....T",
-    "T.......T...T..T",
-    "TT..b..........T",
-    "TTTTTT.s..TTTTTT",
+    "TTTTTTTTTTTTTTTT",
+    "T,,,,b%%%%,,bbbT",
+    "T,T,,%%%%%,T,b,T",
+    "T,,,,TT%%%,,bbbT",
+    ",,%%%%%%%%,,,,,o",
+    "ss%%%%%%%%ssssso",
+    "%%%%%%%f%%%%,,,T",
+    "%%T%%%%%%TT%%,,,",
+    "T%%%%b%%%%%%%T,T",
+    "T,,TT%%%%b,,,,,T",
+    "T,,,,,%%T,,,T,,T",
+    "TT,,b,,,,,,,,,,T",
+    "TTTTTT,s,,TTTTTT",
 ]
 OW[(2, 0)] = [  # Frozen Path: Penguin Ice Cavern (dungeon 1)
     "TTTTTTTTTTTTTTTT",
@@ -100,10 +102,10 @@ OW[(0, 1)] = [  # Fjordvik west: Elder Astrid's house
     "T.ff....ssssssss",
     "T.......s.......",
     "T..x.x..s..f....",
-    "T.......s.......",
-    "T..b....s....b.T",
-    "T.......s......T",
-    "T.......s......T",
+    "T.......s....,,.",
+    "T..b....s....b,T",
+    "T,,.....s....,,T",
+    "T,,,....s......T",
     "TTTTTT.s..TTTTTT",
 ]
 OW[(1, 1)] = [  # Fjordvik market: Lars's stall
@@ -170,7 +172,7 @@ OW[(0, 2)] = [  # Fjord coast: Ingrid the fisher
     "TwwwwwwwwwwwT..T",
     "TTTTTTTTTTTTTTTT",
 ]
-OW[(1, 2)] = [  # Fjordvik airstrip: Flight 364 (demon side quest hook)
+OW[(1, 2)] = [  # Fjordvik airstrip: Flight 364, the subway stairs, a bench for bad dreams
     "TTTTTT.s..TTTTTT",
     "T......s.......T",
     "T......s.......T",
@@ -180,8 +182,8 @@ OW[(1, 2)] = [  # Fjordvik airstrip: Flight 364 (demon side quest hook)
     "sssssssssqqssss.",
     "..........s.....",
     "....ssssssss....",
-    "T..............T",
-    "T..b....f......T",
+    "T..s...........T",
+    "T..>....f......T",
     "T......T.......T",
     "T..........b...T",
     "TTTTTTTTTTTTTTTT",
@@ -258,6 +260,20 @@ OW_ENT = [
     {"t": "runestone", "at": P(1, 2, 4, 8)},
     {"t": "sign", "at": P(1, 2, 12, 8), "text": "sign_airstrip"},
     {"t": "cargo", "at": P(1, 2, 13, 5)},
+    {"t": "npc", "id": "attendant_ok", "at": P(1, 2, 5, 7)},
+    {"t": "warp", "at": P(1, 2, 3, 10), "to": "subway", "dest": [8, 3]},
+    {"t": "sign", "at": P(1, 2, 2, 9), "text": "sign_subway"},
+    {"t": "taxi", "at": P(1, 0, 7, 12), "to": "airport"},
+    {"t": "log", "id": "biglog", "at": P(1, 0, 15, 5)},
+    {"t": "spore", "at": P(1, 0, 6, 3)}, {"t": "spore", "at": P(1, 0, 11, 8)}, {"t": "slime", "at": P(1, 0, 4, 7)}, {"t": "slime", "at": P(1, 0, 12, 10)},
+    {"t": "beetle", "at": P(3, 0, 4, 9)}, {"t": "beetle", "at": P(3, 2, 7, 7)},
+    {"t": "tablet", "id": "tab_coast", "at": P(0, 2, 2, 3)},
+    {"t": "tablet", "id": "tab_hills", "at": P(0, 0, 13, 11)},
+    {"t": "tablet", "id": "tab_lake", "at": P(2, 1, 14, 1)},
+    {"t": "tablet", "id": "tab_grave", "at": P(3, 2, 1, 12)},
+    {"t": "tablet", "id": "tab_volcano", "at": P(3, 1, 1, 1)},
+    {"t": "tablet", "id": "tab_snow", "at": P(3, 0, 13, 12)},
+    {"t": "tablet", "id": "tab_village", "at": P(0, 1, 2, 12)},
     {"t": "npc", "id": "astrid", "at": P(0, 1, 5, 6)},
     {"t": "npc", "id": "lars", "at": P(1, 1, 7, 5)},
     {"t": "shop", "item": "juice", "price": 40, "at": P(1, 1, 4, 5)},
@@ -374,6 +390,8 @@ CAV_ENT = [
     {"t": "knight", "at": P(2, 1, 9, 5)},
     {"t": "chest", "id": "cv_homing", "at": P(2, 1, 8, 7), "item": "homing", "clear": True},
     {"t": "king", "at": P(1, 0, 8, 5)},
+    {"t": "throne", "at": P(1, 0, 8, 2)},
+    {"t": "tablet", "id": "tab_palace", "at": P(0, 1, 2, 2)},
     {"t": "chest", "id": "cv_thunder", "at": P(1, 0, 8, 4), "item": "thunder", "clear": True},
     {"t": "container", "id": "hc_cavern", "at": P(1, 0, 6, 7), "clear": True},
     {"t": "warp", "at": P(1, 0, 10, 7), "to": "overworld", "dest": P(2, 0, 7, 4), "clear": True, "portal": True},
@@ -423,6 +441,33 @@ BR_ENT = [
     {"t": "container", "id": "hc_barrow", "at": P(1, 0, 6, 9), "clear": True},
     {"t": "warp", "at": P(1, 0, 10, 9), "to": "overworld", "dest": P(0, 0, 7, 4), "clear": True, "portal": True},
 ]
+
+# ---------------- Fjordvik T-bane: the subway station (Owen's page 5) ----------------
+SUBWAY = [
+    "IIIIIIIIIIIIIIII",
+    "IjjjjjjjjjjjjjjI",
+    "IjjjjjjjjjjjjjjI",
+    "IjjjjjjjjjjjjjjI",
+    "IjjjjjjjjjjjjjjI",
+    "IjjjjjjjjjjjjjjI",
+    "IjjjjjjjjjjjjjjI",
+    "IjjjjjjjjjjjjjjI",
+    "IjjjjjjjjjjjjjjI",
+    "IIIIIIIIIIIIIIII",
+    "::::::::::::::::",
+    "::::::::::::::::",
+    "IIIIIIIIIIIIIIII",
+    "IIIIIIIIIIIIIIII",
+]
+SUBWAY_ENT = [
+    {"t": "warp", "at": [8, 1], "to": "overworld", "dest": P(1, 2, 3, 9)},
+    {"t": "exchange", "at": [3, 1]},
+    {"t": "sign", "at": [12, 1], "text": "sign_tbane"},
+    {"t": "taxi", "at": [14, 5], "to": "forest"},
+    {"t": "npc", "id": "commuter", "at": [10, 6]},
+    {"t": "runestone", "at": [6, 7]},
+]
+check_block("subway", SUBWAY)
 
 # ---------------- Owen's room (New York) ----------------
 HOME = [
@@ -573,7 +618,7 @@ RE_ENT = [
 ]
 
 # ---------------- reachability check ----------------
-WALK = set(".fsn~iU_vrFDEhLKGtdg<>=m") - set("t")
+WALK = set(".fsn~iU_vrFDEhLKGtdg<>=m,%j") - set("t")
 def reachable(grid, start, extra=set()):
     H, W = len(grid), len(grid[0])
     seen = {tuple(start)}
@@ -601,7 +646,7 @@ for e in CAV_ENT:
         continue
     ok = any((x + dx, y + dy) in cav_seen for dx, dy in ((0, 0), (1, 0), (-1, 0), (0, 1), (0, -1)))
     assert ok, ("cavern unreachable", e)
-for nm, g, ents, start in (("astrid", ASTRID, ASTRID_ENT, (7, 12)), ("bjarne", BJARNE, BJARNE_ENT, (7, 12)), ("cave", CAVE, CAVE_ENT, (8, 11))):
+for nm, g, ents, start in (("astrid", ASTRID, ASTRID_ENT, (7, 12)), ("bjarne", BJARNE, BJARNE_ENT, (7, 12)), ("cave", CAVE, CAVE_ENT, (8, 11)), ("subway", SUBWAY, SUBWAY_ENT, (8, 2))):
     seen = reachable([list(r) for r in g], start)
     for e in ents:
         x, y = e["at"]
@@ -636,12 +681,13 @@ print("switch min distance px:", round(dmin, 1))
 
 out = {
     "overworld": {"name": "Norway", "rows": ["".join(r) for r in ow], "ents": OW_ENT, "outdoor": True},
-    "cavern": {"name": "Penguin Ice Cavern", "rows": ["".join(r) for r in cav], "ents": CAV_ENT, "dungeon": True},
+    "cavern": {"name": "Penguin Palace", "rows": ["".join(r) for r in cav], "ents": CAV_ENT, "dungeon": True, "palace": True},
     "home": {"name": "Owen's Room, New York", "rows": HOME, "ents": HOME_ENT, "interior": True},
     "arena": {"name": "Valhalla Arena", "rows": ARENA, "ents": [], "arena": True},
     "astrid_house": {"name": "Astrid's House", "rows": ASTRID, "ents": ASTRID_ENT, "interior": True},
     "bjarne_house": {"name": "Bjarne's House", "rows": BJARNE, "ents": BJARNE_ENT, "interior": True},
     "secret_cave": {"name": "Hidden Cave", "rows": CAVE, "ents": CAVE_ENT, "dark": True},
+    "subway": {"name": "Fjordvik T-bane", "rows": SUBWAY, "ents": SUBWAY_ENT, "interior": True},
     "barrow": {"name": "The Drowned Barrow", "rows": ["".join(r) for r in br], "ents": BR_ENT, "dungeon": True},
     "redeye": {"name": "The Red-Eye", "rows": RE, "ents": RE_ENT, "dungeon": True, "dark": True, "redeye": True, "nokeys": True},
 }

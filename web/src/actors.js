@@ -23,6 +23,11 @@ function makeEnt(d, x, y) {
     case 'switch': return { ...base, solid: true, hittable: true, id: d.id, cd: 0 };
     case 'cart': return { ...base, kind: 'hazard', type: 'cart', dir: 1, wob: 0 };
     case 'runedoor': return s.flags[d.needs] ? { ...base, kind: 'warp' } : null;
+    case 'tablet': return { ...base, solid: true, talk: true };
+    case 'throne': return { ...base, solid: true, talk: true };
+    case 'exchange': return { ...base, solid: true, talk: true };
+    case 'taxi': return { ...base, solid: true, talk: true };
+    case 'log': return s.flags['log_chopped'] ? null : makeLog(d, x, y);
     default: return makeEnemy(d.t, x, y);
   }
 }
@@ -37,6 +42,9 @@ const ENEMY = {
   attendant: { hp: 12, r: 8, touch: 2, speed: 0, boss: true },
   captain: { hp: 6, r: 10, touch: 2, speed: 24, shield: true, boss: true },
   hank: { hp: 10, r: 14, touch: 2, speed: 0, boss: true, fly: true },
+  spore: { hp: 2, r: 6, touch: 1, speed: 0 },
+  slime: { hp: 3, r: 6, touch: 1, speed: 0 },
+  beetle: { hp: 3, r: 7, touch: 1, speed: 26 },
 };
 function makeEnemy(type, x, y) {
   const d = ENEMY[type];
@@ -104,7 +112,7 @@ function updatePlayer(dt) {
   if (p.moving) { p.fx = v.x; p.fy = v.y; p.walk += dt * 14; }
   const onIce = tileAt(p.x, p.y) === 'i';
   p.boost = Math.max(0, (p.boost || 0) - dt);
-  const spd = 72 * G.st.speed * (p.boost > 0 ? 1.4 : 1);
+  const spd = 72 * G.st.speed * (p.boost > 0 ? 1.4 : 1) * (p.dashing > 0 ? 1 : groundSpeed(p));
   if (onIce) { const k = Math.min(1, 2.2 * dt); p.vx += (v.x * spd * 1.1 - p.vx) * k; p.vy += (v.y * spd * 1.1 - p.vy) * k; }
   else { p.vx = v.x * spd; p.vy = v.y * spd; }
   const hit = tryMove(p, p.vx * dt, p.vy * dt, 5, 'player');
@@ -211,6 +219,11 @@ function interact(e) {
   p.cd = 0.2;
   switch (e.kind) {
     case 'sign': return say(STORY.signs[e.def.text] || [['', '...']]);
+    case 'tablet': return readTablet(e);
+    case 'exchange': return useExchange();
+    case 'taxi': return useTaxi(e);
+    case 'throne': return say(flag('d1done') ? [['', 'The Penguin King\'s throne. Ice, fish bones and one very small cushion.'], ['Jon', 'Sit on it. SIT ON IT. You\'re the king now.'], ['Owen', 'I\'m not sitting on fish bones, Jon.']] : [['', 'A throne of ice. Someone very round sits here. Often.']]);
+    case 'log': return say([['Jon', 'That log isn\'t going to chop itself. Swing me! (Z)']]);
     case 'sealed': return say(STORY.signs[e.def.text]);
     case 'plaque': return say(STORY.plaque, () => setFlag('read_plaque'));
     case 'door': return startWarp(e.def.to, e.def.dest);
@@ -374,7 +387,7 @@ function jonHits(dmg, reach, from, how) {
   const j = G.jon;
   for (const e of G.ents.slice()) {
     if (j.hit.includes(e)) continue;
-    if (e.hittable && dist(j, e) < reach + 6) { j.hit.push(e); hitSwitch(e); if (how === 'throw') j.mode = 'back'; continue; }
+    if (e.hittable && dist(j, e) < reach + 6) { j.hit.push(e); if (e.onHit) e.onHit(); else hitSwitch(e); if (how === 'throw') j.mode = 'back'; continue; }
     if (!e.enemy || !e.alive) continue;
     if (dist(j, e) < reach + e.r) {
       j.hit.push(e);
@@ -393,6 +406,7 @@ function cutAt(x, y) {
   const tx = Math.floor(x / T), ty = Math.floor(y / T), c = tile(tx, ty);
   if (!sameScreen(tx, ty)) return false;
   if (c === 'b') { setTile(tx, ty, SNOWY(tx, ty) ? 'n' : '.'); leaves(tx * T + 8, ty * T + 8, ['#58b840', '#a8e070', '#388828']); Sound.play('swing'); maybeDrop(tx * T + 8, ty * T + 8, 0.4); return true; }
+  if (c === ',') { setTile(tx, ty, SNOWY(tx, ty) ? 'n' : '.'); leaves(tx * T + 8, ty * T + 8, ['#5fbb44', '#9ee064', '#2f7a2a']); maybeDrop(tx * T + 8, ty * T + 8, 0.12); return false; }
   if (c === 'O') { setTile(tx, ty, '_'); leaves(tx * T + 8, ty * T + 8, ['#b8784a', '#8a5432', '#e0a070']); Sound.play('kill'); maybeDrop(tx * T + 8, ty * T + 8, 0.6); return true; }
   return false;
 }
@@ -416,6 +430,7 @@ function damageEnemy(e, dmg, from, how) {
   // how: 'swing' | 'throw' (Jon), 'thunder' (Thunder Strike), 'magic' (arena weapons)
   const jonHit = how === 'swing' || how === 'throw';
   if (e.flash > 0.05 && jonHit) return false;
+  if (snesDamageRule(e, how, jonHit)) return true;
   const dx = from.x - e.x, dy = from.y - e.y, d = Math.hypot(dx, dy) || 1;
   // Shields block a hit from the front, but the block knocks the shield aside for a moment:
   // hit-hit always works, and hitting from the side or back works right away.
@@ -435,7 +450,7 @@ function damageEnemy(e, dmg, from, how) {
   }
   if ((e.type === 'king' || e.type === 'attendant') && how === 'thunder') { e.st = 'daze'; e.t = 0; dmg = 2; }
   e.hp -= dmg; e.flash = 0.18; Sound.play('hit');
-  if (G.mode === 'arena') floatText(e.x, e.y - 12, String(Math.round(dmg * 10) / 10), G.lastCrit ? '#ffd84a' : '#fff');
+  floatText(e.x, e.y - 12, String(Math.round(dmg * 10) / 10), G.lastCrit ? '#ffd84a' : '#fff');
   const k = (e.boss ? 60 : 150) * G.st.knock; e.kx = -dx / d * k; e.ky = -dy / d * k;
   if (e.hp <= 0) killEnemy(e);
   return false;
@@ -444,6 +459,7 @@ function killEnemy(e) {
   e.alive = false;
   G.ents = G.ents.filter(o => o !== e);
   poof(e.x, e.y, e.boss); Sound.play('kill');
+  snesOnKill(e);
   const s = G.save;
   if (s.items.thunder) s.rune = Math.min(RUNE_MAX, s.rune + G.st.runeKill);
   if (G.mode === 'arena') return arenaKill(e);
@@ -493,6 +509,9 @@ function updateEnemy(e, dt) {
       { const ax = e.tx - e.x, ay = e.ty - e.y, al = Math.hypot(ax, ay) || 1; tryMove(e, ax / al * e.speed * dt, ay / al * e.speed * dt, mr, who); }
       break;
     case 'hank': updateHank(e, dt, dx, dy, d); break;
+    case 'spore': updateSpore(e, dt, dx, dy, d); break;
+    case 'slime': updateSlime(e, dt, dx, dy, d, mr); break;
+    case 'beetle': updateBeetle(e, dt, dx, dy, d, mr); break;
     case 'knight': case 'captain':
       if (e.st === 'intro') { if (G.state === 'play') { e.st = 'chase'; e.t = 0; } break; }
       if (e.st === 'chase') { e.turnT = (e.turnT || 0) + dt; if (e.turnT > 0.5) { e.turnT = 0; e.fx = dx / d; e.fy = dy / d; } tryMove(e, e.fx * e.speed * dt, e.fy * e.speed * dt, mr, who); if (e.t > 2.8) { e.st = 'wind'; e.t = 0; } }
@@ -516,7 +535,7 @@ function updateEnemy(e, dt) {
       } else if (e.st === 'daze') { if (e.t > 2.2) { e.st = 'waddle'; e.t = 0; } }
       break;
   }
-  if (d < e.r + 5 && e.st !== 'daze' && !(e.type === 'attendant' && (e.st === 'hide' || e.st === 'intro'))) hurtPlayer(e.touch, e);
+  if (d < e.r + 5 && e.st !== 'daze' && !(e.flipped > 0) && !(e.type === 'attendant' && (e.st === 'hide' || e.st === 'intro'))) hurtPlayer(e.touch, e);
 }
 
 function updatePickup(e, dt) {

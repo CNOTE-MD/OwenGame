@@ -36,6 +36,7 @@ function updateWarp(dt) {
 
 function onEnterScreen() {
   const has = type => G.ents.some(e => e.type === type && e.alive);
+  markSeen();
   if (G.mapId === 'cavern' && !flag('intro:cavern')) { setFlag('intro:cavern'); say(STORY.cavern_enter); }
   if (has('knight') && !flag('intro:knight')) { setFlag('intro:knight'); Sound.play('boss'); say(STORY.knight); }
   if (G.map.redeye) redeyeEnter();
@@ -46,7 +47,7 @@ function onEnterScreen() {
   if (has('attendant') && !flag('intro:attendant')) { setFlag('intro:attendant'); say(STORY.attendant); }
   if (has('king')) { Sound.play('boss'); say(flag('intro:king') ? [['Penguin King', 'AK! Back for more?']] : STORY.king); setFlag('intro:king'); }
   if (G.mapId === 'overworld' && flag('d2done') && !flag('chapter2_banner') && G.scr.x === 0 && G.scr.y === 0) {
-    setFlag('chapter2_banner'); G.banner = 'CHAPTER 2 COMPLETE'; G.bannerT = 4; Sound.play('secret'); writeSave();
+    setFlag('chapter2_banner'); G.banner = 'CHAPTER 3 COMPLETE'; G.bannerT = 4; Sound.play('secret'); writeSave();
   }
   if (G.mapId === 'overworld' && flag('d1done') && !flag('chapter1_banner') && G.scr.x === 2 && G.scr.y === 0) {
     setFlag('chapter1_banner'); G.banner = STORY.chapter_done; G.bannerT = 4; Sound.play('secret'); writeSave();
@@ -88,7 +89,8 @@ function update(dt) {
       return;
     case 'warp': updateWarp(dt); return;
     case 'menu':
-      if (just('left') || just('right')) { G.menuPage = G.menuPage ? 0 : 1; Sound.play('menu'); }
+      if (just('right')) { G.menuPage = ((G.menuPage || 0) + 1) % 3; Sound.play('menu'); }
+      if (just('left')) { G.menuPage = ((G.menuPage || 0) + 2) % 3; Sound.play('menu'); }
       if (just('menu') || just('a') || just('tap')) { G.state = 'play'; Sound.play('menu'); }
       return;
     case 'over':
@@ -104,8 +106,10 @@ function update(dt) {
   if (just('menu')) { G.state = G.mode === 'arena' ? 'arenapause' : 'menu'; Sound.play('menu'); return; }
   const s = G.save;
   if (s.items.thunder) { G.runeT = (G.runeT || 0) + dt; if (G.runeT > 5) { G.runeT = 0; s.rune = Math.min(RUNE_MAX, s.rune + 1); } }
+  updateClock(dt);
   updatePlayer(dt);
   if (G.state !== 'play') return;
+  updateGround(dt); updateShots(dt);
   updateJon(dt);
   if (G.mode === 'arena') { updateArena(dt); if (G.state !== 'play') return; }
   if (G.map.redeye) updateRedeye(dt);
@@ -117,10 +121,11 @@ function update(dt) {
     if (e.kind === 'enemy' && e.alive) { if (e.slow > 0) { e.slow -= dt; updateEnemy(e, dt * 0.5); } else updateEnemy(e, dt); }
     else if (e.kind === 'pickup') updatePickup(e, dt);
     else if (e.kind === 'hazard') updateCart(e, dt);
-    else if (e.kind === 'switch') e.cd = Math.max(0, e.cd - dt);
+    else if (e.kind === 'switch' || e.kind === 'log') e.cd = Math.max(0, e.cd - dt);
     if (G.state !== 'play') break;
   }
   updateFx(dt);
+  if (G.state === 'play' && G.mapId === 'overworld') checkLogScene();
   if (G.state === 'play') checkScreenEdge();
 }
 
@@ -139,17 +144,19 @@ function render() {
   if (G.mode === 'arena') drawArenaWorld();
   drawHankAxes();
   if (!p.hold) drawJon();
+  drawShots();
   drawFx();
   drawLightning();
   ctx.setTransform(1, 0, 0, 1, 0, 0);
   if (G.map.dungeon || G.map.dark) drawDungeonLight();
+  drawAtmosphere();
   drawRedeyeOverlay();
   if (G.flash > 0) { ctx.globalAlpha = Math.min(1, G.flash * 3); R(0, 0, VW, VH, G.flashColor || '#fff'); ctx.globalAlpha = 1; }
   if (G.mode === 'arena') drawArenaHud(); else drawHud();
   if (G.state === 'warp') { ctx.globalAlpha = clamp(1 - Math.abs(G.warp.t - 0.35) / 0.35, 0, 1); R(0, 0, VW, VH, '#000'); ctx.globalAlpha = 1; }
   if (G.bannerT > 0) { R(0, 92, VW, 34, 'rgba(0,0,0,.8)'); text(G.banner, VW / 2, 113, '#ffd84a', 'center'); }
   if (G.state === 'talk') drawTalk();
-  if (G.state === 'menu') { if (G.menuPage) drawJonPage(); else drawMenu(); }
+  if (G.state === 'menu') { if (G.menuPage === 2) drawMapPage(); else if (G.menuPage) drawJonPage(); else drawMenu(); }
   drawJonLevel();
   drawArenaMenus();
   if (G.state === 'over') {
@@ -163,7 +170,7 @@ function render() {
 
 let last = performance.now();
 G.menuSel = 0;
-buildAll();
+buildAll(); buildSnesArt();
 function frame(now) {
   const dt = Math.min(0.05, (now - last) / 1000); last = now;
   try { pollGamepad(); update(dt); render(); Music.want(musicFor()); Music.tick(); } catch (err) { console.error(err); }
