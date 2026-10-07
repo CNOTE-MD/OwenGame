@@ -38,14 +38,14 @@ function onEnterScreen() {
   const has = type => G.ents.some(e => e.type === type && e.alive);
   markSeen();
   if (G.mapId === 'cavern' && !flag('intro:cavern')) { setFlag('intro:cavern'); say(STORY.cavern_enter); }
-  if (has('knight') && !flag('intro:knight')) { setFlag('intro:knight'); Sound.play('boss'); say(STORY.knight); }
+  if (has('knight') && !flag('intro:knight')) { setFlag('intro:knight'); Sound.play('boss'); showBossCard('knight'); say(STORY.knight); }
   if (G.map.redeye) redeyeEnter();
   HK.axes = [];
   if (G.mapId === 'barrow' && !flag('intro:barrow')) { setFlag('intro:barrow'); say(STORY.barrow_enter); }
-  if (has('captain') && !flag('intro:captain')) { setFlag('intro:captain'); Sound.play('boss'); say(STORY.captain); }
-  if (has('hank')) { Sound.play('boss'); say(flag('intro:hank') ? [['Hank', 'TURN... BACK...']] : STORY.hank); setFlag('intro:hank'); }
-  if (has('attendant') && !flag('intro:attendant')) { setFlag('intro:attendant'); say(STORY.attendant); }
-  if (has('king')) { Sound.play('boss'); say(flag('intro:king') ? [['Penguin King', 'AK! Back for more?']] : STORY.king); setFlag('intro:king'); }
+  if (has('captain') && !flag('intro:captain')) { setFlag('intro:captain'); Sound.play('boss'); showBossCard('captain'); say(STORY.captain); }
+  if (has('hank')) { Sound.play('boss'); showBossCard('hank'); say(flag('intro:hank') ? [['Hank', 'TURN... BACK...']] : STORY.hank); setFlag('intro:hank'); }
+  if (has('attendant') && !flag('intro:attendant')) { setFlag('intro:attendant'); showBossCard('attendant'); say(STORY.attendant); }
+  if (has('king')) { Sound.play('boss'); showBossCard('king'); say(flag('intro:king') ? [['Penguin King', 'AK! Back for more?']] : STORY.king); setFlag('intro:king'); }
   if (G.mapId === 'overworld' && flag('d2done') && !flag('chapter2_banner') && G.scr.x === 0 && G.scr.y === 0) {
     setFlag('chapter2_banner'); G.banner = 'CHAPTER 3 COMPLETE'; G.bannerT = 4; Sound.play('secret'); writeSave();
   }
@@ -56,6 +56,8 @@ function onEnterScreen() {
 
 function update(dt) {
   G.t += dt;
+  updateBossCard(dt);
+  if (G.hitstop > 0) { G.hitstop -= dt; return; }
   G.shake = Math.max(0, G.shake - dt); G.flash = Math.max(0, G.flash - dt); G.bannerT = Math.max(0, G.bannerT - dt);
   if (G.state !== 'play') { JT.t = Math.max(0, JT.t - dt); JT.faceT = Math.max(0, JT.faceT - dt); }
   if (just('mute')) Sound.muted = !Sound.muted;
@@ -89,9 +91,10 @@ function update(dt) {
       return;
     case 'warp': updateWarp(dt); return;
     case 'menu':
-      if (just('right')) { G.menuPage = ((G.menuPage || 0) + 1) % 3; Sound.play('menu'); }
-      if (just('left')) { G.menuPage = ((G.menuPage || 0) + 2) % 3; Sound.play('menu'); }
-      if (just('menu') || just('a') || just('tap')) { G.state = 'play'; Sound.play('menu'); }
+      if (just('right')) { G.menuPage = ((G.menuPage || 0) + 1) % 4; Sound.play('menu'); }
+      if (just('left')) { G.menuPage = ((G.menuPage || 0) + 3) % 4; Sound.play('menu'); }
+      if (G.menuPage === 3) { updateJukebox(); if (just('menu') || just('tap')) { G.state = 'play'; G.jukebox = null; Sound.play('menu'); } return; }
+      if (just('menu') || just('a') || just('tap')) { G.state = 'play'; G.jukebox = null; Sound.play('menu'); }
       return;
     case 'over':
       if (just('a') || just('menu') || just('tap')) { continueGame(true); }
@@ -156,7 +159,8 @@ function render() {
   if (G.state === 'warp') { ctx.globalAlpha = clamp(1 - Math.abs(G.warp.t - 0.35) / 0.35, 0, 1); R(0, 0, VW, VH, '#000'); ctx.globalAlpha = 1; }
   if (G.bannerT > 0) { R(0, 92, VW, 34, 'rgba(0,0,0,.8)'); text(G.banner, VW / 2, 113, '#ffd84a', 'center'); }
   if (G.state === 'talk') drawTalk();
-  if (G.state === 'menu') { if (G.menuPage === 2) drawMapPage(); else if (G.menuPage) drawJonPage(); else drawMenu(); }
+  if (G.state === 'menu') { if (G.menuPage === 3) drawJukebox(); else if (G.menuPage === 2) drawMapPage(); else if (G.menuPage) drawJonPage(); else drawMenu(); }
+  drawBossCard(); drawCombo();
   drawJonLevel();
   drawArenaMenus();
   if (G.state === 'over') {
@@ -170,11 +174,11 @@ function render() {
 
 let last = performance.now();
 G.menuSel = 0;
-buildAll(); buildSnesArt();
+buildAll(); buildSnesArt(); buildAwesomeArt();
 function frame(now) {
   const dt = Math.min(0.05, (now - last) / 1000); last = now;
-  try { pollGamepad(); update(dt); render(); Music.want(musicFor()); Music.tick(); } catch (err) { console.error(err); }
-  for (const k in edge) edge[k] = false;
+  try { pollGamepad(); update(dt); render(); const mid = musicFor(); markHeard(mid); Music.want(mid); Music.tick(); } catch (err) { console.error(err); }
+  if (!(G.hitstop > 0)) for (const k in edge) edge[k] = false;   // a tap during hit-stop still counts
   requestAnimationFrame(frame);
 }
 (document.fonts && document.fonts.load ? document.fonts.load('8px "Press Start 2P"').catch(() => {}) : Promise.resolve())

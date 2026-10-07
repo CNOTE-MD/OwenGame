@@ -158,8 +158,8 @@ const MAPS = {
 {
 "t": "beetle",
 "at": [
-55,
-35
+51,
+31
 ]
 },
 {
@@ -467,7 +467,7 @@ const MAPS = {
 ]
 },
 {
-"t": "penguin",
+"t": "snowpeng",
 "at": [
 36,
 7
@@ -481,7 +481,7 @@ const MAPS = {
 ]
 },
 {
-"t": "penguin",
+"t": "snowpeng",
 "at": [
 58,
 6
@@ -492,6 +492,13 @@ const MAPS = {
 "at": [
 53,
 10
+]
+},
+{
+"t": "snowpeng",
+"at": [
+51,
+11
 ]
 },
 {
@@ -675,7 +682,7 @@ const MAPS = {
 ]
 },
 {
-"t": "penguin",
+"t": "guard",
 "at": [
 26,
 33
@@ -751,7 +758,7 @@ const MAPS = {
 ]
 },
 {
-"t": "draugr",
+"t": "guard",
 "at": [
 5,
 18

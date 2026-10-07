@@ -164,6 +164,7 @@ function musicFor() {
   if (st === 'title') return 'title';
   if (st === 'cutscene' || (st === 'talk' && G.talk && G.talk.back === 'cutscene')) return (G.cutPages && G.cutPages[G.cut.i] && String(G.cutPages[G.cut.i].art).startsWith('taxi')) ? 'journey' : 'creepy';
   if (st === 'over' || st === 'arenaover') return null;
+  if (st === 'menu' && G.jukebox) return G.jukebox;
   if (G.mode === 'arena') {
     if (st === 'shop' || st === 'levelup') return 'village';
     return G.ents.some(e => e.type === 'king' && e.alive) ? 'boss' : 'arena';

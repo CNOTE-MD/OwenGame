@@ -59,7 +59,7 @@ const path = require('path');
   await check('Sven pays 30 kr', await ev(() => flag('sven_done')) && (await ev(() => G.save.kr)) === kr0 + 30);
 
   // the grave secret
-  await go('overworld', 61, 38); await place(61, 37, 0, -1); await press('KeyZ'); await talkThrough(); await wait(100);
+  await go('overworld', 61, 38); await ev(() => { G.ents = G.ents.filter(e => !e.enemy); }); await place(61, 37, 0, -1); await press('KeyZ'); await talkThrough(); await wait(100);
   await check('reading Fluffy\'s grave opens stairs', await ev(() => tile(61, 36) === '>' && flag('grave_open')));
   await place(61, 37, 0, -1); await pg.keyboard.down('ArrowUp'); await wait(400); await pg.keyboard.up('ArrowUp'); await wait(900); await talkThrough();
   await check('stairs lead to the hidden cave', await ev(() => G.mapId === 'secret_cave'));

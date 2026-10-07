@@ -65,14 +65,14 @@ function drawEnemy(e) {
   const white = e.flash > 0 || (e.st === 'wind' && Math.floor(G.t * 16) % 2 === 0);
   const f = Math.floor(e.wob / 2.5) % 2;
   switch (e.type) {
-    case 'penguin': case 'knight': case 'king': {
+    case 'penguin': case 'knight': case 'king': case 'snowpeng': case 'guard': {
       const s = e.type === 'king' ? 3 : e.type === 'knight' ? 2 : 1;
       const { d, flip } = dirOf(e.fx, e.fy);
-      const waddle = e.st === 'daze' || e.st === 'slide' ? 0 : [0, 1, 0, -1][Math.floor(e.wob / 2.5) % 4] * s;
+      const waddle = e.st === 'daze' || e.st === 'slide' || e.bow ? 0 : [0, 1, 0, -1][Math.floor(e.wob / 2.5) % 4] * s;
       const shake = (e.type === 'king' && (e.st === 'wind' || e.st === 'slide') ? Math.round(rnd(-1, 1)) : 0) + waddle;
       shadowAt(x, y + 5 * s, s);
-      const img = SPR[`peng_${d}_${e.st === 'daze' ? 0 : f}${flip ? '_f' : ''}`];
-      const foot = y + 6 * s;
+      const img = SPR[`${pengKey(e)}_${e.bow ? 'down' : d}_${e.st === 'daze' || e.bow ? 0 : f}${flip && !e.bow ? '_f' : ''}`];
+      const foot = y + 6 * s + (e.bow ? 2 : 0);
       spr(img, x + shake, foot, { scale: s, white });
       const top = foot - img.height * s + 2 * s;
       if (e.type === 'king') {
@@ -83,6 +83,8 @@ function drawEnemy(e) {
         spr(SPR.helmet, x, top + 4 * s, { scale: s, white });
         drawShield(e, x, y - 2 * s, s);
       }
+      if (e.type === 'guard') { spr(SPR.helmet, x, top + 4, { white }); drawShield(e, x, y - 2, 1); }
+      if (e.bow && Math.floor(G.t * 2 + e.wob) % 3 === 0) text('ak', x + 8, y - 10, '#c8d8ff', 'left', false);
       break; }
     case 'draugr': {
       const { d, flip } = dirOf(e.fx, e.fy);

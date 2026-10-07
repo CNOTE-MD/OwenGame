@@ -641,8 +641,8 @@ const MAPS = {
 {
 "t": "beetle",
 "at": [
-55,
-35
+51,
+31
 ]
 },
 {
@@ -950,7 +950,7 @@ const MAPS = {
 ]
 },
 {
-"t": "penguin",
+"t": "snowpeng",
 "at": [
 36,
 7
@@ -964,7 +964,7 @@ const MAPS = {
 ]
 },
 {
-"t": "penguin",
+"t": "snowpeng",
 "at": [
 58,
 6
@@ -975,6 +975,13 @@ const MAPS = {
 "at": [
 53,
 10
+]
+},
+{
+"t": "snowpeng",
+"at": [
+51,
+11
 ]
 },
 {
@@ -1158,7 +1165,7 @@ const MAPS = {
 ]
 },
 {
-"t": "penguin",
+"t": "guard",
 "at": [
 26,
 33
@@ -1234,7 +1241,7 @@ const MAPS = {
 ]
 },
 {
-"t": "draugr",
+"t": "guard",
 "at": [
 5,
 18
@@ -2268,6 +2275,8 @@ const JON = {
   beetle: ['Armor. Of course it has armor. THROW me at it!', 'Flip it! Flip it like a pancake! Then chop the pancake!', 'That beetle is wearing more plating than Hank.'],
   slime: ['Blue goo. Don\'t let it touch me. I\'ll smell like goo.', 'It split! That\'s cheating! Chop it twice!', 'Jello with ambitions.'],
   spore: ['A mushroom is SPITTING at us. A mushroom.', 'It hides under its own hat. Coward. Get close, then back off, then CHOP.', 'Never trust a fungus with eyes.'],
+  guard: ['Royal Guards! Gold penguins with shields. Of course.', 'Get behind him! Penguins can\'t turn fast. Short legs.', 'He\'s wearing a bucket. A GOLD bucket.'],
+  snowpeng: ['Snow penguins! They\'re FAST. Why are they fast?!', 'Zigzag penguin. Zigzag penguin. Hold still, bird!', 'They skate. Penguins that skate. I\'m done.'],
   dark: ['Dark. Hold me up high. I glow. You\'re welcome.', 'If something grabs you, swing me. If something grabs ME, swing harder.'],
   area: {
     home: 'Our room! With MY sign in it.',
@@ -2701,6 +2710,7 @@ function musicFor() {
   if (st === 'title') return 'title';
   if (st === 'cutscene' || (st === 'talk' && G.talk && G.talk.back === 'cutscene')) return (G.cutPages && G.cutPages[G.cut.i] && String(G.cutPages[G.cut.i].art).startsWith('taxi')) ? 'journey' : 'creepy';
   if (st === 'over' || st === 'arenaover') return null;
+  if (st === 'menu' && G.jukebox) return G.jukebox;
   if (G.mode === 'arena') {
     if (st === 'shop' || st === 'levelup') return 'village';
     return G.ents.some(e => e.type === 'king' && e.alive) ? 'boss' : 'arena';
@@ -3013,6 +3023,8 @@ const ENEMY = {
   captain: { hp: 6, r: 10, touch: 2, speed: 24, shield: true, boss: true },
   hank: { hp: 10, r: 14, touch: 2, speed: 0, boss: true, fly: true },
   spore: { hp: 2, r: 6, touch: 1, speed: 0 },
+  snowpeng: { hp: 2, r: 6, touch: 1, speed: 66 },
+  guard: { hp: 4, r: 7, touch: 1, speed: 30, shield: true },
   slime: { hp: 3, r: 6, touch: 1, speed: 0 },
   beetle: { hp: 3, r: 7, touch: 1, speed: 26 },
 };
@@ -3192,7 +3204,7 @@ function interact(e) {
     case 'tablet': return readTablet(e);
     case 'exchange': return useExchange();
     case 'taxi': return useTaxi(e);
-    case 'throne': return say(flag('d1done') ? [['', 'The Penguin King\'s throne. Ice, fish bones and one very small cushion.'], ['Jon', 'Sit on it. SIT ON IT. You\'re the king now.'], ['Owen', 'I\'m not sitting on fish bones, Jon.']] : [['', 'A throne of ice. Someone very round sits here. Often.']]);
+    case 'throne': return sitOnThrone();
     case 'log': return say([['Jon', 'That log isn\'t going to chop itself. Swing me! (Z)']]);
     case 'sealed': return say(STORY.signs[e.def.text]);
     case 'plaque': return say(STORY.plaque, () => setFlag('read_plaque'));
@@ -3429,7 +3441,8 @@ function killEnemy(e) {
   e.alive = false;
   G.ents = G.ents.filter(o => o !== e);
   poof(e.x, e.y, e.boss); Sound.play('kill');
-  snesOnKill(e);
+  snesOnKill(e); awesomeOnKill(e);
+  if (G.mode !== 'arena') hitStop(e.boss ? 0.28 : 0.05);
   const s = G.save;
   if (s.items.thunder) s.rune = Math.min(RUNE_MAX, s.rune + G.st.runeKill);
   if (G.mode === 'arena') return arenaKill(e);
@@ -3462,8 +3475,11 @@ function updateEnemy(e, dt) {
     case 'imp': updateImp(e, dt, dx, dy, d, mr); break;
     case 'attendant': updateAttendant(e, dt, dx, dy, d, mr); break;
     case 'penguin':
+      if (kingOwenRules(e)) break;
       if (d < 120 || e.aggro) { toward(e.speed); e.fx = dx / d; e.fy = dy / d; }
       break;
+    case 'snowpeng': updateSnowPeng(e, dt, dx, dy, d, mr); break;
+    case 'guard': updateGuard(e, dt, dx, dy, d, mr); break;
     case 'draugr':
       // sluggish: only turns to face you every 0.8s, so circling behind works
       if (d < 110 || e.aggro) { if (e.t > 0.8) { e.t = 0; e.fx = dx / d; e.fy = dy / d; } tryMove(e, e.fx * e.speed * dt, e.fy * e.speed * dt, mr, who); }
@@ -3505,7 +3521,7 @@ function updateEnemy(e, dt) {
       } else if (e.st === 'daze') { if (e.t > 2.2) { e.st = 'waddle'; e.t = 0; } }
       break;
   }
-  if (d < e.r + 5 && e.st !== 'daze' && !(e.flipped > 0) && !(e.type === 'attendant' && (e.st === 'hide' || e.st === 'intro'))) hurtPlayer(e.touch, e);
+  if (d < e.r + 5 && e.st !== 'daze' && !(e.flipped > 0) && !e.bow && !(e.type === 'attendant' && (e.st === 'hide' || e.st === 'intro'))) hurtPlayer(e.touch, e);
 }
 
 function updatePickup(e, dt) {
@@ -5233,7 +5249,7 @@ function updateJonTalk(dt) {
   // near water or a penguin
   if (G.mapId === 'overworld' && tileAt(p.x + p.fx * 20, p.y + p.fy * 20) === '~') jonSay('water', { cooldown: 40, face: 'worried' });
   if (G.ents.some(e => e.type === 'penguin' && e.alive && dist(e, p) < 70)) jonSay('penguin', { cooldown: 45 });
-  for (const t of ['beetle', 'slime', 'spore']) if (G.ents.some(e => e.type === t && e.alive && dist(e, p) < 80)) jonSay(t, { cooldown: 70 });
+  for (const t of ['beetle', 'slime', 'spore', 'guard', 'snowpeng']) if (G.ents.some(e => e.type === t && e.alive && dist(e, p) < 80)) jonSay(t, { cooldown: 70 });
   // the weather and the hour
   if (G.map.outdoor) {
     if (typeof isNight === 'function' && isNight()) jonSay('night', { cooldown: 150 });
@@ -5246,6 +5262,7 @@ function updateJonTalk(dt) {
 function jonOnKill(e) {
   JT.streak++; JT.streakT = 2.5;
   if (e.boss) return;
+  comboUp();
   if (JT.streak === 3) jonSay('streak', { force: true, face: 'excited', cooldown: 8 });
   else if (Math.random() < 0.3) jonSay('kill', { cooldown: 7, face: 'excited' });
 }
@@ -5716,6 +5733,152 @@ function checkLogScene() {
   if (dist(e, G.player) < 44) { setFlag('log_scene'); setJonFace('excited', 4); say(STORY.log_scene); }
 }
 
+// ===== awesome.js =====
+// The "even more awesome" pass: boss title cards, hit-stop, combo callouts, a Jukebox page,
+// Snow Penguins and Royal Guards, King Owen on the throne, and a livelier title screen.
+
+// ---------------- boss title cards ----------------
+const BOSS_CARDS = {
+  knight: ['PENGUIN KNIGHT', 'Guard of the Palace'],
+  king: ['THE PENGUIN KING', 'Ak. Ak. Ak.'],
+  captain: ['DRAUGR CAPTAIN', 'He guards the Voodoo Dash'],
+  hank: ["HANK'S GHOST", 'Frozen by Chilly'],
+  attendant: ['THE FLIGHT ATTENDANT', 'Any refreshments, sir?'],
+};
+function showBossCard(type) {
+  const c = BOSS_CARDS[type];
+  if (!c) return;
+  G.bossCard = { name: c[0], sub: c[1], t: 0, life: 3.2 };
+  G.flash = 0.2; G.flashColor = '#fff'; G.shake = Math.max(G.shake, 0.3);
+}
+function updateBossCard(dt) { if (G.bossCard) { G.bossCard.t += dt; if (G.bossCard.t > G.bossCard.life) G.bossCard = null; } }
+function drawBossCard() {
+  const c = G.bossCard;
+  if (!c || G.state === 'menu' || G.state === 'title' || G.state === 'jonlevel') return;
+  const k = Math.min(1, c.t / 0.35), out = Math.max(0, (c.t - (c.life - 0.4)) / 0.4);
+  const bar = Math.round(28 * k * (1 - out));
+  R(0, 0, VW, bar, '#000'); R(0, VH - bar, VW, bar, '#000');
+  if (out >= 1) return;
+  ctx.globalAlpha = 1 - out;
+  const slide = Math.round((1 - k) * 40);
+  R(0, 86, VW, 44, 'rgba(0,0,0,0.72)'); R(0, 86, VW, 1, '#ffd84a'); R(0, 129, VW, 1, '#ffd84a');
+  ctx.font = '12px "Press Start 2P", ui-monospace, Menlo, monospace'; ctx.textAlign = 'center';
+  ctx.fillStyle = '#000'; ctx.fillText(c.name, VW / 2 + 2 - slide, 108); ctx.fillStyle = Math.floor(c.t * 10) % 2 && c.t < 0.8 ? '#fff' : '#ff6b6b'; ctx.fillText(c.name, VW / 2 - slide, 106);
+  text(c.sub, VW / 2 + slide, 122, '#f3ecd2', 'center', false);
+  ctx.globalAlpha = 1;
+}
+
+// ---------------- hit-stop and combos ----------------
+function hitStop(sec) { G.hitstop = Math.max(G.hitstop || 0, sec); }
+function comboUp() {
+  const n = JT.streak;
+  if (n < 2) return;
+  G.combo = { n, t: 0 };
+  if (n >= 5 && G.save.items.thunder) { G.save.rune = Math.min(RUNE_MAX, G.save.rune + 1); }
+  if (n === 5) Sound.play('secret');
+}
+function drawCombo() {
+  const c = G.combo;
+  if (!c || G.state === 'menu' || G.state === 'title') return;
+  c.t += 1 / 60;
+  if (c.t > 1.4) { G.combo = null; return; }
+  const pop = c.t < 0.15 ? 1 + (0.15 - c.t) * 6 : 1, a = c.t > 1 ? 1 - (c.t - 1) / 0.4 : 1;
+  ctx.save(); ctx.globalAlpha = a; ctx.translate(VW / 2, 40); ctx.scale(pop, pop);
+  const label = c.n >= 7 ? `x${c.n}  LEGENDARY!` : c.n >= 5 ? `x${c.n}  CHOP STORM!` : c.n >= 3 ? `x${c.n}  CHOP COMBO!` : `x${c.n}  COMBO`;
+  text(label, 1, 1, '#000', 'center'); text(label, 0, 0, c.n >= 5 ? '#ffd84a' : '#9be08a', 'center');
+  ctx.restore();
+}
+
+// ---------------- the Jukebox ----------------
+const JUKE_ORDER = ['title', 'overworld', 'village', 'journey', 'cold', 'aero', 'palace', 'dungeon', 'boss', 'barrow', 'bjarne', 'arena', 'creepy'];
+function markHeard(id) { if (id && G.save && G.mode === 'story' && !flag('heard:' + id)) { G.save.flags['heard:' + id] = true; } }
+function jukeList() { return JUKE_ORDER.filter(id => SCORE[id]); }
+function updateJukebox() {
+  const list = jukeList();
+  G.jukeSel = clamp(G.jukeSel || 0, 0, list.length - 1);
+  if (just('up')) { G.jukeSel = (G.jukeSel + list.length - 1) % list.length; Sound.play('menu'); }
+  if (just('down')) { G.jukeSel = (G.jukeSel + 1) % list.length; Sound.play('menu'); }
+  if (just('a')) {
+    const id = list[G.jukeSel];
+    if (flag('heard:' + id)) { G.jukebox = G.jukebox === id ? null : id; Sound.play('coin'); } else Sound.play('clank');
+  }
+}
+function drawJukebox() {
+  const list = jukeList();
+  R(0, 0, VW, VH, 'rgba(5,5,20,.92)'); R(8, 8, 240, 208, '#ffd84a'); R(10, 10, 236, 204, '#0d0d33');
+  text('◀ MAP', 20, 26, '#8a8ab0', 'left', false); text('JUKEBOX', 128, 26, '#ffe64d', 'center'); text('GEAR ▶', 236, 26, '#8a8ab0', 'right', false);
+  const heard = list.filter(id => flag('heard:' + id)).length;
+  text(`${heard}/${list.length} songs found. Hear them in the world to unlock.`, 128, 40, '#a79fc4', 'center', false);
+  list.forEach((id, i) => {
+    const y = 54 + i * 11, sel = i === (G.jukeSel || 0), got = flag('heard:' + id), playing = G.jukebox === id;
+    const nm = got ? SCORE[id].name.replace(/ \(.*\)$/, '') : '???';
+    if (sel) R(18, y - 8, 220, 11, '#1a2238');
+    text((sel ? '> ' : '  ') + nm, 22, y, !got ? '#55577a' : sel ? '#ffd84a' : '#f3ecd2', 'left', false);
+    if (playing) { const b = Math.floor(G.t * 8) % 4; text('♪'.repeat(1 + b), 230, y, '#9be08a', 'right', false); }
+  });
+  text('Z: play / stop     Enter: close', 128, 212, '#8a8ab0', 'center', false);
+}
+
+// ---------------- Snow Penguins and Royal Guards ----------------
+const PAL_SNOWPENG = { n: '#dfe7f2', N: '#aebfd6', w: '#ffffff', W: '#d8e4f0', o: '#7fd4ff', O: '#3a8ad0', r: '#4aa0ff', g: '#ffd84a', G: '#c89a18', c: '#7a1a8a', h: '#a8acc0', H: '#6a6e84', R: '#4aa0ff' };
+const PAL_GUARD = { n: '#3a2a10', N: '#6a4a18', w: '#ffd84a', W: '#c89a18', o: '#ff6020', O: '#c83010', r: '#ff2828', g: '#ffd84a', G: '#c89a18', c: '#7a1a8a', h: '#a8acc0', H: '#6a6e84', R: '#e02838' };
+function buildAwesomeArt() {
+  for (const [key, pal] of [['snow', PAL_SNOWPENG], ['guard', PAL_GUARD]]) {
+    for (const dir of ['down', 'up', 'side']) for (let f = 0; f < 2; f++) {
+      const c = buildSprite(PENG[dir][f], pal);
+      SPR[`${key}_${dir}_${f}`] = c; SPR[`${key}_${dir}_${f}_f`] = flipped(c);
+    }
+  }
+}
+function pengKey(e) { return e.type === 'snowpeng' ? 'snow' : e.type === 'guard' ? 'guard' : 'peng'; }
+function updateSnowPeng(e, dt, dx, dy, d, mr) {
+  // fast and twitchy: skates toward Owen in zigzags, slides a little on ice
+  if (d > 140 && !e.aggro) return;
+  e.aggro = true;
+  const a = e.t * 7, zx = -dy / d * Math.sin(a) * 50, zy = dx / d * Math.sin(a) * 50;
+  e.fx = dx / d; e.fy = dy / d;
+  tryMove(e, (dx / d * e.speed + zx) * dt, (dy / d * e.speed + zy) * dt, mr, 'walker');
+  if (Math.random() < 0.15) G.fx.push({ x: e.x + rnd(-3, 3), y: e.y + 6, vx: rnd(-10, 10), vy: rnd(-15, -5), t: 0, life: 0.3, color: '#ffffff', size: 1 });
+}
+function updateGuard(e, dt, dx, dy, d, mr) {
+  // a shield-bearing penguin: slow to turn, so get around him; when staggered he waddles in a panic
+  if (d < 110 || e.aggro) { e.aggro = true; if (e.t > 0.7) { e.t = 0; e.fx = dx / d; e.fy = dy / d; } tryMove(e, e.fx * e.speed * dt, e.fy * e.speed * dt, mr, 'walker'); }
+}
+function awesomeOnKill(e) {
+  if (e.type === 'guard') { Sound.play('coin'); G.ents.push({ kind: 'pickup', what: 'kr5', x: e.x, y: e.y, life: 9 }); }
+  if (e.type === 'snowpeng') puff(e.x, e.y, '#ffffff', 10);
+}
+
+// ---------------- King Owen ----------------
+function sitOnThrone() {
+  if (!flag('d1done')) return say([['', 'A throne of ice. Someone very round sits here. Often.']]);
+  if (flag('king_owen')) return say([['', 'Your throne. Cold, bony, perfect.'], ['Jon', 'Your Majesty. Can we go now? Your Majesty.']]);
+  return say([['', 'The Penguin King\'s throne. Ice, fish bones and one very small cushion.'], ['Jon', 'Sit on it. SIT ON IT. You\'re the king now.'], ['Owen', 'I\'m not sitting on fish bones, Jon.'], ['Jon', '...'], ['Owen', 'Fine. One second.'], ['', 'You sit. The ice creaks. Somewhere in the palace a hundred penguins stop what they are doing.']], () => {
+    setFlag('king_owen'); G.banner = 'KING OWEN OF THE PENGUINS'; G.bannerT = 4; Sound.play('secret'); G.shake = 0.3;
+    for (const e of G.ents) if (e.type === 'penguin' && e.alive) { e.bow = true; }
+    jonXP(20); JT.queued = 'boss'; writeSave();
+  });
+}
+function kingOwenRules(e) {
+  // once Owen has sat on the throne, every penguin in the palace bows instead of biting
+  if (e.type === 'penguin' && G.mapId === 'cavern' && flag('king_owen')) { e.bow = true; return true; }
+  return false;
+}
+
+// ---------------- title screen ----------------
+const TITLE_FX = { flakes: [] };
+function drawTitleExtras() {
+  const t = G.t;
+  while (TITLE_FX.flakes.length < 36) TITLE_FX.flakes.push({ x: Math.random() * VW, y: Math.random() * 150, s: 8 + Math.random() * 16, w: Math.random() * 6 });
+  for (const f of TITLE_FX.flakes) { f.y += f.s / 60; f.x += Math.sin(t + f.w) * 0.2; if (f.y > 150) { f.y = 0; f.x = Math.random() * VW; } R(f.x, f.y, f.s > 18 ? 2 : 1, f.s > 18 ? 2 : 1, 'rgba(255,255,255,0.8)'); }
+  // Jon flies across the sky every so often, trailing sparkle
+  const fx = ((t * 60) % (VW + 200)) - 100, fy = 30 + Math.sin(t * 3) * 6;
+  if (fx > -40 && fx < VW + 40) { drawJonSprite(fx, fy, t * 10, false); for (let i = 1; i < 5; i++) R(fx - i * 9, fy + Math.sin(t * 9 + i) * 3, 2, 2, `rgba(255,216,74,${0.6 - i * 0.12})`); }
+  // logo glow pulse
+  const g = 0.5 + 0.5 * Math.sin(t * 2);
+  ctx.globalAlpha = 0.25 * g; R(VW / 2 - 90, 44, 180, 22, '#8fd0ff'); ctx.globalAlpha = 1;
+}
+
 // ===== sprites.js =====
 // Pixel art drawn in code. Everything is centered on (x, y) = feet-ish center.
 
@@ -5784,14 +5947,14 @@ function drawEnemy(e) {
   const white = e.flash > 0 || (e.st === 'wind' && Math.floor(G.t * 16) % 2 === 0);
   const f = Math.floor(e.wob / 2.5) % 2;
   switch (e.type) {
-    case 'penguin': case 'knight': case 'king': {
+    case 'penguin': case 'knight': case 'king': case 'snowpeng': case 'guard': {
       const s = e.type === 'king' ? 3 : e.type === 'knight' ? 2 : 1;
       const { d, flip } = dirOf(e.fx, e.fy);
-      const waddle = e.st === 'daze' || e.st === 'slide' ? 0 : [0, 1, 0, -1][Math.floor(e.wob / 2.5) % 4] * s;
+      const waddle = e.st === 'daze' || e.st === 'slide' || e.bow ? 0 : [0, 1, 0, -1][Math.floor(e.wob / 2.5) % 4] * s;
       const shake = (e.type === 'king' && (e.st === 'wind' || e.st === 'slide') ? Math.round(rnd(-1, 1)) : 0) + waddle;
       shadowAt(x, y + 5 * s, s);
-      const img = SPR[`peng_${d}_${e.st === 'daze' ? 0 : f}${flip ? '_f' : ''}`];
-      const foot = y + 6 * s;
+      const img = SPR[`${pengKey(e)}_${e.bow ? 'down' : d}_${e.st === 'daze' || e.bow ? 0 : f}${flip && !e.bow ? '_f' : ''}`];
+      const foot = y + 6 * s + (e.bow ? 2 : 0);
       spr(img, x + shake, foot, { scale: s, white });
       const top = foot - img.height * s + 2 * s;
       if (e.type === 'king') {
@@ -5802,6 +5965,8 @@ function drawEnemy(e) {
         spr(SPR.helmet, x, top + 4 * s, { scale: s, white });
         drawShield(e, x, y - 2 * s, s);
       }
+      if (e.type === 'guard') { spr(SPR.helmet, x, top + 4, { white }); drawShield(e, x, y - 2, 1); }
+      if (e.bow && Math.floor(G.t * 2 + e.wob) % 3 === 0) text('ak', x + 8, y - 10, '#c8d8ff', 'left', false);
       break; }
     case 'draugr': {
       const { d, flip } = dirOf(e.fx, e.fy);
@@ -6418,6 +6583,7 @@ function drawTitle() {
   ctx.fillStyle = '#000'; ctx.fillText('JÖNTUKA', VW / 2 + 2, 62); ctx.fillStyle = '#8fd0ff'; ctx.fillText('JÖNTUKA', VW / 2, 60);
   text('A VIKING TALE', VW / 2, 80, '#f3ecd2', 'center');
   text('a game by Owen', VW / 2, 96, '#a79fc4', 'center');
+  drawTitleExtras();
   drawJonSprite(VW / 2 + 74 + Math.sin(G.t * 2) * 3, 124, Math.sin(G.t * 1.5) * 0.3, G.t % 3.2 < 0.14);
   const opts = G.titleOpts || titleOptions();
   opts.forEach((o, i) => {
@@ -6534,14 +6700,14 @@ function onEnterScreen() {
   const has = type => G.ents.some(e => e.type === type && e.alive);
   markSeen();
   if (G.mapId === 'cavern' && !flag('intro:cavern')) { setFlag('intro:cavern'); say(STORY.cavern_enter); }
-  if (has('knight') && !flag('intro:knight')) { setFlag('intro:knight'); Sound.play('boss'); say(STORY.knight); }
+  if (has('knight') && !flag('intro:knight')) { setFlag('intro:knight'); Sound.play('boss'); showBossCard('knight'); say(STORY.knight); }
   if (G.map.redeye) redeyeEnter();
   HK.axes = [];
   if (G.mapId === 'barrow' && !flag('intro:barrow')) { setFlag('intro:barrow'); say(STORY.barrow_enter); }
-  if (has('captain') && !flag('intro:captain')) { setFlag('intro:captain'); Sound.play('boss'); say(STORY.captain); }
-  if (has('hank')) { Sound.play('boss'); say(flag('intro:hank') ? [['Hank', 'TURN... BACK...']] : STORY.hank); setFlag('intro:hank'); }
-  if (has('attendant') && !flag('intro:attendant')) { setFlag('intro:attendant'); say(STORY.attendant); }
-  if (has('king')) { Sound.play('boss'); say(flag('intro:king') ? [['Penguin King', 'AK! Back for more?']] : STORY.king); setFlag('intro:king'); }
+  if (has('captain') && !flag('intro:captain')) { setFlag('intro:captain'); Sound.play('boss'); showBossCard('captain'); say(STORY.captain); }
+  if (has('hank')) { Sound.play('boss'); showBossCard('hank'); say(flag('intro:hank') ? [['Hank', 'TURN... BACK...']] : STORY.hank); setFlag('intro:hank'); }
+  if (has('attendant') && !flag('intro:attendant')) { setFlag('intro:attendant'); showBossCard('attendant'); say(STORY.attendant); }
+  if (has('king')) { Sound.play('boss'); showBossCard('king'); say(flag('intro:king') ? [['Penguin King', 'AK! Back for more?']] : STORY.king); setFlag('intro:king'); }
   if (G.mapId === 'overworld' && flag('d2done') && !flag('chapter2_banner') && G.scr.x === 0 && G.scr.y === 0) {
     setFlag('chapter2_banner'); G.banner = 'CHAPTER 3 COMPLETE'; G.bannerT = 4; Sound.play('secret'); writeSave();
   }
@@ -6552,6 +6718,8 @@ function onEnterScreen() {
 
 function update(dt) {
   G.t += dt;
+  updateBossCard(dt);
+  if (G.hitstop > 0) { G.hitstop -= dt; return; }
   G.shake = Math.max(0, G.shake - dt); G.flash = Math.max(0, G.flash - dt); G.bannerT = Math.max(0, G.bannerT - dt);
   if (G.state !== 'play') { JT.t = Math.max(0, JT.t - dt); JT.faceT = Math.max(0, JT.faceT - dt); }
   if (just('mute')) Sound.muted = !Sound.muted;
@@ -6585,9 +6753,10 @@ function update(dt) {
       return;
     case 'warp': updateWarp(dt); return;
     case 'menu':
-      if (just('right')) { G.menuPage = ((G.menuPage || 0) + 1) % 3; Sound.play('menu'); }
-      if (just('left')) { G.menuPage = ((G.menuPage || 0) + 2) % 3; Sound.play('menu'); }
-      if (just('menu') || just('a') || just('tap')) { G.state = 'play'; Sound.play('menu'); }
+      if (just('right')) { G.menuPage = ((G.menuPage || 0) + 1) % 4; Sound.play('menu'); }
+      if (just('left')) { G.menuPage = ((G.menuPage || 0) + 3) % 4; Sound.play('menu'); }
+      if (G.menuPage === 3) { updateJukebox(); if (just('menu') || just('tap')) { G.state = 'play'; G.jukebox = null; Sound.play('menu'); } return; }
+      if (just('menu') || just('a') || just('tap')) { G.state = 'play'; G.jukebox = null; Sound.play('menu'); }
       return;
     case 'over':
       if (just('a') || just('menu') || just('tap')) { continueGame(true); }
@@ -6652,7 +6821,8 @@ function render() {
   if (G.state === 'warp') { ctx.globalAlpha = clamp(1 - Math.abs(G.warp.t - 0.35) / 0.35, 0, 1); R(0, 0, VW, VH, '#000'); ctx.globalAlpha = 1; }
   if (G.bannerT > 0) { R(0, 92, VW, 34, 'rgba(0,0,0,.8)'); text(G.banner, VW / 2, 113, '#ffd84a', 'center'); }
   if (G.state === 'talk') drawTalk();
-  if (G.state === 'menu') { if (G.menuPage === 2) drawMapPage(); else if (G.menuPage) drawJonPage(); else drawMenu(); }
+  if (G.state === 'menu') { if (G.menuPage === 3) drawJukebox(); else if (G.menuPage === 2) drawMapPage(); else if (G.menuPage) drawJonPage(); else drawMenu(); }
+  drawBossCard(); drawCombo();
   drawJonLevel();
   drawArenaMenus();
   if (G.state === 'over') {
@@ -6666,11 +6836,11 @@ function render() {
 
 let last = performance.now();
 G.menuSel = 0;
-buildAll(); buildSnesArt();
+buildAll(); buildSnesArt(); buildAwesomeArt();
 function frame(now) {
   const dt = Math.min(0.05, (now - last) / 1000); last = now;
-  try { pollGamepad(); update(dt); render(); Music.want(musicFor()); Music.tick(); } catch (err) { console.error(err); }
-  for (const k in edge) edge[k] = false;
+  try { pollGamepad(); update(dt); render(); const mid = musicFor(); markHeard(mid); Music.want(mid); Music.tick(); } catch (err) { console.error(err); }
+  if (!(G.hitstop > 0)) for (const k in edge) edge[k] = false;   // a tap during hit-stop still counts
   requestAnimationFrame(frame);
 }
 (document.fonts && document.fonts.load ? document.fonts.load('8px "Press Start 2P"').catch(() => {}) : Promise.resolve())

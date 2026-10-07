@@ -174,6 +174,8 @@ const JON = {
   beetle: ['Armor. Of course it has armor. THROW me at it!', 'Flip it! Flip it like a pancake! Then chop the pancake!', 'That beetle is wearing more plating than Hank.'],
   slime: ['Blue goo. Don\'t let it touch me. I\'ll smell like goo.', 'It split! That\'s cheating! Chop it twice!', 'Jello with ambitions.'],
   spore: ['A mushroom is SPITTING at us. A mushroom.', 'It hides under its own hat. Coward. Get close, then back off, then CHOP.', 'Never trust a fungus with eyes.'],
+  guard: ['Royal Guards! Gold penguins with shields. Of course.', 'Get behind him! Penguins can\'t turn fast. Short legs.', 'He\'s wearing a bucket. A GOLD bucket.'],
+  snowpeng: ['Snow penguins! They\'re FAST. Why are they fast?!', 'Zigzag penguin. Zigzag penguin. Hold still, bird!', 'They skate. Penguins that skate. I\'m done.'],
   dark: ['Dark. Hold me up high. I glow. You\'re welcome.', 'If something grabs you, swing me. If something grabs ME, swing harder.'],
   area: {
     home: 'Our room! With MY sign in it.',
