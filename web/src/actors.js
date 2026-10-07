@@ -250,7 +250,7 @@ function interact(e) {
     case 'shop': return buy(e);
     case 'chest':
       if (e.open) return say([['', 'The chest is empty.']]);
-      e.open = true; setFlag('chest:' + e.def.id);
+      e.open = true; setFlag('chest:' + e.def.id); JT.queued = 'chest';
       return giveItem(e.def.item);
   }
 }
@@ -406,7 +406,7 @@ function cutAt(x, y) {
   const tx = Math.floor(x / T), ty = Math.floor(y / T), c = tile(tx, ty);
   if (!sameScreen(tx, ty)) return false;
   if (c === 'b') { setTile(tx, ty, SNOWY(tx, ty) ? 'n' : '.'); leaves(tx * T + 8, ty * T + 8, ['#58b840', '#a8e070', '#388828']); Sound.play('swing'); maybeDrop(tx * T + 8, ty * T + 8, 0.4); return true; }
-  if (c === ',') { setTile(tx, ty, SNOWY(tx, ty) ? 'n' : '.'); leaves(tx * T + 8, ty * T + 8, ['#5fbb44', '#9ee064', '#2f7a2a']); maybeDrop(tx * T + 8, ty * T + 8, 0.12); return false; }
+  if (c === ',') { setTile(tx, ty, SNOWY(tx, ty) ? 'n' : '.'); leaves(tx * T + 8, ty * T + 8, ['#5fbb44', '#9ee064', '#2f7a2a']); maybeDrop(tx * T + 8, ty * T + 8, 0.12); if (Math.random() < 0.3) jonSay('grass', { cooldown: 45 }); return false; }
   if (c === 'O') { setTile(tx, ty, '_'); leaves(tx * T + 8, ty * T + 8, ['#b8784a', '#8a5432', '#e0a070']); Sound.play('kill'); maybeDrop(tx * T + 8, ty * T + 8, 0.6); return true; }
   return false;
 }

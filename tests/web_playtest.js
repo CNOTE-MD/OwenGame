@@ -92,7 +92,7 @@ const SHOTS = process.env.SHOTS || '/tmp';
   await goScreen('overworld', 39, 4); await place(39, 3, 0, -1);
   await pg.keyboard.down('ArrowUp'); await wait(300); await pg.keyboard.up('ArrowUp'); await wait(900); await talkThrough();
   await check('entered Ice Cavern', await ev(() => G.mapId === 'cavern'));
-  await check('music: cavern theme', await ev(() => musicFor() === 'dungeon'));
+  await check('music: Penguin Rhapsody in the palace', await ev(() => musicFor() === 'palace'));
   await pg.screenshot({ path: SHOTS + '/p4_cavern.png' });
 
   // locked door in hub (top at 23-24,28). No key -> stays locked; with key -> opens

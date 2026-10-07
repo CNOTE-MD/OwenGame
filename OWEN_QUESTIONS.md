@@ -61,6 +61,11 @@ Rules of thumb: his journal pages always win over anything already in the game. 
 35. What should the final wave (wave 20) look like?
 36. Should there be a leaderboard? Who are you trying to beat?
 
+## Music
+
+49. Four new songs sound like Foreigner, Journey, Aerosmith and Queen (Frozen Path, Muck Forest, subway, Penguin Palace). Which is your favorite? Which band is missing?
+50. Jon hums them when you stand still. What song should Jon sing badly on purpose?
+
 ## Rush
 
 37. Jon can recite Rush E. Should the real "Rush E" vibe show up more? Where?

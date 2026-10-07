@@ -110,6 +110,14 @@ const Music = {
         case 'flute':
           this.osc('sine', f, t, end).connect(flt); this.osc('triangle', f, t, end, 3).connect(flt); flt.frequency.value = 2400;
           this.env(g, t, 0.06, 0.28, 0.2, 0.85, 0.15, end); break;
+        case 'piano': {  // bright stage piano: hammer click, quick bloom, long tail
+          this.osc('triangle', f, t, end).connect(flt); this.osc('square', f * 2, t, end, 2).connect(flt); this.osc('sine', f * 4, t, end).connect(flt);
+          flt.frequency.setValueAtTime(5200, t); flt.frequency.exponentialRampToValueAtTime(1400, t + 0.3); flt.Q.value = 0.7;
+          this.env(g, t, 0.003, 0.3, 0.3, 0.6, 0.25, end); break; }
+        case 'choir': {  // stacked voices: three detuned saws and a sine, slow swell, vowel-ish filter
+          this.osc('sawtooth', f, t, end, -14).connect(flt); this.osc('sawtooth', f, t, end, 0).connect(flt); this.osc('sawtooth', f, t, end, 14).connect(flt); this.osc('sine', f * 2, t, end).connect(flt);
+          flt.frequency.setValueAtTime(700, t); flt.frequency.linearRampToValueAtTime(1300, t + 0.4); flt.Q.value = 3;
+          this.env(g, t, 0.3, 0.2, 0.35, 0.7, 0.5, end); break; }
       }
     }
   },
@@ -154,7 +162,7 @@ const Music = {
 function musicFor() {
   const st = G.state;
   if (st === 'title') return 'title';
-  if (st === 'cutscene' || (st === 'talk' && G.talk && G.talk.back === 'cutscene')) return 'creepy';
+  if (st === 'cutscene' || (st === 'talk' && G.talk && G.talk.back === 'cutscene')) return (G.cutPages && G.cutPages[G.cut.i] && String(G.cutPages[G.cut.i].art).startsWith('taxi')) ? 'journey' : 'creepy';
   if (st === 'over' || st === 'arenaover') return null;
   if (G.mode === 'arena') {
     if (st === 'shop' || st === 'levelup') return 'village';
@@ -164,9 +172,13 @@ function musicFor() {
   if (G.mapId === 'barrow') return G.ents.some(e => e.boss && e.alive) ? 'boss' : 'barrow';
   if (G.map.redeye) return G.ents.some(e => e.type === 'attendant' && e.alive) ? 'boss' : 'creepy';
   if (G.mapId === 'bjarne_house' && flag('bjarne_done')) return 'bjarne';
+  if (G.mapId === 'subway') return 'aero';
+  if (G.mapId === 'cavern') return G.ents.some(e => e.boss && e.alive) ? 'boss' : 'palace';
   if (G.map.interior) return 'village';
   if (G.map.dark) return 'dungeon';
   if (G.map.dungeon) return G.ents.some(e => e.boss && e.alive) ? 'boss' : 'dungeon';
   if (G.scr.y === 1 && G.scr.x <= 1) return 'village';
+  if (G.scr.y === 0 && G.scr.x === 1) return 'journey';   // the Muck Forest: don't stop choppin'
+  if (G.scr.y === 0 && G.scr.x >= 2) return 'cold';       // the Frozen Path and Storm Peak
   return 'overworld';
 }

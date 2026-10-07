@@ -131,6 +131,21 @@ const path = require('path');
   await check('the Red-Eye is a dream now', await ev(() => STORY.cargo_open[0][1].includes('bench') && STORY.attendant_down.some(l => /wake up/.test(l[1]))));
   await check('Jon says Hello Señor', await ev(() => JON.idle.includes('Hello Señor!')));
 
+  // --- Owen's bands and Jon's mouth ---
+  await check('four band-sound pieces compile', await ev(() => ['cold', 'journey', 'aero', 'palace'].every(id => { const c = Music.compile(id); return c.ev.length > 40 && c.len > 10 && c.ev.some(e => e.inst === 'piano' || e.inst === 'choir' || e.inst === 'gtr'); })));
+  await check('Queen piece stacks a choir, Journey piece runs a piano', await ev(() => Music.compile('palace').ev.some(e => e.inst === 'choir' && e.f.length >= 2) && Music.compile('journey').ev.filter(e => e.inst === 'piano').length > 60));
+  await go('subway', 8, 3); await check('the subway plays the Aerosmith-sound piece', await ev(() => musicFor() === 'aero'));
+  await go('overworld', 24, 8); await check('the Muck Forest plays the Journey-sound piece', await ev(() => musicFor() === 'journey'));
+  await go('overworld', 40, 6); await check('the Frozen Path plays the Foreigner-sound piece', await ev(() => musicFor() === 'cold'));
+  await go('cavern', 24, 20); await check('the Penguin Palace plays the Queen-sound piece', await ev(() => musicFor() === 'palace'));
+  await go('cavern', 24, 5, true); await check('the King still gets the boss theme', await ev(() => musicFor() === 'boss'));
+  await check('Jon has a lot to say', await ev(() => JON.idle.length >= 18 && JON.sing.length >= 8 && Object.values(JON).filter(Array.isArray).reduce((n, a) => n + a.length, 0) >= 150));
+  await check('every Jon trigger has lines', await ev(() => ['muck', 'grass', 'snow', 'night', 'dawn', 'tablet', 'taxi', 'chest', 'beetle', 'slime', 'spore', 'dark', 'log', 'sing'].every(k => Array.isArray(JON[k]) && JON[k].length >= 2)));
+  await go('overworld', 18, 7); await ev(() => { JT.cd = {}; JT.t = 0; }); await pg.keyboard.down('ArrowRight'); await wait(500); await pg.keyboard.up('ArrowRight');
+  await check('Jon complains about the muck', await ev(() => JON.muck.includes(JT.line)));
+  await go('overworld', 40, 6); await ev(() => { JT.cd = {}; JT.t = 0; G.save.clock = 12; }); await wait(400);
+  await check('Jon comments on the snow', await ev(() => JON.snow.includes(JT.line) || JT.line === JON.area.frozen));
+
   console.log('errors:', JSON.stringify(errs));
   console.log('FAILS:', fails + errs.length);
   await b.close();
