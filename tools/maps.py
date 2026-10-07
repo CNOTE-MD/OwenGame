@@ -53,14 +53,14 @@ OW[(1, 0)] = [  # Muck Forest (Owen's page 5): muck and grime, tall grass, and t
     ",,%%%%%%%%,,,,,o",
     "ss%%%%%%%%ssssso",
     "%%%%%%%f%%%%,,,T",
-    "%%T%%%%%%TT%%,,,",
+    "%%T%%%%%%TT%%,,T",
     "T%%%%b%%%%%%%T,T",
     "T,,TT%%%%b,,,,,T",
     "T,,,,,%%T,,,T,,T",
     "TT,,b,,,,,,,,,,T",
     "TTTTTT,s,,TTTTTT",
 ]
-OW[(2, 0)] = [  # Frozen Path: Penguin Ice Cavern (dungeon 1)
+OW[(2, 0)] = [  # Frozen Path: Penguin Palace (chapter 2); only reached past the log
     "TTTTTTTTTTTTTTTT",
     "TMMMMMMMMMMMMMMT",
     "TMMMMMMEMMMMMMMT",
@@ -74,7 +74,7 @@ OW[(2, 0)] = [  # Frozen Path: Penguin Ice Cavern (dungeon 1)
     "Tnn#nnnsnnnTnnnT",
     "TnnnnnnsnnnnnnnT",
     "TnnnnnTsnnnnnnnT",
-    "TTTTTT.s..TTTTTT",
+    "TTTTTTTTTTTTTTTT",
 ]
 OW[(3, 0)] = [  # Storm Peak base: sealed (dungeon 4)
     "TTTTTTTTTTTTTTTT",
@@ -90,7 +90,7 @@ OW[(3, 0)] = [  # Storm Peak base: sealed (dungeon 4)
     "TnnnnnnsnnnnnTnT",
     "Tnnn#nnsnnnnnnnT",
     "TnnnnnnsnnnnnnnT",
-    "TTTTTT.s..TTTTTT",
+    "TTTTTTTTTTTTTTTT",
 ]
 OW[(0, 1)] = [  # Fjordvik west: Elder Astrid's house
     "TTTTTT.s..TTTTTT",
@@ -124,8 +124,8 @@ OW[(1, 1)] = [  # Fjordvik market: Lars's stall
     "T.......s......T",
     "TTTTTT.s..TTTTTT",
 ]
-OW[(2, 1)] = [  # Lake Jontuka, north shore
-    "TTTTTT.s..TTTTTT",
+OW[(2, 1)] = [  # Lake Jontuka, north shore (cliffs to the north; the Frozen Path is only reached through the Muck Forest)
+    "TTTTTTTTTTTTTTTT",
     "T.....ss.......T",
     "T..sssssssssss.T",
     "T..s~~~~~~~~~s.T",
@@ -141,7 +141,7 @@ OW[(2, 1)] = [  # Lake Jontuka, north shore
     "TTTTTT.s..TTTTTT",
 ]
 OW[(3, 1)] = [  # Volcano road: sealed Walter's Forge (dungeon 3)
-    "TTTTTT.s..TTTTTT",
+    "TTTTTTTTTTTTTTTT",
     "T#.....s....lllT",
     "T..#...s...lMMMT",
     "T......s...lMXMT",
@@ -634,11 +634,16 @@ def reachable(grid, start, extra=set()):
     return seen
 
 thicken(ow, OW_ENT)
-ow_seen = reachable(ow, OW_ENT[0]["at"])
+ow_seen = reachable(ow, OW_ENT[0]["at"], extra={"o"})   # the log gets chopped
 for e in OW_ENT:
     x, y = e["at"]
     ok = any((x + dx, y + dy) in ow_seen for dx, dy in ((0, 0), (1, 0), (-1, 0), (0, 1), (0, -1)))
     assert ok, ("overworld unreachable", e)
+# Owen's log is the only way to the Frozen Path and Storm Peak
+no_log = reachable(ow, OW_ENT[0]["at"])
+assert tuple(P(2, 0, 7, 3)) not in no_log, "the Frozen Path must need the log chopped"
+assert tuple(P(3, 0, 7, 3)) not in no_log, "Storm Peak must need the log chopped"
+assert tuple(P(1, 0, 14, 6)) in no_log, "you must be able to walk up to the log"
 cav_seen = reachable(cav, P(1, 3, 7, 12))
 for e in CAV_ENT:
     x, y = e["at"]
