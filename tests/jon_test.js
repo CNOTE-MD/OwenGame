@@ -20,7 +20,7 @@ const path = require('path');
   await check('Jon greets a new area', await ev(() => JT.line === JON.area.village || flag('jonarea:village')));
   await ev(() => { JT.t = 0; JT.cd = {}; JT.idle = 8.95; G.player.moving = false; });
   await wait(150);
-  await check('Jon talks when Owen stands still', await ev(() => JON.idle.includes(JT.line)));
+  await check('Jon talks (or sings) when Owen stands still', await ev(() => JON.idle.includes(JT.line) || JON.sing.includes(JT.line)));
   await ev(() => { JT.t = 0; JT.idle = 21.95; });
   await wait(150);
   await check('...then falls asleep', await ev(() => JT.asleep && jonFaceNow() === 'sleepy'));

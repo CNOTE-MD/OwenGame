@@ -63,7 +63,7 @@ function updateGround(dt) {
   const c = tileAt(p.x, p.y + 4);
   RUST.t -= dt;
   if (c === ',' && RUST.t <= 0) { RUST.t = 0.18; for (let i = 0; i < 2; i++) G.fx.push({ kind: 'leaf', x: p.x + rnd(-5, 5), y: p.y + 4, vx: rnd(-20, 20), vy: rnd(-40, -15), grav: 180, t: 0, life: 0.4, color: pick(['#58b840', '#a8e070']) }); }
-  if (c === '%' && RUST.t <= 0) { RUST.t = 0.22; Sound.play('mud'); for (let i = 0; i < 3; i++) G.fx.push({ x: p.x + rnd(-4, 4), y: p.y + 5, vx: rnd(-25, 25), vy: rnd(-35, -10), grav: 200, t: 0, life: 0.35, color: pick(['#5a3e22', '#7a5a32', '#3a2a16']), size: 2 }); }
+  if (c === '%' && RUST.t <= 0) { RUST.t = 0.22; Sound.play('mud'); jonSay('muck', { cooldown: 60, face: 'worried' }); for (let i = 0; i < 3; i++) G.fx.push({ x: p.x + rnd(-4, 4), y: p.y + 5, vx: rnd(-25, 25), vy: rnd(-35, -10), grav: 200, t: 0, life: 0.35, color: pick(['#5a3e22', '#7a5a32', '#3a2a16']), size: 2 }); }
 }
 function groundSpeed(p) { const c = tileAt(p.x, p.y + 4); return c === '%' ? 0.55 : c === ',' ? 0.9 : 1; }
 
@@ -202,7 +202,7 @@ function tabletsFound() { return Object.keys(TABLETS).filter(k => flag('got:' + 
 function readTablet(e) {
   const id = e.def.id;
   if (flag('got:' + id)) return say([['', TABLETS[id]]]);
-  setFlag('got:' + id); jonXP(8); Sound.play('secret');
+  setFlag('got:' + id); jonXP(8); Sound.play('secret'); JT.queued = 'tablet';
   const n = tabletsFound();
   const lines = [['', TABLETS[id]], ['', `Rune tablet ${n} of ${TABLET_TOTAL} found.`]];
   if (n === TABLET_TOTAL) { say(lines, () => { setFlag('got:hc_tablets'); giveItem('container'); }); return; }
@@ -264,6 +264,7 @@ function startRide(to) {
     if (to === 'forest') { loadMap('overworld', 23 * T + 8, 12 * T + 8); } else { loadMap('overworld', 20 * T + 8, 37 * T + 8); }
     G.state = 'play'; writeSave();
     if (to === 'forest' && !flag('forest_arrival')) { setFlag('forest_arrival'); say(STORY.forest_arrival); }
+    JT.queued = 'taxi';
   };
   Sound.play('door');
   say(G.cutPages[0].lines, nextCutPage);
@@ -292,7 +293,7 @@ function hitLog(e) {
   if (e.cd > 0 || e.hp <= 0) return;
   e.cd = 0.3; e.hp--; Sound.play('swing'); leaves(e.x, e.y, ['#a8723a', '#6e4420', '#c89058']);
   G.shake = 0.08;
-  if (e.hp > 0) { if (e.hp === 2) jonSay('log', { line: 'Chop! Chop! Say it with me!', force: true, face: 'excited' }); return; }
+  if (e.hp > 0) { jonSay('log', { force: true, face: 'excited' }); return; }
   // chopped: both log tiles become path, for good
   const tx = Math.floor(e.x / T), ty = Math.floor(e.y / T);
   for (const yy of [ty, ty + 1]) if (tile(tx, yy) === 'o') { setTile(tx, yy, 's'); setFlag(`tile:${G.mapId}:${tx},${yy}:s`); leaves(tx * T + 8, yy * T + 8, ['#a8723a', '#6e4420', '#c89058']); }

@@ -43,7 +43,7 @@ const path = require('path');
   await ev(() => { const c = G.ents.find(e => e.type === 'captain'); damageEnemy(c, 1, { x: c.x + 20, y: c.y }, 'swing'); });
   await check('Captain\'s shield blocks the front and staggers', await ev(() => { const c = G.ents.find(e => e.type === 'captain'); return c.hp === c.max && c.guardDown > 0; }));
   await ev(() => { const c = G.ents.find(e => e.type === 'captain'); c.hp = 1; c.flash = 0; damageEnemy(c, 1, { x: c.x + 20, y: c.y }, 'swing'); });
-  await wait(100); await talkThrough();
+  await wait(450); await talkThrough();   // the boss hit-stop lasts 0.28s before Jon's level-up can appear
   await check('beating him reveals the dash chest', await ev(() => G.ents.some(e => e.def && e.def.id === 'br_dash')));
   await place(8, 21, 0, -1); await pg.keyboard.press('KeyZ'); await wait(1400); await talkThrough();
   await check('got the Voodoo Dash', await ev(() => G.save.items.dash));

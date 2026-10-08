@@ -33,14 +33,15 @@ function updateJonTalk(dt) {
     JT.idle = 0;
   } else {
     JT.idle += dt;
-    if (JT.idle > 9 && JT.idle - dt <= 9) jonSay('idle', { cooldown: 6 });
+    if (JT.idle > 9 && JT.idle - dt <= 9) jonSay(Math.random() < 0.35 ? 'sing' : 'idle', { cooldown: 6 });
+    if (JT.idle > 16 && JT.idle - dt <= 16) jonSay('sing', { cooldown: 6 });
     if (JT.idle > 22 && !JT.asleep) { JT.asleep = true; jonSay('sleepy', { force: true }); }
     if (JT.asleep && Math.floor(JT.idle) % 6 === 0 && Math.floor(JT.idle - dt) % 6 !== 0) jonSay('sleepy', { force: true });
   }
   // worried when Owen is low
   if (p.hp <= 2 && s.maxHp > 2) { if (JT.faceT <= 0) setJonFace('worried', 0.5); jonSay('lowhp', { cooldown: 25, face: 'worried' }); }
   // first time in each area
-  const area = G.map.dungeon || G.map.interior || G.map.dark ? G.mapId : (G.scr.y === 1 && G.scr.x <= 1 ? 'village' : 'overworld');
+  const area = G.map.dungeon || G.map.interior || G.map.dark ? G.mapId : (G.scr.y === 1 && G.scr.x <= 1 ? 'village' : G.scr.y === 0 && G.scr.x === 1 ? 'forest' : G.scr.y === 0 && G.scr.x >= 2 ? 'frozen' : 'overworld');
   if (area !== JT.lastArea) {
     JT.lastArea = area;
     const line = JON.area[area];
@@ -49,11 +50,20 @@ function updateJonTalk(dt) {
   // near water or a penguin
   if (G.mapId === 'overworld' && tileAt(p.x + p.fx * 20, p.y + p.fy * 20) === '~') jonSay('water', { cooldown: 40, face: 'worried' });
   if (G.ents.some(e => e.type === 'penguin' && e.alive && dist(e, p) < 70)) jonSay('penguin', { cooldown: 45 });
+  for (const t of ['beetle', 'slime', 'spore', 'guard', 'snowpeng']) if (G.ents.some(e => e.type === t && e.alive && dist(e, p) < 80)) jonSay(t, { cooldown: 70 });
+  // the weather and the hour
+  if (G.map.outdoor) {
+    if (typeof isNight === 'function' && isNight()) jonSay('night', { cooldown: 150 });
+    else if (typeof phaseOfDay === 'function' && phaseOfDay() === 'dawn') jonSay('dawn', { cooldown: 200 });
+    if (typeof AMB !== 'undefined' && AMB.flakes.length) jonSay('snow', { cooldown: 120 });
+  }
+  if (G.map.dark) jonSay('dark', { cooldown: 90 });
 }
 // event hooks used by the rest of the game
 function jonOnKill(e) {
   JT.streak++; JT.streakT = 2.5;
   if (e.boss) return;
+  comboUp();
   if (JT.streak === 3) jonSay('streak', { force: true, face: 'excited', cooldown: 8 });
   else if (Math.random() < 0.3) jonSay('kill', { cooldown: 7, face: 'excited' });
 }

@@ -12,7 +12,7 @@
 | `web/src/snes.js` | The SNES pass: day/night, weather, tall grass and muck, Spore Cap/Slime/Beetle, rune tablets, the map page, and Owen's page 5 (subway, taxi, the big log) |
 | `web/src/*.js` | Engine, world, actors, sprites, UI, main loop |
 | `web/src/arena.js` | Valhalla Arena: waves, shop cards, level-ups (tune or add cards here) |
-| `tools/score.py` | The music: original Rush-style pieces as step sequences (odd meters, bass, guitar, synth lead, drums). Run it, then `tools/music_to_midi.py` to refresh `music/midi/*.mid` |
+| `tools/score.py` | The music: original pieces as step sequences. Rush-style odd meters for the title, overworld, dungeon, boss, arena, Bjarne and Barrow; four pieces in the sound of Owen's bands: Cold as Fjord (Foreigner) on the frozen screens, Don't Stop Choppin' (Journey) in the Muck Forest and the taxi, Walk This Fjord (Aerosmith) in the subway, Penguin Rhapsody (Queen) in the Penguin Palace. Run it, then `tools/music_to_midi.py` to refresh `music/midi/*.mid` |
 | `OWEN_QUESTIONS.md` | Prompts to ask Owen after he plays; his answers drive the next build |
 | `STORY_BIBLE.md` | Characters, chapter arc, items, the Red-Eye side quest, Arena mode |
 

@@ -71,6 +71,19 @@ You don't have to do it. After the Penguin Palace you can sit on the bench by th
 
 Chilly froze Hank's ghost to guard the barrow until the axe came home. Fluffy's ghost points the way. Hank, freed, apologizes for throwing Jon in a lake, sends Owen to Walter's Forge, and almost says Walter's real name.
 
+## Music
+
+Rush-style originals (odd meters, melodic bass) carry the title, overworld, boss, arena, Bjarne and Barrow. Owen's favorite bands get the new screens, each an original piece that borrows the band's sound, not a song:
+
+| Piece | Sound | Where |
+|---|---|---|
+| Cold as Fjord | Foreigner: off-beat keyboard stabs over a synth pad, eighth-note bass, big chorus chords | Frozen Path, Storm Peak |
+| Don't Stop Choppin' | Journey: a piano arpeggio that never stops, four chords, a lead that climbs and stays up | Muck Forest, the taxi ride |
+| Walk This Fjord | Aerosmith: a strutting blues riff in twelve, bass and guitar in unison, chromatic walk-ups | Fjordvik T-bane |
+| Penguin Rhapsody | Queen: a piano ballad with a stacked choir, then a galloping hard-rock section with three-part harmony guitars | Penguin Palace |
+
+Jon hums all four when Owen stands still.
+
 ## Arena mode: "Valhalla Arena" (*Brotato*-style, built in milestone 2)
 
 - **Waves:** 20 timed waves of mixed enemies (penguins, draugr, wisps, bats, knights, then elites). Every fifth wave is a boss.

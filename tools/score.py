@@ -1,5 +1,6 @@
-"""The game's music, written as step sequences. Original compositions in the style of Rush:
-odd meters, a melodic bass that does more than hold roots, power chords, synth leads, tom fills.
+"""The game's music, written as step sequences. Original compositions in the style of Rush
+(odd meters, melodic bass, power chords, synth leads, tom fills) plus four pieces in the sound of
+Owen's favorite bands: Foreigner, Journey, Aerosmith and Queen. Everything here is original.
 
 Each step is an eighth note. In a line, a token is a note (E2), a chord (E3+B3), '-' to hold
 the previous note, or '.' for silence. Bars are separated by '|'. Drum lines use one character
@@ -110,6 +111,64 @@ TRACKS = {
       "lead": "D5 - - A#4 - - G4 - A4 | C5 - - A4 - - F4 - G4 | B4 - - G4 - - E4 - F4 | E4 - - - - - C#5 - -",
       "k": "x..x..x..|x..x..x..|x..x..x..|x..xx.xxx", "s": "...x..x..|...x..x..|...x..x..|...x..xxx", "h": rep("xxxxxxxxx", 4), "c": "x........|.........|x........|........."},
   }},
+  # ---- Owen's favorite bands. Original pieces that borrow each band's SOUND, not their songs. ----
+  "cold": {"name": "Cold as Fjord (Foreigner sound)", "bpm": 128, "gain": 0.85, "order": ["A", "A", "B", "B"], "sections": {
+    # staccato off-beat keyboard stabs over a synth pad, a driving eighth-note bass, then the big chorus chords
+    "A": {"steps": 8,
+      "piano": ". A3+C4+E4 . A3+C4+E4 . A3+C4+E4 . A3+C4+E4 | . F3+A3+C4 . F3+A3+C4 . F3+A3+C4 . F3+A3+C4 | . C3+E3+G3 . C3+E3+G3 . C3+E3+G3 . C3+E3+G3 | . G3+B3+D4 . G3+B3+D4 . G3+B3+D4 . G3+B3+D4",
+      "pad":   "A3+E4 - - - - - - - | F3+C4 - - - - - - - | C3+G3 - - - - - - - | G3+D4 - - - - - - -",
+      "bass":  "A2 A2 A2 A2 A2 A2 A2 A2 | F2 F2 F2 F2 F2 F2 F2 F2 | C2 C2 C2 C2 C2 C2 C2 C2 | G2 G2 G2 G2 G2 G2 F2 E2",
+      "lead":  "E5 - - - C5 - - - | A4 - - - - - - - | E5 - D5 - C5 - D5 - | B4 - - - - - - -",
+      "k": rep("x...x...", 4), "s": rep("....x...", 4), "h": rep("x.x.x.x.", 4), "c": "x.......|........|........|........"},
+    "B": {"steps": 8,
+      "gtr":   "A3+E4 - - - A3+E4 - - - | G3+D4 - - - G3+D4 - - - | F3+C4 - - - F3+C4 - - - | G3+D4 - - G3+D4 - - - -",
+      "piano": "A3+C4+E4 - - - A3+C4+E4 - - - | G3+B3+D4 - - - G3+B3+D4 - - - | F3+A3+C4 - - - F3+A3+C4 - - - | G3+B3+D4 - - - G3+B3+D4 - - -",
+      "bass":  "A2 A2 A2 A2 A2 A2 A2 A2 | G2 G2 G2 G2 G2 G2 G2 G2 | F2 F2 F2 F2 F2 F2 F2 F2 | G2 G2 G2 G2 G2 G2 G2 G2",
+      "lead":  "A4 - C5 - E5 - - - | D5 - - - B4 - G4 - | A4 - C5 - F5 - - - | E5 - D5 - B4 - - -",
+      "k": rep("x...x...", 4), "s": rep("....x...", 4), "h": rep("x.x.x.x.", 4), "c": "x.......|x.......|x.......|x.......", "t": "........|........|........|....hhml"},
+  }},
+  "journey": {"name": "Don't Stop Choppin' (Journey sound)", "bpm": 120, "gain": 0.85, "order": ["A", "B", "B"], "sections": {
+    # the piano arpeggio that never stops, four chords, a lead that climbs and stays up there
+    "A": {"steps": 8,
+      "piano": "E3 G#3 B3 E4 G#4 E4 B3 G#3 | B2 D#3 F#3 B3 D#4 B3 F#3 D#3 | C#3 E3 G#3 C#4 E4 C#4 G#3 E3 | A2 C#3 E3 A3 C#4 A3 E3 C#3",
+      "bass":  "E2 - - - E2 - E2 - | B1 - - - B1 - B1 - | C#2 - - - C#2 - C#2 - | A1 - - - A1 - A1 -",
+      "lead":  "B4 - - - G#4 - - - | F#4 - - - - - - - | E4 - G#4 - B4 - - - | C#5 - B4 - - - - -",
+      "k": rep("x...x...", 4), "h": rep("x.x.x.x.", 4), "s": rep("....x...", 4)},
+    "B": {"steps": 8,
+      "piano": "E3 G#3 B3 E4 G#4 E4 B3 G#3 | B2 D#3 F#3 B3 D#4 B3 F#3 D#3 | C#3 E3 G#3 C#4 E4 C#4 G#3 E3 | A2 C#3 E3 A3 C#4 A3 E3 C#3",
+      "gtr":   "E3+B3 - - - - - - - | B3+F#4 - - - - - - - | C#3+G#3 - - - - - - - | A3+E4 - - - - - - -",
+      "bass":  "E2 - E2 - E2 - E2 - | B1 - B1 - B1 - B1 - | C#2 - C#2 - C#2 - C#2 - | A1 - A1 - A1 - A1 -",
+      "lead":  "G#5 - - - F#5 - E5 - | D#5 - - - - - F#5 - | E5 - - - G#5 - - - | A5 - G#5 - F#5 - E5 -",
+      "k": rep("x...x...", 4), "s": rep("....x...", 4), "h": rep("xxxxxxxx", 4), "c": "x.......|........|x.......|........", "t": "........|........|........|....hhmm"},
+  }},
+  "aero": {"name": "Walk This Fjord (Aerosmith sound)", "bpm": 112, "gain": 0.9, "order": ["A", "A", "B"], "sections": {
+    # a strutting blues riff in twelve, bass and guitar in unison, chromatic walk-ups, a cowbell-ish ride
+    "A": {"steps": 12,
+      "bass": "E2 - . E2 G2 - A2 - . A#2 B2 - | E2 - . E2 G2 - A2 - . B2 A2 G2 | E2 - . E2 G2 - A2 - . A#2 B2 - | D3 - . D3 B2 - A2 - . G2 E2 -",
+      "gtr":  "E3+B3 - . E3+B3 G3+D4 - A3+E4 - . A#3+F4 B3+F#4 - | E3+B3 - . E3+B3 G3+D4 - A3+E4 - . B3+F#4 A3+E4 G3+D4 | E3+B3 - . E3+B3 G3+D4 - A3+E4 - . A#3+F4 B3+F#4 - | D4+A4 - . D4+A4 B3+F#4 - A3+E4 - . G3+D4 E3+B3 -",
+      "lead": ". . . . . . . . . . . . | . . . . . . E5 - D5 - B4 - | . . . . . . . . . . . . | G4 - A4 - B4 - D5 - E5 - - -",
+      "k": rep("x..x..x..x..", 4), "s": rep("...x.....x..", 4), "r": rep("x.xx.xx.xx.x", 4), "c": "x...........|............|x...........|............"},
+    "B": {"steps": 12,
+      "bass": "A2 - . A2 C3 - D3 - . D#3 E3 - | A2 - . A2 C3 - D3 - . E3 D3 C3 | E2 - . E2 G2 - A2 - . A#2 B2 - | B2 - . B2 D3 - E3 - . G3 E3 D3",
+      "gtr":  "A3+E4 - . A3+E4 C4+G4 - D4+A4 - . D#4+A#4 E4+B4 - | A3+E4 - . A3+E4 C4+G4 - D4+A4 - . E4+B4 D4+A4 C4+G4 | E3+B3 - . E3+B3 G3+D4 - A3+E4 - . A#3+F4 B3+F#4 - | B3+F#4 - . B3+F#4 D4+A4 - E4+B4 - . G4+D5 E4+B4 D4+A4",
+      "lead": "E5 - - - G5 - A5 - - - - - | . . . . . . C5 - D5 - E5 - | . . . . . . . . . . . . | B4 - D5 - E5 - G5 - E5 - - -",
+      "k": rep("x..x..x..x..", 4), "s": rep("...x.....x..", 4), "h": rep("x.xx.xx.xx.x", 4), "c": "x...........|x...........|x...........|x...........", "t": "............|............|............|.........hml"},
+  }},
+  "palace": {"name": "Penguin Rhapsody (Queen sound)", "bpm": 144, "gain": 0.9, "order": ["A", "B", "B", "A"], "sections": {
+    # a piano ballad with a stacked choir, then a galloping hard-rock section with three-part harmony guitars
+    "A": {"steps": 8,
+      "piano": "A#3+D4+F4 - - - A#3+D4+F4 - - - | G3+A#3+D4 - - - G3+A#3+D4 - - - | D#3+G3+A#3 - - - D#3+G3+A#3 - - - | F3+A3+C4 - - - F3+A3+C4 - - -",
+      "choir": "D4+F4+A#4 - - - - - - - | D4+G4+A#4 - - - - - - - | D#4+G4+A#4 - - - - - - - | C4+F4+A4 - - - - - - -",
+      "bass":  "A#1 - - - - - - - | G1 - - - - - - - | D#2 - - - - - - - | F2 - - - - - C2 F2",
+      "bell":  "F5 - - - D5 - - - | A#4 - - - - - - - | G5 - F5 - D#5 - - - | F5 - - - - - - -",
+      "k": "x.......|x.......|x.......|x......."},
+    "B": {"steps": 8,
+      "gtr":   "G3+D4 G3+D4 . G3+D4 G3+D4 G3+D4 . G3+D4 | D#3+A#3 D#3+A#3 . D#3+A#3 D#3+A#3 D#3+A#3 . D#3+A#3 | F3+C4 F3+C4 . F3+C4 F3+C4 F3+C4 . F3+C4 | D3+A3 - - - D3+A3 - D3+A3 -",
+      "bass":  "G2 G2 . G2 G2 G2 . G2 | D#2 D#2 . D#2 D#2 D#2 . D#2 | F2 F2 . F2 F2 F2 . F2 | D2 - - - D2 - D2 -",
+      "lead":  "G4+A#4+D5 - - - F4+A4+D5 - - - | D#4+G4+A#4 - - - - - - - | F4+A4+C5 - - - G4+A#4+D5 - - - | A4+D5+F#5 - - - - - - -",
+      "choir": "G4+A#4 - - - - - - - | D#4+G4 - - - - - - - | F4+A4 - - - - - - - | D4+F#4 - - - - - - -",
+      "k": rep("x..xx.x.", 4), "s": rep("....x...", 4), "h": rep("xxxxxxxx", 4), "c": "x.......|x.......|x.......|x......."},
+  }},
   "creepy": {"name": "Flight 364", "bpm": 60, "gain": 1.8, "order": ["A"], "sections": {
     "A": {"steps": 8,
       "pad":  rep("A2+D#3 - - - - - - -", 4),
@@ -135,9 +194,9 @@ def check():
                 bars = bars or len(parts)
                 if len(parts) != bars: errors.append(f"{tid}.{sid}.{line}: {len(parts)} bars, expected {bars}")
                 for i, bar in enumerate(parts):
-                    count = len(bar.split()) if line in ("bass", "gtr", "lead", "pad", "pluck", "bell", "flute") else len(bar.strip())
+                    count = len(bar.split()) if line in ("bass", "gtr", "lead", "pad", "pluck", "bell", "flute", "piano", "choir") else len(bar.strip())
                     if count != n: errors.append(f"{tid}.{sid}.{line} bar {i + 1}: {count} steps, expected {n}")
-                    if line in ("bass", "gtr", "lead", "pad", "pluck", "bell", "flute"):
+                    if line in ("bass", "gtr", "lead", "pad", "pluck", "bell", "flute", "piano", "choir"):
                         for tok in bar.split():
                             if tok in "-.": continue
                             for nt in tok.split("+"): midi_of(nt)

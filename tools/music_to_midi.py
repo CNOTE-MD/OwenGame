@@ -8,7 +8,7 @@ from score import midi_of
 TPQ = 480; STEP = TPQ // 2   # one step = an eighth note
 # channel, GM program (0-based), velocity
 INST = {"bass": (0, 33, 100), "gtr": (1, 30, 88), "lead": (2, 81, 92), "pad": (3, 88, 70),
-        "pluck": (4, 24, 80), "bell": (5, 9, 85), "flute": (6, 73, 80)}
+        "pluck": (4, 24, 80), "bell": (5, 9, 85), "flute": (6, 73, 80), "piano": (7, 0, 92), "choir": (8, 52, 72)}
 DRUM = {"k": 36, "s": 38, "h": 42, "o": 46, "c": 49, "r": 37}
 TOM = {"h": 50, "m": 47, "l": 45}
 

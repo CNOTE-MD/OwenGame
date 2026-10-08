@@ -43,6 +43,8 @@ const ENEMY = {
   captain: { hp: 6, r: 10, touch: 2, speed: 24, shield: true, boss: true },
   hank: { hp: 10, r: 14, touch: 2, speed: 0, boss: true, fly: true },
   spore: { hp: 2, r: 6, touch: 1, speed: 0 },
+  snowpeng: { hp: 2, r: 6, touch: 1, speed: 66 },
+  guard: { hp: 4, r: 7, touch: 1, speed: 30, shield: true },
   slime: { hp: 3, r: 6, touch: 1, speed: 0 },
   beetle: { hp: 3, r: 7, touch: 1, speed: 26 },
 };
@@ -222,7 +224,7 @@ function interact(e) {
     case 'tablet': return readTablet(e);
     case 'exchange': return useExchange();
     case 'taxi': return useTaxi(e);
-    case 'throne': return say(flag('d1done') ? [['', 'The Penguin King\'s throne. Ice, fish bones and one very small cushion.'], ['Jon', 'Sit on it. SIT ON IT. You\'re the king now.'], ['Owen', 'I\'m not sitting on fish bones, Jon.']] : [['', 'A throne of ice. Someone very round sits here. Often.']]);
+    case 'throne': return sitOnThrone();
     case 'log': return say([['Jon', 'That log isn\'t going to chop itself. Swing me! (Z)']]);
     case 'sealed': return say(STORY.signs[e.def.text]);
     case 'plaque': return say(STORY.plaque, () => setFlag('read_plaque'));
@@ -250,7 +252,7 @@ function interact(e) {
     case 'shop': return buy(e);
     case 'chest':
       if (e.open) return say([['', 'The chest is empty.']]);
-      e.open = true; setFlag('chest:' + e.def.id);
+      e.open = true; setFlag('chest:' + e.def.id); JT.queued = 'chest';
       return giveItem(e.def.item);
   }
 }
@@ -406,7 +408,7 @@ function cutAt(x, y) {
   const tx = Math.floor(x / T), ty = Math.floor(y / T), c = tile(tx, ty);
   if (!sameScreen(tx, ty)) return false;
   if (c === 'b') { setTile(tx, ty, SNOWY(tx, ty) ? 'n' : '.'); leaves(tx * T + 8, ty * T + 8, ['#58b840', '#a8e070', '#388828']); Sound.play('swing'); maybeDrop(tx * T + 8, ty * T + 8, 0.4); return true; }
-  if (c === ',') { setTile(tx, ty, SNOWY(tx, ty) ? 'n' : '.'); leaves(tx * T + 8, ty * T + 8, ['#5fbb44', '#9ee064', '#2f7a2a']); maybeDrop(tx * T + 8, ty * T + 8, 0.12); return false; }
+  if (c === ',') { setTile(tx, ty, SNOWY(tx, ty) ? 'n' : '.'); leaves(tx * T + 8, ty * T + 8, ['#5fbb44', '#9ee064', '#2f7a2a']); maybeDrop(tx * T + 8, ty * T + 8, 0.12); if (Math.random() < 0.3) jonSay('grass', { cooldown: 45 }); return false; }
   if (c === 'O') { setTile(tx, ty, '_'); leaves(tx * T + 8, ty * T + 8, ['#b8784a', '#8a5432', '#e0a070']); Sound.play('kill'); maybeDrop(tx * T + 8, ty * T + 8, 0.6); return true; }
   return false;
 }
@@ -459,7 +461,8 @@ function killEnemy(e) {
   e.alive = false;
   G.ents = G.ents.filter(o => o !== e);
   poof(e.x, e.y, e.boss); Sound.play('kill');
-  snesOnKill(e);
+  snesOnKill(e); awesomeOnKill(e);
+  if (G.mode !== 'arena') hitStop(e.boss ? 0.28 : 0.05);
   const s = G.save;
   if (s.items.thunder) s.rune = Math.min(RUNE_MAX, s.rune + G.st.runeKill);
   if (G.mode === 'arena') return arenaKill(e);
@@ -492,8 +495,11 @@ function updateEnemy(e, dt) {
     case 'imp': updateImp(e, dt, dx, dy, d, mr); break;
     case 'attendant': updateAttendant(e, dt, dx, dy, d, mr); break;
     case 'penguin':
+      if (kingOwenRules(e)) break;
       if (d < 120 || e.aggro) { toward(e.speed); e.fx = dx / d; e.fy = dy / d; }
       break;
+    case 'snowpeng': updateSnowPeng(e, dt, dx, dy, d, mr); break;
+    case 'guard': updateGuard(e, dt, dx, dy, d, mr); break;
     case 'draugr':
       // sluggish: only turns to face you every 0.8s, so circling behind works
       if (d < 110 || e.aggro) { if (e.t > 0.8) { e.t = 0; e.fx = dx / d; e.fy = dy / d; } tryMove(e, e.fx * e.speed * dt, e.fy * e.speed * dt, mr, who); }
@@ -535,7 +541,7 @@ function updateEnemy(e, dt) {
       } else if (e.st === 'daze') { if (e.t > 2.2) { e.st = 'waddle'; e.t = 0; } }
       break;
   }
-  if (d < e.r + 5 && e.st !== 'daze' && !(e.flipped > 0) && !(e.type === 'attendant' && (e.st === 'hide' || e.st === 'intro'))) hurtPlayer(e.touch, e);
+  if (d < e.r + 5 && e.st !== 'daze' && !(e.flipped > 0) && !e.bow && !(e.type === 'attendant' && (e.st === 'hide' || e.st === 'intro'))) hurtPlayer(e.touch, e);
 }
 
 function updatePickup(e, dt) {
