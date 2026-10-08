@@ -65,7 +65,7 @@ function updateGround(dt) {
   if (c === ',' && RUST.t <= 0) { RUST.t = 0.18; for (let i = 0; i < 2; i++) G.fx.push({ kind: 'leaf', x: p.x + rnd(-5, 5), y: p.y + 4, vx: rnd(-20, 20), vy: rnd(-40, -15), grav: 180, t: 0, life: 0.4, color: pick(['#58b840', '#a8e070']) }); }
   if (c === '%' && RUST.t <= 0) { RUST.t = 0.22; Sound.play('mud'); jonSay('muck', { cooldown: 60, face: 'worried' }); for (let i = 0; i < 3; i++) G.fx.push({ x: p.x + rnd(-4, 4), y: p.y + 5, vx: rnd(-25, 25), vy: rnd(-35, -10), grav: 200, t: 0, life: 0.35, color: pick(['#5a3e22', '#7a5a32', '#3a2a16']), size: 2 }); }
 }
-function groundSpeed(p) { const c = tileAt(p.x, p.y + 4); return c === '%' ? 0.55 : c === ',' ? 0.9 : 1; }
+function groundSpeed(p) { const c = tileAt(p.x, p.y + 4); return c === '%' ? (typeof charmOn === 'function' && charmOn('boots') ? 1 : 0.55) : c === ',' ? 0.9 : 1; }
 
 function renderGroundTile(c, v, frame, snowy) {
   const r = rng(v * 311 + c.charCodeAt(0) * 17);

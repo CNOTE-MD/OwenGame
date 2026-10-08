@@ -116,6 +116,7 @@ function applyJonPerks() {
   G.st = baseStats();
   const d = jonData();
   for (const pk of JON_PERKS) for (let i = 0; i < (d.perks[pk.id] || 0); i++) pk.apply(G.st);
+  if (typeof applyCharm === 'function') applyCharm(G.st);
 }
 function jonXP(n) {
   if (G.mode === 'arena' || !G.save) return;

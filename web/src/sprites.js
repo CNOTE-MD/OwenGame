@@ -159,7 +159,7 @@ function drawItemIcon(id, x, y) {
 function drawThing(e) {
   const x = Math.round(e.x - G.cam.x), y = Math.round(e.y - G.cam.y), t = G.t;
   switch (e.kind) {
-    case 'enemy': return drawEnemy(e);
+    case 'enemy': drawEnemy(e); drawFrozen(e); return;
     case 'tablet': shadowAt(x, y + 6, 0.8); spr(SPR.tablet, x, y + 7 + Math.round(Math.sin(t * 2) * 1)); if (Math.floor(t * 3) % 3 === 0) drawTwinkle(x + 5, y - 6, 0); return;
     case 'throne': spr(SPR.throne, x, y + 8); return;
     case 'exchange': spr(SPR.machine, x, y + 8); if (Math.floor(t * 2) % 2) R(x - 1, y - 4, 2, 1, '#5fdc8a'); return;

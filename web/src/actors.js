@@ -12,7 +12,7 @@ function makeEnt(d, x, y) {
     case 'cargo': return { ...base, talk: true };
     case 'npc': return { ...base, solid: true, talk: true, id: d.id, bob: Math.random() * 6 };
     case 'shop': return { ...base, talk: true, item: d.item, price: d.price };
-    case 'chest': return { ...base, solid: true, talk: true, open: !!s.flags['chest:' + d.id] };
+    case 'chest': if (d.needs && !s.flags[d.needs]) return null; return { ...base, solid: true, talk: true, open: !!s.flags['chest:' + d.id] };
     case 'piece': case 'container': return s.flags['got:' + d.id] ? null : { ...base, kind: 'pickup', what: d.t, id: d.id, permanent: true };
     case 'warp': return { ...base, portal: !!d.portal };
     case 'flight': return { ...base };
@@ -164,9 +164,9 @@ function updatePlayer(dt) {
   } else if (just('horn')) {
     blowHorn();
   } else if (just('c')) {
-    if (!s.items.thunder) floatText(p.x, p.y - 18, 'No rune yet', '#aab');
-    else if (s.rune < RUNE_MAX) { floatText(p.x, p.y - 18, 'Rune not full', '#7fd4ff'); }
-    else startThunder();
+    castSpell();
+  } else if (just('spell')) {
+    cycleSpell();
   }
 }
 
@@ -288,6 +288,7 @@ function npcLines(id) {
 function buy(e) {
   const s = G.save, it = ITEMS[e.item];
   if (e.item === 'juice' && s.potions >= 3) return say([['Lars', 'You can only carry three bottles. Drink some first. Or die. Then it drinks itself.']]);
+  const lim = magicBuyLimit(e.item); if (lim) return say([['Lars', lim]]);
   if (s.kr < e.price) return say([['Lars', `${it.name} costs ${e.price} kroner. You have ${s.kr}. Cut more bushes!`]]);
   s.kr -= e.price; Sound.play('coin');
   applyItem(e.item);
@@ -312,11 +313,12 @@ function applyItem(id) {
     case 'horn': s.items.horn = true; break;
     case 'dash': s.items.dash = true; break;
     case 'kr50': s.kr += 50; break;
+    default: magicApplyItem(id);
   }
 }
 function giveItem(id, after) {
   applyItem(id);
-  if (['homing', 'thunder', 'dash', 'horn', 'container'].includes(id)) jonXP(15); else jonXP(5);
+  if (['homing', 'thunder', 'dash', 'horn', 'container', 'frost', 'fire', 'mend', 'bearclaw', 'boots', 'cloak', 'tooth'].includes(id)) jonXP(15); else jonXP(5);
   setJonFace('excited', 2.5);
   G.player.hold = { id, t: 1.1 };
   G.state = 'hold'; Sound.play('item');
@@ -433,6 +435,7 @@ function damageEnemy(e, dmg, from, how) {
   const jonHit = how === 'swing' || how === 'throw';
   if (e.flash > 0.05 && jonHit) return false;
   if (snesDamageRule(e, how, jonHit)) return true;
+  { const fz = frozenRule(e, how, jonHit); if (fz) dmg *= fz; }
   const dx = from.x - e.x, dy = from.y - e.y, d = Math.hypot(dx, dy) || 1;
   // Shields block a hit from the front, but the block knocks the shield aside for a moment:
   // hit-hit always works, and hitting from the side or back works right away.
@@ -477,7 +480,7 @@ function killEnemy(e) {
 function maybeDrop(x, y, chance) {
   if (Math.random() > chance * (1 + G.st.luck)) return;
   const r = Math.random();
-  const what = r < 0.35 ? 'heart' : r < 0.75 ? 'kr1' : r < 0.9 ? 'kr5' : 'rune';
+  const what = r < 0.33 ? 'heart' : r < 0.7 ? 'kr1' : r < 0.85 ? 'kr5' : r < 0.95 ? 'rune' : 'salmon';
   G.ents.push({ kind: 'pickup', what, x, y, life: 9 });
 }
 function spawnEnemy(type, x, y) { const e = makeEnemy(type, x, y); e.st = 'idle'; G.ents.push(e); puff(x, y, '#cfe8ff', 8); G.roomEnemies = true; }
@@ -558,6 +561,7 @@ function updatePickup(e, dt) {
     case 'kr5': s.kr += 5; Sound.play('coin'); break;
     case 'krn': s.kr += e.value; Sound.play('coin'); break;
     case 'rune': s.rune = Math.min(RUNE_MAX, s.rune + 4); Sound.play('heart'); break;
+    case 'salmon': addToBag('salmon'); Sound.play('coin'); floatText(p.x, p.y - 18, 'Salmon!', '#ff8a6a'); break;
     case 'piece': case 'container':
       setFlag('got:' + e.id);
       giveItem(e.what);

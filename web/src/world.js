@@ -12,7 +12,7 @@ const G = {
 
 function newSave() {
   return { map: 'home', x: 0, y: 0, maxHp: 6, hp: 6, kr: 0, rune: 0, potions: 0, pieces: 0,
-    items: {}, flags: {}, keys: {}, bigkeys: {}, voodoo: true, jon: { lvl: 1, xp: 0, perks: {} } };
+    items: {}, flags: {}, keys: {}, bigkeys: {}, voodoo: true, jon: { lvl: 1, xp: 0, perks: {} }, bag: {}, charms: {}, charm: null, spell: null };
 }
 const SAVE_KEY = 'jontuka-save-v1';
 // Stats Owen carries. Story mode uses the defaults; the Arena upgrades them.

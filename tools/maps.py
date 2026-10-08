@@ -279,6 +279,12 @@ OW_ENT = [
     {"t": "shop", "item": "juice", "price": 40, "at": P(1, 1, 4, 5)},
     {"t": "shop", "item": "shard", "price": 25, "at": P(1, 1, 6, 5)},
     {"t": "shop", "item": "heart3", "price": 10, "at": P(1, 1, 8, 5)},
+    {"t": "shop", "item": "salmon", "price": 15, "at": P(1, 1, 11, 5)},
+    {"t": "shop", "item": "lutefisk", "price": 8, "at": P(1, 1, 13, 5)},
+    {"t": "shop", "item": "tooth", "price": 60, "at": P(1, 1, 12, 7)},
+    {"t": "chest", "id": "c_boots", "at": P(1, 0, 2, 10), "item": "boots"},
+    {"t": "chest", "id": "c_cloak", "at": P(2, 0, 13, 8), "item": "cloak"},
+    {"t": "chest", "id": "c_bearclaw", "at": P(3, 0, 12, 11), "item": "bearclaw"},
     {"t": "npc", "id": "sven", "at": P(1, 1, 12, 9)},
     {"t": "npc", "id": "ingrid", "at": P(0, 2, 9, 8)},
     {"t": "sign", "at": P(0, 1, 10, 7), "text": "sign_fjordvik"},
@@ -392,6 +398,7 @@ CAV_ENT = [
     {"t": "king", "at": P(1, 0, 8, 5)},
     {"t": "throne", "at": P(1, 0, 8, 2)},
     {"t": "tablet", "id": "tab_palace", "at": P(0, 1, 2, 2)},
+    {"t": "chest", "id": "cv_frost", "at": P(0, 1, 12, 2), "item": "frost", "clear": True},
     {"t": "chest", "id": "cv_thunder", "at": P(1, 0, 8, 4), "item": "thunder", "clear": True},
     {"t": "container", "id": "hc_cavern", "at": P(1, 0, 6, 7), "clear": True},
     {"t": "warp", "at": P(1, 0, 10, 7), "to": "overworld", "dest": P(2, 0, 7, 4), "clear": True, "portal": True},
@@ -466,6 +473,7 @@ SUBWAY_ENT = [
     {"t": "taxi", "at": [14, 5], "to": "forest"},
     {"t": "npc", "id": "commuter", "at": [10, 6]},
     {"t": "runestone", "at": [6, 7]},
+    {"t": "chest", "id": "c_fire", "at": [2, 7], "item": "fire"},
 ]
 check_block("subway", SUBWAY)
 
@@ -527,6 +535,7 @@ ASTRID_ENT = [
     {"t": "sign", "at": [10, 0], "text": "tapestry"},
     {"t": "sign", "at": [2, 1], "text": "bookshelf"},
     {"t": "chest", "id": "c_astrid", "at": [14, 10], "item": "juice"},
+    {"t": "chest", "id": "c_mend", "at": [2, 10], "item": "mend", "needs": "d1done"},
     {"t": "warp", "at": [7, 13], "to": "overworld", "dest": P(0, 1, 4, 5)},
     {"t": "warp", "at": [8, 13], "to": "overworld", "dest": P(0, 1, 4, 5)},
 ]

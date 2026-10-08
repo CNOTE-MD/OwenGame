@@ -66,6 +66,12 @@ Rules of thumb: his journal pages always win over anything already in the game. 
 49. Four new songs sound like Foreigner, Journey, Aerosmith and Queen (Frozen Path, Muck Forest, subway, Penguin Palace). Which is your favorite? Which band is missing?
 50. Jon hums them when you stand still. What song should Jon sing badly on purpose?
 
+## Magic and items
+
+51. Four runes now: Thunder, Frost, Fire, Mend. What should the fifth rune do, and where is it hidden?
+52. Lars sells salmon, lutefisk and a troll tooth. What else should be in the bag? What food does Jon hate most?
+53. Charms: Bear Claw, Boots, Cloak, Troll Tooth. Invent one charm that only Jon would want.
+
 ## Rush
 
 37. Jon can recite Rush E. Should the real "Rush E" vibe show up more? Where?

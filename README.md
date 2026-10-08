@@ -9,6 +9,8 @@
 | `web/src/story.js` | Every word in the game, including everything Jon says on his own (`JON`). Owen can edit this. |
 | `web/src/jon.js` | Jon's personality (faces, when he talks) and growth (XP, levels, perks, abilities) |
 | `tools/maps.py` | ASCII maps for Norway, the Penguin Palace, the subway, the Barrow and Owen's room, plus a reachability checker |
+| `web/src/magic.js` | Magic and items: Rune Spells (Thunder, Frost, Fire, Mend on the rune meter), the Bag (salmon, lutefisk, shards), Charms (one worn at a time), the SPELLS and BAG menu pages |
+| `web/src/awesome.js` | Boss title cards, hit-stop, combo callouts, the Jukebox, Snow Penguins and Royal Guards, King Owen, title-screen flair |
 | `web/src/snes.js` | The SNES pass: day/night, weather, tall grass and muck, Spore Cap/Slime/Beetle, rune tablets, the map page, and Owen's page 5 (subway, taxi, the big log) |
 | `web/src/*.js` | Engine, world, actors, sprites, UI, main loop |
 | `web/src/arena.js` | Valhalla Arena: waves, shop cards, level-ups (tune or add cards here) |
@@ -16,7 +18,7 @@
 | `OWEN_QUESTIONS.md` | Prompts to ask Owen after he plays; his answers drive the next build |
 | `STORY_BIBLE.md` | Characters, chapter arc, items, the Red-Eye side quest, Arena mode |
 
-Rebuild: `python3 tools/maps.py && python3 tools/build_web.py`. Test: `NODE_PATH=$(npm root -g) node tests/web_playtest.js`, then `tests/arena_playtest.js`, `tests/ch1_depth_test.js`, `tests/redeye_test.js`, `tests/ch2_test.js`, `tests/jon_test.js`, `tests/pad_test.js` and `tests/snes_test.js` the same way.
+Rebuild: `python3 tools/maps.py && python3 tools/build_web.py`. Test: `NODE_PATH=$(npm root -g) node tests/web_playtest.js`, then `tests/arena_playtest.js`, `tests/ch1_depth_test.js`, `tests/redeye_test.js`, `tests/ch2_test.js`, `tests/jon_test.js`, `tests/pad_test.js`, `tests/snes_test.js` and `tests/magic_test.js` the same way.
 
 ## Godot prototype (frozen)
 
