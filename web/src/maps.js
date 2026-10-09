@@ -262,6 +262,60 @@ const MAPS = {
 ]
 },
 {
+"t": "shop",
+"item": "salmon",
+"price": 15,
+"at": [
+27,
+19
+]
+},
+{
+"t": "shop",
+"item": "lutefisk",
+"price": 8,
+"at": [
+29,
+19
+]
+},
+{
+"t": "shop",
+"item": "tooth",
+"price": 60,
+"at": [
+28,
+21
+]
+},
+{
+"t": "chest",
+"id": "c_boots",
+"at": [
+18,
+10
+],
+"item": "boots"
+},
+{
+"t": "chest",
+"id": "c_cloak",
+"at": [
+45,
+8
+],
+"item": "cloak"
+},
+{
+"t": "chest",
+"id": "c_bearclaw",
+"at": [
+60,
+11
+],
+"item": "bearclaw"
+},
+{
 "t": "npc",
 "id": "sven",
 "at": [
@@ -829,6 +883,16 @@ const MAPS = {
 },
 {
 "t": "chest",
+"id": "cv_frost",
+"at": [
+12,
+16
+],
+"item": "frost",
+"clear": true
+},
+{
+"t": "chest",
 "id": "cv_thunder",
 "at": [
 24,
@@ -1000,6 +1064,16 @@ const MAPS = {
 10
 ],
 "item": "juice"
+},
+{
+"t": "chest",
+"id": "c_mend",
+"at": [
+2,
+10
+],
+"item": "mend",
+"needs": "d1done"
 },
 {
 "t": "warp",
@@ -1230,6 +1304,15 @@ const MAPS = {
 6,
 7
 ]
+},
+{
+"t": "chest",
+"id": "c_fire",
+"at": [
+2,
+7
+],
+"item": "fire"
 }
 ],
 "interior": true

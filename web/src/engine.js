@@ -14,7 +14,7 @@ const pick = arr => arr[Math.floor(Math.random() * arr.length)];
 const ACTIONS = {
   left: ['ArrowLeft', 'KeyA'], right: ['ArrowRight', 'KeyD'], up: ['ArrowUp', 'KeyW'], down: ['ArrowDown', 'KeyS'],
   a: ['KeyZ', 'Space', 'KeyJ'], b: ['KeyX', 'KeyK'], c: ['KeyC', 'KeyL'], dash: ['ShiftLeft', 'ShiftRight', 'KeyF'],
-  menu: ['Enter', 'Escape', 'KeyP'], mute: ['KeyM'], music: ['KeyN'], horn: ['KeyV'],
+  menu: ['Enter', 'Escape', 'KeyP'], mute: ['KeyM'], music: ['KeyN'], horn: ['KeyV'], spell: ['KeyQ', 'Tab'],
 };
 const keys = {}, virt = {}, edge = {};
 const held = a => !!virt[a] || ACTIONS[a].some(c => keys[c]);
@@ -48,7 +48,7 @@ const stick = { active: false, x: 0, y: 0 };
 })();
 // ---------- gamepad (Xbox / PlayStation / Backbone / Switch Pro, over Bluetooth on iPad) ----------
 const PAD = { on: false, x: 0, y: 0, active: false, prev: {}, idx: null };
-const PAD_MAP = { 0: 'a', 1: 'b', 2: 'c', 3: 'horn', 4: 'dash', 5: 'dash', 6: 'dash', 7: 'dash', 8: 'mute', 9: 'menu', 12: 'up', 13: 'down', 14: 'left', 15: 'right' };
+const PAD_MAP = { 0: 'a', 1: 'b', 2: 'c', 3: 'horn', 4: 'spell', 5: 'dash', 6: 'dash', 7: 'dash', 8: 'mute', 9: 'menu', 12: 'up', 13: 'down', 14: 'left', 15: 'right' };
 function pollGamepad() {
   const pads = navigator.getGamepads ? navigator.getGamepads() : [];
   let gp = null;

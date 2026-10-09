@@ -71,6 +71,21 @@ You don't have to do it. After the Penguin Palace you can sit on the bench by th
 
 Chilly froze Hank's ghost to guard the barrow until the axe came home. Fluffy's ghost points the way. Hank, freed, apologizes for throwing Jon in a lake, sends Owen to Walter's Forge, and almost says Walter's real name.
 
+## Magic: Rune Spells
+
+Walter carved runes into Jon; Owen finds them one by one and casts them with C off the rune meter (cycle with Q or the left shoulder button, or pick in the SPELLS page).
+
+| Rune | Cost | Does | Where |
+|---|---|---|---|
+| Thunder Strike | full meter | Lightning hits everything on screen | Penguin Palace (behind the King) |
+| Frost Rune | 4 | Freezes enemies near Owen; chopping the ice does double damage | Penguin Palace, the Royal Guard room |
+| Fire Rune | 3 | A fireball that burns bushes and tall grass, chops the log, hits for 2 | On the subway tracks |
+| Mend Rune | 6 | Heals two hearts | Astrid's house, after the palace falls (Hank's own; "he used it mostly on the dog") |
+
+## Items: the Bag and Charms
+
+The BAG page holds food and charms. Smoked Salmon (Lars, 15 kr, or dropped by enemies) heals two hearts; Lutefisk (8 kr) heals everything and Jon will never let it go; Rune Shards fill the meter. Charms are worn one at a time: Bear Claw (crits twice as often, Storm Peak), Fisherman's Boots (muck can't slow you, Muck Forest), Wool Cloak (shrugs off some hits, Frozen Path), Troll Tooth (enemies drop more, Lars, 60 kr).
+
 ## Music
 
 Rush-style originals (odd meters, melodic bass) carry the title, overworld, boss, arena, Bjarne and Barrow. Owen's favorite bands get the new screens, each an original piece that borrows the band's sound, not a song:

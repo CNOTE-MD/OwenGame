@@ -44,8 +44,7 @@ function drawHud() {
   R(6, 3, 8, 17, '#000'); R(7, 4, 6, 15, '#1a2238');
   const fill = Math.round(15 * s.rune / RUNE_MAX); R(7, 19 - fill, 6, fill, s.rune >= RUNE_MAX ? (Math.floor(G.t * 4) % 2 ? '#7fd4ff' : '#cfefff') : '#2f8fd0');
   // item box
-  R(17, 2, 20, 19, '#ffd84a'); R(18, 3, 18, 17, '#0d0d33');
-  if (s.items.thunder) drawItemIcon('thunder', 27, 12); else if (s.items.homing) drawItemIcon('homing', 27, 12);
+  drawSpellBox();
   // kroner, keys
   drawItemIcon('coin', 46, 7); text(String(s.kr).padStart(3, '0'), 52, 11, '#fff');
   if (G.map && G.map.dungeon && !G.map.nokeys) { drawItemIcon('key', 46, 17); text('x' + (s.keys[G.mapId] || 0), 52, 20, '#fff'); if (s.bigkeys[G.mapId]) drawItemIcon('bigkey', 82, 15); }
@@ -83,7 +82,7 @@ function drawMenu() {
   const slots = [
     ['Jon Lv' + jonData().lvl + ' (swing Z)', 'homing', true, () => drawJonSprite(30, 44, 0, false, jonFaceNow())],
     ['Homing Jon (throw X)', 'homing', !!s.items.homing],
-    ['Thunder Rune (C)', 'thunder', !!s.items.thunder],
+    ['Rune Spells (C) ' + knownSpells().length + '/4', 'thunder', anySpell()],
     ['Lingonberry Juice x' + s.potions, 'juice', s.potions > 0],
     ['Demon Horn (V)', 'horn', !!s.items.horn],
     ['Voodoo Dash (Shift/F)', 'dash', !!s.items.dash],

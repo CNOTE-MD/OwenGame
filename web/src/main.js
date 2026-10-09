@@ -91,9 +91,9 @@ function update(dt) {
       return;
     case 'warp': updateWarp(dt); return;
     case 'menu':
-      if (just('right')) { G.menuPage = ((G.menuPage || 0) + 1) % 4; Sound.play('menu'); }
-      if (just('left')) { G.menuPage = ((G.menuPage || 0) + 3) % 4; Sound.play('menu'); }
-      if (G.menuPage === 3) { updateJukebox(); if (just('menu') || just('tap')) { G.state = 'play'; G.jukebox = null; Sound.play('menu'); } return; }
+      if (just('right')) { G.menuPage = ((G.menuPage || 0) + 1) % 6; Sound.play('menu'); }
+      if (just('left')) { G.menuPage = ((G.menuPage || 0) + 5) % 6; Sound.play('menu'); }
+      if (G.menuPage >= 3) { if (G.menuPage === 3) updateJukebox(); else if (G.menuPage === 4) updateSpellsPage(); else updateBagPage(); if (just('menu') || just('tap')) { G.state = 'play'; G.jukebox = null; Sound.play('menu'); } return; }
       if (just('menu') || just('a') || just('tap')) { G.state = 'play'; G.jukebox = null; Sound.play('menu'); }
       return;
     case 'over':
@@ -108,11 +108,11 @@ function update(dt) {
   if (G.trans) { updateTransition(dt); return; }
   if (just('menu')) { G.state = G.mode === 'arena' ? 'arenapause' : 'menu'; Sound.play('menu'); return; }
   const s = G.save;
-  if (s.items.thunder) { G.runeT = (G.runeT || 0) + dt; if (G.runeT > 5) { G.runeT = 0; s.rune = Math.min(RUNE_MAX, s.rune + 1); } }
+  if (anySpell()) { G.runeT = (G.runeT || 0) + dt; if (G.runeT > 5) { G.runeT = 0; s.rune = Math.min(RUNE_MAX, s.rune + 1); } }
   updateClock(dt);
   updatePlayer(dt);
   if (G.state !== 'play') return;
-  updateGround(dt); updateShots(dt);
+  updateGround(dt); updateShots(dt); updateFire(dt);
   updateJon(dt);
   if (G.mode === 'arena') { updateArena(dt); if (G.state !== 'play') return; }
   if (G.map.redeye) updateRedeye(dt);
@@ -121,7 +121,8 @@ function update(dt) {
   if (G.state !== 'play') return;
   if (HK.axes.length) updateHankAxes(dt);
   for (const e of G.ents.slice()) {
-    if (e.kind === 'enemy' && e.alive) { if (e.slow > 0) { e.slow -= dt; updateEnemy(e, dt * 0.5); } else updateEnemy(e, dt); }
+    if (e.kind === 'enemy' && e.alive && e.freeze > 0) { e.freeze -= dt; e.flash = Math.max(0, e.flash - dt); }
+    else if (e.kind === 'enemy' && e.alive) { if (e.slow > 0) { e.slow -= dt; updateEnemy(e, dt * 0.5); } else updateEnemy(e, dt); }
     else if (e.kind === 'pickup') updatePickup(e, dt);
     else if (e.kind === 'hazard') updateCart(e, dt);
     else if (e.kind === 'switch' || e.kind === 'log') e.cd = Math.max(0, e.cd - dt);
@@ -147,7 +148,7 @@ function render() {
   if (G.mode === 'arena') drawArenaWorld();
   drawHankAxes();
   if (!p.hold) drawJon();
-  drawShots();
+  drawShots(); drawFire();
   drawFx();
   drawLightning();
   ctx.setTransform(1, 0, 0, 1, 0, 0);
@@ -159,7 +160,7 @@ function render() {
   if (G.state === 'warp') { ctx.globalAlpha = clamp(1 - Math.abs(G.warp.t - 0.35) / 0.35, 0, 1); R(0, 0, VW, VH, '#000'); ctx.globalAlpha = 1; }
   if (G.bannerT > 0) { R(0, 92, VW, 34, 'rgba(0,0,0,.8)'); text(G.banner, VW / 2, 113, '#ffd84a', 'center'); }
   if (G.state === 'talk') drawTalk();
-  if (G.state === 'menu') { if (G.menuPage === 3) drawJukebox(); else if (G.menuPage === 2) drawMapPage(); else if (G.menuPage) drawJonPage(); else drawMenu(); }
+  if (G.state === 'menu') { if (G.menuPage === 5) drawBagPage(); else if (G.menuPage === 4) drawSpellsPage(); else if (G.menuPage === 3) drawJukebox(); else if (G.menuPage === 2) drawMapPage(); else if (G.menuPage) drawJonPage(); else drawMenu(); }
   drawBossCard(); drawCombo();
   drawJonLevel();
   drawArenaMenus();
@@ -174,7 +175,7 @@ function render() {
 
 let last = performance.now();
 G.menuSel = 0;
-buildAll(); buildSnesArt(); buildAwesomeArt();
+buildAll(); buildSnesArt(); buildAwesomeArt(); buildMagicArt();
 function frame(now) {
   const dt = Math.min(0.05, (now - last) / 1000); last = now;
   try { pollGamepad(); update(dt); render(); const mid = musicFor(); markHeard(mid); Music.want(mid); Music.tick(); } catch (err) { console.error(err); }
