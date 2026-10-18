@@ -191,7 +191,7 @@ function hurtPlayer(dmg, from, force) {
   const p = G.player, s = G.save;
   if (!force && (p.inv > 0 || p.launching || p.falling > 0 || G.state !== 'play')) return;
   if (!force && G.st.armor > 0 && Math.random() < Math.min(0.6, G.st.armor * 0.1)) { p.inv = 0.4; floatText(p.x, p.y - 18, 'BLOCK', '#9fd0ff'); Sound.play('clank'); return; }
-  p.hp -= dmg; p.inv = 1; Sound.play('hurt'); G.shake = 0.15;
+  p.hp -= dmg; p.inv = 1; Sound.play('hurt'); G.shake = 0.15; rumble(120, 0.5, 0.3);
   if (G.mode !== 'arena') jonOnHurt(from);
   if (from) { const d = Math.hypot(p.x - from.x, p.y - from.y) || 1; p.kx = (p.x - from.x) / d * 170; p.ky = (p.y - from.y) / d * 170; }
   if (p.hp > 0) return;
@@ -213,7 +213,7 @@ function finishDeath() {
   if (G.mode === 'arena') return arenaOver(false);
   if (!s.voodoo && s.voodoo2) { s.voodoo2 = false; p.hp = s.maxHp; p.inv = 2.5; puff(p.x, p.y, '#ffd84a', 16); Sound.play('secret'); return say([['Jon', 'Best friends forever means FOREVER. Get up!']]); }
   if (s.voodoo) { s.voodoo = false; p.hp = s.maxHp; p.inv = 2.5; puff(p.x, p.y, '#9a4dd9', 16); Sound.play('secret'); return say(STORY.revive); }
-  G.state = 'over'; G.menuSel = 0;
+  deed('deaths'); G.state = 'over'; G.menuSel = 0;
 }
 
 function interact(e) {
@@ -465,14 +465,14 @@ function killEnemy(e) {
   G.ents = G.ents.filter(o => o !== e);
   poof(e.x, e.y, e.boss); Sound.play('kill');
   snesOnKill(e); awesomeOnKill(e);
-  if (G.mode !== 'arena') hitStop(e.boss ? 0.28 : 0.05);
+  if (G.mode !== 'arena') { hitStop(e.boss ? 0.28 : 0.05); deed('kills'); rumble(e.boss ? 400 : 60, e.boss ? 1 : 0.3, e.boss ? 0.6 : 0.2); }
   const s = G.save;
   if (s.items.thunder) s.rune = Math.min(RUNE_MAX, s.rune + G.st.runeKill);
   if (G.mode === 'arena') return arenaKill(e);
   jonXP(e.boss ? 25 : e.shield ? 3 : 2); jonOnKill(e);
   if (e.boss) JT.queued = 'boss';
   if (!e.boss) maybeDrop(e.x, e.y, 0.65);
-  if (e.type === 'king') { G.shake = 0.6; say(STORY.king_down, checkRoomClear); return; }
+  if (e.type === 'king') { G.shake = 0.6; ICICLES.length = 0; say(STORY.king_down, checkRoomClear); return; }
   if (e.type === 'hank') { G.shake = 0.6; HK.axes = []; for (const w of G.ents.filter(o => o.type === 'wisp')) killEnemy(w); say(STORY.hank_down, () => { setFlag('d2done'); checkRoomClear(); writeSave(); }); return; }
   if (e.type === 'attendant') { G.shake = 0.6; RE.shots = []; say(STORY.attendant_down, () => { setFlag('redeye_done'); checkRoomClear(); }); return; }
   checkRoomClear();
@@ -534,14 +534,15 @@ function updateEnemy(e, dt) {
         if (G.mode === 'arena') { arenaSpawn('penguin', e.x - 40, e.y); arenaSpawn('penguin', e.x + 40, e.y); }
         else { spawnEnemy('penguin', G.cam.x + 40, G.cam.y + 60); spawnEnemy('penguin', G.cam.x + VW - 40, G.cam.y + 60); }
       }
-      if (e.st === 'waddle') { e.fx = dx / d; e.fy = dy / d; toward(e.speed); if (e.t > 2.2) { e.st = 'wind'; e.t = 0; Sound.play('charge'); } }
-      else if (e.st === 'wind') { e.fx = dx / d; e.fy = dy / d; if (e.t > 0.6) { e.st = 'slide'; e.t = 0; e.bounces = 0; } }
+      kingRage(e, dt, dx, dy, d, mr, who);
+      if (e.st === 'waddle') { e.fx = dx / d; e.fy = dy / d; toward(e.speed * (e.raged ? 1.3 : 1)); if (e.t > (e.raged ? 1.4 : 2.2)) { e.st = 'wind'; e.t = 0; Sound.play('charge'); } }
+      else if (e.st === 'wind') { e.fx = dx / d; e.fy = dy / d; if (e.t > (e.raged ? 0.4 : 0.6)) { e.st = 'slide'; e.t = 0; e.bounces = 0; } }
       else if (e.st === 'slide') {
-        const h = tryMove(e, e.fx * 190 * dt, e.fy * 190 * dt, mr, who);
+        const h = tryMove(e, e.fx * (e.raged ? 240 : 190) * dt, e.fy * (e.raged ? 240 : 190) * dt, mr, who);
         if (h.hitX) e.fx *= -1; if (h.hitY) e.fy *= -1;
-        if (h.hitX || h.hitY) { e.bounces++; G.shake = 0.15; Sound.play('clank'); }
-        if (e.bounces >= 3 || e.t > 4) { e.st = 'daze'; e.t = 0; }
-      } else if (e.st === 'daze') { if (e.t > 2.2) { e.st = 'waddle'; e.t = 0; } }
+        if (h.hitX || h.hitY) { e.bounces++; G.shake = 0.15; Sound.play('clank'); if (e.raged && G.mode !== 'arena') dropIcicles(3, p.x, p.y); }
+        if (e.bounces >= (e.raged ? 4 : 3) || e.t > 4) { e.st = 'daze'; e.t = 0; }
+      } else if (e.st === 'daze') { if (e.t > (e.raged ? 1.6 : 2.2)) { e.st = 'waddle'; e.t = 0; } }
       break;
   }
   if (d < e.r + 5 && e.st !== 'daze' && !(e.flipped > 0) && !e.bow && !(e.type === 'attendant' && (e.st === 'hide' || e.st === 'intro'))) hurtPlayer(e.touch, e);

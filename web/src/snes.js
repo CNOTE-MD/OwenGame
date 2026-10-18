@@ -241,6 +241,8 @@ function drawMapPage() {
   text(`Heart pieces ${pieces}/4   Containers ${conts}/4`, 20, 184, '#f2ebcc', 'left', false);
   text(`Rune tablets ${tabletsFound()}/${TABLET_TOTAL}` + (tabletsFound() >= TABLET_TOTAL ? '  ✓' : ''), 20, 196, '#c8e8ff', 'left', false);
   text('Side quests ' + ['bjarne_done', 'sven_done'].filter(flag).length + '/2   Chapters ' + (flag('d2done') ? 3 : flag('d1done') ? 2 : 1) + ' of 5', 20, 208, '#f2ebcc', 'left', false);
+  drawDeeds();
+  const ot = objectiveTarget(); if (ot) { const OX = 32 + Math.floor(ot.x / 16) * 48 + 20, OY = 40 + Math.floor(ot.y / 14) * 34 + 14; if (Math.floor(G.t * 4) % 2) { text('!', OX, OY + 4, '#000', 'center'); text('!', OX - 1, OY + 3, '#ffd84a', 'center'); } }
 }
 
 // ---------------- Owen's page 5: subway, taxi, the big log ----------------

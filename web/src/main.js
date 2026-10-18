@@ -112,7 +112,7 @@ function update(dt) {
   updateClock(dt);
   updatePlayer(dt);
   if (G.state !== 'play') return;
-  updateGround(dt); updateShots(dt); updateFire(dt);
+  updateGround(dt); updateShots(dt); updateFire(dt); updateIcicles(dt); deed('seconds', dt);
   updateJon(dt);
   if (G.mode === 'arena') { updateArena(dt); if (G.state !== 'play') return; }
   if (G.map.redeye) updateRedeye(dt);
@@ -148,7 +148,7 @@ function render() {
   if (G.mode === 'arena') drawArenaWorld();
   drawHankAxes();
   if (!p.hold) drawJon();
-  drawShots(); drawFire();
+  drawShots(); drawFire(); drawIcicles();
   drawFx();
   drawLightning();
   ctx.setTransform(1, 0, 0, 1, 0, 0);
@@ -156,7 +156,7 @@ function render() {
   drawAtmosphere();
   drawRedeyeOverlay();
   if (G.flash > 0) { ctx.globalAlpha = Math.min(1, G.flash * 3); R(0, 0, VW, VH, G.flashColor || '#fff'); ctx.globalAlpha = 1; }
-  if (G.mode === 'arena') drawArenaHud(); else drawHud();
+  if (G.mode === 'arena') drawArenaHud(); else { drawHud(); drawCompass(); }
   if (G.state === 'warp') { ctx.globalAlpha = clamp(1 - Math.abs(G.warp.t - 0.35) / 0.35, 0, 1); R(0, 0, VW, VH, '#000'); ctx.globalAlpha = 1; }
   if (G.bannerT > 0) { R(0, 92, VW, 34, 'rgba(0,0,0,.8)'); text(G.banner, VW / 2, 113, '#ffd84a', 'center'); }
   if (G.state === 'talk') drawTalk();
@@ -178,7 +178,7 @@ G.menuSel = 0;
 buildAll(); buildSnesArt(); buildAwesomeArt(); buildMagicArt();
 function frame(now) {
   const dt = Math.min(0.05, (now - last) / 1000); last = now;
-  try { pollGamepad(); update(dt); render(); const mid = musicFor(); markHeard(mid); Music.want(mid); Music.tick(); } catch (err) { console.error(err); }
+  try { pollGamepad(); update(dt); render(); const mid = musicFor(); markHeard(mid); Music.want(mid); Music.tick(); Ambience.tick(dt); } catch (err) { console.error(err); }
   if (!(G.hitstop > 0)) for (const k in edge) edge[k] = false;   // a tap during hit-stop still counts
   requestAnimationFrame(frame);
 }

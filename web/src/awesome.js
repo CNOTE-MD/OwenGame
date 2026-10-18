@@ -38,6 +38,7 @@ function comboUp() {
   const n = JT.streak;
   if (n < 2) return;
   G.combo = { n, t: 0 };
+  if (G.save && G.mode !== 'arena') { const d = G.save.deeds || (G.save.deeds = {}); d.combo = Math.max(d.combo || 0, n); }
   if (n >= 5 && G.save.items.thunder) { G.save.rune = Math.min(RUNE_MAX, G.save.rune + 1); }
   if (n === 5) Sound.play('secret');
 }
