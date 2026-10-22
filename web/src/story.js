@@ -176,6 +176,7 @@ const JON = {
   spore: ['A mushroom is SPITTING at us. A mushroom.', 'It hides under its own hat. Coward. Get close, then back off, then CHOP.', 'Never trust a fungus with eyes.'],
   guard: ['Royal Guards! Gold penguins with shields. Of course.', 'Get behind him! Penguins can\'t turn fast. Short legs.', 'He\'s wearing a bucket. A GOLD bucket.'],
   snowpeng: ['Snow penguins! They\'re FAST. Why are they fast?!', 'Zigzag penguin. Zigzag penguin. Hold still, bird!', 'They skate. Penguins that skate. I\'m done.'],
+  rage: ['He\'s MAD now. Watch the ceiling! ICICLES!', 'Royal rage! Dodge the shadows, chop when he\'s dizzy!', 'Okay he\'s faster. That\'s fine. That\'s FINE.'],
   frost: ['Ice ice, baby penguin.', 'Frozen! Now CHOP. Chop chop chop!', 'Cold as fjord. Literally this time.'],
   mend: ['Ahh. Hearts. Feel better? You look less green.', 'Mended! Hank\'s rune works. Mostly used it on the dog, apparently.'],
   lutefisk: ['You ATE it. You actually ate it. I can smell it from HERE.', 'Lutefisk. Jelly fish. Not a jellyfish. Jelly. Fish. Why.', 'I need a minute. I need a minute away from you.'],

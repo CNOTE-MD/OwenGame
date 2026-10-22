@@ -2360,6 +2360,7 @@ const JON = {
   spore: ['A mushroom is SPITTING at us. A mushroom.', 'It hides under its own hat. Coward. Get close, then back off, then CHOP.', 'Never trust a fungus with eyes.'],
   guard: ['Royal Guards! Gold penguins with shields. Of course.', 'Get behind him! Penguins can\'t turn fast. Short legs.', 'He\'s wearing a bucket. A GOLD bucket.'],
   snowpeng: ['Snow penguins! They\'re FAST. Why are they fast?!', 'Zigzag penguin. Zigzag penguin. Hold still, bird!', 'They skate. Penguins that skate. I\'m done.'],
+  rage: ['He\'s MAD now. Watch the ceiling! ICICLES!', 'Royal rage! Dodge the shadows, chop when he\'s dizzy!', 'Okay he\'s faster. That\'s fine. That\'s FINE.'],
   frost: ['Ice ice, baby penguin.', 'Frozen! Now CHOP. Chop chop chop!', 'Cold as fjord. Literally this time.'],
   mend: ['Ahh. Hearts. Feel better? You look less green.', 'Mended! Hank\'s rune works. Mostly used it on the dog, apparently.'],
   lutefisk: ['You ATE it. You actually ate it. I can smell it from HERE.', 'Lutefisk. Jelly fish. Not a jellyfish. Jelly. Fish. Why.', 'I need a minute. I need a minute away from you.'],
@@ -3266,7 +3267,7 @@ function hurtPlayer(dmg, from, force) {
   const p = G.player, s = G.save;
   if (!force && (p.inv > 0 || p.launching || p.falling > 0 || G.state !== 'play')) return;
   if (!force && G.st.armor > 0 && Math.random() < Math.min(0.6, G.st.armor * 0.1)) { p.inv = 0.4; floatText(p.x, p.y - 18, 'BLOCK', '#9fd0ff'); Sound.play('clank'); return; }
-  p.hp -= dmg; p.inv = 1; Sound.play('hurt'); G.shake = 0.15;
+  p.hp -= dmg; p.inv = 1; Sound.play('hurt'); G.shake = 0.15; rumble(120, 0.5, 0.3);
   if (G.mode !== 'arena') jonOnHurt(from);
   if (from) { const d = Math.hypot(p.x - from.x, p.y - from.y) || 1; p.kx = (p.x - from.x) / d * 170; p.ky = (p.y - from.y) / d * 170; }
   if (p.hp > 0) return;
@@ -3288,7 +3289,7 @@ function finishDeath() {
   if (G.mode === 'arena') return arenaOver(false);
   if (!s.voodoo && s.voodoo2) { s.voodoo2 = false; p.hp = s.maxHp; p.inv = 2.5; puff(p.x, p.y, '#ffd84a', 16); Sound.play('secret'); return say([['Jon', 'Best friends forever means FOREVER. Get up!']]); }
   if (s.voodoo) { s.voodoo = false; p.hp = s.maxHp; p.inv = 2.5; puff(p.x, p.y, '#9a4dd9', 16); Sound.play('secret'); return say(STORY.revive); }
-  G.state = 'over'; G.menuSel = 0;
+  deed('deaths'); G.state = 'over'; G.menuSel = 0;
 }
 
 function interact(e) {
@@ -3540,14 +3541,14 @@ function killEnemy(e) {
   G.ents = G.ents.filter(o => o !== e);
   poof(e.x, e.y, e.boss); Sound.play('kill');
   snesOnKill(e); awesomeOnKill(e);
-  if (G.mode !== 'arena') hitStop(e.boss ? 0.28 : 0.05);
+  if (G.mode !== 'arena') { hitStop(e.boss ? 0.28 : 0.05); deed('kills'); rumble(e.boss ? 400 : 60, e.boss ? 1 : 0.3, e.boss ? 0.6 : 0.2); }
   const s = G.save;
   if (s.items.thunder) s.rune = Math.min(RUNE_MAX, s.rune + G.st.runeKill);
   if (G.mode === 'arena') return arenaKill(e);
   jonXP(e.boss ? 25 : e.shield ? 3 : 2); jonOnKill(e);
   if (e.boss) JT.queued = 'boss';
   if (!e.boss) maybeDrop(e.x, e.y, 0.65);
-  if (e.type === 'king') { G.shake = 0.6; say(STORY.king_down, checkRoomClear); return; }
+  if (e.type === 'king') { G.shake = 0.6; ICICLES.length = 0; say(STORY.king_down, checkRoomClear); return; }
   if (e.type === 'hank') { G.shake = 0.6; HK.axes = []; for (const w of G.ents.filter(o => o.type === 'wisp')) killEnemy(w); say(STORY.hank_down, () => { setFlag('d2done'); checkRoomClear(); writeSave(); }); return; }
   if (e.type === 'attendant') { G.shake = 0.6; RE.shots = []; say(STORY.attendant_down, () => { setFlag('redeye_done'); checkRoomClear(); }); return; }
   checkRoomClear();
@@ -3609,14 +3610,15 @@ function updateEnemy(e, dt) {
         if (G.mode === 'arena') { arenaSpawn('penguin', e.x - 40, e.y); arenaSpawn('penguin', e.x + 40, e.y); }
         else { spawnEnemy('penguin', G.cam.x + 40, G.cam.y + 60); spawnEnemy('penguin', G.cam.x + VW - 40, G.cam.y + 60); }
       }
-      if (e.st === 'waddle') { e.fx = dx / d; e.fy = dy / d; toward(e.speed); if (e.t > 2.2) { e.st = 'wind'; e.t = 0; Sound.play('charge'); } }
-      else if (e.st === 'wind') { e.fx = dx / d; e.fy = dy / d; if (e.t > 0.6) { e.st = 'slide'; e.t = 0; e.bounces = 0; } }
+      kingRage(e, dt, dx, dy, d, mr, who);
+      if (e.st === 'waddle') { e.fx = dx / d; e.fy = dy / d; toward(e.speed * (e.raged ? 1.3 : 1)); if (e.t > (e.raged ? 1.4 : 2.2)) { e.st = 'wind'; e.t = 0; Sound.play('charge'); } }
+      else if (e.st === 'wind') { e.fx = dx / d; e.fy = dy / d; if (e.t > (e.raged ? 0.4 : 0.6)) { e.st = 'slide'; e.t = 0; e.bounces = 0; } }
       else if (e.st === 'slide') {
-        const h = tryMove(e, e.fx * 190 * dt, e.fy * 190 * dt, mr, who);
+        const h = tryMove(e, e.fx * (e.raged ? 240 : 190) * dt, e.fy * (e.raged ? 240 : 190) * dt, mr, who);
         if (h.hitX) e.fx *= -1; if (h.hitY) e.fy *= -1;
-        if (h.hitX || h.hitY) { e.bounces++; G.shake = 0.15; Sound.play('clank'); }
-        if (e.bounces >= 3 || e.t > 4) { e.st = 'daze'; e.t = 0; }
-      } else if (e.st === 'daze') { if (e.t > 2.2) { e.st = 'waddle'; e.t = 0; } }
+        if (h.hitX || h.hitY) { e.bounces++; G.shake = 0.15; Sound.play('clank'); if (e.raged && G.mode !== 'arena') dropIcicles(3, p.x, p.y); }
+        if (e.bounces >= (e.raged ? 4 : 3) || e.t > 4) { e.st = 'daze'; e.t = 0; }
+      } else if (e.st === 'daze') { if (e.t > (e.raged ? 1.6 : 2.2)) { e.st = 'waddle'; e.t = 0; } }
       break;
   }
   if (d < e.r + 5 && e.st !== 'daze' && !(e.flipped > 0) && !e.bow && !(e.type === 'attendant' && (e.st === 'hide' || e.st === 'intro'))) hurtPlayer(e.touch, e);
@@ -5767,6 +5769,8 @@ function drawMapPage() {
   text(`Heart pieces ${pieces}/4   Containers ${conts}/4`, 20, 184, '#f2ebcc', 'left', false);
   text(`Rune tablets ${tabletsFound()}/${TABLET_TOTAL}` + (tabletsFound() >= TABLET_TOTAL ? '  ✓' : ''), 20, 196, '#c8e8ff', 'left', false);
   text('Side quests ' + ['bjarne_done', 'sven_done'].filter(flag).length + '/2   Chapters ' + (flag('d2done') ? 3 : flag('d1done') ? 2 : 1) + ' of 5', 20, 208, '#f2ebcc', 'left', false);
+  drawDeeds();
+  const ot = objectiveTarget(); if (ot) { const OX = 32 + Math.floor(ot.x / 16) * 48 + 20, OY = 40 + Math.floor(ot.y / 14) * 34 + 14; if (Math.floor(G.t * 4) % 2) { text('!', OX, OY + 4, '#000', 'center'); text('!', OX - 1, OY + 3, '#ffd84a', 'center'); } }
 }
 
 // ---------------- Owen's page 5: subway, taxi, the big log ----------------
@@ -5874,6 +5878,7 @@ function comboUp() {
   const n = JT.streak;
   if (n < 2) return;
   G.combo = { n, t: 0 };
+  if (G.save && G.mode !== 'arena') { const d = G.save.deeds || (G.save.deeds = {}); d.combo = Math.max(d.combo || 0, n); }
   if (n >= 5 && G.save.items.thunder) { G.save.rune = Math.min(RUNE_MAX, G.save.rune + 1); }
   if (n === 5) Sound.play('secret');
 }
@@ -6185,6 +6190,138 @@ function buildMagicArt() {
   SPR.icon_tooth = mk(['.wwwww..', 'wWWWWWw.', 'wWWWWWw.', '.wWWWw..', '..wWw...', '..wWw...', '...w....'], { w: '#c8c8a8', W: '#f0f0e0' });
 }
 
+// ===== better.js =====
+// The "better" pass: an objective compass, the Penguin King's Royal Rage, ambient sound,
+// controller rumble, the nap bench, and a record of Owen's deeds on the map page.
+
+// ---------------- objective compass ----------------
+// where the current objective lives on the overworld (tile coords), or null
+function objectiveTarget() {
+  const s = G.save;
+  if (G.mode === 'arena' || G.mapId !== 'overworld') return null;
+  if (!flag('met_astrid')) return { x: 4, y: 19, label: 'Astrid' };
+  if (!flag('exchanged') && !flag('d1done')) return { x: 19, y: 38, label: 'Subway' };
+  if (!flag('log_chopped') && !flag('d1done')) return { x: 31, y: 6, label: 'The log' };
+  if (!flag('d1done')) return { x: 39, y: 2, label: 'Penguin Palace' };
+  if (!flag('d2done')) return { x: 7, y: 2, label: 'Drowned Barrow' };
+  if (!flag('redeye_done')) return { x: 29, y: 33, label: 'A nap' };
+  return null;
+}
+function drawCompass() {
+  const t = objectiveTarget();
+  if (!t || G.state !== 'play') return;
+  const p = G.player, tx = t.x * T + 8, ty = t.y * T + 8;
+  const sx = tx - G.cam.x, sy = ty - G.cam.y;
+  if (sx > 8 && sx < VW - 8 && sy > 26 && sy < VH - 8) {
+    // on this screen: a bobbing marker over the spot
+    const b = Math.round(Math.sin(G.t * 5) * 2);
+    poly([[sx, sy - 12 + b], [sx - 4, sy - 18 + b], [sx + 4, sy - 18 + b]], '#ffd84a'); R(sx - 1, sy - 24 + b, 2, 5, '#ffd84a');
+    return;
+  }
+  // off screen: an arrow at the edge of the screen, pointing the way
+  const a = Math.atan2(ty - p.y, tx - p.x), cx = p.x - G.cam.x, cy = p.y - G.cam.y;
+  const ax = clamp(cx + Math.cos(a) * 60, 12, VW - 12), ay = clamp(cy + Math.sin(a) * 60, 34, VH - 12);
+  const pulse = 0.6 + 0.4 * Math.sin(G.t * 6);
+  ctx.save(); ctx.translate(Math.round(ax), Math.round(ay)); ctx.rotate(a); ctx.globalAlpha = pulse;
+  poly([[7, 0], [-5, -5], [-2, 0], [-5, 5]], '#000'); poly([[6, 0], [-4, -4], [-2, 0], [-4, 4]], '#ffd84a');
+  ctx.restore(); ctx.globalAlpha = 1;
+}
+
+// ---------------- the Penguin King's Royal Rage ----------------
+const ICICLES = [];
+function kingRage(e, dt, dx, dy, d, mr, who) {
+  // below four hearts the King rages: faster slides, more bounces, and every bounce shakes icicles loose
+  if (e.hp > 4 || e.raged) return;
+  e.raged = true; e.st = 'wind'; e.t = 0; G.shake = 0.5; Sound.play('boss');
+  floatText(e.x, e.y - 40, 'ROYAL RAGE!', '#ff6b6b');
+  JT.queued = null; jonSay('rage', { force: true, face: 'worried' });
+}
+function dropIcicles(n, nearX, nearY) {
+  for (let i = 0; i < n; i++) {
+    const x = clamp(nearX + rnd(-70, 70), G.cam.x + 16, G.cam.x + VW - 16), y = clamp(nearY + rnd(-50, 50), G.cam.y + 40, G.cam.y + VH - 16);
+    if (solidAt(x, y, 'walker')) continue;
+    ICICLES.push({ x, y, t: 0, warn: 0.7, fall: 0.25 });
+  }
+}
+function updateIcicles(dt) {
+  const p = G.player;
+  for (const c of ICICLES) {
+    c.t += dt;
+    if (c.t >= c.warn && !c.hit) { c.hit = true; Sound.play('clank'); puff(c.x, c.y, '#cfefff', 8); if (dist(c, p) < 11) hurtPlayer(1, c); }
+  }
+  for (let i = ICICLES.length - 1; i >= 0; i--) if (ICICLES[i].t > ICICLES[i].warn + ICICLES[i].fall) ICICLES.splice(i, 1);
+}
+function drawIcicles() {
+  for (const c of ICICLES) {
+    const x = Math.round(c.x - G.cam.x), y = Math.round(c.y - G.cam.y);
+    if (c.t < c.warn) { const k = c.t / c.warn; ctx.globalAlpha = 0.35 + k * 0.4; ctx.fillStyle = '#9fd0ff'; ctx.beginPath(); ctx.ellipse(x, y + 3, 7 * k + 2, 3 * k + 1, 0, 0, Math.PI * 2); ctx.fill(); ctx.globalAlpha = 1; const fy = y - 120 + k * 120; poly([[x, fy + 8], [x - 3, fy - 6], [x + 3, fy - 6]], '#dff6ff'); R(x - 1, fy - 6, 2, 3, '#ffffff'); }
+    else { const k = (c.t - c.warn) / c.fall; for (let i = 0; i < 4; i++) R(x - 6 + i * 4, y - 2 - k * 8, 2, 2, '#dff6ff'); }
+  }
+}
+
+// ---------------- ambient sound ----------------
+const Ambience = {
+  name: null, nodes: [], timer: 0,
+  for() {
+    if (!G.map || G.state === 'title' || G.mode === 'arena' || Sound.muted) return null;
+    if (G.mapId === 'subway') return 'subway';
+    if (G.map.redeye) return null;
+    if (G.map.dungeon || G.map.dark) return 'drips';
+    if (G.map.interior) return null;
+    if (G.scr.y === 0 && G.scr.x >= 2) return 'wind';
+    if (typeof isNight === 'function' && isNight()) return 'crickets';
+    return 'birds';
+  },
+  start(id) {
+    const ac = Sound.ac; if (!ac) return;
+    this.stop(); this.name = id;
+    if (id === 'wind' || id === 'subway') {
+      const n = ac.sampleRate * 2, buf = ac.createBuffer(1, n, ac.sampleRate), ch = buf.getChannelData(0);
+      for (let i = 0; i < n; i++) ch[i] = Math.random() * 2 - 1;
+      const src = ac.createBufferSource(), f = ac.createBiquadFilter(), g = ac.createGain(), lfo = ac.createOscillator(), lg = ac.createGain();
+      src.buffer = buf; src.loop = true; f.type = id === 'wind' ? 'bandpass' : 'lowpass'; f.frequency.value = id === 'wind' ? 500 : 110; f.Q.value = id === 'wind' ? 0.6 : 2;
+      g.gain.value = id === 'wind' ? 0.05 : 0.07; lfo.frequency.value = id === 'wind' ? 0.18 : 0.5; lg.gain.value = id === 'wind' ? 300 : 30;
+      lfo.connect(lg); lg.connect(f.frequency); src.connect(f).connect(g).connect(ac.destination); src.start(); lfo.start();
+      this.nodes = [src, lfo, g];
+    }
+  },
+  stop() { for (const n of this.nodes) { try { if (n.gain) { n.gain.setTargetAtTime(0, Sound.ac.currentTime, 0.2); } else if (n.stop) setTimeout(() => { try { n.stop(); } catch (e) {} }, 600); } catch (e) {} } this.nodes = []; this.name = null; },
+  tick(dt) {
+    const id = this.for();
+    if (id !== this.name) { if (id === 'wind' || id === 'subway') this.start(id); else { this.stop(); this.name = id; } }
+    if (!Sound.ac || Sound.muted) return;
+    this.timer -= dt;
+    if (this.timer > 0) return;
+    // one-shot sounds that recur at random
+    if (id === 'birds') { this.timer = rnd(2.5, 7); const base = pick([1800, 2200, 2600]); Sound.tone([[base, 0.06, 'sine', base * 1.3], [base * 1.2, 0.08, 'sine', base * 0.9], [base * 1.05, 0.05, 'sine', base * 1.4]], 0.025); }
+    else if (id === 'crickets') { this.timer = rnd(0.4, 1.2); Sound.tone([[4200, 0.03, 'square'], [4200, 0.03, 'square'], [4200, 0.03, 'square']], 0.008); }
+    else if (id === 'drips') { this.timer = rnd(2, 6); const f = pick([900, 1200, 1500]); Sound.tone([[f, 0.05, 'sine', f * 0.5]], 0.03); }
+    else if (id === 'wind') { this.timer = rnd(4, 9); }
+    else this.timer = 1;
+  },
+};
+
+// ---------------- controller rumble ----------------
+function rumble(ms, strong = 0.6, weak = 0.3) {
+  try {
+    const pads = navigator.getGamepads ? navigator.getGamepads() : [];
+    for (const gp of pads) {
+      if (!gp || !gp.connected) continue;
+      const act = gp.vibrationActuator || (gp.hapticActuators && gp.hapticActuators[0]);
+      if (act && act.playEffect) act.playEffect('dual-rumble', { duration: ms, strongMagnitude: strong, weakMagnitude: weak });
+      else if (act && act.pulse) act.pulse(strong, ms);
+    }
+  } catch (e) {}
+}
+
+// ---------------- deeds ----------------
+function deed(k, n = 1) { if (!G.save || G.mode === 'arena') return; const d = G.save.deeds || (G.save.deeds = {}); d[k] = (d[k] || 0) + n; }
+function drawDeeds() {
+  const d = (G.save && G.save.deeds) || {};
+  const mins = Math.floor((d.seconds || 0) / 60);
+  text(`Chops ${d.kills || 0}   Best combo x${d.combo || 0}   Naps ${d.deaths || 0}   ${mins} min`, 20, 220, '#8a8ab0', 'left', false);
+}
+
 // ===== sprites.js =====
 // Pixel art drawn in code. Everything is centered on (x, y) = feet-ish center.
 
@@ -6348,6 +6485,7 @@ function drawThing(e) {
   const x = Math.round(e.x - G.cam.x), y = Math.round(e.y - G.cam.y), t = G.t;
   switch (e.kind) {
     case 'enemy': drawEnemy(e); drawFrozen(e); return;
+    case 'cargo': if (flag('d1done')) { shadowAt(x, y + 6, 1.4); spr(SPR.bench, x, y + 8); } return;
     case 'tablet': shadowAt(x, y + 6, 0.8); spr(SPR.tablet, x, y + 7 + Math.round(Math.sin(t * 2) * 1)); if (Math.floor(t * 3) % 3 === 0) drawTwinkle(x + 5, y - 6, 0); return;
     case 'throne': spr(SPR.throne, x, y + 8); return;
     case 'exchange': spr(SPR.machine, x, y + 8); if (Math.floor(t * 2) % 2) R(x - 1, y - 4, 2, 1, '#5fdc8a'); return;
@@ -7079,7 +7217,7 @@ function update(dt) {
   updateClock(dt);
   updatePlayer(dt);
   if (G.state !== 'play') return;
-  updateGround(dt); updateShots(dt); updateFire(dt);
+  updateGround(dt); updateShots(dt); updateFire(dt); updateIcicles(dt); deed('seconds', dt);
   updateJon(dt);
   if (G.mode === 'arena') { updateArena(dt); if (G.state !== 'play') return; }
   if (G.map.redeye) updateRedeye(dt);
@@ -7115,7 +7253,7 @@ function render() {
   if (G.mode === 'arena') drawArenaWorld();
   drawHankAxes();
   if (!p.hold) drawJon();
-  drawShots(); drawFire();
+  drawShots(); drawFire(); drawIcicles();
   drawFx();
   drawLightning();
   ctx.setTransform(1, 0, 0, 1, 0, 0);
@@ -7123,7 +7261,7 @@ function render() {
   drawAtmosphere();
   drawRedeyeOverlay();
   if (G.flash > 0) { ctx.globalAlpha = Math.min(1, G.flash * 3); R(0, 0, VW, VH, G.flashColor || '#fff'); ctx.globalAlpha = 1; }
-  if (G.mode === 'arena') drawArenaHud(); else drawHud();
+  if (G.mode === 'arena') drawArenaHud(); else { drawHud(); drawCompass(); }
   if (G.state === 'warp') { ctx.globalAlpha = clamp(1 - Math.abs(G.warp.t - 0.35) / 0.35, 0, 1); R(0, 0, VW, VH, '#000'); ctx.globalAlpha = 1; }
   if (G.bannerT > 0) { R(0, 92, VW, 34, 'rgba(0,0,0,.8)'); text(G.banner, VW / 2, 113, '#ffd84a', 'center'); }
   if (G.state === 'talk') drawTalk();
@@ -7145,7 +7283,7 @@ G.menuSel = 0;
 buildAll(); buildSnesArt(); buildAwesomeArt(); buildMagicArt();
 function frame(now) {
   const dt = Math.min(0.05, (now - last) / 1000); last = now;
-  try { pollGamepad(); update(dt); render(); const mid = musicFor(); markHeard(mid); Music.want(mid); Music.tick(); } catch (err) { console.error(err); }
+  try { pollGamepad(); update(dt); render(); const mid = musicFor(); markHeard(mid); Music.want(mid); Music.tick(); Ambience.tick(dt); } catch (err) { console.error(err); }
   if (!(G.hitstop > 0)) for (const k in edge) edge[k] = false;   // a tap during hit-stop still counts
   requestAnimationFrame(frame);
 }
