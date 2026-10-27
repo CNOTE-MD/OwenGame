@@ -22,39 +22,68 @@ function updateTalk(dt) {
   if (Math.floor(tk.shown) !== before && Math.floor(tk.shown) % 3 === 0 && tk.shown < tk.cur[1].length) Sound.play('blip');
   if (just('a') || just('b') || just('tap')) { if (tk.shown < tk.cur[1].length) tk.shown = 999; else nextLine(); }
 }
+// Dialogue: the A Link to the Past box, with the speaker's portrait and a name plate.
+const PORTRAIT_NPC = { Astrid: 'astrid', Lars: 'lars', Sven: 'sven', Ingrid: 'ingrid', Bjarne: 'bjarne', Attendant: 'attendant_ok', Commuter: 'commuter' };
+function drawPortrait(who, x, y) {
+  // x, y: centre of a 30x30 window
+  const blink = G.t % 3.4 < 0.12;
+  ctx.save(); ctx.translate(x, y); ctx.scale(2, 2);
+  if (who === 'Jon') drawJonSprite(0, 1, 0, blink, typeof jonFaceNow === 'function' ? jonFaceNow() : null);
+  else if (who === 'Owen') { const key = G.save && (G.save.voodoo || G.mode === 'arena') ? 'owen' : 'zombie'; spr(SPR[key + '_down_w0'], 0, 7); }
+  else if (who === 'Penguin King') { spr(SPR.peng_down_0, 0, 6); spr(SPR.crown, 0, -6); }
+  else if (who === 'Forest Giant') { ctx.scale(0.5, 0.5); spr(SPR.giant, 0, 16); }
+  else if (PORTRAIT_NPC[who]) spr(SPR['npc_' + PORTRAIT_NPC[who] + (blink ? '_blink' : '')] || SPR.npc_sven, 0, 7);
+  else { ctx.restore(); return false; }
+  ctx.restore(); return true;
+}
+const HAS_PORTRAIT = who => who === 'Jon' || who === 'Owen' || who === 'Penguin King' || who === 'Forest Giant' || !!PORTRAIT_NPC[who];
 function drawTalk() {
   const tk = G.talk; if (!tk) return;
   const [who, msg] = tk.cur;
   const inCut = tk.back === 'cutscene';
   const top = !inCut && G.player && G.player.y - G.cam.y > 140;
-  const by = top ? 26 : 152;
-  R(8, by - 2, 240, 66, '#fff'); R(10, by, 236, 62, '#0d0d33');
-  let y = by + 12;
-  if (who) { text(who, 16, y, '#ffe64d'); y += 12; }
-  let left = Math.floor(tk.shown);
-  for (const l of wrap(msg, 222).slice(0, who ? 4 : 5)) { text(l.slice(0, Math.max(0, left)), 16, y, '#fff', 'left', false); left -= l.length + 1; y += 10; }
-  if (tk.shown >= msg.length && Math.floor(G.t * 3) % 2 === 0) text('▼', 234, by + 58, '#fff', 'left', false);
+  const by = top ? 30 : 156, bx = 6, bw = 244, bh = 62;
+  drawPanel(bx, by, bw, bh);
+  let tx = bx + 10, tw = bw - 20;
+  if (who && HAS_PORTRAIT(who)) {
+    R(bx + 6, by + 7, 36, 36, '#0a0812'); R(bx + 7, by + 8, 34, 34, '#2a2f66'); R(bx + 7, by + 8, 34, 12, '#343a7a');
+    ctx.save(); ctx.beginPath(); ctx.rect(bx + 7, by + 8, 34, 34); ctx.clip(); drawPortrait(who, bx + 24, by + 24); ctx.restore();
+    tx = bx + 48; tw = bw - 56;
+  }
+  if (who) {
+    const nw = textWidth(who) + 12;
+    drawPanel(tx - 4, by - 9, nw, 14, { plain: true, field: '#2a1a10', top: '#3a2616' });
+    text(who, tx + 2, by + 1, '#ffd84a', 'left', false);
+  }
+  let left = Math.floor(tk.shown), y = by + 17;
+  for (const l of wrap(msg, tw).slice(0, 4)) { text(l.slice(0, Math.max(0, left)), tx, y, '#f6f0dc', 'left', true); left -= l.length + 1; y += 11; }
+  if (tk.shown >= msg.length) text('▼', bx + bw - 13, by + bh - 6 + (Math.floor(G.t * 4) % 2), '#ffd84a', 'left', false);
 }
 
 // ---------- HUD (A Link to the Past layout: magic meter, item box, money, keys, life) ----------
+// HUD: A Link to the Past's layout, drawn with outlines over a soft shade instead of a box.
 function drawHud() {
   const s = G.save, p = G.player;
-  R(0, 0, VW, 22, 'rgba(0,0,0,.45)');
-  // rune meter
-  R(6, 3, 8, 17, '#000'); R(7, 4, 6, 15, '#1a2238');
-  const fill = Math.round(15 * s.rune / RUNE_MAX); R(7, 19 - fill, 6, fill, s.rune >= RUNE_MAX ? (Math.floor(G.t * 4) % 2 ? '#7fd4ff' : '#cfefff') : '#2f8fd0');
+  for (let i = 0; i < 7; i++) R(0, i * 4, VW, 4, `rgba(10,8,18,${(0.5 - i * 0.07).toFixed(2)})`);
+  // rune meter: a bone-framed vial
+  R(5, 2, 10, 21, '#0a0812'); R(6, 3, 8, 19, '#e8dcb8'); R(7, 4, 6, 17, '#0a0812');
+  const fill = Math.round(17 * s.rune / RUNE_MAX), full = s.rune >= RUNE_MAX;
+  if (fill) { R(7, 21 - fill, 6, fill, full ? (Math.floor(G.t * 4) % 2 ? '#7fd4ff' : '#cfefff') : '#2f8fd0'); R(7, 21 - fill, 2, fill, full ? '#ffffff' : '#7fd4ff'); R(7, 21 - fill, 6, 1, '#cfefff'); }
+  R(8, 1, 4, 2, '#ffd84a');
   // item box
   drawSpellBox();
-  // kroner, keys
-  drawItemIcon('coin', 46, 7); text(String(s.kr).padStart(3, '0'), 52, 11, '#fff');
-  if (G.map && G.map.dungeon && !G.map.nokeys) { drawItemIcon('key', 46, 17); text('x' + (s.keys[G.mapId] || 0), 52, 20, '#fff'); if (s.bigkeys[G.mapId]) drawItemIcon('bigkey', 82, 15); }
-  if (s.potions) { drawItemIcon('juice', 98, 12); text('x' + s.potions, 104, 16, '#fff'); }
+  // kroner, keys, juice
+  drawItemIcon('coin', 46, 7); text(String(s.kr).padStart(3, '0'), 52, 11, '#ffffff', 'left', 'outline');
+  if (G.map && G.map.dungeon && !G.map.nokeys) { drawItemIcon('key', 46, 18); text('x' + (s.keys[G.mapId] || 0), 52, 22, '#ffffff', 'left', 'outline'); if (s.bigkeys[G.mapId]) drawItemIcon('bigkey', 74, 16); }
+  if (s.potions) { drawItemIcon('juice', 86, 12); text('x' + s.potions, 92, 16, '#ffffff', 'left', 'outline'); }
   // life
-  text('-LIFE-', 190, 9, '#f2ebcc', 'center');
+  text('- LIFE -', 191, 8, '#ff9a8a', 'center', 'outline');
   const n = s.maxHp / 2;
   for (let i = 0; i < n; i++) {
     const v = clamp(p.hp - i * 2, 0, 2) / 2, row = Math.floor(i / 10), col = i % 10;
-    drawHeart(144 + col * 9, 12 + row * 8, v, s.voodoo ? '#f22633' : s.voodoo2 ? '#ffd84a' : '#9a4dd9');
+    const hx = 147 + col * 9, hy = 12 + row * 8;
+    R(hx - 1, hy - 1, 9, 8, 'rgba(10,8,18,.55)');
+    drawHeart(hx, hy, v, s.voodoo ? '#f22633' : s.voodoo2 ? '#ffd84a' : '#9a4dd9');
   }
 }
 
@@ -74,11 +103,23 @@ function objective() {
   }
   return 'Chapter 3 complete! Walter\'s Forge and the Storm Peak wait for Owen\'s next chapters.';
 }
+const MENU_TABS = ['GEAR', 'JON', 'MAP', 'MUSIC', 'SPELLS', 'BAG'];
+function drawMenuTabs(active) {
+  R(11, 11, 234, 22, '#14163a'); R(11, 11, 234, 10, '#1e2250'); R(14, 32, 228, 1, '#3a3f80');
+  const gap = 9, ws = MENU_TABS.map(t => textWidth(t)), total = ws.reduce((a, b) => a + b, 0) + gap * (MENU_TABS.length - 1);
+  let x = Math.round(128 - total / 2);
+  MENU_TABS.forEach((t, i) => {
+    const on = i === active;
+    if (on) { R(x - 3, 15, ws[i] + 6, 14, '#ffd84a'); R(x - 2, 16, ws[i] + 4, 12, '#2a1a10'); }
+    text(t, x, 25, on ? '#ffd84a' : '#8a8ab0', 'left', false);
+    x += ws[i] + gap;
+  });
+  text('◀', 16, 25, '#55577a', 'left', false); text('▶', 240, 25, '#55577a', 'right', false);
+}
 function drawMenu() {
   const s = G.save;
   R(0, 0, VW, VH, 'rgba(5,5,20,.92)');
-  R(8, 8, 240, 208, '#ffd84a'); R(10, 10, 236, 204, '#0d0d33');
-  text('GEAR', 20, 26, '#ffe64d'); text('JON ▶', 236, 26, '#9be08a', 'right', false); text('◀ MAP', 20, 26 + 180, '#8a8ab0', 'left', false);
+  drawPanel(8, 8, 240, 208);
   const slots = [
     ['Jon Lv' + jonData().lvl + ' (swing Z)', 'homing', true, () => drawJonSprite(30, 44, 0, false, jonFaceNow())],
     ['Homing Jon (throw X)', 'homing', !!s.items.homing],
@@ -88,42 +129,78 @@ function drawMenu() {
     ['Voodoo Dash (Shift/F)', 'dash', !!s.items.dash],
   ];
   slots.forEach(([label, icon, have, custom], i) => {
-    const y = 44 + i * 16;
-    R(20, y - 8, 18, 16, '#1a2238');
-    if (have) { if (custom) custom(); else drawItemIcon(icon, 29, y); text(label, 44, y + 4, '#fff'); }
+    const y = 46 + i * 15;
+    R(19, y - 9, 20, 17, '#0a0812'); R(20, y - 8, 18, 15, '#232860');
+    if (have) { if (custom) custom(); else drawItemIcon(icon, 29, y); text(label, 44, y + 4, '#f6f0dc'); }
     else text('???', 44, y + 4, '#55577a');
   });
   const sq = (n, start, done) => flag(start) ? n + (flag(done) ? ' ✓' : ' …') : null;
   const side = [sq('Bjarne', 'quest_bjarne', 'bjarne_done'), sq('Sven', 'quest_sven', 'sven_done')].filter(Boolean);
-  if (side.length) text('Side quests: ' + side.join('  '), 20, 142, '#c8e8ff', 'left', false);
-  text('Heart pieces: ' + s.pieces + '/4', 20, 154, '#f2ebcc');
-  text('Voodoo bond: ' + (s.voodoo ? 'ready' : 'used'), 20, 166, s.voodoo ? '#9be08a' : '#c9a0f0');
-  if (G.map.dungeon && !G.map.nokeys) text('Keys ' + (s.keys[G.mapId] || 0) + '  Big key: ' + (s.bigkeys[G.mapId] ? 'yes' : 'no'), 236, 154, '#f2ebcc', 'right', false);
-  text('QUEST', 20, 180, '#ffe64d');
-  wrap(objective(), 214).slice(0, 3).forEach((l, i) => text(l, 20, 191 + i * 9, '#fff', 'left', false));
-  text(Sound.muted ? 'M: sound off' : 'M: sound on', 236, 26, '#8a8ab0', 'right', false);
-  text(Music.on ? 'N: music on' : 'N: music off', 236, 38, '#8a8ab0', 'right', false);
+  text('Heart pieces ' + s.pieces + '/4', 20, 140, '#f2ebcc');
+  text('Voodoo bond ' + (s.voodoo ? 'ready' : 'used'), 20, 151, s.voodoo ? '#9be08a' : '#c9a0f0');
+  if (side.length) text('Side quests ' + side.join('  '), 20, 162, '#c8e8ff', 'left', false);
+  text(Sound.muted ? 'M sound off' : 'M sound on', 236, 140, '#8a8ab0', 'right', false);
+  text(Music.on ? 'N music on' : 'N music off', 236, 151, '#8a8ab0', 'right', false);
+  R(16, 169, 224, 1, '#3a3f80');
+  text('QUEST', 20, 180, '#ffd84a');
+  wrap(objective(), 216).slice(0, 3).forEach((l, i) => text(l, 20, 191 + i * 10, '#f6f0dc', 'left', false));
 }
 
 // ---------- title ----------
 function drawTitle() {
-  R(0, 0, VW, VH, '#14121f');
-  for (let i = 0; i < 50; i++) R((i * 53) % VW, (i * 97) % 130, 1, 1, i % 3 ? '#4a4570' : '#a79fc4');
-  R(0, 150, VW, 74, '#1b3a6b'); R(0, 150, VW, 2, '#73a6f2');
-  for (let x = 0; x < VW; x += 32) R(x + (G.t * 8) % 32, 160 + (x / 32 % 3) * 14, 10, 1, '#3d66c4');
-  ctx.font = '20px "Press Start 2P", ui-monospace, Menlo, monospace'; ctx.textAlign = 'center';
-  ctx.fillStyle = '#000'; ctx.fillText('JÖNTUKA', VW / 2 + 2, 62); ctx.fillStyle = '#8fd0ff'; ctx.fillText('JÖNTUKA', VW / 2, 60);
-  text('A VIKING TALE', VW / 2, 80, '#f3ecd2', 'center');
-  text('a game by Owen', VW / 2, 96, '#a79fc4', 'center');
+  const t = G.t;
+  // night sky, banded like SNES gradients
+  const SKY = ['#070818', '#0a0c24', '#0e1030', '#13153c', '#191a48', '#211f52', '#2b2459'];
+  SKY.forEach((c, i) => R(0, i * 20, VW, 20, c));
+  for (let i = 0; i < 70; i++) { const x = (i * 53 + 7) % VW, y = (i * 97) % 120; if ((Math.floor(t * 2 + i * 0.7)) % 7) R(x, y, 1, 1, i % 4 ? '#5a5690' : '#e8e4ff'); }
+  // aurora borealis: three ribbons, stepped alpha so it stays pixel art
+  const ribbons = [['#4dffb0', 34, 0.0, 26], ['#3ad0ff', 48, 1.7, 20], ['#b06bff', 58, 3.1, 14]];
+  for (const [col, base, ph, len] of ribbons) for (let x = 0; x < VW; x += 2) {
+    const y = Math.round(base + Math.sin(x * 0.028 + t * 0.45 + ph) * 11 + Math.sin(x * 0.071 + t * 0.9 + ph) * 4);
+    const pulse = 0.55 + 0.45 * Math.sin(x * 0.05 - t * 1.3 + ph);
+    ctx.globalAlpha = 0.34 * pulse; R(x, y, 2, Math.round(len * 0.35), col);
+    ctx.globalAlpha = 0.18 * pulse; R(x, y + Math.round(len * 0.35), 2, Math.round(len * 0.4), col);
+    ctx.globalAlpha = 0.08 * pulse; R(x, y + Math.round(len * 0.75), 2, len, col);
+  }
+  ctx.globalAlpha = 1;
+  // mountains: a far range and a near range, jagged and snow-capped
+  const ridge = (seed, base, amp, step) => { const pts = []; for (let x = -step; x <= VW + step; x += step) pts.push([x, base - Math.abs(Math.sin(x * 0.019 + seed) * amp) - (hash(x, seed) % 9)]); return pts; };
+  const far = ridge(1.3, 132, 38, 12), near = ridge(4.1, 148, 24, 9);
+  poly([[0, 150], ...far, [VW, 150]], '#2c3070');
+  for (const [x, y] of far) if (y < 108) poly([[x - 6, y + 7], [x, y], [x + 6, y + 7]], '#b8bfe8');
+  poly([[0, 152], ...near, [VW, 152]], '#171a44');
+  for (const [x, y] of near) R(x, y, 2, 1, '#3a4a8a');
+  // the fjord, with the aurora shimmering in it
+  R(0, 148, VW, 76, '#0b1530'); R(0, 148, VW, 1, '#3a4a8a');
+  for (let i = 0; i < 26; i++) { const y = 152 + (i * 13) % 70, x = ((i * 71 + t * (6 + i % 3)) % (VW + 40)) - 20; ctx.globalAlpha = 0.5; R(x, y, 8 + (i % 4) * 4, 1, i % 3 === 0 ? '#4dffb0' : i % 3 === 1 ? '#3ad0ff' : '#2a3a7a'); }
+  ctx.globalAlpha = 1;
+  // a longship drifting across the water
+  const sx = ((t * 7) % (VW + 90)) - 60, sy = 166 + Math.round(Math.sin(t * 1.6) * 1);
+  poly([[sx, sy], [sx + 44, sy], [sx + 40, sy + 6], [sx + 4, sy + 6]], '#3a2410');
+  R(sx + 2, sy, 40, 2, '#6b4322'); for (let k = 0; k < 6; k++) R(sx + 7 + k * 6, sy + 1, 3, 3, k % 2 ? '#c03a2a' : '#e8dcb8');
+  poly([[sx + 44, sy], [sx + 49, sy - 8], [sx + 52, sy - 7], [sx + 47, sy]], '#6b4322'); R(sx + 50, sy - 7, 1, 1, '#ffd84a');
+  R(sx + 21, sy - 22, 2, 22, '#3a2410');
+  for (let k = 0; k < 5; k++) R(sx + 11, sy - 20 + k * 3, 22, 3, k % 2 ? '#e8dcb8' : '#c03a2a');
+  ctx.globalAlpha = 0.25; R(sx + 4, sy + 7, 40, 2, '#c03a2a'); ctx.globalAlpha = 1;
   drawTitleExtras();
-  drawJonSprite(VW / 2 + 74 + Math.sin(G.t * 2) * 3, 124, Math.sin(G.t * 1.5) * 0.3, G.t % 3.2 < 0.14);
-  const opts = G.titleOpts || titleOptions();
+  // the logo: chunky outlined letters, ice-blue with a darker lower half
+  const ly = 92;
+  text('JÖNTUKA', VW / 2, ly, '#dff6ff', 'center', 'outline', 3);
+  ctx.save(); ctx.beginPath(); ctx.rect(0, ly - 9, VW, 10); ctx.clip(); text('JÖNTUKA', VW / 2, ly, '#5aa8e8', 'center', false, 3); ctx.restore();
+  R(VW / 2 - 70, ly + 8, 140, 1, '#ffd84a');
+  text('A VIKING TALE', VW / 2, ly + 20, '#ffd84a', 'center', 'outline');
+  text('a game by Owen', VW / 2, ly + 32, '#a79fc4', 'center', true);
+  drawJonSprite(VW / 2 + 92 + Math.sin(t * 2) * 3, ly - 26, Math.sin(t * 1.5) * 0.3, t % 3.2 < 0.14);
+  // menu
+  const opts = G.titleOpts || titleOptions(), mh = 14 + opts.length * 13;
+  drawPanel(VW / 2 - 64, 222 - mh - 12, 128, mh);
   opts.forEach((o, i) => {
-    const sel = i === G.menuSel;
-    text((sel ? '> ' : '  ') + o.label, VW / 2 - 58, 170 + i * 14, o.disabled ? '#55577a' : sel ? '#ffd84a' : '#f3ecd2');
+    const sel = i === G.menuSel, y = 222 - mh - 12 + 15 + i * 13;
+    if (sel) text('▶', VW / 2 - 52, y, '#ffd84a', 'left', false);
+    text(o.label, VW / 2 - 42, y, o.disabled ? '#55577a' : sel ? '#ffd84a' : '#f6f0dc', 'left', true);
   });
-  if (G.confirmErase) text('Press Z again to erase your save', VW / 2, 218, '#ff8a8a', 'center');
-  const best = G.titleBest || 0; if (best && !G.confirmErase) text('Arena best: wave ' + best, VW / 2, 218, '#a79fc4', 'center');
+  if (G.confirmErase) text('Press Z again to erase your save', VW / 2, 220, '#ff8a8a', 'center', 'outline');
+  else { const best = G.titleBest || 0; if (best) text('Arena best: wave ' + best, VW - 6, 220, '#a79fc4', 'right', true); }
 }
 function titleOptions() {
   const has = !!readSave();

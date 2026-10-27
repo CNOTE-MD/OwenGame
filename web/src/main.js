@@ -143,6 +143,7 @@ function render() {
   if (G.state === 'cutscene' || (G.state === 'talk' && G.talk && G.talk.back === 'cutscene')) { drawCutscene(); drawTalk(); return; }
   if (G.shake > 0) ctx.setTransform(1, 0, 0, 1, Math.round(rnd(-2, 2)), Math.round(rnd(-2, 2)));
   drawMap();
+  drawIceGlints();
   const p = G.player;
   const list = G.ents.filter(e => e.kind !== 'warp' || e.portal).map(e => ({ y: e.y, f: () => drawThing(e) }));
   list.push({ y: p.y, f: () => drawOwen(p.x - G.cam.x, p.y - G.cam.y) });
@@ -163,7 +164,7 @@ function render() {
   if (G.state === 'warp') { ctx.globalAlpha = clamp(1 - Math.abs(G.warp.t - 0.35) / 0.35, 0, 1); R(0, 0, VW, VH, '#000'); ctx.globalAlpha = 1; }
   if (G.bannerT > 0) { R(0, 92, VW, 34, 'rgba(0,0,0,.8)'); text(G.banner, VW / 2, 113, '#ffd84a', 'center'); }
   if (G.state === 'talk') drawTalk();
-  if (G.state === 'menu') { if (G.menuPage === 5) drawBagPage(); else if (G.menuPage === 4) drawSpellsPage(); else if (G.menuPage === 3) drawJukebox(); else if (G.menuPage === 2) drawMapPage(); else if (G.menuPage) drawJonPage(); else drawMenu(); }
+  if (G.state === 'menu') { if (G.menuPage === 5) drawBagPage(); else if (G.menuPage === 4) drawSpellsPage(); else if (G.menuPage === 3) drawJukebox(); else if (G.menuPage === 2) drawMapPage(); else if (G.menuPage) drawJonPage(); else drawMenu(); drawMenuTabs(G.menuPage || 0); }
   drawBossCard(); drawCombo();
   drawJonLevel();
   drawArenaMenus();
@@ -181,7 +182,7 @@ G.menuSel = 0;
 buildAll(); buildSnesArt(); buildAwesomeArt(); buildMagicArt(); buildGiantArt(); buildOwenArt();
 function frame(now) {
   const dt = Math.min(0.05, (now - last) / 1000); last = now;
-  try { pollGamepad(); update(dt); render(); const mid = musicFor(); markHeard(mid); Music.want(mid); Music.tick(); Ambience.tick(dt); } catch (err) { console.error(err); }
+  try { pollGamepad(); update(dt); render(); if ((G.fitT = (G.fitT || 0) - dt) <= 0) { G.fitT = 0.5; fitScreen(); } present(); const mid = musicFor(); markHeard(mid); Music.want(mid); Music.tick(); Ambience.tick(dt); } catch (err) { console.error(err); }
   if (!(G.hitstop > 0)) for (const k in edge) edge[k] = false;   // a tap during hit-stop still counts
   requestAnimationFrame(frame);
 }

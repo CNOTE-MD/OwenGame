@@ -336,13 +336,13 @@ function statLines() {
     `Speed ${Math.round(st.speed * 100)}%   Attack ${Math.round(st.atk * 100)}%`,
   ];
 }
-function drawPanel(title) {
-  R(0, 0, VW, VH, 'rgba(5,5,20,.9)'); R(6, 6, 244, 212, '#c9a227'); R(8, 8, 240, 208, '#14102a');
+function drawArenaPanel(title) {
+  R(0, 0, VW, VH, 'rgba(5,5,20,.9)'); drawPanel(6, 6, 244, 212);
   text(title, 16, 22, '#ffd84a');
 }
 function drawArenaMenus() {
   if (G.state === 'levelup') {
-    drawPanel('LEVEL UP!  Pick one');
+    drawArenaPanel('LEVEL UP!  Pick one');
     A.choices.forEach((c, i) => {
       const y = 46 + i * 26, sel = i === A.sel;
       R(16, y - 12, 224, 20, sel ? '#3a2e5a' : '#1e1838'); if (sel) R(16, y - 12, 3, 20, '#9be08a');
@@ -353,7 +353,7 @@ function drawArenaMenus() {
     return;
   }
   if (G.state === 'shop') {
-    drawPanel('SHOP · after wave ' + A.wave);
+    drawArenaPanel('SHOP · after wave ' + A.wave);
     text(String(G.save.kr) + ' kr', 240, 22, '#ffd84a', 'right');
     A.cards.forEach((c, i) => {
       const y = 40 + i * 30, sel = i === A.sel, price = cardPrice(c), afford = G.save.kr >= price;
@@ -369,7 +369,7 @@ function drawArenaMenus() {
     return;
   }
   if (G.state === 'arenapause') {
-    drawPanel('PAUSED');
+    drawArenaPanel('PAUSED');
     statLines().forEach((l, i) => text(l, 16, 44 + i * 12, '#fff', 'left', false));
     const owned = Object.entries(A.owned).map(([id, n]) => ARENA_CARDS.find(c => c.id === id).name + (n > 1 ? ' x' + n : ''));
     text('BUILD', 16, 92, '#ffd84a');
@@ -378,7 +378,7 @@ function drawArenaMenus() {
     return;
   }
   if (G.state === 'arenaover') {
-    drawPanel(A.won ? 'VALHALLA CHAMPION!' : 'DEFEATED');
+    drawArenaPanel(A.won ? 'VALHALLA CHAMPION!' : 'DEFEATED');
     text(A.won ? 'All 20 waves. Chilly is furious.' : `You reached wave ${A.wave}.`, 128, 56, '#fff', 'center');
     text(`Kills ${A.kills}   Level ${A.lvl}   Best: wave ${arenaBest()}`, 128, 76, '#a79fc4', 'center', false);
     const owned = Object.entries(A.owned).map(([id, n]) => ARENA_CARDS.find(c => c.id === id).name + (n > 1 ? ' x' + n : ''));

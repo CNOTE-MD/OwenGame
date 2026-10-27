@@ -33,3 +33,14 @@ Names, dialogue, enemy stats and level layouts live in plain data files under `d
 3. Does Owen want his own drawings used as art? Otherwise placeholder pixel art.
 4. Unreadable words on pages 1 and 2 (marked `[?]` in the transcript).
 5. Tone: the story is funny/spooky; the penguin is the villain, and the demon is played as a scare. Confirm that is the intent.
+
+## Presentation (October 2026 art pass)
+
+- **Type:** one hand-built bitmap font (`web/src/pixelfont.js`), 7-pixel caps, 5-pixel lowercase, 2-pixel descenders, with the accents and symbols the story uses. No system fonts anywhere. Text takes a drop shadow, an outline (HUD numbers, titles) or nothing.
+- **Windows:** one frame for every window (`drawPanel`): dark outline, bone border, gold corner rivets, navy field with a lighter top band.
+- **Scaling:** the game draws at 256x224 into an offscreen buffer, then copies it to the screen at a whole-number scale; the browser smooths only the last fraction. One-pixel lines and letters stay intact at any window or iPad size.
+- **HUD:** A Link to the Past's layout over a soft shade: a bone-framed rune vial, framed item box, outlined counters, hearts on dark backing under "- LIFE -".
+- **Dialogue:** name plate tab, speaker portrait (Jon, Owen, villagers, the Penguin King, the Forest Giant), bouncing gold advance arrow.
+- **Menus:** one tab strip (GEAR, JON, MAP, MUSIC, SPELLS, BAG) across all six pages.
+- **Title:** aurora borealis over a fjord, two mountain ranges, a longship crossing the water, a three-times-scale outlined logo.
+- **World:** the lake has an organic shoreline; palace ice catches moving glints.

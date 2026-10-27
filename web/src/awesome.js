@@ -27,8 +27,8 @@ function drawBossCard() {
   ctx.globalAlpha = 1 - out;
   const slide = Math.round((1 - k) * 40);
   R(0, 86, VW, 44, 'rgba(0,0,0,0.72)'); R(0, 86, VW, 1, '#ffd84a'); R(0, 129, VW, 1, '#ffd84a');
-  ctx.font = '12px "Press Start 2P", ui-monospace, Menlo, monospace'; ctx.textAlign = 'center';
-  ctx.fillStyle = '#000'; ctx.fillText(c.name, VW / 2 + 2 - slide, 108); ctx.fillStyle = Math.floor(c.t * 10) % 2 && c.t < 0.8 ? '#fff' : '#ff6b6b'; ctx.fillText(c.name, VW / 2 - slide, 106);
+  const sc = textWidth(c.name, 2) > 236 ? 1 : 2;
+  text(c.name, VW / 2 - slide, 110, Math.floor(c.t * 10) % 2 && c.t < 0.8 ? '#ffffff' : '#ff6b6b', 'center', 'outline', sc);
   text(c.sub, VW / 2 + slide, 122, '#f3ecd2', 'center', false);
   ctx.globalAlpha = 1;
 }
@@ -71,18 +71,18 @@ function updateJukebox() {
 }
 function drawJukebox() {
   const list = jukeList();
-  R(0, 0, VW, VH, 'rgba(5,5,20,.92)'); R(8, 8, 240, 208, '#ffd84a'); R(10, 10, 236, 204, '#0d0d33');
+  R(0, 0, VW, VH, 'rgba(5,5,20,.92)'); drawPanel(8, 8, 240, 208);
   text('◀ MAP', 20, 26, '#8a8ab0', 'left', false); text('JUKEBOX', 128, 26, '#ffe64d', 'center'); text('GEAR ▶', 236, 26, '#8a8ab0', 'right', false);
   const heard = list.filter(id => flag('heard:' + id)).length;
-  text(`${heard}/${list.length} songs found. Hear them in the world to unlock.`, 128, 40, '#a79fc4', 'center', false);
+  text(`${heard} of ${list.length} songs found`, 128, 44, '#a79fc4', 'center', false);
   list.forEach((id, i) => {
-    const y = 54 + i * 11, sel = i === (G.jukeSel || 0), got = flag('heard:' + id), playing = G.jukebox === id;
+    const y = 57 + i * 10, sel = i === (G.jukeSel || 0), got = flag('heard:' + id), playing = G.jukebox === id;
     const nm = got ? SCORE[id].name.replace(/ \(.*\)$/, '') : '???';
-    if (sel) R(18, y - 8, 220, 11, '#1a2238');
+    if (sel) R(18, y - 8, 220, 10, '#232860');
     text((sel ? '> ' : '  ') + nm, 22, y, !got ? '#55577a' : sel ? '#ffd84a' : '#f3ecd2', 'left', false);
     if (playing) { const b = Math.floor(G.t * 8) % 4; text('♪'.repeat(1 + b), 230, y, '#9be08a', 'right', false); }
   });
-  text('Z: play / stop     Enter: close', 128, 212, '#8a8ab0', 'center', false);
+  text('Find songs in the world · Z plays', 128, 210, '#8a8ab0', 'center', false);
 }
 
 // ---------------- Snow Penguins and Royal Guards ----------------
@@ -141,6 +141,22 @@ function drawTitleExtras() {
   const fx = ((t * 60) % (VW + 200)) - 100, fy = 30 + Math.sin(t * 3) * 6;
   if (fx > -40 && fx < VW + 40) { drawJonSprite(fx, fy, t * 10, false); for (let i = 1; i < 5; i++) R(fx - i * 9, fy + Math.sin(t * 9 + i) * 3, 2, 2, `rgba(255,216,74,${0.6 - i * 0.12})`); }
   // logo glow pulse
-  const g = 0.5 + 0.5 * Math.sin(t * 2);
-  ctx.globalAlpha = 0.25 * g; R(VW / 2 - 90, 44, 180, 22, '#8fd0ff'); ctx.globalAlpha = 1;
+
+}
+
+// ---------------- ice glints ----------------
+// Light skates across the palace's ice floors: a few tiles at a time catch a diagonal sparkle.
+function drawIceGlints() {
+  if (!G.map || !(G.map.palace || G.mapId === 'cavern')) return;
+  const x0 = Math.floor(G.cam.x / T), y0 = Math.floor(G.cam.y / T), t = G.t;
+  for (let ty = y0; ty <= y0 + SH; ty++) for (let tx = x0; tx <= x0 + SW; tx++) {
+    if (tile(tx, ty) !== 'i') continue;
+    const ph = (t * 0.6 + hash(tx, ty) / 100 * 7) % 7;
+    if (ph > 0.5) continue;
+    const k = ph / 0.5, ox = tx * T - G.cam.x, oy = ty * T - G.cam.y;
+    ctx.globalAlpha = 0.65 * Math.sin(k * Math.PI);
+    for (let i = 0; i < 5; i++) R(Math.round(ox + 2 + k * 10 + i), Math.round(oy + 12 - i * 2 - k * 4), 1, 1, '#ffffff');
+    R(Math.round(ox + 4 + k * 10), Math.round(oy + 8 - k * 4), 1, 1, '#dff6ff');
+  }
+  ctx.globalAlpha = 1;
 }
