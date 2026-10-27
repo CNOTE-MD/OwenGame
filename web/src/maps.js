@@ -120,6 +120,30 @@ const MAPS = {
 ]
 },
 {
+"t": "sleeplog",
+"at": [
+26,
+4
+]
+},
+{
+"t": "chest",
+"id": "c_leaf",
+"at": [
+18,
+12
+],
+"item": "leaf",
+"needs": "giant_done"
+},
+{
+"t": "varg",
+"at": [
+12,
+8
+]
+},
+{
 "t": "log",
 "id": "biglog",
 "at": [
@@ -128,14 +152,14 @@ const MAPS = {
 ]
 },
 {
-"t": "spore",
+"t": "varg",
 "at": [
 22,
 3
 ]
 },
 {
-"t": "spore",
+"t": "varg",
 "at": [
 27,
 8
@@ -292,6 +316,24 @@ const MAPS = {
 "price": 60,
 "at": [
 28,
+21
+]
+},
+{
+"t": "shop",
+"item": "mango",
+"price": 40,
+"at": [
+30,
+21
+]
+},
+{
+"t": "shop",
+"item": "fuel",
+"price": 12,
+"at": [
+26,
 21
 ]
 },
@@ -1207,10 +1249,17 @@ const MAPS = {
 ]
 },
 {
-"t": "bat",
+"t": "spider",
 "at": [
 11,
 8
+]
+},
+{
+"t": "spider",
+"at": [
+3,
+9
 ]
 },
 {

@@ -24,6 +24,7 @@ const ARENA_CARDS = [
   { id: 'hammer', name: "Walter's Hammer", desc: '+10% crit, more knockback', price: 35, max: 3, apply: () => { G.st.crit += 0.1; G.st.knock += 0.25; } },
   { id: 'heart', name: 'Heart Container', desc: '+1 heart, heal', price: 30, max: 5, apply: () => { G.save.maxHp += 2; G.player.hp += 2; } },
   { id: 'herring', name: 'Pickled Herring', desc: '+1 regen', price: 20, max: 4, apply: () => { G.st.regen++; } },
+  ...OWEN_CARDS
 ];
 const LEVEL_UPS = [
   { name: '+1 Heart', apply: () => { G.save.maxHp += 2; G.player.hp += 2; } },
@@ -39,6 +40,7 @@ const LEVEL_UPS = [
 
 function arenaBest() { try { return +localStorage.getItem(ARENA_BEST_KEY) || 0; } catch (e) { return 0; } }
 function waveSpec(w) {
+  if (w === 20) return { len: 45, every: 0.25, batch: 4, pool: ['minichilly'], knightChance: 0, hpMul: 2, touchAdd: 1, bosses: 0 };   // Owen: just a bunch of miniature Chillys
   const pool = ['penguin'];
   if (w >= 2) pool.push('bat');
   if (w >= 3) pool.push('wisp', 'penguin');
@@ -76,9 +78,10 @@ function nextWave() {
   A.wave++;
   const sp = waveSpec(A.wave);
   A.t = 0; A.len = sp.len; A.spawnT = 0.5; A.marks = []; A.shots = [];
+  if (A.infinity) A.infT = 30;
   G.state = 'play';
   placeTurrets();
-  G.banner = A.wave % 5 === 0 ? `WAVE ${A.wave} · BOSS` : `WAVE ${A.wave}`; G.bannerT = 1.6;
+  G.banner = A.wave === 20 ? 'WAVE 20 · MINI CHILLYS' : A.wave % 5 === 0 ? `WAVE ${A.wave} · BOSS` : `WAVE ${A.wave}`; G.bannerT = 1.6;
   if (sp.bosses) {
     Sound.play('boss');
     for (let i = 0; i < sp.bosses; i++) arenaSpawn('king', 16 * T + (i ? 80 : -80) * (sp.bosses > 1 ? 1 : 0), 9 * T, true);
@@ -149,6 +152,7 @@ function updateArena(dt) {
       arenaSpawn(Math.random() < sp.knightChance ? 'knight' : pick(sp.pool), pt.x, pt.y);
     }
   }
+  updateOwenCards(dt);
   for (const m of A.marks) { m.t -= dt; if (m.t <= 0) arenaSpawn(m.type, m.x, m.y, true); }
   A.marks = A.marks.filter(m => m.t > 0);
   // Ghost Jons
@@ -280,6 +284,7 @@ function arenaOver(won) {
 // ---------- drawing ----------
 function drawArenaWorld() {
   const cx = G.cam.x, cy = G.cam.y, p = G.player;
+  drawOwenCards();
   for (const m of A.marks) { const a = Math.floor(G.t * 10) % 2; R(m.x - cx - 5, m.y - cy - 1, 10, 2, a ? '#ff4d4d' : '#ffd84a'); R(m.x - cx - 1, m.y - cy - 5, 2, 10, a ? '#ff4d4d' : '#ffd84a'); }
   if (A.frost) {
     const r = 34 + A.frost * 10;

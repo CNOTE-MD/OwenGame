@@ -61,12 +61,14 @@ function drawEnemy(e) {
   const x = Math.round(e.x - G.cam.x), y = Math.round(e.y - G.cam.y);
   if (drawCh2Enemy(e, x, y)) return;
   if (drawRedeyeEnemy(e, x, y)) { if (e.boss && e.alive && attendantVisible(e)) { R(x - 31, y - 41, 62, 5, '#000'); R(x - 30, y - 40, 60 * Math.max(0, e.hp / e.max), 3, '#e23'); } return; }
-  if (e.type === 'giant') { drawGiant(e, x, y); return; }
+  if (e.type === 'giant') { drawGiantWrap(e); drawGiant(e, x, y); return; }
+  if (e.type === 'varg') { drawVarg(e, x, y); drawRooted(e); return; }
+  if (e.type === 'spider') { shadowAt(x, y + 3, 0.6); spr(SPR.spider, x, y + 4 + (Math.floor(e.wob) % 2), { white: e.flash > 0 }); drawRooted(e); return; }
   if (drawSnesEnemy(e, x, y)) return;
   const white = e.flash > 0 || (e.st === 'wind' && Math.floor(G.t * 16) % 2 === 0);
   const f = Math.floor(e.wob / 2.5) % 2;
   switch (e.type) {
-    case 'penguin': case 'knight': case 'king': case 'snowpeng': case 'guard': {
+    case 'penguin': case 'knight': case 'king': case 'snowpeng': case 'guard': case 'minichilly': {
       const s = e.type === 'king' ? 3 : e.type === 'knight' ? 2 : 1;
       const { d, flip } = dirOf(e.fx, e.fy);
       const waddle = e.st === 'daze' || e.st === 'slide' || e.bow ? 0 : [0, 1, 0, -1][Math.floor(e.wob / 2.5) % 4] * s;
@@ -85,6 +87,7 @@ function drawEnemy(e) {
         drawShield(e, x, y - 2 * s, s);
       }
       if (e.type === 'guard') { spr(SPR.helmet, x, top + 4, { white }); drawShield(e, x, y - 2, 1); }
+      if (e.type === 'minichilly') { R(x - 6, top + 6, 12, 2, '#7a1a8a'); R(x - 7, top + 8, 3, 6, '#7a1a8a'); R(x + 4, top + 8, 3, 6, '#7a1a8a'); }
       if (e.bow && Math.floor(G.t * 2 + e.wob) % 3 === 0) text('ak', x + 8, y - 10, '#c8d8ff', 'left', false);
       break; }
     case 'draugr': {
@@ -160,7 +163,8 @@ function drawItemIcon(id, x, y) {
 function drawThing(e) {
   const x = Math.round(e.x - G.cam.x), y = Math.round(e.y - G.cam.y), t = G.t;
   switch (e.kind) {
-    case 'enemy': drawEnemy(e); drawFrozen(e); return;
+    case 'enemy': drawEnemy(e); drawFrozen(e); drawRooted(e); return;
+    case 'sleeplog': return drawSleepLog(e);
     case 'cargo': if (flag('d1done')) { shadowAt(x, y + 6, 1.4); spr(SPR.bench, x, y + 8); } return;
     case 'tablet': shadowAt(x, y + 6, 0.8); spr(SPR.tablet, x, y + 7 + Math.round(Math.sin(t * 2) * 1)); if (Math.floor(t * 3) % 3 === 0) drawTwinkle(x + 5, y - 6, 0); return;
     case 'throne': spr(SPR.throne, x, y + 8); return;

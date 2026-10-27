@@ -192,10 +192,10 @@ const TABLETS = {
   tab_coast: 'Rune tablet: "HANK WAS HERE. HANK THREW THE AXE. HANK IS SORRY."',
   tab_hills: 'Rune tablet: "The smith\'s name is a vegetable. Do not laugh. He hears."',
   tab_lake: 'Rune tablet: "The lake keeps what the lake is given. Unless you have Viking blood. Then it spits."',
-  tab_grave: 'Rune tablet: "Chilly cannot stand the sun. That is why he sends birds that cannot fly."',
-  tab_volcano: 'Rune tablet: "Behind the forge door: the real name. Behind the real name: the way to end winter."',
+  tab_grave: 'Rune tablet: "Chilly cannot stand the sun. He is part vampire and all penguin. In daylight his skin falls off. So he sends birds that cannot fly."',
+  tab_volcano: 'Rune tablet: "Names have power. That is why nobody says the smith\'s. Behind the forge door: his notes, and a monster made of tin that guards them."',
   tab_snow: 'Rune tablet: "A penguin in Norway is a lie with feathers."',
-  tab_village: 'Rune tablet: "Fjordvik, founded by Hank. Population: brave. Dogs: one, very good."',
+  tab_village: 'Rune tablet: "Hank\'s real name is not Hank. It\'s actually Hank with a J."',
   tab_palace: 'Rune tablet: "The King is a cousin. The real one is still out there. Ak."',
 };
 function tabletsFound() { return Object.keys(TABLETS).filter(k => flag('got:' + k)).length; }

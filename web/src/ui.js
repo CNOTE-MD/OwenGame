@@ -70,9 +70,8 @@ function objective() {
   if (!flag('d1done')) return 'Chapter 2: destroy Jjorvic Palace. Whatever rules it sits on the throne at the top.';
   if (!flag('d2done')) {
     if (!s.items.dash) return 'Chapter 3: the Drowned Barrow has opened in the north-west foothills. Find what the Draugr Captain guards.';
-    return 'Chapter 3: use the Voodoo Dash to cross the water and barriers. Find the big key and free Hank\'s ghost.' + (flag('redeye_done') ? '' : ' (Optional: a nap on the bench by Flight 364.)');
+    return 'Chapter 3: use the Voodoo Dash to cross the water and barriers. Find the big key and free Hank\'s ghost.';
   }
-  if (!flag('redeye_done')) return 'Chapter 3 complete! Walter\'s Forge waits for Owen\'s next chapter. Optional: you keep dreaming about Flight 364. Sit on the bench by the plane.';
   return 'Chapter 3 complete! Walter\'s Forge and the Storm Peak wait for Owen\'s next chapters.';
 }
 function drawMenu() {
@@ -83,7 +82,7 @@ function drawMenu() {
   const slots = [
     ['Jon Lv' + jonData().lvl + ' (swing Z)', 'homing', true, () => drawJonSprite(30, 44, 0, false, jonFaceNow())],
     ['Homing Jon (throw X)', 'homing', !!s.items.homing],
-    ['Rune Spells (C) ' + knownSpells().length + '/4', 'thunder', anySpell()],
+    ['Rune Spells (C) ' + knownSpells().length + '/5', 'thunder', anySpell()],
     ['Lingonberry Juice x' + s.potions, 'juice', s.potions > 0],
     ['Demon Horn (V)', 'horn', !!s.items.horn],
     ['Voodoo Dash (Shift/F)', 'dash', !!s.items.dash],

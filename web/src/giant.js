@@ -45,10 +45,15 @@ function updateGiant(e, dt, dx, dy, d, mr) {
   if (e.st === 'intro') { if (G.state === 'play') { e.st = 'stalk'; e.t = 0; } return; }
   if (e.hiding) { updateGiantHide(e, dt); return; }
   if (!e.hid && e.hp <= 6) { startGiantHide(e); return; }
+  if (giantWrap(e, dt)) return;
   if (e.st === 'stalk') {
     e.fx = Math.sign(dx) || -1; e.fy = 0;
     if (d > 40) tryMove(e, dx / d * e.speed * dt, dy / d * e.speed * dt, mr, 'walker');
-    if (e.t > (e.hid ? 1.4 : 2.2)) { e.st = 'raise'; e.t = 0; e.aim = { x: p.x, y: p.y }; Sound.play('charge'); }
+    if (e.t > (e.hid ? 1.4 : 2.2)) {
+      e.cycle = (e.cycle || 0) + 1;
+      if (e.cycle % 3 === 2) { e.st = 'wrap'; e.t = 0; e.wrapAt = { x: p.x, y: p.y }; Sound.play('secret'); }   // Owen: giants summon leaves to wrap you up
+      else { e.st = 'raise'; e.t = 0; e.aim = { x: p.x, y: p.y }; Sound.play('charge'); }
+    }
   } else if (e.st === 'raise') {
     if (e.t < 0.55) e.aim = { x: p.x, y: p.y };   // tracks you, then commits
     if (e.t > 0.9) { e.st = 'slam'; e.t = 0; slamClub(e); }

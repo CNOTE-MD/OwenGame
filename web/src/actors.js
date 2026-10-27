@@ -27,6 +27,7 @@ function makeEnt(d, x, y) {
     case 'throne': return { ...base, solid: true, talk: true };
     case 'exchange': return { ...base, solid: true, talk: true };
     case 'taxi': return { ...base, solid: true, talk: true };
+    case 'sleeplog': return s.flags['giant_done'] ? { ...base, solid: true, talk: true } : null;
     case 'log': return s.flags['log_chopped'] ? null : s.flags['giant_woke'] ? (() => { const g = makeEnemy('giant', x - 28, y + 10); g.fx = -1; return g; })() : makeLog(d, x, y);
     default: return makeEnemy(d.t, x, y);
   }
@@ -34,10 +35,10 @@ function makeEnt(d, x, y) {
 const ENEMY = {
   penguin: { hp: 2, r: 6, touch: 1, speed: 40 },
   draugr: { hp: 3, r: 6, touch: 1, speed: 18, shield: true },
-  wisp: { hp: 1, r: 5, touch: 1, speed: 26, fly: true },
+  wisp: { hp: 1, r: 5, touch: 1, speed: 18, fly: true },
   bat: { hp: 1, r: 5, touch: 1, speed: 75, fly: true },
   knight: { hp: 5, r: 10, touch: 2, speed: 28, shield: true, boss: true },
-  king: { hp: 10, r: 16, touch: 2, speed: 26, boss: true },
+  king: { hp: 8, r: 16, touch: 2, speed: 26, boss: true },
   imp: { hp: 2, r: 5, touch: 1, speed: 0 },
   attendant: { hp: 12, r: 8, touch: 2, speed: 0, boss: true },
   captain: { hp: 6, r: 10, touch: 2, speed: 24, shield: true, boss: true },
@@ -46,6 +47,9 @@ const ENEMY = {
   snowpeng: { hp: 2, r: 6, touch: 1, speed: 66 },
   guard: { hp: 4, r: 7, touch: 1, speed: 30, shield: true },
   giant: { hp: 12, r: 16, touch: 1, speed: 16, boss: true },
+  varg: { hp: 3, r: 6, touch: 1, speed: 0 },
+  spider: { hp: 1, r: 4, touch: 1, speed: 70 },
+  minichilly: { hp: 2, r: 6, touch: 1, speed: 52 },
   slime: { hp: 3, r: 6, touch: 1, speed: 0 },
   beetle: { hp: 3, r: 7, touch: 1, speed: 26 },
 };
@@ -110,7 +114,8 @@ function updatePlayer(dt) {
     if (p.lp >= 1) { p.launching = false; puff(p.x, p.y + 6, '#e8e0c8', 6); }
     return;
   }
-  const v = inputVec();
+  let v = inputVec();
+  if (p.rooted > 0) { p.rooted -= dt; v = { x: 0, y: 0 }; if (Math.random() < 0.2) G.fx.push({ kind: 'leaf', x: p.x + rnd(-6, 6), y: p.y + rnd(-4, 6), vx: 0, vy: -10, grav: 0, t: 0, life: 0.4, color: '#58b840' }); }
   p.moving = !!(v.x || v.y);
   if (p.moving) { p.fx = v.x; p.fy = v.y; p.walk += dt * 14; }
   const onIce = tileAt(p.x, p.y) === 'i';
@@ -191,6 +196,7 @@ function tryUnlock(tx, ty, c) {
 function hurtPlayer(dmg, from, force) {
   const p = G.player, s = G.save;
   if (!force && (p.inv > 0 || p.launching || p.falling > 0 || G.state !== 'play')) return;
+  if (!force && runeShieldBlocks()) return;
   if (!force && G.st.armor > 0 && Math.random() < Math.min(0.6, G.st.armor * 0.1)) { p.inv = 0.4; floatText(p.x, p.y - 18, 'BLOCK', '#9fd0ff'); Sound.play('clank'); return; }
   p.hp -= dmg; p.inv = 1; Sound.play('hurt'); G.shake = 0.15; rumble(120, 0.5, 0.3);
   if (G.mode !== 'arena') jonOnHurt(from);
@@ -223,6 +229,7 @@ function interact(e) {
   switch (e.kind) {
     case 'sign': return say(STORY.signs[e.def.text] || [['', '...']]);
     case 'tablet': return readTablet(e);
+    case 'sleeplog': return say([['', 'The Forest Giant of the North, back to being a log. A snoring log.'], ['Jon', 'Shh. Let him sleep. He had a big boss fight scene.']]);
     case 'exchange': return useExchange();
     case 'taxi': return useTaxi(e);
     case 'throne': return sitOnThrone();
@@ -281,7 +288,7 @@ function npcLines(id) {
       G.afterTalk = () => { setFlag('got:hp_bjarne'); giveItem('piece'); };
       return STORY.bjarne_thanks;
     }
-    return flag('bjarne_done') ? STORY.bjarne_after : STORY.bjarne_waiting;
+    return flag('bjarne_done') ? [...STORY.bjarne_after, ['Bjarne', 'Next I\'m writing Rush P. It\'s mostly the letter P. Very fast.']] : STORY.bjarne_waiting;
   }
   return STORY[id] || [['', '...']];
 }
@@ -314,12 +321,13 @@ function applyItem(id) {
     case 'horn': s.items.horn = true; break;
     case 'dash': s.items.dash = true; break;
     case 'kr50': s.kr += 50; break;
+    case 'horn': s.items.horn = true; break;
     default: magicApplyItem(id);
   }
 }
 function giveItem(id, after) {
   applyItem(id);
-  if (['homing', 'thunder', 'dash', 'horn', 'container', 'frost', 'fire', 'mend', 'bearclaw', 'boots', 'cloak', 'tooth'].includes(id)) jonXP(15); else jonXP(5);
+  if (['homing', 'thunder', 'dash', 'horn', 'container', 'frost', 'fire', 'mend', 'leaf', 'bearclaw', 'boots', 'cloak', 'tooth', 'mango'].includes(id)) jonXP(15); else jonXP(5);
   setJonFace('excited', 2.5);
   G.player.hold = { id, t: 1.1 };
   G.state = 'hold'; Sound.play('item');
@@ -500,7 +508,7 @@ function updateEnemy(e, dt) {
   switch (e.type) {
     case 'imp': updateImp(e, dt, dx, dy, d, mr); break;
     case 'attendant': updateAttendant(e, dt, dx, dy, d, mr); break;
-    case 'penguin':
+    case 'penguin': case 'minichilly':
       if (kingOwenRules(e)) break;
       if (d < 120 || e.aggro) { toward(e.speed); e.fx = dx / d; e.fy = dy / d; }
       break;
@@ -514,7 +522,8 @@ function updateEnemy(e, dt) {
       break;
     case 'wisp': {
       const a = e.t * 2.2;
-      tryMove(e, (dx / d * e.speed + Math.cos(a) * 30) * dt, (dy / d * e.speed + Math.sin(a * 1.3) * 30) * dt, mr, who);
+      tryMove(e, (dx / d * e.speed + Math.cos(a) * 18) * dt, (dy / d * e.speed + Math.sin(a * 1.3) * 18) * dt, mr, who);
+      if (d < e.r + 5 && G.player.inv <= 0 && G.state === 'play') { hurtPlayer(e.touch, e); killEnemy(e); return; }   // a wisp pops when it touches you: one hit, not a swarm of them
       break; }
     case 'bat':
       if (e.t > 0.7) { e.t = 0; e.tx = p.x + rnd(-40, 40); e.ty = p.y + rnd(-40, 40); }
@@ -523,6 +532,8 @@ function updateEnemy(e, dt) {
     case 'hank': updateHank(e, dt, dx, dy, d); break;
     case 'giant': updateGiant(e, dt, dx, dy, d, mr); return;
     case 'spore': updateSpore(e, dt, dx, dy, d); break;
+    case 'varg': updateVarg(e, dt, dx, dy, d, mr); break;
+    case 'spider': updateSpider(e, dt, dx, dy, d, mr); break;
     case 'slime': updateSlime(e, dt, dx, dy, d, mr); break;
     case 'beetle': updateBeetle(e, dt, dx, dy, d, mr); break;
     case 'knight': case 'captain':
@@ -544,9 +555,9 @@ function updateEnemy(e, dt) {
       else if (e.st === 'slide') {
         const h = tryMove(e, e.fx * (e.raged ? 240 : 190) * dt, e.fy * (e.raged ? 240 : 190) * dt, mr, who);
         if (h.hitX) e.fx *= -1; if (h.hitY) e.fy *= -1;
-        if (h.hitX || h.hitY) { e.bounces++; G.shake = 0.15; Sound.play('clank'); if (e.raged && G.mode !== 'arena') dropIcicles(3, p.x, p.y); }
+        if (h.hitX || h.hitY) { e.bounces++; G.shake = 0.15; Sound.play('clank'); if (e.raged && G.mode !== 'arena') dropIcicles(2, p.x, p.y); }
         if (e.bounces >= (e.raged ? 4 : 3) || e.t > 4) { e.st = 'daze'; e.t = 0; }
-      } else if (e.st === 'daze') { if (e.t > (e.raged ? 1.6 : 2.2)) { e.st = 'waddle'; e.t = 0; } }
+      } else if (e.st === 'daze') { if (e.t > (e.raged ? 2.2 : 3)) { e.st = 'waddle'; e.t = 0; } }
       break;
   }
   if (d < e.r + 5 && e.st !== 'daze' && !(e.flipped > 0) && !e.bow && !(e.type === 'attendant' && (e.st === 'hide' || e.st === 'intro'))) hurtPlayer(e.touch, e);

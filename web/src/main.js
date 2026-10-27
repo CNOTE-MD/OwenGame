@@ -111,18 +111,20 @@ function update(dt) {
   const s = G.save;
   if (anySpell()) { G.runeT = (G.runeT || 0) + dt; if (G.runeT > 5) { G.runeT = 0; s.rune = Math.min(RUNE_MAX, s.rune + 1); } }
   updateClock(dt);
+  if (G.player.fuel > 0) G.player.fuel -= dt;
   updatePlayer(dt);
   if (G.state !== 'play') return;
   updateGround(dt); updateShots(dt); updateFire(dt); updateIcicles(dt); deed('seconds', dt);
   updateJon(dt);
   if (G.mode === 'arena') { updateArena(dt); if (G.state !== 'play') return; }
   if (G.map.redeye) updateRedeye(dt);
-  updateJonTalk(dt);
+  updateJonTalk(dt); jonCompliment(dt);
   maybeJonLevelUp();
   if (G.state !== 'play') return;
   if (HK.axes.length) updateHankAxes(dt);
   for (const e of G.ents.slice()) {
     if (e.kind === 'enemy' && e.alive && e.freeze > 0) { e.freeze -= dt; e.flash = Math.max(0, e.flash - dt); }
+    else if (e.kind === 'enemy' && e.alive && e.root > 0) { e.root -= dt; e.flash = Math.max(0, e.flash - dt); }
     else if (e.kind === 'enemy' && e.alive) { if (e.slow > 0) { e.slow -= dt; updateEnemy(e, dt * 0.5); } else updateEnemy(e, dt); }
     else if (e.kind === 'pickup') updatePickup(e, dt);
     else if (e.kind === 'hazard') updateCart(e, dt);
@@ -176,7 +178,7 @@ function render() {
 
 let last = performance.now();
 G.menuSel = 0;
-buildAll(); buildSnesArt(); buildAwesomeArt(); buildMagicArt(); buildGiantArt();
+buildAll(); buildSnesArt(); buildAwesomeArt(); buildMagicArt(); buildGiantArt(); buildOwenArt();
 function frame(now) {
   const dt = Math.min(0.05, (now - last) / 1000); last = now;
   try { pollGamepad(); update(dt); render(); const mid = musicFor(); markHeard(mid); Music.want(mid); Music.tick(); Ambience.tick(dt); } catch (err) { console.error(err); }

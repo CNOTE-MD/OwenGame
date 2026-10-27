@@ -1,5 +1,7 @@
 # Questions for Owen
 
+Owen answered the first fifty online in October 2026 (Quest Log); his answers are in `story/OWEN_ANSWERS.md` and the canon is in `STORY_BIBLE.md`. The list below is the archive.
+
 Prompts to move the story and the game forward. Ask a few at a time, ideally right after he plays. Write his answers in here (or have him write them) and they become the next build.
 
 Rules of thumb: his journal pages always win over anything already in the game. Short answers are fine. "I don't know yet" is fine too; skip it and come back.

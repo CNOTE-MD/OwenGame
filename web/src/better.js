@@ -11,7 +11,6 @@ function objectiveTarget() {
   if (!flag('log_chopped') && !flag('d1done')) return { x: 31, y: 6, label: 'The log' };
   if (!flag('d1done')) return { x: 39, y: 2, label: 'Jjorvic Palace' };
   if (!flag('d2done')) return { x: 7, y: 2, label: 'Drowned Barrow' };
-  if (!flag('redeye_done')) return { x: 29, y: 33, label: 'A nap' };
   return null;
 }
 function drawCompass() {

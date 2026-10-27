@@ -140,7 +140,7 @@ const path = require('path');
   await go('overworld', 24, 8); await check('the Muck Forest plays the Journey-sound piece', await ev(() => musicFor() === 'journey'));
   await go('overworld', 40, 6); await check('the Frozen Path plays the Foreigner-sound piece', await ev(() => musicFor() === 'cold'));
   await go('cavern', 24, 20); await check('the Penguin Palace plays the Queen-sound piece', await ev(() => musicFor() === 'palace'));
-  await go('cavern', 24, 5, true); await check('the King still gets the boss theme', await ev(() => musicFor() === 'boss'));
+  await go('cavern', 24, 5, true); await check('the King gets his own Queen-sound theme', await ev(() => musicFor() === 'chop'));
   await check('Jon has a lot to say', await ev(() => JON.idle.length >= 18 && JON.sing.length >= 8 && Object.values(JON).filter(Array.isArray).reduce((n, a) => n + a.length, 0) >= 150));
   await check('every Jon trigger has lines', await ev(() => ['muck', 'grass', 'snow', 'night', 'dawn', 'tablet', 'taxi', 'chest', 'beetle', 'slime', 'spore', 'dark', 'log', 'sing'].every(k => Array.isArray(JON[k]) && JON[k].length >= 2)));
   await go('overworld', 18, 7); await ev(() => { JT.cd = {}; JT.t = 0; }); await pg.keyboard.down('ArrowRight'); await wait(500); await pg.keyboard.up('ArrowRight');
