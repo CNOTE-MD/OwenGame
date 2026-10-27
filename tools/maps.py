@@ -264,6 +264,7 @@ OW_ENT = [
     {"t": "warp", "at": P(1, 2, 3, 10), "to": "subway", "dest": [8, 3]},
     {"t": "sign", "at": P(1, 2, 2, 9), "text": "sign_subway"},
     {"t": "taxi", "at": P(1, 0, 7, 12), "to": "airport"},
+    {"t": "runestone", "at": P(1, 0, 10, 12)},
     {"t": "log", "id": "biglog", "at": P(1, 0, 15, 5)},
     {"t": "spore", "at": P(1, 0, 6, 3)}, {"t": "spore", "at": P(1, 0, 11, 8)}, {"t": "slime", "at": P(1, 0, 4, 7)}, {"t": "slime", "at": P(1, 0, 12, 10)},
     {"t": "beetle", "at": P(3, 0, 4, 9)}, {"t": "beetle", "at": P(3, 2, 3, 3)},
@@ -695,7 +696,7 @@ print("switch min distance px:", round(dmin, 1))
 
 out = {
     "overworld": {"name": "Norway", "rows": ["".join(r) for r in ow], "ents": OW_ENT, "outdoor": True},
-    "cavern": {"name": "Penguin Palace", "rows": ["".join(r) for r in cav], "ents": CAV_ENT, "dungeon": True, "palace": True},
+    "cavern": {"name": "Jjorvic Palace", "rows": ["".join(r) for r in cav], "ents": CAV_ENT, "dungeon": True, "palace": True},
     "home": {"name": "Owen's Room, New York", "rows": HOME, "ents": HOME_ENT, "interior": True},
     "arena": {"name": "Valhalla Arena", "rows": ARENA, "ents": [], "arena": True},
     "astrid_house": {"name": "Astrid's House", "rows": ASTRID, "ents": ASTRID_ENT, "interior": True},

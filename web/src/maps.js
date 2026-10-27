@@ -113,6 +113,13 @@ const MAPS = {
 "to": "airport"
 },
 {
+"t": "runestone",
+"at": [
+26,
+12
+]
+},
+{
 "t": "log",
 "id": "biglog",
 "at": [
@@ -629,7 +636,7 @@ const MAPS = {
 "outdoor": true
 },
 "cavern": {
-"name": "Penguin Palace",
+"name": "Jjorvic Palace",
 "rows": [
 "WWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWW",
 "WWWWWWWWWWWWWWWWWt____________tWWWWWWWWWWWWWWWWW",

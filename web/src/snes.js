@@ -296,12 +296,10 @@ function hitLog(e) {
   e.cd = 0.3; e.hp--; Sound.play('swing'); leaves(e.x, e.y, ['#a8723a', '#6e4420', '#c89058']);
   G.shake = 0.08;
   if (e.hp > 0) { jonSay('log', { force: true, face: 'excited' }); return; }
-  // chopped: both log tiles become path, for good
-  const tx = Math.floor(e.x / T), ty = Math.floor(e.y / T);
-  for (const yy of [ty, ty + 1]) if (tile(tx, yy) === 'o') { setTile(tx, yy, 's'); setFlag(`tile:${G.mapId}:${tx},${yy}:s`); leaves(tx * T + 8, yy * T + 8, ['#a8723a', '#6e4420', '#c89058']); }
-  setFlag('log_chopped'); G.ents = G.ents.filter(o => o !== e); G.shake = 0.3; Sound.play('kill'); Sound.play('secret');
+  // the third chop: the log shudders, stands up, and is not a log (Owen's page 6)
+  G.ents = G.ents.filter(o => o !== e); G.shake = 0.5; Sound.play('kill'); Sound.play('creep');
   jonXP(10);
-  say(STORY.log_chopped);
+  say(STORY.log_wakes, () => { wakeGiant(e.x - 28, e.y + 10); setFlag('intro:giant'); say(giantIntroLines()); });
 }
 function checkLogScene() {
   const e = G.ents.find(o => o.kind === 'log');

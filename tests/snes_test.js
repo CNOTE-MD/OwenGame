@@ -67,12 +67,14 @@ const path = require('path');
   await talkThrough();
   await pg.screenshot({ path: SHOTS + '/snes_log.png' });
   for (let i = 0; i < 4; i++) { await place(30, 6, 1, 0); await pg.keyboard.press('KeyZ'); await wait(450); await talkThrough(); }
-  await check('three chops clear the log for good', await ev(() => tile(31, 5) === 's' && tile(31, 6) === 's' && flag('log_chopped') && flag('tile:overworld:31,5:s')));
+  await check('three chops wake the Forest Giant (Owen\'s page 6)', await ev(() => flag('giant_woke') && G.ents.some(e => e.type === 'giant') && !G.ents.some(e => e.kind === 'log')));
+  await ev(() => { const g = G.ents.find(e => e.type === 'giant'); killEnemy(g); }); await wait(100); await talkThrough();
+  await check('felling him clears the log for good', await ev(() => tile(31, 5) === 's' && tile(31, 6) === 's' && flag('log_chopped') && flag('tile:overworld:31,5:s')));
   await go('overworld', 28, 6);
   await check('the log stays chopped after reloading the map', await ev(() => tile(31, 6) === 's' && !G.ents.some(e => e.kind === 'log')));
 
   // --- the Penguin Palace ---
-  await check('dungeon 1 is the Penguin Palace', await ev(() => MAPS.cavern.name === 'Penguin Palace' && MAPS.cavern.palace));
+  await check('dungeon 1 is the Penguin Palace', await ev(() => MAPS.cavern.name === 'Jjorvic Palace' && MAPS.cavern.palace));
   await check('Astrid talks about the palace', await ev(() => npcLines('astrid').some(l => /Palace/.test(l[1]))));
   await go('cavern', 24, 5);
   await check('a throne behind the king', await ev(() => G.ents.some(e => e.kind === 'throne')));

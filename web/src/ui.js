@@ -64,9 +64,10 @@ function objective() {
   if (G.mapId === 'home') return 'Read what Jon carved, then leave through the door.';
   if (!flag('met_astrid')) return 'Find Elder Astrid in Fjordvik: west of the airstrip, then north.';
   if (!flag('exchanged') && !flag('d1done')) return 'Chapter 2: find the subway station south-west of the airstrip. Exchange your dollars for kroner.';
+  if (flag('giant_woke') && !flag('log_chopped')) return 'Chapter 2: the log was the Forest Giant of the North. Dodge the club. When it sticks in the muck, chop him. Fire burns him.';
   if (!flag('log_chopped') && !flag('d1done')) return 'Chapter 2: take a taxi (or walk) to the Muck Forest. Trudge east. Something is in the way.';
-  if (!s.items.homing && !flag('d1done')) return 'Chapter 2: the Penguin Palace is up the Frozen Path, east of the forest. Find the treasure behind the Penguin Knight.';
-  if (!flag('d1done')) return 'Chapter 2: destroy the Penguin Palace. Whatever rules it sits on the throne at the top.';
+  if (!s.items.homing && !flag('d1done')) return 'Chapter 2: Jjorvic Palace is up the Frozen Path, east of the forest. Find the treasure behind the Penguin Knight.';
+  if (!flag('d1done')) return 'Chapter 2: destroy Jjorvic Palace. Whatever rules it sits on the throne at the top.';
   if (!flag('d2done')) {
     if (!s.items.dash) return 'Chapter 3: the Drowned Barrow has opened in the north-west foothills. Find what the Draugr Captain guards.';
     return 'Chapter 3: use the Voodoo Dash to cross the water and barriers. Find the big key and free Hank\'s ghost.' + (flag('redeye_done') ? '' : ' (Optional: a nap on the bench by Flight 364.)');

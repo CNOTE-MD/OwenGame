@@ -9,6 +9,7 @@
 | `web/src/story.js` | Every word in the game, including everything Jon says on his own (`JON`). Owen can edit this. |
 | `web/src/jon.js` | Jon's personality (faces, when he talks) and growth (XP, levels, perks, abilities) |
 | `tools/maps.py` | ASCII maps for Norway, the Penguin Palace, the subway, the Barrow and Owen's room, plus a reachability checker |
+| `web/src/giant.js` | Owen's page 6: the Forest Giant of the North boss at the log (stalk, slam, stuck window, hide as a tree) |
 | `web/src/better.js` | Objective compass, the Penguin King's Royal Rage with icicles, ambient sound (birds, crickets, wind, drips, subway hum), controller rumble, the nap bench, deeds on the map page |
 | `web/src/magic.js` | Magic and items: Rune Spells (Thunder, Frost, Fire, Mend on the rune meter), the Bag (salmon, lutefisk, shards), Charms (one worn at a time), the SPELLS and BAG menu pages |
 | `web/src/awesome.js` | Boss title cards, hit-stop, combo callouts, the Jukebox, Snow Penguins and Royal Guards, King Owen, title-screen flair |
@@ -19,7 +20,7 @@
 | `OWEN_QUESTIONS.md` | Prompts to ask Owen after he plays; his answers drive the next build |
 | `STORY_BIBLE.md` | Characters, chapter arc, items, the Red-Eye side quest, Arena mode |
 
-Rebuild: `python3 tools/maps.py && python3 tools/build_web.py`. Test: `NODE_PATH=$(npm root -g) node tests/web_playtest.js`, then `tests/arena_playtest.js`, `tests/ch1_depth_test.js`, `tests/redeye_test.js`, `tests/ch2_test.js`, `tests/jon_test.js`, `tests/pad_test.js`, `tests/snes_test.js`, `tests/magic_test.js` and `tests/better_test.js` the same way.
+Rebuild: `python3 tools/maps.py && python3 tools/build_web.py`. Test: `NODE_PATH=$(npm root -g) node tests/web_playtest.js`, then `tests/arena_playtest.js`, `tests/ch1_depth_test.js`, `tests/redeye_test.js`, `tests/ch2_test.js`, `tests/jon_test.js`, `tests/pad_test.js`, `tests/snes_test.js`, `tests/magic_test.js`, `tests/better_test.js` and `tests/giant_test.js` the same way.
 
 ## Godot prototype (frozen)
 

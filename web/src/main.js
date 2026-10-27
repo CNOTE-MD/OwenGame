@@ -45,6 +45,7 @@ function onEnterScreen() {
   if (has('captain') && !flag('intro:captain')) { setFlag('intro:captain'); Sound.play('boss'); showBossCard('captain'); say(STORY.captain); }
   if (has('hank')) { Sound.play('boss'); showBossCard('hank'); say(flag('intro:hank') ? [['Hank', 'TURN... BACK...']] : STORY.hank); setFlag('intro:hank'); }
   if (has('attendant') && !flag('intro:attendant')) { setFlag('intro:attendant'); showBossCard('attendant'); say(STORY.attendant); }
+  if (has('giant') && G.ents.find(e => e.type === 'giant').st === 'intro') { Sound.play('boss'); showBossCard('giant'); say(flag('intro:giant') ? [['Forest Giant', 'BACK FOR MORE, TREE-CHOPPER?']] : giantIntroLines()); setFlag('intro:giant'); }
   if (has('king')) { Sound.play('boss'); showBossCard('king'); say(flag('intro:king') ? [['Penguin King', 'AK! Back for more?']] : STORY.king); setFlag('intro:king'); }
   if (G.mapId === 'overworld' && flag('d2done') && !flag('chapter2_banner') && G.scr.x === 0 && G.scr.y === 0) {
     setFlag('chapter2_banner'); G.banner = 'CHAPTER 3 COMPLETE'; G.bannerT = 4; Sound.play('secret'); writeSave();
@@ -125,7 +126,7 @@ function update(dt) {
     else if (e.kind === 'enemy' && e.alive) { if (e.slow > 0) { e.slow -= dt; updateEnemy(e, dt * 0.5); } else updateEnemy(e, dt); }
     else if (e.kind === 'pickup') updatePickup(e, dt);
     else if (e.kind === 'hazard') updateCart(e, dt);
-    else if (e.kind === 'switch' || e.kind === 'log') e.cd = Math.max(0, e.cd - dt);
+    else if (e.kind === 'switch' || e.kind === 'log' || e.kind === 'faketree') e.cd = Math.max(0, e.cd - dt);
     if (G.state !== 'play') break;
   }
   updateFx(dt);
@@ -175,7 +176,7 @@ function render() {
 
 let last = performance.now();
 G.menuSel = 0;
-buildAll(); buildSnesArt(); buildAwesomeArt(); buildMagicArt();
+buildAll(); buildSnesArt(); buildAwesomeArt(); buildMagicArt(); buildGiantArt();
 function frame(now) {
   const dt = Math.min(0.05, (now - last) / 1000); last = now;
   try { pollGamepad(); update(dt); render(); const mid = musicFor(); markHeard(mid); Music.want(mid); Music.tick(); Ambience.tick(dt); } catch (err) { console.error(err); }

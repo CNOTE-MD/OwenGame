@@ -25,7 +25,7 @@ const path = require('path');
   await ev(() => setFlag('exchanged'));
   await check('...then the log', await ev(() => objectiveTarget().label === 'The log'));
   await ev(() => setFlag('log_chopped'));
-  await check('...then the Penguin Palace', await ev(() => objectiveTarget().label === 'Penguin Palace'));
+  await check('...then the Penguin Palace', await ev(() => objectiveTarget().label === 'Jjorvic Palace'));
   await wait(100); await pg.screenshot({ path: SHOTS + '/better_compass.png' });
   await go('overworld', 38, 4);
   await check('on the palace screen the marker sits on the cave mouth', await ev(() => { const t = objectiveTarget(); const sx = t.x * 16 + 8 - G.cam.x; return sx > 8 && sx < 248; }));

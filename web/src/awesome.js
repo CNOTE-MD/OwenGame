@@ -8,6 +8,7 @@ const BOSS_CARDS = {
   captain: ['DRAUGR CAPTAIN', 'He guards the Voodoo Dash'],
   hank: ["HANK'S GHOST", 'Frozen by Chilly'],
   attendant: ['THE FLIGHT ATTENDANT', 'Any refreshments, sir?'],
+  giant: ['FOREST GIANT OF THE NORTH', 'He was the log.'],
 };
 function showBossCard(type) {
   const c = BOSS_CARDS[type];

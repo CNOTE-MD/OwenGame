@@ -27,7 +27,7 @@ function makeEnt(d, x, y) {
     case 'throne': return { ...base, solid: true, talk: true };
     case 'exchange': return { ...base, solid: true, talk: true };
     case 'taxi': return { ...base, solid: true, talk: true };
-    case 'log': return s.flags['log_chopped'] ? null : makeLog(d, x, y);
+    case 'log': return s.flags['log_chopped'] ? null : s.flags['giant_woke'] ? (() => { const g = makeEnemy('giant', x - 28, y + 10); g.fx = -1; return g; })() : makeLog(d, x, y);
     default: return makeEnemy(d.t, x, y);
   }
 }
@@ -45,6 +45,7 @@ const ENEMY = {
   spore: { hp: 2, r: 6, touch: 1, speed: 0 },
   snowpeng: { hp: 2, r: 6, touch: 1, speed: 66 },
   guard: { hp: 4, r: 7, touch: 1, speed: 30, shield: true },
+  giant: { hp: 12, r: 16, touch: 1, speed: 16, boss: true },
   slime: { hp: 3, r: 6, touch: 1, speed: 0 },
   beetle: { hp: 3, r: 7, touch: 1, speed: 26 },
 };
@@ -52,7 +53,7 @@ function makeEnemy(type, x, y) {
   const d = ENEMY[type];
   if (!d) return null;
   return { x, y, kind: 'enemy', enemy: true, alive: true, type, ...d, max: d.hp, flash: 0, kx: 0, ky: 0, t: Math.random() * 2,
-    st: ['king', 'knight', 'attendant', 'captain', 'hank'].includes(type) ? 'intro' : 'idle', fx: 0, fy: 1, wob: Math.random() * 6, tx: x, ty: y, bounces: 0, summoned: false };
+    st: ['king', 'knight', 'attendant', 'captain', 'hank', 'giant'].includes(type) ? 'intro' : 'idle', fx: 0, fy: 1, wob: Math.random() * 6, tx: x, ty: y, bounces: 0, summoned: false };
 }
 
 // ---------- particles ----------
@@ -436,6 +437,7 @@ function damageEnemy(e, dmg, from, how) {
   if (e.flash > 0.05 && jonHit) return false;
   if (snesDamageRule(e, how, jonHit)) return true;
   { const fz = frozenRule(e, how, jonHit); if (fz) dmg *= fz; }
+  if (e.type === 'giant') { if (giantDamageRule(e, how, jonHit)) return true; if (how === 'magic') dmg += 1; }
   const dx = from.x - e.x, dy = from.y - e.y, d = Math.hypot(dx, dy) || 1;
   // Shields block a hit from the front, but the block knocks the shield aside for a moment:
   // hit-hit always works, and hitting from the side or back works right away.
@@ -472,6 +474,7 @@ function killEnemy(e) {
   jonXP(e.boss ? 25 : e.shield ? 3 : 2); jonOnKill(e);
   if (e.boss) JT.queued = 'boss';
   if (!e.boss) maybeDrop(e.x, e.y, 0.65);
+  if (e.type === 'giant') { giantOnKill(e); return; }
   if (e.type === 'king') { G.shake = 0.6; ICICLES.length = 0; say(STORY.king_down, checkRoomClear); return; }
   if (e.type === 'hank') { G.shake = 0.6; HK.axes = []; for (const w of G.ents.filter(o => o.type === 'wisp')) killEnemy(w); say(STORY.hank_down, () => { setFlag('d2done'); checkRoomClear(); writeSave(); }); return; }
   if (e.type === 'attendant') { G.shake = 0.6; RE.shots = []; say(STORY.attendant_down, () => { setFlag('redeye_done'); checkRoomClear(); }); return; }
@@ -518,6 +521,7 @@ function updateEnemy(e, dt) {
       { const ax = e.tx - e.x, ay = e.ty - e.y, al = Math.hypot(ax, ay) || 1; tryMove(e, ax / al * e.speed * dt, ay / al * e.speed * dt, mr, who); }
       break;
     case 'hank': updateHank(e, dt, dx, dy, d); break;
+    case 'giant': updateGiant(e, dt, dx, dy, d, mr); return;
     case 'spore': updateSpore(e, dt, dx, dy, d); break;
     case 'slime': updateSlime(e, dt, dx, dy, d, mr); break;
     case 'beetle': updateBeetle(e, dt, dx, dy, d, mr); break;

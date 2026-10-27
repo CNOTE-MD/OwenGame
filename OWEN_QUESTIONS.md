@@ -61,6 +61,13 @@ Rules of thumb: his journal pages always win over anything already in the game. 
 35. What should the final wave (wave 20) look like?
 36. Should there be a leaderboard? Who are you trying to beat?
 
+## Your page 6 (the Forest Giant) is in the game
+
+54. The giant hides as a tree when he's hurt. Right? What else can a Forest Giant do?
+55. What does the giant say when he loses? Does he become a log again, or something else?
+56. The penguins warned him about you. How did they know you were coming?
+57. Jjorvic Palace: what does the name mean? Who built it?
+
 ## Music
 
 49. Four new songs sound like Foreigner, Journey, Aerosmith and Queen (Frozen Path, Muck Forest, subway, Penguin Palace). Which is your favorite? Which band is missing?
