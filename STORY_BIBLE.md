@@ -32,7 +32,7 @@ Chapter numbers follow Owen's journal: chapter 1 is New York and the plane, chap
 | Ch. | Dungeon | Where | Boss | Jon gains | Status |
 |---|---|---|---|---|---|
 | 1 | New York, Flight 364 | Owen's room, the plane | (the attendant dream) | Jon | **Built** |
-| 2 | **Penguin Palace** (Owen's page 5: the subway, the exchangy doohickey, a taxi, the Muck Forest, the big log) | Frozen Path, NE, past the Muck Forest | Penguin King (mini-boss: Penguin Knight) | **Homing Jon** (locks on, flies farther), **Thunder Rune** (Thunder Strike) | **Built** |
+| 2 | **Jjorvic Palace** (Owen's pages 5 and 6: the subway, the exchangy doohickey, a taxi, the Muck Forest, the big log that is the **Forest Giant of the North**) | Frozen Path, NE, past the Muck Forest | Forest Giant of the North (at the log), then the Penguin King (mini-boss: Penguin Knight) | **Homing Jon** (locks on, flies farther), **Thunder Rune** (Thunder Strike) | **Built** |
 | 3 | Drowned Barrow | Foothills, NW | Hank's ghost, frozen by Chilly (mini-boss: Draugr Captain) | **Voodoo Dash** (zombie dash through enemies, water, pits and spirit barriers) | **Built as a draft**; Owen's pages override it |
 | 4 | Walter's Forge | Volcano road, E | Forge golem | **Rune Shield** (Jon spins around Owen and blocks) + Walter's real name revealed | Sealed door in game |
 | 5 | Storm Peak | North-east summit | Chilly's herald | **Thunder Strike II** (lightning chains between enemies) | Sealed door in game |
@@ -44,6 +44,33 @@ Chapter numbers follow Owen's journal: chapter 1 is New York and the plane, chap
 ## Chapter 2 as Owen wrote it (page 5, built)
 
 The flight attendant was "perfectly normal (it was a dream)", so the Red-Eye is now a nightmare Owen can choose to have later. She points Owen to the subway station south-west of the airstrip. In the Fjordvik T-bane he works the exchangy doohickey for 200 kroner, then pays a taxi 20 kr to the forest (walking is still allowed). The old Whispering Forest is now the **Muck Forest**: muck slows Owen and splashes, tall grass rustles and hides drops, and a fallen log blocks the way east. When Owen reaches it, Jon flies out: "Hello Señor! Ooh, that's a big log, want me to chop it?" "Jon..." Three swings clear the log for good and the Frozen Path leads to the **Penguin Palace** (renamed from the Ice Cavern; it has a throne behind the King). Beating it shows CHAPTER 2 COMPLETE.
+
+## Canon from Owen's Quest Log answers (October 2026)
+
+Full answers are in `story/OWEN_ANSWERS.md`. What they settle:
+
+| Topic | Owen's answer |
+|---|---|
+| Chilly | Part vampire, all penguin: daylight makes his skin fall off. Wants Jon for an unknowable inner power that can make or break the world, which only the evil can fill. Owen learns this through a deeper friendship with Jon. Weakness: fire. |
+| Hank | Threw the axe in the lake to keep it from people like Chilly. His real name is Hank with a J. |
+| Walter (Pickles) | Only his tools and notes remain, guarded by a giant tin monster in the Forge. Jon is the one who says "Pickles" first. Names have power in Norse stories, so nobody says it. Pickles's notes are what finally un-zombie Owen. |
+| Jon | Based on a flying, talking, Spanish-speaking sword from a book Owen read. Says "you're terrible, do better" with love. Scared of spiders. Brags about being a magical talking flying axe. Loves mangoes; hates cucumbers and squash. Is confiscated at one point; Owen reclaims him from a giants' palace. Stays to the end. |
+| Fluffy | Just a random dog. |
+| Forest Giants | Hide as trees and logs, wrap foes in leaves, can heal (and won't). Turn back into logs when beaten. The penguins have penguin sense. |
+| Jjorvic Palace | A palace carved into a glacier. The name just sounds Nordic. |
+| Walter's Forge | Lava rivers and a giant monster made of tin (the boss). Jon gains the Rune Shield there. |
+| Storm Peak | A palace on top belonging to Chilly's distant cousin. |
+| Ending | Owen is fixed by Pickles's notes. The last line of the story is "Goodbye". |
+| Next to build | Finding Storm Peak. |
+| Future ideas | Possessed wombat, squirrel and Carolina dog; a giant peanut-butter lion; Chilly's arch-enemy's palace (he's mad at Chilly, not helpful); a throne-room riddle for a heart piece. |
+
+## Page 6: the Forest Giant of the North (built)
+
+Updated from Owen's answers: every third attack the giant wraps a ring of ground in leaves (dash or step out); when he loses he turns back into a log that rolls off the path and snores; the Leaf Rune (the fifth rune) appears in the Muck Forest afterward; the fight plays the Led Zeppelin-sound piece.
+
+The third chop on the log wakes it. Owen's page plays word for word: "Who awakens the Forest Giant of the NORTH?!" / "Um, we were looking for Jjorvic Palace." / "Ah, the penguins told me about you." / Jon: "Señor, can we get to the big boss fight scene please?" / "Later, Jon." The giant raises his club, and the fight starts where the page ends.
+
+The fight: he is fifty feet tall, so chops bounce off ("TOO TALL"). He stalks, raises the club (a shadow tracks Owen, then commits), slams it for two hearts, and the club sticks in the muck: that is the window to chop his ankles. Fire burns him any time (giants hate fire). Below half health he hides as a tree: three trees sprout, one of them can't hold still; throw Jon at it to find him stuck. When he falls, the log is gone for good and the Frozen Path opens. A runestone stands in the forest for retries. The palace is **Jjorvic Palace** (Owen's name) everywhere.
 
 ## The SNES pass (built)
 
@@ -95,7 +122,7 @@ Rush-style originals (odd meters, melodic bass) carry the title, overworld, boss
 | Cold as Fjord | Foreigner: off-beat keyboard stabs over a synth pad, eighth-note bass, big chorus chords | Frozen Path, Storm Peak |
 | Don't Stop Choppin' | Journey: a piano arpeggio that never stops, four chords, a lead that climbs and stays up | Muck Forest, the taxi ride |
 | Walk This Fjord | Aerosmith: a strutting blues riff in twelve, bass and guitar in unison, chromatic walk-ups | Fjordvik T-bane |
-| Penguin Rhapsody | Queen: a piano ballad with a stacked choir, then a galloping hard-rock section with three-part harmony guitars | Penguin Palace |
+| Penguin Rhapsody | Queen: a piano ballad with a stacked choir, then a galloping hard-rock section with three-part harmony guitars | Jjorvic Palace |
 
 Jon hums all four when Owen stands still.
 

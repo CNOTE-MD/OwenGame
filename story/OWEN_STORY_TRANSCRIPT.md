@@ -35,3 +35,11 @@ As I boarded the plane (Jon was in a checked bag down below) I tried not to thin
 When I got off the plane, the perfectly normal (it was a dream) flight attendant sent me off to the nearby subway station where I could exchange U.S. dollars for kroner and hitch a ride for the forest to search for a palace filled with penguins (I know, right?) and destroy it. When I got to the subway station, I found one of those exchangy doohickeys and worked it for a couple hundred kroner (some of which I used for an uber/taxicab). Once I got to the forest, I truged through the muck and grime on the floor. After about 2 hours of this, I got to a log that was too high to step over and too low to duck under. Naturally, Jon took this as a golden oppurtunity and flew out "Hello Señor! Ooh, that's a big log, want me to chop it?" "Jon..."
 
 Notes: the flight attendant was a dream (so the Red-Eye is a nightmare, not real); Owen's plan is to find and destroy a palace filled with penguins; the forest floor is muck and grime; Jon says "Hello Señor!"
+
+## Page 6 (chapter 2 continued)
+
+"Jon..." I stutter. "What, Señor? Oh..." In front of us was a 50 ft tall Forest Giant. These guys are known for hiding as trees and logs, and they absolutely HATE humans due to our ability to chop down trees, which these guys basically worship to the greatest amount. Oh they also have a club the size of a narrow building. "Who awakens the Forest Giant of the NORTH?!" He rumbled. "Um, we were looking for JJORVIC palace." I say. "Ah, the penguins told me about you." Gulp. That wasn't good. "Señor," Jon said "Can we get to the big boss fight scene please?" "Later, Jon" I say through my currently pursed lips. The giant raises his club.
+
+(Teacher's notes in the margin: "Yikes!" and "Quite the cliffhanger".)
+
+Notes: the log IS the Forest Giant of the North (they hide as trees and logs; they hate humans for chopping trees; club the size of a narrow building). The palace of penguins is named JJORVIC palace. The penguins warned the giant about Owen. Jon wants the big boss fight scene.

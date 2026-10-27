@@ -264,8 +264,12 @@ OW_ENT = [
     {"t": "warp", "at": P(1, 2, 3, 10), "to": "subway", "dest": [8, 3]},
     {"t": "sign", "at": P(1, 2, 2, 9), "text": "sign_subway"},
     {"t": "taxi", "at": P(1, 0, 7, 12), "to": "airport"},
+    {"t": "runestone", "at": P(1, 0, 10, 12)},
+    {"t": "sleeplog", "at": P(1, 0, 10, 4)},
+    {"t": "chest", "id": "c_leaf", "at": P(1, 0, 2, 12), "item": "leaf", "needs": "giant_done"},
+    {"t": "varg", "at": P(0, 0, 12, 8)},
     {"t": "log", "id": "biglog", "at": P(1, 0, 15, 5)},
-    {"t": "spore", "at": P(1, 0, 6, 3)}, {"t": "spore", "at": P(1, 0, 11, 8)}, {"t": "slime", "at": P(1, 0, 4, 7)}, {"t": "slime", "at": P(1, 0, 12, 10)},
+    {"t": "varg", "at": P(1, 0, 6, 3)}, {"t": "varg", "at": P(1, 0, 11, 8)}, {"t": "slime", "at": P(1, 0, 4, 7)}, {"t": "slime", "at": P(1, 0, 12, 10)},
     {"t": "beetle", "at": P(3, 0, 4, 9)}, {"t": "beetle", "at": P(3, 2, 3, 3)},
     {"t": "tablet", "id": "tab_coast", "at": P(0, 2, 2, 3)},
     {"t": "tablet", "id": "tab_hills", "at": P(0, 0, 13, 11)},
@@ -282,6 +286,8 @@ OW_ENT = [
     {"t": "shop", "item": "salmon", "price": 15, "at": P(1, 1, 11, 5)},
     {"t": "shop", "item": "lutefisk", "price": 8, "at": P(1, 1, 13, 5)},
     {"t": "shop", "item": "tooth", "price": 60, "at": P(1, 1, 12, 7)},
+    {"t": "shop", "item": "mango", "price": 40, "at": P(1, 1, 14, 7)},
+    {"t": "shop", "item": "fuel", "price": 12, "at": P(1, 1, 10, 7)},
     {"t": "chest", "id": "c_boots", "at": P(1, 0, 2, 10), "item": "boots"},
     {"t": "chest", "id": "c_cloak", "at": P(2, 0, 13, 8), "item": "cloak"},
     {"t": "chest", "id": "c_bearclaw", "at": P(3, 0, 12, 11), "item": "bearclaw"},
@@ -579,7 +585,7 @@ CAVE = [
 ]
 CAVE_ENT = [
     {"t": "chest", "id": "c_cave", "at": [5, 1], "item": "piece"},
-    {"t": "bat", "at": [4, 4]}, {"t": "bat", "at": [11, 8]}, {"t": "wisp", "at": [12, 2]},
+    {"t": "bat", "at": [4, 4]}, {"t": "spider", "at": [11, 8]}, {"t": "spider", "at": [3, 9]}, {"t": "wisp", "at": [12, 2]},
     {"t": "warp", "at": [8, 12], "to": "overworld", "dest": P(3, 2, 13, 9)},
     {"t": "sign", "at": [6, 7], "text": "cave_carving"},
 ]
@@ -695,7 +701,7 @@ print("switch min distance px:", round(dmin, 1))
 
 out = {
     "overworld": {"name": "Norway", "rows": ["".join(r) for r in ow], "ents": OW_ENT, "outdoor": True},
-    "cavern": {"name": "Penguin Palace", "rows": ["".join(r) for r in cav], "ents": CAV_ENT, "dungeon": True, "palace": True},
+    "cavern": {"name": "Jjorvic Palace", "rows": ["".join(r) for r in cav], "ents": CAV_ENT, "dungeon": True, "palace": True},
     "home": {"name": "Owen's Room, New York", "rows": HOME, "ents": HOME_ENT, "interior": True},
     "arena": {"name": "Valhalla Arena", "rows": ARENA, "ents": [], "arena": True},
     "astrid_house": {"name": "Astrid's House", "rows": ASTRID, "ents": ASTRID_ENT, "interior": True},

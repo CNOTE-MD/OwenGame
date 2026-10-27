@@ -174,11 +174,12 @@ function musicFor() {
   if (G.map.redeye) return G.ents.some(e => e.type === 'attendant' && e.alive) ? 'boss' : 'creepy';
   if (G.mapId === 'bjarne_house' && flag('bjarne_done')) return 'bjarne';
   if (G.mapId === 'subway') return 'aero';
-  if (G.mapId === 'cavern') return G.ents.some(e => e.boss && e.alive) ? 'boss' : 'palace';
+  if (G.mapId === 'cavern') return G.ents.some(e => e.type === 'king' && e.alive) ? 'chop' : G.ents.some(e => e.boss && e.alive) ? 'boss' : 'palace';
   if (G.map.interior) return 'village';
   if (G.map.dark) return 'dungeon';
   if (G.map.dungeon) return G.ents.some(e => e.boss && e.alive) ? 'boss' : 'dungeon';
   if (G.scr.y === 1 && G.scr.x <= 1) return 'village';
+  if (G.ents.some(e => e.type === 'giant' && e.alive)) return 'zep';   // Owen: more Led Zeppelin
   if (G.scr.y === 0 && G.scr.x === 1) return 'journey';   // the Muck Forest: don't stop choppin'
   if (G.scr.y === 0 && G.scr.x >= 2) return 'cold';       // the Frozen Path and Storm Peak
   return 'overworld';

@@ -7,8 +7,9 @@ const SPELLS = {
   frost: { name: 'Frost Rune', cost: 4, icon: 'frost', desc: 'Freezes enemies near you. Chop for double.' },
   fire: { name: 'Fire Rune', cost: 3, icon: 'fire', desc: 'A fireball. Burns bushes and grass.' },
   mend: { name: 'Mend Rune', cost: 6, icon: 'mend', desc: 'Heals two hearts.' },
+  leaf: { name: 'Leaf Rune', cost: 5, icon: 'leaf', desc: 'Plants rise and hold enemies near you.' },
 };
-const SPELL_ORDER = ['thunder', 'frost', 'fire', 'mend'];
+const SPELL_ORDER = ['thunder', 'frost', 'fire', 'mend', 'leaf'];
 function knownSpells() { return SPELL_ORDER.filter(id => G.save.items[id]); }
 function anySpell() { return knownSpells().length > 0; }
 function equippedSpell() { const s = G.save; if (s.spell && s.items[s.spell]) return s.spell; const k = knownSpells(); s.spell = k[0] || null; return s.spell; }
@@ -24,7 +25,7 @@ function castSpell() {
   if (s.rune < sp.cost) return floatText(p.x, p.y - 18, id === 'thunder' ? 'Rune not full' : 'Not enough rune', '#7fd4ff');
   if (id === 'thunder') return startThunder();
   s.rune -= sp.cost; p.cd = 0.3;
-  if (id === 'frost') castFrost(); else if (id === 'fire') castFire(); else if (id === 'mend') castMend();
+  if (id === 'frost') castFrost(); else if (id === 'fire') castFire(); else if (id === 'mend') castMend(); else if (id === 'leaf') castLeaf();
 }
 function castFrost() {
   const p = G.player; Sound.play('splash'); Sound.play('charge'); G.shake = 0.12;
@@ -79,6 +80,7 @@ const CONSUMABLES = {
   salmon: { name: 'Smoked Salmon', icon: 'salmon', heal: 4, price: 15, max: 5, text: 'Smoky. Perfect. Two hearts back.' },
   lutefisk: { name: 'Lutefisk', icon: 'lutefisk', heal: 99, price: 8, max: 3, text: 'Fish. Lye. Jelly. All your hearts back, and a memory you will never lose.' },
   shard: { name: 'Rune Shard', icon: 'shard', rune: true, price: 25, max: 3, text: 'The rune meter fills up.' },
+  fuel: { name: 'Fjord Fuel', icon: 'fuel', fuel: true, price: 12, max: 3, text: 'Fjord Fuel! Your dash goes farther for a whole minute. Jon: "Can I have a sip? No? Rude."' },
 };
 function bagCount(id) { return (G.save.bag && G.save.bag[id]) || 0; }
 function addToBag(id, n = 1) { const s = G.save; s.bag = s.bag || {}; s.bag[id] = Math.min(CONSUMABLES[id].max, (s.bag[id] || 0) + n); }
@@ -86,9 +88,11 @@ function useConsumable(id) {
   const s = G.save, p = G.player, c = CONSUMABLES[id];
   if (!bagCount(id)) return false;
   if (c.heal && p.hp >= s.maxHp) { Sound.play('clank'); return false; }
+  if (c.fuel && !s.items.dash) { G.bagMsg = { text: 'You need the Voodoo Dash first.', t: 2 }; Sound.play('clank'); return false; }
   s.bag[id]--;
   if (c.heal) { p.hp = Math.min(s.maxHp, p.hp + c.heal); Sound.play('heart'); }
   if (c.rune) { s.rune = RUNE_MAX; Sound.play('heart'); }
+  if (c.fuel) { p.fuel = 60; Sound.play('charge'); }
   if (id === 'lutefisk') JT.queued = 'lutefisk';
   G.bagMsg = { text: c.text, t: 2.5 }; writeSave();
   return true;
@@ -100,6 +104,7 @@ const CHARMS = {
   boots: { name: "Fisherman's Boots", icon: 'boots', desc: 'Muck cannot slow you.', apply: () => {} },
   cloak: { name: 'Wool Cloak', icon: 'cloak', desc: 'Shrugs off some hits.', apply: st => { st.armor += 2; } },
   tooth: { name: 'Troll Tooth', icon: 'tooth', desc: 'Enemies drop more.', apply: st => { st.luck += 0.6; } },
+  mango: { name: 'Mango', icon: 'mango', desc: 'Jon\'s favorite. He swings faster when you wear it.', apply: st => { st.atk += 0.2; } },
 };
 function hasCharm(id) { return !!(G.save.charms && G.save.charms[id]); }
 function charmOn(id) { return G.save.charm === id && hasCharm(id); }
@@ -171,7 +176,7 @@ function drawBagPage() {
     const y = 62 + i * 20, sel = i === (G.bagSel || 0);
     if (sel) R(18, y - 10, 220, 20, '#1a2238');
     R(22, y - 8, 16, 16, '#0d1a2e');
-    if (e.kind === 'eat') { const c = CONSUMABLES[e.id]; drawItemIcon(c.icon, 30, y); text(`${c.name}  x${bagCount(e.id)}`, 44, y - 1, sel ? '#ffd84a' : '#f3ecd2', 'left', false); text(c.heal === 99 ? 'Full heal. Jon will have opinions.' : c.heal ? `Heals ${c.heal / 2} hearts` : 'Fills the rune meter', 44, y + 8, '#a79fc4', 'left', false); }
+    if (e.kind === 'eat') { const c = CONSUMABLES[e.id]; drawItemIcon(c.icon, 30, y); text(`${c.name}  x${bagCount(e.id)}`, 44, y - 1, sel ? '#ffd84a' : '#f3ecd2', 'left', false); text(c.heal === 99 ? 'Full heal. Jon will have opinions.' : c.heal ? `Heals ${c.heal / 2} hearts` : c.fuel ? 'Longer dashes for a minute' : 'Fills the rune meter', 44, y + 8, '#a79fc4', 'left', false); }
     else { const c = CHARMS[e.id]; drawItemIcon(c.icon, 30, y); text((charmOn(e.id) ? '★ ' : '') + c.name, 44, y - 1, sel ? '#ffd84a' : '#f3ecd2', 'left', false); text(c.desc, 44, y + 8, '#a79fc4', 'left', false); }
   });
   if (G.bagMsg) { R(14, 186, 228, 14, '#1a2238'); text(G.bagMsg.text, 128, 196, '#9be08a', 'center', false); }

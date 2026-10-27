@@ -136,7 +136,7 @@ const SHOTS = process.env.SHOTS || '/tmp';
   await ev(() => { G.save.bigkeys.cavern = true; G.player.bump = 0; });
   await place(24, 15, 0, -1); await pg.keyboard.down('ArrowUp'); await wait(900); await pg.keyboard.up('ArrowUp'); await wait(700);
   await talkThrough();
-  await check('music: boss theme with the King alive', await ev(() => musicFor() === 'boss'));
+  await check('music: the King gets We Will Chop You', await ev(() => musicFor() === 'chop'));
   await check('in boss room with Penguin King', await ev(() => G.scr.y === 0 && G.ents.some(e => e.type === 'king')));
   await pg.screenshot({ path: SHOTS + '/p5_boss.png' });
   // swing on an undazed king clanks

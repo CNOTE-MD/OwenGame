@@ -8,6 +8,7 @@ const BOSS_CARDS = {
   captain: ['DRAUGR CAPTAIN', 'He guards the Voodoo Dash'],
   hank: ["HANK'S GHOST", 'Frozen by Chilly'],
   attendant: ['THE FLIGHT ATTENDANT', 'Any refreshments, sir?'],
+  giant: ['FOREST GIANT OF THE NORTH', 'He was the log.'],
 };
 function showBossCard(type) {
   const c = BOSS_CARDS[type];
@@ -55,7 +56,7 @@ function drawCombo() {
 }
 
 // ---------------- the Jukebox ----------------
-const JUKE_ORDER = ['title', 'overworld', 'village', 'journey', 'cold', 'aero', 'palace', 'dungeon', 'boss', 'barrow', 'bjarne', 'arena', 'creepy'];
+const JUKE_ORDER = ['title', 'overworld', 'village', 'journey', 'zep', 'cold', 'aero', 'palace', 'chop', 'dungeon', 'boss', 'barrow', 'bjarne', 'arena', 'creepy'];
 function markHeard(id) { if (id && G.save && G.mode === 'story' && !flag('heard:' + id)) { G.save.flags['heard:' + id] = true; } }
 function jukeList() { return JUKE_ORDER.filter(id => SCORE[id]); }
 function updateJukebox() {
@@ -95,7 +96,7 @@ function buildAwesomeArt() {
     }
   }
 }
-function pengKey(e) { return e.type === 'snowpeng' ? 'snow' : e.type === 'guard' ? 'guard' : 'peng'; }
+function pengKey(e) { return e.type === 'snowpeng' ? 'snow' : e.type === 'guard' ? 'guard' : e.type === 'minichilly' ? 'chilly' : 'peng'; }
 function updateSnowPeng(e, dt, dx, dy, d, mr) {
   // fast and twitchy: skates toward Owen in zigzags, slides a little on ice
   if (d > 140 && !e.aggro) return;

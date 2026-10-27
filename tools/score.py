@@ -1,6 +1,6 @@
 """The game's music, written as step sequences. Original compositions in the style of Rush
-(odd meters, melodic bass, power chords, synth leads, tom fills) plus four pieces in the sound of
-Owen's favorite bands: Foreigner, Journey, Aerosmith and Queen. Everything here is original.
+(odd meters, melodic bass, power chords, synth leads, tom fills) plus pieces in the sound of
+Owen's favorite bands: Foreigner, Journey, Aerosmith, Queen and Led Zeppelin. Everything here is original.
 
 Each step is an eighth note. In a line, a token is a note (E2), a chord (E3+B3), '-' to hold
 the previous note, or '.' for silence. Bars are separated by '|'. Drum lines use one character
@@ -168,6 +168,33 @@ TRACKS = {
       "lead":  "G4+A#4+D5 - - - F4+A4+D5 - - - | D#4+G4+A#4 - - - - - - - | F4+A4+C5 - - - G4+A#4+D5 - - - | A4+D5+F#5 - - - - - - -",
       "choir": "G4+A#4 - - - - - - - | D#4+G4 - - - - - - - | F4+A4 - - - - - - - | D4+F#4 - - - - - - -",
       "k": rep("x..xx.x.", 4), "s": rep("....x...", 4), "h": rep("xxxxxxxx", 4), "c": "x.......|x.......|x.......|x......."},
+  }},
+  "zep": {"name": "Stairway to Valhalla (Led Zeppelin sound)", "bpm": 132, "gain": 0.95, "order": ["A", "A", "B", "A"], "sections": {
+    # a galloping riff in triplets, bass and guitar in unison, a lead that wails like a singer, heavy kick
+    "A": {"steps": 12,
+      "bass": "E2 . E2 E2 . E2 E2 . E3 D3 . B2 | E2 . E2 E2 . E2 E2 . E3 G3 . F#3 | E2 . E2 E2 . E2 E2 . E3 D3 . B2 | C3 . C3 D3 . D3 E3 - - - - -",
+      "gtr":  "E3+B3 . E3+B3 E3+B3 . E3+B3 E3+B3 . E4+B4 D4+A4 . B3+F#4 | E3+B3 . E3+B3 E3+B3 . E3+B3 E3+B3 . E4+B4 G4+D5 . F#4+C#5 | E3+B3 . E3+B3 E3+B3 . E3+B3 E3+B3 . E4+B4 D4+A4 . B3+F#4 | C4+G4 . C4+G4 D4+A4 . D4+A4 E4+B4 - - - - -",
+      "lead": ". . . . . . . . . . . . | B4 - - - - - - - - A4 - G4 | . . . . . . . . . . . . | E5 - - - - - D5 - B4 - - -",
+      "k": "x..x..x..x..|x..x..x..x..|x..x..x..x..|x..x..x.xxxx", "s": "...x.....x..|...x.....x..|...x.....x..|...x.....x..",
+      "h": "x.xx.xx.xx.x|x.xx.xx.xx.x|x.xx.xx.xx.x|x.xx.xx.xx.x", "c": "x...........|............|x...........|............"},
+    "B": {"steps": 12,
+      "bass": "A2 - - - - - A2 - - G2 - - | D2 - - - - - D2 - - E2 - - | A2 - - - - - A2 - - G2 - - | B2 - - - - - B2 - - - - -",
+      "gtr":  "A3+E4 - - - - - A3+E4 - - G3+D4 - - | D3+A3 - - - - - D3+A3 - - E3+B3 - - | A3+E4 - - - - - A3+E4 - - G3+D4 - - | B3+F#4 - - - - - B3+F#4 - - - - -",
+      "lead": "E5 - - - - - G5 - - A5 - - | F#5 - - - - - E5 - - D5 - - | E5 - - - - - G5 - - B5 - - | A5 - - - - - G5 - - F#5 - -",
+      "k": "x.....x.....|x.....x.....|x.....x.....|x..x..x..xxx", "s": "...x.....x..|...x.....x..|...x.....x..|...x.....x..",
+      "c": "x...........|x...........|x...........|x...........", "t": "............|............|............|.........hml"},
+  }},
+  "chop": {"name": "We Will Chop You (Queen sound)", "bpm": 120, "gain": 0.95, "order": ["A", "A", "B", "B"], "sections": {
+    # stomp, stomp, clap: then a guitar solo the whole palace can hear
+    "A": {"steps": 8,
+      "lead": "E4 - E4 - G4 - E4 - | D4 - - - E4 - - - | E4 - E4 - G4 - A4 - | G4 - E4 - D4 - - -",
+      "choir": "E4+G4 - - - - - - - | D4+F#4 - - - - - - - | E4+G4 - - - - - - - | D4+G4 - - - - - - -",
+      "k": "x.x.....|x.x.....|x.x.....|x.x.....", "s": "....x...|....x...|....x...|....x..."},
+    "B": {"steps": 8,
+      "gtr":  "E3+B3 - - - - - - - | G3+D4 - - - A3+E4 - - - | E3+B3 - - - - - - - | D3+A3 - - - E3+B3 - - -",
+      "bass": "E2 - - - E2 - - - | G2 - - - A2 - - - | E2 - - - E2 - - - | D2 - - - E2 - - -",
+      "lead": "B4 D5 E5 G5 E5 D5 B4 A4 | G4 A4 B4 - D5 - E5 - | G5 - A5 - G5 E5 D5 E5 | D5 B4 A4 G4 E4 - - -",
+      "k": "x.x.....|x.x.....|x.x.....|x.x.x.x.", "s": "....x...|....x...|....x...|....x.xx", "c": "x.......|........|x.......|........"},
   }},
   "creepy": {"name": "Flight 364", "bpm": 60, "gain": 1.8, "order": ["A"], "sections": {
     "A": {"steps": 8,

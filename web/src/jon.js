@@ -50,7 +50,7 @@ function updateJonTalk(dt) {
   // near water or a penguin
   if (G.mapId === 'overworld' && tileAt(p.x + p.fx * 20, p.y + p.fy * 20) === '~') jonSay('water', { cooldown: 40, face: 'worried' });
   if (G.ents.some(e => e.type === 'penguin' && e.alive && dist(e, p) < 70)) jonSay('penguin', { cooldown: 45 });
-  for (const t of ['beetle', 'slime', 'spore', 'guard', 'snowpeng']) if (G.ents.some(e => e.type === t && e.alive && dist(e, p) < 80)) jonSay(t, { cooldown: 70 });
+  for (const t of ['beetle', 'slime', 'varg', 'spider', 'guard', 'snowpeng']) if (G.ents.some(e => e.type === t && e.alive && dist(e, p) < 80)) jonSay(t, { cooldown: 70 });
   // the weather and the hour
   if (G.map.outdoor) {
     if (typeof isNight === 'function' && isNight()) jonSay('night', { cooldown: 150 });

@@ -8,7 +8,7 @@ function startDash() {
   if (!s.items.dash) return floatText(p.x, p.y - 18, 'No dash yet', '#aab');
   if (p.dashCd > 0 || p.dashing > 0) return;
   const l = Math.hypot(p.fx, p.fy) || 1;
-  p.dashing = DASH_TIME; p.dashCd = 0.55; p.dx = p.fx / l; p.dy = p.fy / l; p.dashHit = [];
+  p.dashing = DASH_TIME * (p.fuel > 0 ? 1.7 : 1); p.dashCd = p.fuel > 0 ? 0.35 : 0.55; p.dx = p.fx / l; p.dy = p.fy / l; p.dashHit = [];
   if (!isFinite(p.dx) || !isFinite(p.dy)) { p.dx = 0; p.dy = 1; }
   p.inv = Math.max(p.inv, DASH_TIME + 0.08);
   G.jon.mode = 'follow';

@@ -1,5 +1,7 @@
 # Questions for Owen
 
+Owen answered the first fifty online in October 2026 (Quest Log); his answers are in `story/OWEN_ANSWERS.md` and the canon is in `STORY_BIBLE.md`. The list below is the archive.
+
 Prompts to move the story and the game forward. Ask a few at a time, ideally right after he plays. Write his answers in here (or have him write them) and they become the next build.
 
 Rules of thumb: his journal pages always win over anything already in the game. Short answers are fine. "I don't know yet" is fine too; skip it and come back.
@@ -60,6 +62,13 @@ Rules of thumb: his journal pages always win over anything already in the game. 
 34. Name three Arena upgrade cards. What do they do?
 35. What should the final wave (wave 20) look like?
 36. Should there be a leaderboard? Who are you trying to beat?
+
+## Your page 6 (the Forest Giant) is in the game
+
+54. The giant hides as a tree when he's hurt. Right? What else can a Forest Giant do?
+55. What does the giant say when he loses? Does he become a log again, or something else?
+56. The penguins warned him about you. How did they know you were coming?
+57. Jjorvic Palace: what does the name mean? Who built it?
 
 ## Music
 
