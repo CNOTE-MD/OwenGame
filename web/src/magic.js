@@ -3,11 +3,11 @@
 
 // ---------------- rune spells ----------------
 const SPELLS = {
-  thunder: { name: 'Thunder Strike', cost: 16, icon: 'thunder', desc: 'Lightning hits everything on screen.' },
-  frost: { name: 'Frost Rune', cost: 4, icon: 'frost', desc: 'Freezes enemies near you. Chop for double.' },
-  fire: { name: 'Fire Rune', cost: 3, icon: 'fire', desc: 'A fireball. Burns bushes and grass.' },
+  thunder: { name: 'Thunder Strike', cost: 16, icon: 'thunder', desc: 'Lightning hits every foe.' },
+  frost: { name: 'Frost Rune', cost: 4, icon: 'frost', desc: 'Freezes foes. Chop for 2x.' },
+  fire: { name: 'Fire Rune', cost: 3, icon: 'fire', desc: 'Fireball. Burns grass.' },
   mend: { name: 'Mend Rune', cost: 6, icon: 'mend', desc: 'Heals two hearts.' },
-  leaf: { name: 'Leaf Rune', cost: 5, icon: 'leaf', desc: 'Plants rise and hold enemies near you.' },
+  leaf: { name: 'Leaf Rune', cost: 5, icon: 'leaf', desc: 'Plants hold foes in place.' },
 };
 const SPELL_ORDER = ['thunder', 'frost', 'fire', 'mend', 'leaf'];
 function knownSpells() { return SPELL_ORDER.filter(id => G.save.items[id]); }
@@ -136,15 +136,15 @@ function updateSpellsPage() {
 }
 function drawSpellsPage() {
   const s = G.save, k = knownSpells();
-  R(0, 0, VW, VH, 'rgba(5,5,20,.92)'); R(8, 8, 240, 208, '#ffd84a'); R(10, 10, 236, 204, '#0d0d33');
+  R(0, 0, VW, VH, 'rgba(5,5,20,.92)'); drawPanel(8, 8, 240, 208);
   text('◀ JUKEBOX', 20, 26, '#8a8ab0', 'left', false); text('RUNE SPELLS', 128, 26, '#ffe64d', 'center'); text('BAG ▶', 236, 26, '#8a8ab0', 'right', false);
-  R(20, 36, 8, 60, '#000'); R(21, 37, 6, 58, '#1a2238'); const fill = Math.round(58 * s.rune / RUNE_MAX); R(21, 95 - fill, 6, fill, '#2f8fd0');
-  text(`Rune ${s.rune}/${RUNE_MAX}`, 34, 44, '#7fd4ff', 'left', false);
-  text('Cast with C. Cycle with Q.', 34, 56, '#a79fc4', 'left', false);
+  R(19, 38, 10, 30, '#0a0812'); R(20, 39, 8, 28, '#e8dcb8'); R(21, 40, 6, 26, '#0a0812'); const fill = Math.round(26 * s.rune / RUNE_MAX); if (fill) { R(21, 66 - fill, 6, fill, '#2f8fd0'); R(21, 66 - fill, 2, fill, '#7fd4ff'); }
+  text(`Rune ${s.rune}/${RUNE_MAX}`, 36, 50, '#7fd4ff', 'left', false);
+  text('Cast with C. Cycle with Q.', 36, 62, '#a79fc4', 'left', false);
   if (!k.length) { text('No runes yet. Walter carved them into Jon long ago; find them.', 34, 76, '#55577a', 'left', false); return; }
   SPELL_ORDER.forEach((id, i) => {
-    const y = 80 + i * 26, know = s.items[id], sel = know && k[G.spellSel || 0] === id, eq = equippedSpell() === id;
-    if (sel) R(18, y - 11, 220, 22, '#1a2238');
+    const y = 86 + i * 24, know = s.items[id], sel = know && k[G.spellSel || 0] === id, eq = equippedSpell() === id;
+    if (sel) R(18, y - 11, 220, 22, '#232860');
     R(22, y - 9, 18, 18, '#0d1a2e');
     if (know) { drawItemIcon(SPELLS[id].icon, 31, y); text((eq ? '★ ' : '') + SPELLS[id].name, 46, y - 2, sel ? '#ffd84a' : '#f3ecd2', 'left', false); text(SPELLS[id].desc, 46, y + 8, '#a79fc4', 'left', false); text(`${SPELLS[id].cost}`, 228, y - 2, s.rune >= SPELLS[id].cost ? '#7fd4ff' : '#55577a', 'right', false); }
     else text('???', 46, y + 2, '#55577a', 'left', false);
@@ -168,24 +168,24 @@ function updateBagPage() {
 }
 function drawBagPage() {
   const list = bagEntries();
-  R(0, 0, VW, VH, 'rgba(5,5,20,.92)'); R(8, 8, 240, 208, '#ffd84a'); R(10, 10, 236, 204, '#0d0d33');
+  R(0, 0, VW, VH, 'rgba(5,5,20,.92)'); drawPanel(8, 8, 240, 208);
   text('◀ SPELLS', 20, 26, '#8a8ab0', 'left', false); text('BAG', 128, 26, '#ffe64d', 'center'); text('GEAR ▶', 236, 26, '#8a8ab0', 'right', false);
-  text(`Hearts ${Math.ceil(G.player.hp / 2)}/${G.save.maxHp / 2}   Kroner ${G.save.kr}`, 20, 42, '#f2ebcc', 'left', false);
+  text(`Hearts ${Math.ceil(G.player.hp / 2)}/${G.save.maxHp / 2}   Kroner ${G.save.kr}`, 20, 46, '#f2ebcc', 'left', false);
   if (!list.length) text('Empty. Lars sells salmon. Chests hide charms.', 20, 70, '#55577a', 'left', false);
   list.forEach((e, i) => {
-    const y = 62 + i * 20, sel = i === (G.bagSel || 0);
-    if (sel) R(18, y - 10, 220, 20, '#1a2238');
+    const y = 66 + i * 24, sel = i === (G.bagSel || 0);
+    if (sel) R(18, y - 11, 220, 23, '#232860');
     R(22, y - 8, 16, 16, '#0d1a2e');
-    if (e.kind === 'eat') { const c = CONSUMABLES[e.id]; drawItemIcon(c.icon, 30, y); text(`${c.name}  x${bagCount(e.id)}`, 44, y - 1, sel ? '#ffd84a' : '#f3ecd2', 'left', false); text(c.heal === 99 ? 'Full heal. Jon will have opinions.' : c.heal ? `Heals ${c.heal / 2} hearts` : c.fuel ? 'Longer dashes for a minute' : 'Fills the rune meter', 44, y + 8, '#a79fc4', 'left', false); }
-    else { const c = CHARMS[e.id]; drawItemIcon(c.icon, 30, y); text((charmOn(e.id) ? '★ ' : '') + c.name, 44, y - 1, sel ? '#ffd84a' : '#f3ecd2', 'left', false); text(c.desc, 44, y + 8, '#a79fc4', 'left', false); }
+    if (e.kind === 'eat') { const c = CONSUMABLES[e.id]; drawItemIcon(c.icon, 30, y); text(`${c.name}  x${bagCount(e.id)}`, 44, y - 2, sel ? '#ffd84a' : '#f3ecd2', 'left', false); text(c.heal === 99 ? 'Full heal. Jon will have opinions.' : c.heal ? `Heals ${c.heal / 2} hearts` : c.fuel ? 'Longer dashes for a minute' : 'Fills the rune meter', 44, y + 9, '#a79fc4', 'left', false); }
+    else { const c = CHARMS[e.id]; drawItemIcon(c.icon, 30, y); text((charmOn(e.id) ? '★ ' : '') + c.name, 44, y - 2, sel ? '#ffd84a' : '#f3ecd2', 'left', false); text(c.desc, 44, y + 9, '#a79fc4', 'left', false); }
   });
   if (G.bagMsg) { R(14, 186, 228, 14, '#1a2238'); text(G.bagMsg.text, 128, 196, '#9be08a', 'center', false); }
-  text('Z: eat / wear     ★ worn (one charm at a time)', 128, 212, '#8a8ab0', 'center', false);
+  text('Z eat or wear · ★ worn · one charm at a time', 128, 210, '#8a8ab0', 'center', false);
 }
 // the HUD: equipped spell in the item box, cost pips, worn charm
 function drawSpellBox() {
   const s = G.save, id = equippedSpell();
-  R(17, 2, 20, 19, '#ffd84a'); R(18, 3, 18, 17, '#0d0d33');
+  R(16, 1, 23, 23, '#0a0812'); R(17, 2, 21, 21, '#e8dcb8'); R(18, 3, 19, 19, '#0a0812'); R(19, 4, 17, 17, '#232860'); R(19, 4, 17, 6, '#2c3274');
   if (id) {
     const sp = SPELLS[id], ok = s.rune >= sp.cost;
     ctx.globalAlpha = ok ? 1 : 0.4; drawItemIcon(sp.icon, 27, 12); ctx.globalAlpha = 1;

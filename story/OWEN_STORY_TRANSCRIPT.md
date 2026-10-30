@@ -43,3 +43,11 @@ Notes: the flight attendant was a dream (so the Red-Eye is a nightmare, not real
 (Teacher's notes in the margin: "Yikes!" and "Quite the cliffhanger".)
 
 Notes: the log IS the Forest Giant of the North (they hide as trees and logs; they hate humans for chopping trees; club the size of a narrow building). The palace of penguins is named JJORVIC palace. The penguins warned the giant about Owen. Jon wants the big boss fight scene.
+
+## Page 7 (chapter 2 continued)
+
+Those next few minutes were a blur to me. The giant swings, I dodge, I swing, I miss, Jon sings, I tell him to be quiet, and so on. When I felt tired, I accidentally made the time-out signal, which I guess is a sign of war for giants, so he didn't stop. Just then, a hint of knowledge came to my noggin. I remembered that the north giants literally despised the south giants, and the same with the east and west, so they had a war in which north sided with east, and south sided with west. Ever since, east has liked north, and north liked east, etc., etc. So I gathered my wits...
+
+(Teacher's notes: "minute?", "quiet", "Why the big spaces?", "Quite the cliffhanger!")
+
+Notes: the giant fight is a blur of swings and misses; Jon sings mid-fight and Owen tells him to be quiet; Owen, tired, accidentally makes the time-out signal (a T), which giants take as a sign of war. Giant lore: North giants despise South giants, East despise West; in their war North sided with East and South with West; ever since, East and North like each other. The page ends as Owen gathers his wits: how he uses this is the next page.

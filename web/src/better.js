@@ -125,5 +125,5 @@ function deed(k, n = 1) { if (!G.save || G.mode === 'arena') return; const d = G
 function drawDeeds() {
   const d = (G.save && G.save.deeds) || {};
   const mins = Math.floor((d.seconds || 0) / 60);
-  text(`Chops ${d.kills || 0}   Best combo x${d.combo || 0}   Naps ${d.deaths || 0}   ${mins} min`, 20, 220, '#8a8ab0', 'left', false);
+  text(`Chops ${d.kills || 0}   Best combo x${d.combo || 0}   Naps ${d.deaths || 0}   ${mins} min`, 20, 206, '#8a8ab0', 'left', false);
 }

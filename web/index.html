@@ -18,7 +18,7 @@
   body { margin: 0; padding-inline: 16px; padding-block: 16px 24px; font-family: var(--pixel); font-size: 10px; line-height: 1.7; }
   main { max-width: 768px; margin-inline: auto; display: flex; flex-direction: column; gap: 14px; }
   .screen { position: relative; width: 100%; aspect-ratio: 8 / 7; background: #000; border: 3px solid var(--panel); outline: 2px solid var(--axe); }
-  canvas { display: block; width: 100%; height: 100%; image-rendering: pixelated; image-rendering: crisp-edges; touch-action: none; }
+  canvas { display: block; width: 100%; height: 100%; image-rendering: auto; touch-action: none; }
   .legend { display: flex; flex-wrap: wrap; gap: 8px 20px; color: var(--muted); }
   .legend b { color: var(--gold); font-weight: normal; }
   .pad { display: none; justify-content: space-between; align-items: center; gap: 16px; user-select: none; -webkit-user-select: none; }
@@ -564,15 +564,15 @@ const MAPS = {
 "TTTTTT.s..TTTTTTTTTTTT,s,,TTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTT",
 "TTTTTT.s..TTTTTTTTTTTT.s..TTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTT",
 "TT.....s.......TT......s.......TT.....ss.......TT#.....s....lllT",
-"TTRRRRR.s......TT..RRRRRR......TT..sssssssssss.TT..#...s...lMMMT",
-"TTRRRRR.s..RRRRTT..RRRRRR...f..TT..s~~~~~~~~~s.TT......s...lMXMT",
-"TTHHDHH.s..RRRRTT..HHHHHH......TT..s~~~~~~~~~s.TT....#.s...lMsMT",
-"TT......s..HHDHTT..xQ.Q.Qx.........s~~~~~~~~~s.........s....ssTT",
-"TTff....sssssssssssssssssssssss.ssss~~~~~~~~~sssssssssssssssssTT",
-"TT......s...............s..........s~~~~~~~~~s.........s......TT",
-"TT.x.x..s..f.......f....s..........s~~~~~~~~~s.....#...s...#..TT",
-"TT......s....,,.T.......s....b.TT..s~~~~~~~~~s.TT......s......TT",
-"TT.b....s....b,TT..b....s......TT..sssssssssss.TT.#....s....#.TT",
+"TTRRRRR.s......TT..RRRRRR......TT....ssssss....TT..#...s...lMMMT",
+"TTRRRRR.s..RRRRTT..RRRRRR...f..TT..sss~~~~ss.f.TT......s...lMXMT",
+"TTHHDHH.s..RRRRTT..HHHHHH......TT.ss~~~~~~~ss..TT....#.s...lMsMT",
+"TT......s..HHDHTT..xQ.Q.Qx........s~~~~~~~~~s..........s....ssTT",
+"TTff....sssssssssssssssssssssss.sss~~~~~~~~~ssssssssssssssssssTT",
+"TT......s...............s.........ss~~~~~~~~s..........s......TT",
+"TT.x.x..s..f.......f....s..........ss~~~~~~ss......#...s...#..TT",
+"TT......s....,,.T.......s....b.TT...ss~~~~ss...TT......s......TT",
+"TT.b....s....b,TT..b....s......TT....ssssss....TT.#....s....#.TT",
 "T,,.....s....,,TT.......s......TT......s.......TT......s......TT",
 "T,,,....s......TT.......s......TT..T...s....T..TT......s..#...TT",
 "TTTTTT.s..TTTTTTTTTTTT.s..TTTTTTTTTTTT.s..TTTTTTTTTTTT.s..TTTTTT",
@@ -2347,6 +2347,30 @@ const STORY = {
     ['Jon', 'Three good chops. Swing me at it. This is my moment.'],
   ],
   log_wakes: [['', 'The third chop lands. The log... shudders. Bark cracks. Two red eyes open in the wood.'], ['', 'The log stands up. And up. And UP.']],
+  giant_blur: [
+    ['Owen', 'Those next few minutes were a blur to me. The giant swings, I dodge, I swing, I miss...'],
+    ['Jon', '*singing* Ahh-ahh-AHHHH-ahh! Stairway to VALHALLAAAA—'],
+    ['Owen', 'Jon. Be quiet.'],
+    ['Jon', '...stairway to valhalla. (quietly)'],
+  ],
+  giant_timeout: [
+    ['Owen', 'When I felt tired, I accidentally made the time-out signal.'],
+    ['', 'Owen\'s hands make a T.'],
+    ['Forest Giant', 'A "T"?! THE SIGN OF WAR! SO BE IT, TREE-CHOPPER!'],
+    ['Owen', 'Which I guess is a sign of war for giants. So he didn\'t stop.'],
+    ['Jon', 'You made a T. Why did you make a T?!'],
+    ['Owen', 'I was TIRED!'],
+    ['Jon', 'He\'s faster now. Great. Love that. Dodge everything.'],
+  ],
+  giant_lore: [
+    ['Owen', 'Just then, a hint of knowledge came to my noggin.'],
+    ['Owen', 'I remembered that the north giants literally despised the south giants, and the same with the east and west.'],
+    ['Owen', 'So they had a war, in which north sided with east, and south sided with west.'],
+    ['Owen', 'Ever since, east has liked north, and north liked east, etc., etc.'],
+    ['Owen', 'So I gathered my wits...'],
+    ['Jon', '...and? AND?? What\'s the plan, Señor?'],
+    ['Owen', 'Still gathering.'],
+  ],
   giant_hide: [['Forest Giant', 'ENOUGH. You will never find me among my brothers.'], ['', 'He steps backward into the forest and is gone. Three trees stand where there were none.'], ['Jon', 'One of those trees is HIM. Throw me at the one that can\'t hold still!']],
   giant_down: [['Forest Giant', 'The penguins... said... you were small...'], ['', 'The Forest Giant of the North topples, slowly, like a tree. Then he shrinks, and stiffens, and turns back into a log.'], ['', 'The log rolls off the path, bumps into a bush, and starts to snore.'], ['Jon', 'TIMBER! For REAL this time! Did you see that? Did you SEE that?'], ['Owen', 'I saw it, Jon.'], ['Jon', 'Big boss fight scene: complete. Jjorvic Palace is east, through the snow. Let\'s go wreck it.']],
   log_chopped: [['Jon', 'TIMBER!']],
@@ -2550,9 +2574,21 @@ const ITEMS = {
 // ===== engine.js =====
 // Screen, input, sound and drawing helpers.
 const T = 16, SW = 16, SH = 14, VW = 256, VH = 224;
-const cv = document.getElementById('g');
-const ctx = cv.getContext('2d');
+const cv = document.getElementById('g');        // the screen the player sees (and touches)
+// The game draws at the SNES's 256x224 into an offscreen buffer. Each frame it is copied to the screen
+// at a whole-number scale (crisp, every pixel the same size), and the browser smooths only the last
+// small fraction. That keeps one-pixel lines and letters from vanishing at odd window sizes.
+const buf = document.createElement('canvas'); buf.width = 256; buf.height = 224;
+const ctx = buf.getContext('2d');
 ctx.imageSmoothingEnabled = false;
+const dctx = cv.getContext('2d');
+let PRESCALE = 1;
+function fitScreen() {
+  const r = cv.getBoundingClientRect();
+  const k = clamp(Math.ceil(((r.width || 256) * (window.devicePixelRatio || 1)) / 256), 1, 8);
+  if (k !== PRESCALE || cv.width !== 256 * k) { PRESCALE = k; cv.width = 256 * k; cv.height = 224 * k; }
+}
+function present() { dctx.imageSmoothingEnabled = false; dctx.drawImage(buf, 0, 0, cv.width, cv.height); }
 const FONT = '8px "Press Start 2P", ui-monospace, Menlo, Consolas, monospace';
 
 const clamp = (v, a, b) => Math.max(a, Math.min(b, v));
@@ -2747,21 +2783,7 @@ function poly(pts, fill, stroke) {
   if (fill) { ctx.fillStyle = fill; ctx.fill(); }
   if (stroke) { ctx.strokeStyle = stroke; ctx.lineWidth = 1; ctx.stroke(); }
 }
-function text(s, x, y, color = '#fff', align = 'left', shadow = true) {
-  ctx.font = FONT; ctx.textAlign = align;
-  if (shadow) { ctx.fillStyle = '#000'; ctx.fillText(s, x + 1, y + 1); }
-  ctx.fillStyle = color; ctx.fillText(s, x, y);
-}
-function wrap(s, maxW) {
-  ctx.font = FONT;
-  const out = []; let line = '';
-  for (const w of s.split(' ')) {
-    const t = line ? line + ' ' + w : w;
-    if (ctx.measureText(t).width > maxW && line) { out.push(line); line = w; } else line = t;
-  }
-  if (line) out.push(line);
-  return out;
-}
+// text(), wrap(), textWidth() and drawPanel() live in pixelfont.js
 const hash = (x, y) => Math.floor(Math.abs(Math.sin(x * 12.9898 + y * 78.233) * 43758.5453)) % 100;
 const HEART = [' ## ## ', '#######', '#######', ' ##### ', '  ###  ', '   #   '];
 function drawHeart(x, y, fill, color = '#f22633') {
@@ -2770,6 +2792,115 @@ function drawHeart(x, y, fill, color = '#f22633') {
     const lit = fill >= 1 || (fill > 0 && xx < 4);
     R(x + xx, y + yy, 1, 1, lit ? color : '#3a1820');
   }));
+}
+
+// ===== pixelfont.js =====
+// A hand-built bitmap font, so every word in the game is crisp pixels instead of a smoothed
+// system font. Rows top to bottom: rows 0-6 sit on the baseline (caps are 7 tall, lowercase 5),
+// rows 7-8 are descenders. Glyphs shorter than 7 rows are top-aligned.
+const PF_GLYPHS = {
+  A: '.###./#...#/#...#/#####/#...#/#...#/#...#', B: '####./#...#/#...#/####./#...#/#...#/####.', C: '.###./#...#/#..../#..../#..../#...#/.###.',
+  D: '####./#...#/#...#/#...#/#...#/#...#/####.', E: '#####/#..../#..../####./#..../#..../#####', F: '#####/#..../#..../####./#..../#..../#....',
+  G: '.###./#...#/#..../#.###/#...#/#...#/.####', H: '#...#/#...#/#...#/#####/#...#/#...#/#...#', I: '###/.#./.#./.#./.#./.#./###',
+  J: '..###/...#./...#./...#./#..#./#..#./.##..', K: '#...#/#..#./#.#../##.../#.#../#..#./#...#', L: '#..../#..../#..../#..../#..../#..../#####',
+  M: '#...#/##.##/#.#.#/#.#.#/#...#/#...#/#...#', N: '#...#/##..#/#.#.#/#..##/#...#/#...#/#...#', O: '.###./#...#/#...#/#...#/#...#/#...#/.###.',
+  P: '####./#...#/#...#/####./#..../#..../#....', Q: '.###./#...#/#...#/#...#/#.#.#/#..#./.##.#', R: '####./#...#/#...#/####./#.#../#..#./#...#',
+  S: '.####/#..../#..../.###./....#/....#/####.', T: '#####/..#../..#../..#../..#../..#../..#..', U: '#...#/#...#/#...#/#...#/#...#/#...#/.###.',
+  V: '#...#/#...#/#...#/#...#/#...#/.#.#./..#..', W: '#...#/#...#/#...#/#.#.#/#.#.#/##.##/#...#', X: '#...#/#...#/.#.#./..#../.#.#./#...#/#...#',
+  Y: '#...#/#...#/.#.#./..#../..#../..#../..#..', Z: '#####/....#/...#./..#../.#.../#..../#####',
+  a: '...../...../.###./....#/.####/#...#/.####', b: '#..../#..../####./#...#/#...#/#...#/####.', c: '...../...../.####/#..../#..../#..../.####',
+  d: '....#/....#/.####/#...#/#...#/#...#/.####', e: '...../...../.###./#...#/#####/#..../.###.', f: '..##/.#../.#../###./.#../.#../.#..',
+  g: '...../...../.####/#...#/#...#/#...#/.####/....#/.###.', h: '#..../#..../####./#...#/#...#/#...#/#...#', i: '#/./#/#/#/#/#',
+  j: '..#/.../..#/..#/..#/..#/..#/#.#/.#.', k: '#.../#.../#..#/#.#./##../#.#./#..#', l: '#./#./#./#./#./#./.#',
+  m: '...../...../##.#./#.#.#/#.#.#/#.#.#/#.#.#', n: '...../...../####./#...#/#...#/#...#/#...#', o: '...../...../.###./#...#/#...#/#...#/.###.',
+  p: '...../...../####./#...#/#...#/#...#/####./#..../#....', q: '...../...../.####/#...#/#...#/#...#/.####/....#/....#',
+  r: '..../..../#.##/##../#.../#.../#...', s: '...../...../.####/#..../.###./....#/####.', t: '.#../.#../####/.#../.#../.#../..##',
+  u: '...../...../#...#/#...#/#...#/#...#/.####', v: '...../...../#...#/#...#/#...#/.#.#./..#..', w: '...../...../#...#/#...#/#.#.#/#.#.#/.#.#.',
+  x: '...../...../#...#/.#.#./..#../.#.#./#...#', y: '...../...../#...#/#...#/#...#/#...#/.####/....#/.###.', z: '...../...../#####/...#./..#../.#.../#####',
+  0: '.###./#...#/#..##/#.#.#/##..#/#...#/.###.', 1: '..#../.##../..#../..#../..#../..#../.###.', 2: '.###./#...#/....#/...#./..#../.#.../#####',
+  3: '#####/...#./..#../...#./....#/#...#/.###.', 4: '...#./..##./.#.#./#..#./#####/...#./...#.', 5: '#####/#..../####./....#/....#/#...#/.###.',
+  6: '..##./.#.../#..../####./#...#/#...#/.###.', 7: '#####/....#/...#./..#../.#.../.#.../.#...', 8: '.###./#...#/#...#/.###./#...#/#...#/.###.',
+  9: '.###./#...#/#...#/.####/....#/...#./.##..',
+  '.': '././././././#', ',': '././././././#/#', '!': '#/#/#/#/#/./#', '?': '.###./#...#/....#/...#./..#../...../..#..',
+  ':': '././#/./././#', ';': '././#/./././#/#', "'": '#/#', '"': '#.#/#.#', '-': '..../..../..../####', '+': '...../..#../..#../#####/..#../..#..',
+  '(': '.#/#./#./#./#./#./.#', ')': '#./.#/.#/.#/.#/.#/#.', '/': '....#/...#./...#./..#../.#.../.#.../#....', '&': '.##../#..#./#.#../.#.../#.#.#/#..#./.##.#',
+  '*': '...../#.#.#/.###./#####/.###./#.#.#', '=': '...../...../#####/...../#####', '%': '##..#/##.#./...#./..#../.#.../.#.##/#..##',
+  '#': '.#.#./#####/.#.#./.#.#./#####/.#.#.', '_': '...../...../...../...../...../...../#####', '<': '.../..#/.#./#../.#./..#', '>': '.../#../.#./..#/.#./#..',
+  '[': '##/#./#./#./#./#./##', ']': '##/.#/.#/.#/.#/.#/##', '|': '#/#/#/#/#/#/#', '~': '...../...../.#..#/#.##./', '$': '..#../.####/#.#../.###./..#.#/####./..#..',
+  '▼': '...../...../#####/.###./..#..', '▶': '.../#../##./###/##./#..', '◀': '.../..#/.##/###/.##/..#', '▲': '...../..#../.###./#####',
+  '♥': '...../##.##/#####/#####/.###./..#..', '★': '..#../..#../#####/.###./.#.#./#...#', '✓': '...../....#/...#./#.#../.#...',
+  '♪': '..##/..#./..#./..#./###./###.', '½': '#..../#..#./#.#../..##./.#..#/#...#/...##', '·': './././#', '…': '...../...../...../...../...../...../#.#.#',
+  '→': '...../..#../...#./#####/...#./..#..', 'Ø': '.###./#..##/#.#.#/#.#.#/#.#.#/##..#/.###.', 'ø': '...../...../.###./#..##/#.#.#/##..#/.###.',
+  'Ö': '#...#/.###./#...#/#...#/#...#/#...#/.###.', 'ö': '.#.#./...../.###./#...#/#...#/#...#/.###.', 'ü': '.#.#./...../#...#/#...#/#...#/#...#/.####',
+  'ñ': '.##.#/#.##./####./#...#/#...#/#...#/#...#', 'á': '...#./..#../.###./....#/.####/#...#/.####', 'é': '...#./..#../.###./#...#/#####/#..../.###.',
+  'í': '.#/#./../.#/.#/.#/.#', 'ó': '...#./..#../.###./#...#/#...#/#...#/.###.', 'ú': '...#./..#../#...#/#...#/#...#/#...#/.####',
+  '¡': '#/./#/#/#/#/#', '¿': '..#../...../..#../.#.../#..../#...#/.###.', '—': '..../..../..../####', '–': '..../..../..../####', '’': '#/#', '‘': '#/#', '“': '#.#/#.#', '”': '#.#/#.#',
+};
+const PF = { map: new Map(), atlas: null, tint: new Map(), H: 9 };
+(function buildPixelFont() {
+  let x = 0; const list = [];
+  for (const ch in PF_GLYPHS) {
+    const rows = PF_GLYPHS[ch].split('/'); const w = Math.max(...rows.map(r => r.length));
+    while (rows.length < 7) rows.push('.'.repeat(w));
+    while (rows.length < 9) rows.push('.'.repeat(w));
+    list.push({ ch, rows, w, x }); PF.map.set(ch, { x, w }); x += w + 1;
+  }
+  PF.map.set(' ', { x: -1, w: 3 });
+  const c = document.createElement('canvas'); c.width = x; c.height = PF.H;
+  const g = c.getContext('2d'); g.fillStyle = '#fff';
+  for (const gl of list) gl.rows.forEach((r, y) => [...r].forEach((p, i) => { if (p === '#') g.fillRect(gl.x + i, y, 1, 1); }));
+  PF.atlas = c;
+})();
+function pfTint(color) {
+  let c = PF.tint.get(color);
+  if (!c) {
+    c = document.createElement('canvas'); c.width = PF.atlas.width; c.height = PF.H;
+    const g = c.getContext('2d'); g.drawImage(PF.atlas, 0, 0); g.globalCompositeOperation = 'source-in'; g.fillStyle = color; g.fillRect(0, 0, c.width, c.height);
+    PF.tint.set(color, c);
+  }
+  return c;
+}
+function pfGlyph(ch) { return PF.map.get(ch) || PF.map.get(ch.normalize('NFD')[0]) || PF.map.get('?'); }
+function textWidth(s, scale = 1) {
+  let w = 0; for (const ch of String(s)) w += pfGlyph(ch).w + 1;
+  return Math.max(0, w - 1) * scale;
+}
+function pfRun(s, x, y, color, scale) {
+  const img = pfTint(color);
+  for (const ch of s) {
+    const g = pfGlyph(ch);
+    if (g.x >= 0) ctx.drawImage(img, g.x, 0, g.w, PF.H, x, y - 7 * scale, g.w * scale, PF.H * scale);
+    x += (g.w + 1) * scale;
+  }
+}
+// shadow: true = drop shadow, 'outline' = full dark outline, false = none
+function text(s, x, y, color = '#fff', align = 'left', shadow = true, scale = 1) {
+  s = String(s);
+  const w = textWidth(s, scale);
+  x = Math.round(align === 'center' ? x - w / 2 : align === 'right' ? x - w : x); y = Math.round(y);
+  if (shadow === 'outline') { for (const [dx, dy] of [[-1, 0], [1, 0], [0, -1], [0, 1], [1, 1]]) pfRun(s, x + dx * scale, y + dy * scale, '#120e1c', scale); }
+  else if (shadow) pfRun(s, x + scale, y + scale, '#120e1c', scale);
+  pfRun(s, x, y, color, scale);
+}
+function wrap(s, maxW) {
+  const out = []; let line = '';
+  for (const w of String(s).split(' ')) {
+    const t = line ? line + ' ' + w : w;
+    if (textWidth(t) > maxW && line) { out.push(line); line = w; } else line = t;
+  }
+  if (line) out.push(line);
+  return out;
+}
+// One frame style for every window: dark outline, a bone border, a gold rivet in each corner, and a navy field with a lighter top.
+function drawPanel(x, y, w, h, opts = {}) {
+  const edge = opts.edge || '#e8dcb8', field = opts.field || '#14163a', top = opts.top || '#1e2250';
+  R(x, y, w, h, '#0a0812');
+  R(x + 1, y + 1, w - 2, h - 2, edge);
+  R(x + 2, y + 2, w - 4, h - 4, '#0a0812');
+  R(x + 3, y + 3, w - 6, h - 6, field);
+  R(x + 3, y + 3, w - 6, Math.min(10, h - 6), top);
+  R(x + 3, y + 3, w - 6, 1, 'rgba(255,255,255,.08)');
+  if (!opts.plain) for (const [cx, cy] of [[x, y], [x + w - 4, y], [x, y + h - 4], [x + w - 4, y + h - 4]]) { R(cx, cy, 4, 4, '#0a0812'); R(cx + 1, cy + 1, 2, 2, '#ffd84a'); }
 }
 
 // ===== music.js =====
@@ -5526,15 +5657,14 @@ function jonFaceNow() {
 
 function drawJonBubble(x, y) {
   if (JT.t <= 0 || !JT.line || G.state !== 'play') return;
-  ctx.font = FONT;
   const lines = wrap(JT.line, 150).slice(0, 3);
-  const w = Math.max(...lines.map(l => Math.ceil(ctx.measureText(l).width))) + 8, h = lines.length * 10 + 4;
+  const w = Math.max(...lines.map(l => textWidth(l))) + 10, h = lines.length * 10 + 5;
   const bx = clamp(Math.round(x - w / 2), 2, VW - w - 2), by = clamp(Math.round(y - 22 - h), 24, VH - h - 4);
   ctx.globalAlpha = Math.min(1, JT.t * 3);
   R(bx - 1, by - 1, w + 2, h + 2, OUTLINE); R(bx, by, w, h, '#fffbe8');
   const tx = clamp(Math.round(x), bx + 4, bx + w - 6);
   R(tx, by + h, 4, 2, '#fffbe8'); R(tx + 1, by + h + 2, 2, 2, '#fffbe8'); R(tx - 1, by + h, 1, 2, OUTLINE); R(tx + 4, by + h, 1, 2, OUTLINE);
-  lines.forEach((l, i) => text(l, bx + 4, by + 10 + i * 10, '#2a1a10', 'left', false));
+  lines.forEach((l, i) => text(l, bx + 5, by + 10 + i * 10, '#2a1a10', 'left', false));
   ctx.globalAlpha = 1;
 }
 
@@ -5623,11 +5753,10 @@ function drawJonLevel() {
 // JON page of the gear menu
 function drawJonPage() {
   drawJonPageBody();
-  text('◀ GEAR', 20, 206, '#8a8ab0', 'left', false); text('MAP ▶', 236, 206, '#8a8ab0', 'right', false);
 }
 function drawJonPageBody() {
   const d = jonData();
-  R(0, 0, VW, VH, 'rgba(5,5,20,.92)'); R(8, 8, 240, 208, '#ffd84a'); R(10, 10, 236, 204, '#0d0d33');
+  R(0, 0, VW, VH, 'rgba(5,5,20,.92)'); drawPanel(8, 8, 240, 208);
   text('JON', 20, 26, '#ffe64d'); text('◀ GEAR', 236, 26, '#8a8ab0', 'right', false);
   drawJonSprite(36, 56, Math.sin(G.t * 2) * 0.2, G.t % 3.2 < 0.14, jonFaceNow());
   text('Level ' + d.lvl + (d.lvl >= JON_MAX ? ' (max)' : ''), 56, 48, '#fff');
@@ -5867,7 +5996,7 @@ function drawSnesEnemy(e, x, y) {
 const TABLET_TOTAL = 8;
 const TABLETS = {
   tab_coast: 'Rune tablet: "HANK WAS HERE. HANK THREW THE AXE. HANK IS SORRY."',
-  tab_hills: 'Rune tablet: "The smith\'s name is a vegetable. Do not laugh. He hears."',
+  tab_hills: 'Rune tablet: "The giants\' war: North and East against South and West. North despises South. East despises West. East and North are friends to this day."',
   tab_lake: 'Rune tablet: "The lake keeps what the lake is given. Unless you have Viking blood. Then it spits."',
   tab_grave: 'Rune tablet: "Chilly cannot stand the sun. He is part vampire and all penguin. In daylight his skin falls off. So he sends birds that cannot fly."',
   tab_volcano: 'Rune tablet: "Names have power. That is why nobody says the smith\'s. Behind the forge door: his notes, and a monster made of tin that guards them."',
@@ -5891,7 +6020,7 @@ function markSeen() { if (G.mapId === 'overworld') setFlag(`seen:${G.scr.x},${G.
 const SCREEN_NAMES = { '0,0': 'Foothills', '1,0': 'Muck Forest', '2,0': 'Frozen Path', '3,0': 'Storm Peak', '0,1': 'Fjordvik', '1,1': 'Market', '2,1': 'Lake Jöntuka', '3,1': 'Volcano Road', '0,2': 'Fjord Coast', '1,2': 'Airstrip', '2,2': 'The Beach', '3,2': 'Graveyard' };
 function drawMapPage() {
   const s = G.save;
-  R(0, 0, VW, VH, 'rgba(5,5,20,.92)'); R(8, 8, 240, 208, '#ffd84a'); R(10, 10, 236, 204, '#0d0d33');
+  R(0, 0, VW, VH, 'rgba(5,5,20,.92)'); drawPanel(8, 8, 240, 208);
   text('◀ JON', 20, 26, '#8a8ab0', 'left', false); text('MAP OF NORWAY', 128, 26, '#ffe64d', 'center'); text('GEAR ▶', 236, 26, '#8a8ab0', 'right', false);
   const ox = 32, oy = 40, cw = 48, ch = 34;
   for (let y = 0; y < 3; y++) for (let x = 0; x < 4; x++) {
@@ -5912,12 +6041,12 @@ function drawMapPage() {
   const here = G.mapId === 'overworld' ? SCREEN_NAMES[`${G.scr.x},${G.scr.y}`] : G.map.name;
   text(here || '', 128, 150, '#fff', 'center');
   const h = clockHour(), hh = Math.floor(h), mm = Math.floor((h - hh) * 60);
-  text(`${phaseOfDay().toUpperCase()}  ${hh % 12 || 12}:${String(mm).padStart(2, '0')} ${hh < 12 ? 'AM' : 'PM'}`, 128, 164, '#a79fc4', 'center', false);
+  text(`${phaseOfDay().toUpperCase()}  ${hh % 12 || 12}:${String(mm).padStart(2, '0')} ${hh < 12 ? 'AM' : 'PM'}`, 128, 160, '#a79fc4', 'center', false);
   const pieces = ['hp_forest', 'hp_grave', 'c_cave', 'hp_bjarne'].filter(k => flag('got:' + k) || flag('chest:' + k)).length;
   const conts = ['hc_cavern', 'hc_barrow', 'hc_redeye', 'hc_tablets'].filter(k => flag('got:' + k)).length;
-  text(`Heart pieces ${pieces}/4   Containers ${conts}/4`, 20, 184, '#f2ebcc', 'left', false);
-  text(`Rune tablets ${tabletsFound()}/${TABLET_TOTAL}` + (tabletsFound() >= TABLET_TOTAL ? '  ✓' : ''), 20, 196, '#c8e8ff', 'left', false);
-  text('Side quests ' + ['bjarne_done', 'sven_done'].filter(flag).length + '/2   Chapters ' + (flag('d2done') ? 3 : flag('d1done') ? 2 : 1) + ' of 5', 20, 208, '#f2ebcc', 'left', false);
+  text(`Heart pieces ${pieces}/4   Containers ${conts}/4`, 20, 174, '#f2ebcc', 'left', false);
+  text(`Rune tablets ${tabletsFound()}/${TABLET_TOTAL}` + (tabletsFound() >= TABLET_TOTAL ? '  ✓' : ''), 20, 184, '#c8e8ff', 'left', false);
+  text('Side quests ' + ['bjarne_done', 'sven_done'].filter(flag).length + '/2   Chapters ' + (flag('d2done') ? 3 : flag('d1done') ? 2 : 1) + ' of 5', 20, 194, '#f2ebcc', 'left', false);
   drawDeeds();
   const ot = objectiveTarget(); if (ot) { const OX = 32 + Math.floor(ot.x / 16) * 48 + 20, OY = 40 + Math.floor(ot.y / 14) * 34 + 14; if (Math.floor(G.t * 4) % 2) { text('!', OX, OY + 4, '#000', 'center'); text('!', OX - 1, OY + 3, '#ffd84a', 'center'); } }
 }
@@ -6014,8 +6143,8 @@ function drawBossCard() {
   ctx.globalAlpha = 1 - out;
   const slide = Math.round((1 - k) * 40);
   R(0, 86, VW, 44, 'rgba(0,0,0,0.72)'); R(0, 86, VW, 1, '#ffd84a'); R(0, 129, VW, 1, '#ffd84a');
-  ctx.font = '12px "Press Start 2P", ui-monospace, Menlo, monospace'; ctx.textAlign = 'center';
-  ctx.fillStyle = '#000'; ctx.fillText(c.name, VW / 2 + 2 - slide, 108); ctx.fillStyle = Math.floor(c.t * 10) % 2 && c.t < 0.8 ? '#fff' : '#ff6b6b'; ctx.fillText(c.name, VW / 2 - slide, 106);
+  const sc = textWidth(c.name, 2) > 236 ? 1 : 2;
+  text(c.name, VW / 2 - slide, 110, Math.floor(c.t * 10) % 2 && c.t < 0.8 ? '#ffffff' : '#ff6b6b', 'center', 'outline', sc);
   text(c.sub, VW / 2 + slide, 122, '#f3ecd2', 'center', false);
   ctx.globalAlpha = 1;
 }
@@ -6058,18 +6187,18 @@ function updateJukebox() {
 }
 function drawJukebox() {
   const list = jukeList();
-  R(0, 0, VW, VH, 'rgba(5,5,20,.92)'); R(8, 8, 240, 208, '#ffd84a'); R(10, 10, 236, 204, '#0d0d33');
+  R(0, 0, VW, VH, 'rgba(5,5,20,.92)'); drawPanel(8, 8, 240, 208);
   text('◀ MAP', 20, 26, '#8a8ab0', 'left', false); text('JUKEBOX', 128, 26, '#ffe64d', 'center'); text('GEAR ▶', 236, 26, '#8a8ab0', 'right', false);
   const heard = list.filter(id => flag('heard:' + id)).length;
-  text(`${heard}/${list.length} songs found. Hear them in the world to unlock.`, 128, 40, '#a79fc4', 'center', false);
+  text(`${heard} of ${list.length} songs found`, 128, 44, '#a79fc4', 'center', false);
   list.forEach((id, i) => {
-    const y = 54 + i * 11, sel = i === (G.jukeSel || 0), got = flag('heard:' + id), playing = G.jukebox === id;
+    const y = 57 + i * 10, sel = i === (G.jukeSel || 0), got = flag('heard:' + id), playing = G.jukebox === id;
     const nm = got ? SCORE[id].name.replace(/ \(.*\)$/, '') : '???';
-    if (sel) R(18, y - 8, 220, 11, '#1a2238');
+    if (sel) R(18, y - 8, 220, 10, '#232860');
     text((sel ? '> ' : '  ') + nm, 22, y, !got ? '#55577a' : sel ? '#ffd84a' : '#f3ecd2', 'left', false);
     if (playing) { const b = Math.floor(G.t * 8) % 4; text('♪'.repeat(1 + b), 230, y, '#9be08a', 'right', false); }
   });
-  text('Z: play / stop     Enter: close', 128, 212, '#8a8ab0', 'center', false);
+  text('Find songs in the world · Z plays', 128, 210, '#8a8ab0', 'center', false);
 }
 
 // ---------------- Snow Penguins and Royal Guards ----------------
@@ -6128,8 +6257,24 @@ function drawTitleExtras() {
   const fx = ((t * 60) % (VW + 200)) - 100, fy = 30 + Math.sin(t * 3) * 6;
   if (fx > -40 && fx < VW + 40) { drawJonSprite(fx, fy, t * 10, false); for (let i = 1; i < 5; i++) R(fx - i * 9, fy + Math.sin(t * 9 + i) * 3, 2, 2, `rgba(255,216,74,${0.6 - i * 0.12})`); }
   // logo glow pulse
-  const g = 0.5 + 0.5 * Math.sin(t * 2);
-  ctx.globalAlpha = 0.25 * g; R(VW / 2 - 90, 44, 180, 22, '#8fd0ff'); ctx.globalAlpha = 1;
+
+}
+
+// ---------------- ice glints ----------------
+// Light skates across the palace's ice floors: a few tiles at a time catch a diagonal sparkle.
+function drawIceGlints() {
+  if (!G.map || !(G.map.palace || G.mapId === 'cavern')) return;
+  const x0 = Math.floor(G.cam.x / T), y0 = Math.floor(G.cam.y / T), t = G.t;
+  for (let ty = y0; ty <= y0 + SH; ty++) for (let tx = x0; tx <= x0 + SW; tx++) {
+    if (tile(tx, ty) !== 'i') continue;
+    const ph = (t * 0.6 + hash(tx, ty) / 100 * 7) % 7;
+    if (ph > 0.5) continue;
+    const k = ph / 0.5, ox = tx * T - G.cam.x, oy = ty * T - G.cam.y;
+    ctx.globalAlpha = 0.65 * Math.sin(k * Math.PI);
+    for (let i = 0; i < 5; i++) R(Math.round(ox + 2 + k * 10 + i), Math.round(oy + 12 - i * 2 - k * 4), 1, 1, '#ffffff');
+    R(Math.round(ox + 4 + k * 10), Math.round(oy + 8 - k * 4), 1, 1, '#dff6ff');
+  }
+  ctx.globalAlpha = 1;
 }
 
 // ===== magic.js =====
@@ -6138,11 +6283,11 @@ function drawTitleExtras() {
 
 // ---------------- rune spells ----------------
 const SPELLS = {
-  thunder: { name: 'Thunder Strike', cost: 16, icon: 'thunder', desc: 'Lightning hits everything on screen.' },
-  frost: { name: 'Frost Rune', cost: 4, icon: 'frost', desc: 'Freezes enemies near you. Chop for double.' },
-  fire: { name: 'Fire Rune', cost: 3, icon: 'fire', desc: 'A fireball. Burns bushes and grass.' },
+  thunder: { name: 'Thunder Strike', cost: 16, icon: 'thunder', desc: 'Lightning hits every foe.' },
+  frost: { name: 'Frost Rune', cost: 4, icon: 'frost', desc: 'Freezes foes. Chop for 2x.' },
+  fire: { name: 'Fire Rune', cost: 3, icon: 'fire', desc: 'Fireball. Burns grass.' },
   mend: { name: 'Mend Rune', cost: 6, icon: 'mend', desc: 'Heals two hearts.' },
-  leaf: { name: 'Leaf Rune', cost: 5, icon: 'leaf', desc: 'Plants rise and hold enemies near you.' },
+  leaf: { name: 'Leaf Rune', cost: 5, icon: 'leaf', desc: 'Plants hold foes in place.' },
 };
 const SPELL_ORDER = ['thunder', 'frost', 'fire', 'mend', 'leaf'];
 function knownSpells() { return SPELL_ORDER.filter(id => G.save.items[id]); }
@@ -6271,15 +6416,15 @@ function updateSpellsPage() {
 }
 function drawSpellsPage() {
   const s = G.save, k = knownSpells();
-  R(0, 0, VW, VH, 'rgba(5,5,20,.92)'); R(8, 8, 240, 208, '#ffd84a'); R(10, 10, 236, 204, '#0d0d33');
+  R(0, 0, VW, VH, 'rgba(5,5,20,.92)'); drawPanel(8, 8, 240, 208);
   text('◀ JUKEBOX', 20, 26, '#8a8ab0', 'left', false); text('RUNE SPELLS', 128, 26, '#ffe64d', 'center'); text('BAG ▶', 236, 26, '#8a8ab0', 'right', false);
-  R(20, 36, 8, 60, '#000'); R(21, 37, 6, 58, '#1a2238'); const fill = Math.round(58 * s.rune / RUNE_MAX); R(21, 95 - fill, 6, fill, '#2f8fd0');
-  text(`Rune ${s.rune}/${RUNE_MAX}`, 34, 44, '#7fd4ff', 'left', false);
-  text('Cast with C. Cycle with Q.', 34, 56, '#a79fc4', 'left', false);
+  R(19, 38, 10, 30, '#0a0812'); R(20, 39, 8, 28, '#e8dcb8'); R(21, 40, 6, 26, '#0a0812'); const fill = Math.round(26 * s.rune / RUNE_MAX); if (fill) { R(21, 66 - fill, 6, fill, '#2f8fd0'); R(21, 66 - fill, 2, fill, '#7fd4ff'); }
+  text(`Rune ${s.rune}/${RUNE_MAX}`, 36, 50, '#7fd4ff', 'left', false);
+  text('Cast with C. Cycle with Q.', 36, 62, '#a79fc4', 'left', false);
   if (!k.length) { text('No runes yet. Walter carved them into Jon long ago; find them.', 34, 76, '#55577a', 'left', false); return; }
   SPELL_ORDER.forEach((id, i) => {
-    const y = 80 + i * 26, know = s.items[id], sel = know && k[G.spellSel || 0] === id, eq = equippedSpell() === id;
-    if (sel) R(18, y - 11, 220, 22, '#1a2238');
+    const y = 86 + i * 24, know = s.items[id], sel = know && k[G.spellSel || 0] === id, eq = equippedSpell() === id;
+    if (sel) R(18, y - 11, 220, 22, '#232860');
     R(22, y - 9, 18, 18, '#0d1a2e');
     if (know) { drawItemIcon(SPELLS[id].icon, 31, y); text((eq ? '★ ' : '') + SPELLS[id].name, 46, y - 2, sel ? '#ffd84a' : '#f3ecd2', 'left', false); text(SPELLS[id].desc, 46, y + 8, '#a79fc4', 'left', false); text(`${SPELLS[id].cost}`, 228, y - 2, s.rune >= SPELLS[id].cost ? '#7fd4ff' : '#55577a', 'right', false); }
     else text('???', 46, y + 2, '#55577a', 'left', false);
@@ -6303,24 +6448,24 @@ function updateBagPage() {
 }
 function drawBagPage() {
   const list = bagEntries();
-  R(0, 0, VW, VH, 'rgba(5,5,20,.92)'); R(8, 8, 240, 208, '#ffd84a'); R(10, 10, 236, 204, '#0d0d33');
+  R(0, 0, VW, VH, 'rgba(5,5,20,.92)'); drawPanel(8, 8, 240, 208);
   text('◀ SPELLS', 20, 26, '#8a8ab0', 'left', false); text('BAG', 128, 26, '#ffe64d', 'center'); text('GEAR ▶', 236, 26, '#8a8ab0', 'right', false);
-  text(`Hearts ${Math.ceil(G.player.hp / 2)}/${G.save.maxHp / 2}   Kroner ${G.save.kr}`, 20, 42, '#f2ebcc', 'left', false);
+  text(`Hearts ${Math.ceil(G.player.hp / 2)}/${G.save.maxHp / 2}   Kroner ${G.save.kr}`, 20, 46, '#f2ebcc', 'left', false);
   if (!list.length) text('Empty. Lars sells salmon. Chests hide charms.', 20, 70, '#55577a', 'left', false);
   list.forEach((e, i) => {
-    const y = 62 + i * 20, sel = i === (G.bagSel || 0);
-    if (sel) R(18, y - 10, 220, 20, '#1a2238');
+    const y = 66 + i * 24, sel = i === (G.bagSel || 0);
+    if (sel) R(18, y - 11, 220, 23, '#232860');
     R(22, y - 8, 16, 16, '#0d1a2e');
-    if (e.kind === 'eat') { const c = CONSUMABLES[e.id]; drawItemIcon(c.icon, 30, y); text(`${c.name}  x${bagCount(e.id)}`, 44, y - 1, sel ? '#ffd84a' : '#f3ecd2', 'left', false); text(c.heal === 99 ? 'Full heal. Jon will have opinions.' : c.heal ? `Heals ${c.heal / 2} hearts` : c.fuel ? 'Longer dashes for a minute' : 'Fills the rune meter', 44, y + 8, '#a79fc4', 'left', false); }
-    else { const c = CHARMS[e.id]; drawItemIcon(c.icon, 30, y); text((charmOn(e.id) ? '★ ' : '') + c.name, 44, y - 1, sel ? '#ffd84a' : '#f3ecd2', 'left', false); text(c.desc, 44, y + 8, '#a79fc4', 'left', false); }
+    if (e.kind === 'eat') { const c = CONSUMABLES[e.id]; drawItemIcon(c.icon, 30, y); text(`${c.name}  x${bagCount(e.id)}`, 44, y - 2, sel ? '#ffd84a' : '#f3ecd2', 'left', false); text(c.heal === 99 ? 'Full heal. Jon will have opinions.' : c.heal ? `Heals ${c.heal / 2} hearts` : c.fuel ? 'Longer dashes for a minute' : 'Fills the rune meter', 44, y + 9, '#a79fc4', 'left', false); }
+    else { const c = CHARMS[e.id]; drawItemIcon(c.icon, 30, y); text((charmOn(e.id) ? '★ ' : '') + c.name, 44, y - 2, sel ? '#ffd84a' : '#f3ecd2', 'left', false); text(c.desc, 44, y + 9, '#a79fc4', 'left', false); }
   });
   if (G.bagMsg) { R(14, 186, 228, 14, '#1a2238'); text(G.bagMsg.text, 128, 196, '#9be08a', 'center', false); }
-  text('Z: eat / wear     ★ worn (one charm at a time)', 128, 212, '#8a8ab0', 'center', false);
+  text('Z eat or wear · ★ worn · one charm at a time', 128, 210, '#8a8ab0', 'center', false);
 }
 // the HUD: equipped spell in the item box, cost pips, worn charm
 function drawSpellBox() {
   const s = G.save, id = equippedSpell();
-  R(17, 2, 20, 19, '#ffd84a'); R(18, 3, 18, 17, '#0d0d33');
+  R(16, 1, 23, 23, '#0a0812'); R(17, 2, 21, 21, '#e8dcb8'); R(18, 3, 19, 19, '#0a0812'); R(19, 4, 17, 17, '#232860'); R(19, 4, 17, 6, '#2c3274');
   if (id) {
     const sp = SPELLS[id], ok = s.rune >= sp.cost;
     ctx.globalAlpha = ok ? 1 : 0.4; drawItemIcon(sp.icon, 27, 12); ctx.globalAlpha = 1;
@@ -6471,7 +6616,7 @@ function deed(k, n = 1) { if (!G.save || G.mode === 'arena') return; const d = G
 function drawDeeds() {
   const d = (G.save && G.save.deeds) || {};
   const mins = Math.floor((d.seconds || 0) / 60);
-  text(`Chops ${d.kills || 0}   Best combo x${d.combo || 0}   Naps ${d.deaths || 0}   ${mins} min`, 20, 220, '#8a8ab0', 'left', false);
+  text(`Chops ${d.kills || 0}   Best combo x${d.combo || 0}   Naps ${d.deaths || 0}   ${mins} min`, 20, 206, '#8a8ab0', 'left', false);
 }
 
 // ===== giant.js =====
@@ -6519,14 +6664,15 @@ function wakeGiant(x, y) {
 }
 function updateGiant(e, dt, dx, dy, d, mr) {
   const p = G.player;
-  if (e.st === 'intro') { if (G.state === 'play') { e.st = 'stalk'; e.t = 0; } return; }
+  if (e.st === 'intro') { if (G.state === 'play') { e.st = 'stalk'; e.t = 0; e.fightT = 0; } return; }
+  if (giantPage7(e, dt)) return;
   if (e.hiding) { updateGiantHide(e, dt); return; }
   if (!e.hid && e.hp <= 6) { startGiantHide(e); return; }
   if (giantWrap(e, dt)) return;
   if (e.st === 'stalk') {
     e.fx = Math.sign(dx) || -1; e.fy = 0;
-    if (d > 40) tryMove(e, dx / d * e.speed * dt, dy / d * e.speed * dt, mr, 'walker');
-    if (e.t > (e.hid ? 1.4 : 2.2)) {
+    if (d > 40) tryMove(e, dx / d * e.speed * (e.warred ? 1.5 : 1) * dt, dy / d * e.speed * (e.warred ? 1.5 : 1) * dt, mr, 'walker');
+    if (e.t > (e.hid || e.warred ? 1.4 : 2.2)) {
       e.cycle = (e.cycle || 0) + 1;
       if (e.cycle % 3 === 2) { e.st = 'wrap'; e.t = 0; e.wrapAt = { x: p.x, y: p.y }; Sound.play('secret'); }   // Owen: giants summon leaves to wrap you up
       else { e.st = 'raise'; e.t = 0; e.aim = { x: p.x, y: p.y }; Sound.play('charge'); }
@@ -6552,7 +6698,8 @@ function slamClub(e) {
 function startGiantHide(e) {
   e.hid = true; e.hiding = true; e.hideT = 0; e.st = 'stalk'; e.t = 0;
   for (let i = 0; i < 24; i++) leaves(e.x + rnd(-24, 24), e.y + rnd(-40, 10), ['#58b840', '#2f7a2a', '#a8723a']);
-  Sound.play('secret'); say(STORY.giant_hide);
+  Sound.play('secret');
+  if (!flag('giant_lore')) { setFlag('giant_lore'); say([...STORY.giant_lore, ...STORY.giant_hide]); } else say(STORY.giant_hide);
   // three trees sprout on the screen; one of them is him
   const spots = [];
   for (let tries = 0; tries < 200 && spots.length < 3; tries++) {
@@ -6621,6 +6768,22 @@ function giantOnKill(e) {
   for (const yy of [5, 6]) if (tile(lx, yy) === 'o') { setTile(lx, yy, 's'); setFlag(`tile:overworld:${lx},${yy}:s`); leaves(lx * T + 8, yy * T + 8, ['#a8723a', '#6e4420', '#c89058']); }
   setFlag('log_chopped'); setFlag('giant_done');
   say(STORY.giant_down, () => { writeSave(); checkRoomClear(); });
+}
+
+// ---------- Owen's page 7: the blur, the time-out signal, and the giants' old war ----------
+function giantPage7(e, dt) {
+  if (G.state !== 'play') return false;
+  e.fightT = (e.fightT || 0) + dt;
+  // a few seconds in: the blur, and Jon will not stop singing
+  if (!flag('giant_blur') && e.fightT > 4 && !e.hiding) { setFlag('giant_blur'); say(STORY.giant_blur); return true; }
+  // tired at half health: Owen makes the time-out signal, which giants read as a sign of war
+  if (!flag('giant_timeout') && G.player.hp <= G.save.maxHp / 2 && !e.hiding) {
+    setFlag('giant_timeout'); e.warred = true; e.st = 'stalk'; e.t = 0;
+    G.shake = 0.5; Sound.play('boss'); floatText(e.x, e.y - 70, 'SIGN OF WAR!', '#ff6b6b');
+    say(STORY.giant_timeout); return true;
+  }
+  if (flag('giant_timeout')) e.warred = true;   // he stays angry if you leave and come back
+  return false;
 }
 
 // ===== owen.js =====
@@ -7306,13 +7469,13 @@ function statLines() {
     `Speed ${Math.round(st.speed * 100)}%   Attack ${Math.round(st.atk * 100)}%`,
   ];
 }
-function drawPanel(title) {
-  R(0, 0, VW, VH, 'rgba(5,5,20,.9)'); R(6, 6, 244, 212, '#c9a227'); R(8, 8, 240, 208, '#14102a');
+function drawArenaPanel(title) {
+  R(0, 0, VW, VH, 'rgba(5,5,20,.9)'); drawPanel(6, 6, 244, 212);
   text(title, 16, 22, '#ffd84a');
 }
 function drawArenaMenus() {
   if (G.state === 'levelup') {
-    drawPanel('LEVEL UP!  Pick one');
+    drawArenaPanel('LEVEL UP!  Pick one');
     A.choices.forEach((c, i) => {
       const y = 46 + i * 26, sel = i === A.sel;
       R(16, y - 12, 224, 20, sel ? '#3a2e5a' : '#1e1838'); if (sel) R(16, y - 12, 3, 20, '#9be08a');
@@ -7323,7 +7486,7 @@ function drawArenaMenus() {
     return;
   }
   if (G.state === 'shop') {
-    drawPanel('SHOP · after wave ' + A.wave);
+    drawArenaPanel('SHOP · after wave ' + A.wave);
     text(String(G.save.kr) + ' kr', 240, 22, '#ffd84a', 'right');
     A.cards.forEach((c, i) => {
       const y = 40 + i * 30, sel = i === A.sel, price = cardPrice(c), afford = G.save.kr >= price;
@@ -7339,7 +7502,7 @@ function drawArenaMenus() {
     return;
   }
   if (G.state === 'arenapause') {
-    drawPanel('PAUSED');
+    drawArenaPanel('PAUSED');
     statLines().forEach((l, i) => text(l, 16, 44 + i * 12, '#fff', 'left', false));
     const owned = Object.entries(A.owned).map(([id, n]) => ARENA_CARDS.find(c => c.id === id).name + (n > 1 ? ' x' + n : ''));
     text('BUILD', 16, 92, '#ffd84a');
@@ -7348,7 +7511,7 @@ function drawArenaMenus() {
     return;
   }
   if (G.state === 'arenaover') {
-    drawPanel(A.won ? 'VALHALLA CHAMPION!' : 'DEFEATED');
+    drawArenaPanel(A.won ? 'VALHALLA CHAMPION!' : 'DEFEATED');
     text(A.won ? 'All 20 waves. Chilly is furious.' : `You reached wave ${A.wave}.`, 128, 56, '#fff', 'center');
     text(`Kills ${A.kills}   Level ${A.lvl}   Best: wave ${arenaBest()}`, 128, 76, '#a79fc4', 'center', false);
     const owned = Object.entries(A.owned).map(([id, n]) => ARENA_CARDS.find(c => c.id === id).name + (n > 1 ? ' x' + n : ''));
@@ -7383,39 +7546,68 @@ function updateTalk(dt) {
   if (Math.floor(tk.shown) !== before && Math.floor(tk.shown) % 3 === 0 && tk.shown < tk.cur[1].length) Sound.play('blip');
   if (just('a') || just('b') || just('tap')) { if (tk.shown < tk.cur[1].length) tk.shown = 999; else nextLine(); }
 }
+// Dialogue: the A Link to the Past box, with the speaker's portrait and a name plate.
+const PORTRAIT_NPC = { Astrid: 'astrid', Lars: 'lars', Sven: 'sven', Ingrid: 'ingrid', Bjarne: 'bjarne', Attendant: 'attendant_ok', Commuter: 'commuter' };
+function drawPortrait(who, x, y) {
+  // x, y: centre of a 30x30 window
+  const blink = G.t % 3.4 < 0.12;
+  ctx.save(); ctx.translate(x, y); ctx.scale(2, 2);
+  if (who === 'Jon') drawJonSprite(0, 1, 0, blink, typeof jonFaceNow === 'function' ? jonFaceNow() : null);
+  else if (who === 'Owen') { const key = G.save && (G.save.voodoo || G.mode === 'arena') ? 'owen' : 'zombie'; spr(SPR[key + '_down_w0'], 0, 7); }
+  else if (who === 'Penguin King') { spr(SPR.peng_down_0, 0, 6); spr(SPR.crown, 0, -6); }
+  else if (who === 'Forest Giant') { ctx.scale(0.5, 0.5); spr(SPR.giant, 0, 16); }
+  else if (PORTRAIT_NPC[who]) spr(SPR['npc_' + PORTRAIT_NPC[who] + (blink ? '_blink' : '')] || SPR.npc_sven, 0, 7);
+  else { ctx.restore(); return false; }
+  ctx.restore(); return true;
+}
+const HAS_PORTRAIT = who => who === 'Jon' || who === 'Owen' || who === 'Penguin King' || who === 'Forest Giant' || !!PORTRAIT_NPC[who];
 function drawTalk() {
   const tk = G.talk; if (!tk) return;
   const [who, msg] = tk.cur;
   const inCut = tk.back === 'cutscene';
   const top = !inCut && G.player && G.player.y - G.cam.y > 140;
-  const by = top ? 26 : 152;
-  R(8, by - 2, 240, 66, '#fff'); R(10, by, 236, 62, '#0d0d33');
-  let y = by + 12;
-  if (who) { text(who, 16, y, '#ffe64d'); y += 12; }
-  let left = Math.floor(tk.shown);
-  for (const l of wrap(msg, 222).slice(0, who ? 4 : 5)) { text(l.slice(0, Math.max(0, left)), 16, y, '#fff', 'left', false); left -= l.length + 1; y += 10; }
-  if (tk.shown >= msg.length && Math.floor(G.t * 3) % 2 === 0) text('▼', 234, by + 58, '#fff', 'left', false);
+  const by = top ? 30 : 156, bx = 6, bw = 244, bh = 62;
+  drawPanel(bx, by, bw, bh);
+  let tx = bx + 10, tw = bw - 20;
+  if (who && HAS_PORTRAIT(who)) {
+    R(bx + 6, by + 7, 36, 36, '#0a0812'); R(bx + 7, by + 8, 34, 34, '#2a2f66'); R(bx + 7, by + 8, 34, 12, '#343a7a');
+    ctx.save(); ctx.beginPath(); ctx.rect(bx + 7, by + 8, 34, 34); ctx.clip(); drawPortrait(who, bx + 24, by + 24); ctx.restore();
+    tx = bx + 48; tw = bw - 56;
+  }
+  if (who) {
+    const nw = textWidth(who) + 12;
+    drawPanel(tx - 4, by - 9, nw, 14, { plain: true, field: '#2a1a10', top: '#3a2616' });
+    text(who, tx + 2, by + 1, '#ffd84a', 'left', false);
+  }
+  let left = Math.floor(tk.shown), y = by + 17;
+  for (const l of wrap(msg, tw).slice(0, 4)) { text(l.slice(0, Math.max(0, left)), tx, y, '#f6f0dc', 'left', true); left -= l.length + 1; y += 11; }
+  if (tk.shown >= msg.length) text('▼', bx + bw - 13, by + bh - 6 + (Math.floor(G.t * 4) % 2), '#ffd84a', 'left', false);
 }
 
 // ---------- HUD (A Link to the Past layout: magic meter, item box, money, keys, life) ----------
+// HUD: A Link to the Past's layout, drawn with outlines over a soft shade instead of a box.
 function drawHud() {
   const s = G.save, p = G.player;
-  R(0, 0, VW, 22, 'rgba(0,0,0,.45)');
-  // rune meter
-  R(6, 3, 8, 17, '#000'); R(7, 4, 6, 15, '#1a2238');
-  const fill = Math.round(15 * s.rune / RUNE_MAX); R(7, 19 - fill, 6, fill, s.rune >= RUNE_MAX ? (Math.floor(G.t * 4) % 2 ? '#7fd4ff' : '#cfefff') : '#2f8fd0');
+  for (let i = 0; i < 7; i++) R(0, i * 4, VW, 4, `rgba(10,8,18,${(0.5 - i * 0.07).toFixed(2)})`);
+  // rune meter: a bone-framed vial
+  R(5, 2, 10, 21, '#0a0812'); R(6, 3, 8, 19, '#e8dcb8'); R(7, 4, 6, 17, '#0a0812');
+  const fill = Math.round(17 * s.rune / RUNE_MAX), full = s.rune >= RUNE_MAX;
+  if (fill) { R(7, 21 - fill, 6, fill, full ? (Math.floor(G.t * 4) % 2 ? '#7fd4ff' : '#cfefff') : '#2f8fd0'); R(7, 21 - fill, 2, fill, full ? '#ffffff' : '#7fd4ff'); R(7, 21 - fill, 6, 1, '#cfefff'); }
+  R(8, 1, 4, 2, '#ffd84a');
   // item box
   drawSpellBox();
-  // kroner, keys
-  drawItemIcon('coin', 46, 7); text(String(s.kr).padStart(3, '0'), 52, 11, '#fff');
-  if (G.map && G.map.dungeon && !G.map.nokeys) { drawItemIcon('key', 46, 17); text('x' + (s.keys[G.mapId] || 0), 52, 20, '#fff'); if (s.bigkeys[G.mapId]) drawItemIcon('bigkey', 82, 15); }
-  if (s.potions) { drawItemIcon('juice', 98, 12); text('x' + s.potions, 104, 16, '#fff'); }
+  // kroner, keys, juice
+  drawItemIcon('coin', 46, 7); text(String(s.kr).padStart(3, '0'), 52, 11, '#ffffff', 'left', 'outline');
+  if (G.map && G.map.dungeon && !G.map.nokeys) { drawItemIcon('key', 46, 18); text('x' + (s.keys[G.mapId] || 0), 52, 22, '#ffffff', 'left', 'outline'); if (s.bigkeys[G.mapId]) drawItemIcon('bigkey', 74, 16); }
+  if (s.potions) { drawItemIcon('juice', 86, 12); text('x' + s.potions, 92, 16, '#ffffff', 'left', 'outline'); }
   // life
-  text('-LIFE-', 190, 9, '#f2ebcc', 'center');
+  text('- LIFE -', 191, 8, '#ff9a8a', 'center', 'outline');
   const n = s.maxHp / 2;
   for (let i = 0; i < n; i++) {
     const v = clamp(p.hp - i * 2, 0, 2) / 2, row = Math.floor(i / 10), col = i % 10;
-    drawHeart(144 + col * 9, 12 + row * 8, v, s.voodoo ? '#f22633' : s.voodoo2 ? '#ffd84a' : '#9a4dd9');
+    const hx = 147 + col * 9, hy = 12 + row * 8;
+    R(hx - 1, hy - 1, 9, 8, 'rgba(10,8,18,.55)');
+    drawHeart(hx, hy, v, s.voodoo ? '#f22633' : s.voodoo2 ? '#ffd84a' : '#9a4dd9');
   }
 }
 
@@ -7435,11 +7627,23 @@ function objective() {
   }
   return 'Chapter 3 complete! Walter\'s Forge and the Storm Peak wait for Owen\'s next chapters.';
 }
+const MENU_TABS = ['GEAR', 'JON', 'MAP', 'MUSIC', 'SPELLS', 'BAG'];
+function drawMenuTabs(active) {
+  R(11, 11, 234, 22, '#14163a'); R(11, 11, 234, 10, '#1e2250'); R(14, 32, 228, 1, '#3a3f80');
+  const gap = 9, ws = MENU_TABS.map(t => textWidth(t)), total = ws.reduce((a, b) => a + b, 0) + gap * (MENU_TABS.length - 1);
+  let x = Math.round(128 - total / 2);
+  MENU_TABS.forEach((t, i) => {
+    const on = i === active;
+    if (on) { R(x - 3, 15, ws[i] + 6, 14, '#ffd84a'); R(x - 2, 16, ws[i] + 4, 12, '#2a1a10'); }
+    text(t, x, 25, on ? '#ffd84a' : '#8a8ab0', 'left', false);
+    x += ws[i] + gap;
+  });
+  text('◀', 16, 25, '#55577a', 'left', false); text('▶', 240, 25, '#55577a', 'right', false);
+}
 function drawMenu() {
   const s = G.save;
   R(0, 0, VW, VH, 'rgba(5,5,20,.92)');
-  R(8, 8, 240, 208, '#ffd84a'); R(10, 10, 236, 204, '#0d0d33');
-  text('GEAR', 20, 26, '#ffe64d'); text('JON ▶', 236, 26, '#9be08a', 'right', false); text('◀ MAP', 20, 26 + 180, '#8a8ab0', 'left', false);
+  drawPanel(8, 8, 240, 208);
   const slots = [
     ['Jon Lv' + jonData().lvl + ' (swing Z)', 'homing', true, () => drawJonSprite(30, 44, 0, false, jonFaceNow())],
     ['Homing Jon (throw X)', 'homing', !!s.items.homing],
@@ -7449,42 +7653,78 @@ function drawMenu() {
     ['Voodoo Dash (Shift/F)', 'dash', !!s.items.dash],
   ];
   slots.forEach(([label, icon, have, custom], i) => {
-    const y = 44 + i * 16;
-    R(20, y - 8, 18, 16, '#1a2238');
-    if (have) { if (custom) custom(); else drawItemIcon(icon, 29, y); text(label, 44, y + 4, '#fff'); }
+    const y = 46 + i * 15;
+    R(19, y - 9, 20, 17, '#0a0812'); R(20, y - 8, 18, 15, '#232860');
+    if (have) { if (custom) custom(); else drawItemIcon(icon, 29, y); text(label, 44, y + 4, '#f6f0dc'); }
     else text('???', 44, y + 4, '#55577a');
   });
   const sq = (n, start, done) => flag(start) ? n + (flag(done) ? ' ✓' : ' …') : null;
   const side = [sq('Bjarne', 'quest_bjarne', 'bjarne_done'), sq('Sven', 'quest_sven', 'sven_done')].filter(Boolean);
-  if (side.length) text('Side quests: ' + side.join('  '), 20, 142, '#c8e8ff', 'left', false);
-  text('Heart pieces: ' + s.pieces + '/4', 20, 154, '#f2ebcc');
-  text('Voodoo bond: ' + (s.voodoo ? 'ready' : 'used'), 20, 166, s.voodoo ? '#9be08a' : '#c9a0f0');
-  if (G.map.dungeon && !G.map.nokeys) text('Keys ' + (s.keys[G.mapId] || 0) + '  Big key: ' + (s.bigkeys[G.mapId] ? 'yes' : 'no'), 236, 154, '#f2ebcc', 'right', false);
-  text('QUEST', 20, 180, '#ffe64d');
-  wrap(objective(), 214).slice(0, 3).forEach((l, i) => text(l, 20, 191 + i * 9, '#fff', 'left', false));
-  text(Sound.muted ? 'M: sound off' : 'M: sound on', 236, 26, '#8a8ab0', 'right', false);
-  text(Music.on ? 'N: music on' : 'N: music off', 236, 38, '#8a8ab0', 'right', false);
+  text('Heart pieces ' + s.pieces + '/4', 20, 140, '#f2ebcc');
+  text('Voodoo bond ' + (s.voodoo ? 'ready' : 'used'), 20, 151, s.voodoo ? '#9be08a' : '#c9a0f0');
+  if (side.length) text('Side quests ' + side.join('  '), 20, 162, '#c8e8ff', 'left', false);
+  text(Sound.muted ? 'M sound off' : 'M sound on', 236, 140, '#8a8ab0', 'right', false);
+  text(Music.on ? 'N music on' : 'N music off', 236, 151, '#8a8ab0', 'right', false);
+  R(16, 169, 224, 1, '#3a3f80');
+  text('QUEST', 20, 180, '#ffd84a');
+  wrap(objective(), 216).slice(0, 3).forEach((l, i) => text(l, 20, 191 + i * 10, '#f6f0dc', 'left', false));
 }
 
 // ---------- title ----------
 function drawTitle() {
-  R(0, 0, VW, VH, '#14121f');
-  for (let i = 0; i < 50; i++) R((i * 53) % VW, (i * 97) % 130, 1, 1, i % 3 ? '#4a4570' : '#a79fc4');
-  R(0, 150, VW, 74, '#1b3a6b'); R(0, 150, VW, 2, '#73a6f2');
-  for (let x = 0; x < VW; x += 32) R(x + (G.t * 8) % 32, 160 + (x / 32 % 3) * 14, 10, 1, '#3d66c4');
-  ctx.font = '20px "Press Start 2P", ui-monospace, Menlo, monospace'; ctx.textAlign = 'center';
-  ctx.fillStyle = '#000'; ctx.fillText('JÖNTUKA', VW / 2 + 2, 62); ctx.fillStyle = '#8fd0ff'; ctx.fillText('JÖNTUKA', VW / 2, 60);
-  text('A VIKING TALE', VW / 2, 80, '#f3ecd2', 'center');
-  text('a game by Owen', VW / 2, 96, '#a79fc4', 'center');
+  const t = G.t;
+  // night sky, banded like SNES gradients
+  const SKY = ['#070818', '#0a0c24', '#0e1030', '#13153c', '#191a48', '#211f52', '#2b2459'];
+  SKY.forEach((c, i) => R(0, i * 20, VW, 20, c));
+  for (let i = 0; i < 70; i++) { const x = (i * 53 + 7) % VW, y = (i * 97) % 120; if ((Math.floor(t * 2 + i * 0.7)) % 7) R(x, y, 1, 1, i % 4 ? '#5a5690' : '#e8e4ff'); }
+  // aurora borealis: three ribbons, stepped alpha so it stays pixel art
+  const ribbons = [['#4dffb0', 34, 0.0, 26], ['#3ad0ff', 48, 1.7, 20], ['#b06bff', 58, 3.1, 14]];
+  for (const [col, base, ph, len] of ribbons) for (let x = 0; x < VW; x += 2) {
+    const y = Math.round(base + Math.sin(x * 0.028 + t * 0.45 + ph) * 11 + Math.sin(x * 0.071 + t * 0.9 + ph) * 4);
+    const pulse = 0.55 + 0.45 * Math.sin(x * 0.05 - t * 1.3 + ph);
+    ctx.globalAlpha = 0.34 * pulse; R(x, y, 2, Math.round(len * 0.35), col);
+    ctx.globalAlpha = 0.18 * pulse; R(x, y + Math.round(len * 0.35), 2, Math.round(len * 0.4), col);
+    ctx.globalAlpha = 0.08 * pulse; R(x, y + Math.round(len * 0.75), 2, len, col);
+  }
+  ctx.globalAlpha = 1;
+  // mountains: a far range and a near range, jagged and snow-capped
+  const ridge = (seed, base, amp, step) => { const pts = []; for (let x = -step; x <= VW + step; x += step) pts.push([x, base - Math.abs(Math.sin(x * 0.019 + seed) * amp) - (hash(x, seed) % 9)]); return pts; };
+  const far = ridge(1.3, 132, 38, 12), near = ridge(4.1, 148, 24, 9);
+  poly([[0, 150], ...far, [VW, 150]], '#2c3070');
+  for (const [x, y] of far) if (y < 108) poly([[x - 6, y + 7], [x, y], [x + 6, y + 7]], '#b8bfe8');
+  poly([[0, 152], ...near, [VW, 152]], '#171a44');
+  for (const [x, y] of near) R(x, y, 2, 1, '#3a4a8a');
+  // the fjord, with the aurora shimmering in it
+  R(0, 148, VW, 76, '#0b1530'); R(0, 148, VW, 1, '#3a4a8a');
+  for (let i = 0; i < 26; i++) { const y = 152 + (i * 13) % 70, x = ((i * 71 + t * (6 + i % 3)) % (VW + 40)) - 20; ctx.globalAlpha = 0.5; R(x, y, 8 + (i % 4) * 4, 1, i % 3 === 0 ? '#4dffb0' : i % 3 === 1 ? '#3ad0ff' : '#2a3a7a'); }
+  ctx.globalAlpha = 1;
+  // a longship drifting across the water
+  const sx = ((t * 7) % (VW + 90)) - 60, sy = 166 + Math.round(Math.sin(t * 1.6) * 1);
+  poly([[sx, sy], [sx + 44, sy], [sx + 40, sy + 6], [sx + 4, sy + 6]], '#3a2410');
+  R(sx + 2, sy, 40, 2, '#6b4322'); for (let k = 0; k < 6; k++) R(sx + 7 + k * 6, sy + 1, 3, 3, k % 2 ? '#c03a2a' : '#e8dcb8');
+  poly([[sx + 44, sy], [sx + 49, sy - 8], [sx + 52, sy - 7], [sx + 47, sy]], '#6b4322'); R(sx + 50, sy - 7, 1, 1, '#ffd84a');
+  R(sx + 21, sy - 22, 2, 22, '#3a2410');
+  for (let k = 0; k < 5; k++) R(sx + 11, sy - 20 + k * 3, 22, 3, k % 2 ? '#e8dcb8' : '#c03a2a');
+  ctx.globalAlpha = 0.25; R(sx + 4, sy + 7, 40, 2, '#c03a2a'); ctx.globalAlpha = 1;
   drawTitleExtras();
-  drawJonSprite(VW / 2 + 74 + Math.sin(G.t * 2) * 3, 124, Math.sin(G.t * 1.5) * 0.3, G.t % 3.2 < 0.14);
-  const opts = G.titleOpts || titleOptions();
+  // the logo: chunky outlined letters, ice-blue with a darker lower half
+  const ly = 92;
+  text('JÖNTUKA', VW / 2, ly, '#dff6ff', 'center', 'outline', 3);
+  ctx.save(); ctx.beginPath(); ctx.rect(0, ly - 9, VW, 10); ctx.clip(); text('JÖNTUKA', VW / 2, ly, '#5aa8e8', 'center', false, 3); ctx.restore();
+  R(VW / 2 - 70, ly + 8, 140, 1, '#ffd84a');
+  text('A VIKING TALE', VW / 2, ly + 20, '#ffd84a', 'center', 'outline');
+  text('a game by Owen', VW / 2, ly + 32, '#a79fc4', 'center', true);
+  drawJonSprite(VW / 2 + 92 + Math.sin(t * 2) * 3, ly - 26, Math.sin(t * 1.5) * 0.3, t % 3.2 < 0.14);
+  // menu
+  const opts = G.titleOpts || titleOptions(), mh = 14 + opts.length * 13;
+  drawPanel(VW / 2 - 64, 222 - mh - 12, 128, mh);
   opts.forEach((o, i) => {
-    const sel = i === G.menuSel;
-    text((sel ? '> ' : '  ') + o.label, VW / 2 - 58, 170 + i * 14, o.disabled ? '#55577a' : sel ? '#ffd84a' : '#f3ecd2');
+    const sel = i === G.menuSel, y = 222 - mh - 12 + 15 + i * 13;
+    if (sel) text('▶', VW / 2 - 52, y, '#ffd84a', 'left', false);
+    text(o.label, VW / 2 - 42, y, o.disabled ? '#55577a' : sel ? '#ffd84a' : '#f6f0dc', 'left', true);
   });
-  if (G.confirmErase) text('Press Z again to erase your save', VW / 2, 218, '#ff8a8a', 'center');
-  const best = G.titleBest || 0; if (best && !G.confirmErase) text('Arena best: wave ' + best, VW / 2, 218, '#a79fc4', 'center');
+  if (G.confirmErase) text('Press Z again to erase your save', VW / 2, 220, '#ff8a8a', 'center', 'outline');
+  else { const best = G.titleBest || 0; if (best) text('Arena best: wave ' + best, VW - 6, 220, '#a79fc4', 'right', true); }
 }
 function titleOptions() {
   const has = !!readSave();
@@ -7698,6 +7938,7 @@ function render() {
   if (G.state === 'cutscene' || (G.state === 'talk' && G.talk && G.talk.back === 'cutscene')) { drawCutscene(); drawTalk(); return; }
   if (G.shake > 0) ctx.setTransform(1, 0, 0, 1, Math.round(rnd(-2, 2)), Math.round(rnd(-2, 2)));
   drawMap();
+  drawIceGlints();
   const p = G.player;
   const list = G.ents.filter(e => e.kind !== 'warp' || e.portal).map(e => ({ y: e.y, f: () => drawThing(e) }));
   list.push({ y: p.y, f: () => drawOwen(p.x - G.cam.x, p.y - G.cam.y) });
@@ -7718,7 +7959,7 @@ function render() {
   if (G.state === 'warp') { ctx.globalAlpha = clamp(1 - Math.abs(G.warp.t - 0.35) / 0.35, 0, 1); R(0, 0, VW, VH, '#000'); ctx.globalAlpha = 1; }
   if (G.bannerT > 0) { R(0, 92, VW, 34, 'rgba(0,0,0,.8)'); text(G.banner, VW / 2, 113, '#ffd84a', 'center'); }
   if (G.state === 'talk') drawTalk();
-  if (G.state === 'menu') { if (G.menuPage === 5) drawBagPage(); else if (G.menuPage === 4) drawSpellsPage(); else if (G.menuPage === 3) drawJukebox(); else if (G.menuPage === 2) drawMapPage(); else if (G.menuPage) drawJonPage(); else drawMenu(); }
+  if (G.state === 'menu') { if (G.menuPage === 5) drawBagPage(); else if (G.menuPage === 4) drawSpellsPage(); else if (G.menuPage === 3) drawJukebox(); else if (G.menuPage === 2) drawMapPage(); else if (G.menuPage) drawJonPage(); else drawMenu(); drawMenuTabs(G.menuPage || 0); }
   drawBossCard(); drawCombo();
   drawJonLevel();
   drawArenaMenus();
@@ -7736,7 +7977,7 @@ G.menuSel = 0;
 buildAll(); buildSnesArt(); buildAwesomeArt(); buildMagicArt(); buildGiantArt(); buildOwenArt();
 function frame(now) {
   const dt = Math.min(0.05, (now - last) / 1000); last = now;
-  try { pollGamepad(); update(dt); render(); const mid = musicFor(); markHeard(mid); Music.want(mid); Music.tick(); Ambience.tick(dt); } catch (err) { console.error(err); }
+  try { pollGamepad(); update(dt); render(); if ((G.fitT = (G.fitT || 0) - dt) <= 0) { G.fitT = 0.5; fitScreen(); } present(); const mid = musicFor(); markHeard(mid); Music.want(mid); Music.tick(); Ambience.tick(dt); } catch (err) { console.error(err); }
   if (!(G.hitstop > 0)) for (const k in edge) edge[k] = false;   // a tap during hit-stop still counts
   requestAnimationFrame(frame);
 }

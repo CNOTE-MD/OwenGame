@@ -190,7 +190,7 @@ function drawSnesEnemy(e, x, y) {
 const TABLET_TOTAL = 8;
 const TABLETS = {
   tab_coast: 'Rune tablet: "HANK WAS HERE. HANK THREW THE AXE. HANK IS SORRY."',
-  tab_hills: 'Rune tablet: "The smith\'s name is a vegetable. Do not laugh. He hears."',
+  tab_hills: 'Rune tablet: "The giants\' war: North and East against South and West. North despises South. East despises West. East and North are friends to this day."',
   tab_lake: 'Rune tablet: "The lake keeps what the lake is given. Unless you have Viking blood. Then it spits."',
   tab_grave: 'Rune tablet: "Chilly cannot stand the sun. He is part vampire and all penguin. In daylight his skin falls off. So he sends birds that cannot fly."',
   tab_volcano: 'Rune tablet: "Names have power. That is why nobody says the smith\'s. Behind the forge door: his notes, and a monster made of tin that guards them."',
@@ -214,7 +214,7 @@ function markSeen() { if (G.mapId === 'overworld') setFlag(`seen:${G.scr.x},${G.
 const SCREEN_NAMES = { '0,0': 'Foothills', '1,0': 'Muck Forest', '2,0': 'Frozen Path', '3,0': 'Storm Peak', '0,1': 'Fjordvik', '1,1': 'Market', '2,1': 'Lake Jöntuka', '3,1': 'Volcano Road', '0,2': 'Fjord Coast', '1,2': 'Airstrip', '2,2': 'The Beach', '3,2': 'Graveyard' };
 function drawMapPage() {
   const s = G.save;
-  R(0, 0, VW, VH, 'rgba(5,5,20,.92)'); R(8, 8, 240, 208, '#ffd84a'); R(10, 10, 236, 204, '#0d0d33');
+  R(0, 0, VW, VH, 'rgba(5,5,20,.92)'); drawPanel(8, 8, 240, 208);
   text('◀ JON', 20, 26, '#8a8ab0', 'left', false); text('MAP OF NORWAY', 128, 26, '#ffe64d', 'center'); text('GEAR ▶', 236, 26, '#8a8ab0', 'right', false);
   const ox = 32, oy = 40, cw = 48, ch = 34;
   for (let y = 0; y < 3; y++) for (let x = 0; x < 4; x++) {
@@ -235,12 +235,12 @@ function drawMapPage() {
   const here = G.mapId === 'overworld' ? SCREEN_NAMES[`${G.scr.x},${G.scr.y}`] : G.map.name;
   text(here || '', 128, 150, '#fff', 'center');
   const h = clockHour(), hh = Math.floor(h), mm = Math.floor((h - hh) * 60);
-  text(`${phaseOfDay().toUpperCase()}  ${hh % 12 || 12}:${String(mm).padStart(2, '0')} ${hh < 12 ? 'AM' : 'PM'}`, 128, 164, '#a79fc4', 'center', false);
+  text(`${phaseOfDay().toUpperCase()}  ${hh % 12 || 12}:${String(mm).padStart(2, '0')} ${hh < 12 ? 'AM' : 'PM'}`, 128, 160, '#a79fc4', 'center', false);
   const pieces = ['hp_forest', 'hp_grave', 'c_cave', 'hp_bjarne'].filter(k => flag('got:' + k) || flag('chest:' + k)).length;
   const conts = ['hc_cavern', 'hc_barrow', 'hc_redeye', 'hc_tablets'].filter(k => flag('got:' + k)).length;
-  text(`Heart pieces ${pieces}/4   Containers ${conts}/4`, 20, 184, '#f2ebcc', 'left', false);
-  text(`Rune tablets ${tabletsFound()}/${TABLET_TOTAL}` + (tabletsFound() >= TABLET_TOTAL ? '  ✓' : ''), 20, 196, '#c8e8ff', 'left', false);
-  text('Side quests ' + ['bjarne_done', 'sven_done'].filter(flag).length + '/2   Chapters ' + (flag('d2done') ? 3 : flag('d1done') ? 2 : 1) + ' of 5', 20, 208, '#f2ebcc', 'left', false);
+  text(`Heart pieces ${pieces}/4   Containers ${conts}/4`, 20, 174, '#f2ebcc', 'left', false);
+  text(`Rune tablets ${tabletsFound()}/${TABLET_TOTAL}` + (tabletsFound() >= TABLET_TOTAL ? '  ✓' : ''), 20, 184, '#c8e8ff', 'left', false);
+  text('Side quests ' + ['bjarne_done', 'sven_done'].filter(flag).length + '/2   Chapters ' + (flag('d2done') ? 3 : flag('d1done') ? 2 : 1) + ' of 5', 20, 194, '#f2ebcc', 'left', false);
   drawDeeds();
   const ot = objectiveTarget(); if (ot) { const OX = 32 + Math.floor(ot.x / 16) * 48 + 20, OY = 40 + Math.floor(ot.y / 14) * 34 + 14; if (Math.floor(G.t * 4) % 2) { text('!', OX, OY + 4, '#000', 'center'); text('!', OX - 1, OY + 3, '#ffd84a', 'center'); } }
 }

@@ -1,8 +1,20 @@
 // Screen, input, sound and drawing helpers.
 const T = 16, SW = 16, SH = 14, VW = 256, VH = 224;
-const cv = document.getElementById('g');
-const ctx = cv.getContext('2d');
+const cv = document.getElementById('g');        // the screen the player sees (and touches)
+// The game draws at the SNES's 256x224 into an offscreen buffer. Each frame it is copied to the screen
+// at a whole-number scale (crisp, every pixel the same size), and the browser smooths only the last
+// small fraction. That keeps one-pixel lines and letters from vanishing at odd window sizes.
+const buf = document.createElement('canvas'); buf.width = 256; buf.height = 224;
+const ctx = buf.getContext('2d');
 ctx.imageSmoothingEnabled = false;
+const dctx = cv.getContext('2d');
+let PRESCALE = 1;
+function fitScreen() {
+  const r = cv.getBoundingClientRect();
+  const k = clamp(Math.ceil(((r.width || 256) * (window.devicePixelRatio || 1)) / 256), 1, 8);
+  if (k !== PRESCALE || cv.width !== 256 * k) { PRESCALE = k; cv.width = 256 * k; cv.height = 224 * k; }
+}
+function present() { dctx.imageSmoothingEnabled = false; dctx.drawImage(buf, 0, 0, cv.width, cv.height); }
 const FONT = '8px "Press Start 2P", ui-monospace, Menlo, Consolas, monospace';
 
 const clamp = (v, a, b) => Math.max(a, Math.min(b, v));
@@ -197,21 +209,7 @@ function poly(pts, fill, stroke) {
   if (fill) { ctx.fillStyle = fill; ctx.fill(); }
   if (stroke) { ctx.strokeStyle = stroke; ctx.lineWidth = 1; ctx.stroke(); }
 }
-function text(s, x, y, color = '#fff', align = 'left', shadow = true) {
-  ctx.font = FONT; ctx.textAlign = align;
-  if (shadow) { ctx.fillStyle = '#000'; ctx.fillText(s, x + 1, y + 1); }
-  ctx.fillStyle = color; ctx.fillText(s, x, y);
-}
-function wrap(s, maxW) {
-  ctx.font = FONT;
-  const out = []; let line = '';
-  for (const w of s.split(' ')) {
-    const t = line ? line + ' ' + w : w;
-    if (ctx.measureText(t).width > maxW && line) { out.push(line); line = w; } else line = t;
-  }
-  if (line) out.push(line);
-  return out;
-}
+// text(), wrap(), textWidth() and drawPanel() live in pixelfont.js
 const hash = (x, y) => Math.floor(Math.abs(Math.sin(x * 12.9898 + y * 78.233) * 43758.5453)) % 100;
 const HEART = [' ## ## ', '#######', '#######', ' ##### ', '  ###  ', '   #   '];
 function drawHeart(x, y, fill, color = '#f22633') {

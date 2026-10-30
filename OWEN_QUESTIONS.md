@@ -70,6 +70,12 @@ Rules of thumb: his journal pages always win over anything already in the game. 
 56. The penguins warned him about you. How did they know you were coming?
 57. Jjorvic Palace: what does the name mean? Who built it?
 
+## Your page 7 (the time-out signal) is in the game
+
+58. You gathered your wits. What's the plan? Do you tell the giant you're a friend of the East giants?
+59. What does the time-out signal look like to a giant, and why is it a sign of war?
+60. Are there giants of the South, East and West in the game later? Where do they live?
+
 ## Music
 
 49. Four new songs sound like Foreigner, Journey, Aerosmith and Queen (Frozen Path, Muck Forest, subway, Penguin Palace). Which is your favorite? Which band is missing?

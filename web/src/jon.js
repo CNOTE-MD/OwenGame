@@ -77,15 +77,14 @@ function jonFaceNow() {
 
 function drawJonBubble(x, y) {
   if (JT.t <= 0 || !JT.line || G.state !== 'play') return;
-  ctx.font = FONT;
   const lines = wrap(JT.line, 150).slice(0, 3);
-  const w = Math.max(...lines.map(l => Math.ceil(ctx.measureText(l).width))) + 8, h = lines.length * 10 + 4;
+  const w = Math.max(...lines.map(l => textWidth(l))) + 10, h = lines.length * 10 + 5;
   const bx = clamp(Math.round(x - w / 2), 2, VW - w - 2), by = clamp(Math.round(y - 22 - h), 24, VH - h - 4);
   ctx.globalAlpha = Math.min(1, JT.t * 3);
   R(bx - 1, by - 1, w + 2, h + 2, OUTLINE); R(bx, by, w, h, '#fffbe8');
   const tx = clamp(Math.round(x), bx + 4, bx + w - 6);
   R(tx, by + h, 4, 2, '#fffbe8'); R(tx + 1, by + h + 2, 2, 2, '#fffbe8'); R(tx - 1, by + h, 1, 2, OUTLINE); R(tx + 4, by + h, 1, 2, OUTLINE);
-  lines.forEach((l, i) => text(l, bx + 4, by + 10 + i * 10, '#2a1a10', 'left', false));
+  lines.forEach((l, i) => text(l, bx + 5, by + 10 + i * 10, '#2a1a10', 'left', false));
   ctx.globalAlpha = 1;
 }
 
@@ -174,11 +173,10 @@ function drawJonLevel() {
 // JON page of the gear menu
 function drawJonPage() {
   drawJonPageBody();
-  text('◀ GEAR', 20, 206, '#8a8ab0', 'left', false); text('MAP ▶', 236, 206, '#8a8ab0', 'right', false);
 }
 function drawJonPageBody() {
   const d = jonData();
-  R(0, 0, VW, VH, 'rgba(5,5,20,.92)'); R(8, 8, 240, 208, '#ffd84a'); R(10, 10, 236, 204, '#0d0d33');
+  R(0, 0, VW, VH, 'rgba(5,5,20,.92)'); drawPanel(8, 8, 240, 208);
   text('JON', 20, 26, '#ffe64d'); text('◀ GEAR', 236, 26, '#8a8ab0', 'right', false);
   drawJonSprite(36, 56, Math.sin(G.t * 2) * 0.2, G.t % 3.2 < 0.14, jonFaceNow());
   text('Level ' + d.lvl + (d.lvl >= JON_MAX ? ' (max)' : ''), 56, 48, '#fff');

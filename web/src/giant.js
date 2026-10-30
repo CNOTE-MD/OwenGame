@@ -42,14 +42,15 @@ function wakeGiant(x, y) {
 }
 function updateGiant(e, dt, dx, dy, d, mr) {
   const p = G.player;
-  if (e.st === 'intro') { if (G.state === 'play') { e.st = 'stalk'; e.t = 0; } return; }
+  if (e.st === 'intro') { if (G.state === 'play') { e.st = 'stalk'; e.t = 0; e.fightT = 0; } return; }
+  if (giantPage7(e, dt)) return;
   if (e.hiding) { updateGiantHide(e, dt); return; }
   if (!e.hid && e.hp <= 6) { startGiantHide(e); return; }
   if (giantWrap(e, dt)) return;
   if (e.st === 'stalk') {
     e.fx = Math.sign(dx) || -1; e.fy = 0;
-    if (d > 40) tryMove(e, dx / d * e.speed * dt, dy / d * e.speed * dt, mr, 'walker');
-    if (e.t > (e.hid ? 1.4 : 2.2)) {
+    if (d > 40) tryMove(e, dx / d * e.speed * (e.warred ? 1.5 : 1) * dt, dy / d * e.speed * (e.warred ? 1.5 : 1) * dt, mr, 'walker');
+    if (e.t > (e.hid || e.warred ? 1.4 : 2.2)) {
       e.cycle = (e.cycle || 0) + 1;
       if (e.cycle % 3 === 2) { e.st = 'wrap'; e.t = 0; e.wrapAt = { x: p.x, y: p.y }; Sound.play('secret'); }   // Owen: giants summon leaves to wrap you up
       else { e.st = 'raise'; e.t = 0; e.aim = { x: p.x, y: p.y }; Sound.play('charge'); }
@@ -75,7 +76,8 @@ function slamClub(e) {
 function startGiantHide(e) {
   e.hid = true; e.hiding = true; e.hideT = 0; e.st = 'stalk'; e.t = 0;
   for (let i = 0; i < 24; i++) leaves(e.x + rnd(-24, 24), e.y + rnd(-40, 10), ['#58b840', '#2f7a2a', '#a8723a']);
-  Sound.play('secret'); say(STORY.giant_hide);
+  Sound.play('secret');
+  if (!flag('giant_lore')) { setFlag('giant_lore'); say([...STORY.giant_lore, ...STORY.giant_hide]); } else say(STORY.giant_hide);
   // three trees sprout on the screen; one of them is him
   const spots = [];
   for (let tries = 0; tries < 200 && spots.length < 3; tries++) {
@@ -144,4 +146,20 @@ function giantOnKill(e) {
   for (const yy of [5, 6]) if (tile(lx, yy) === 'o') { setTile(lx, yy, 's'); setFlag(`tile:overworld:${lx},${yy}:s`); leaves(lx * T + 8, yy * T + 8, ['#a8723a', '#6e4420', '#c89058']); }
   setFlag('log_chopped'); setFlag('giant_done');
   say(STORY.giant_down, () => { writeSave(); checkRoomClear(); });
+}
+
+// ---------- Owen's page 7: the blur, the time-out signal, and the giants' old war ----------
+function giantPage7(e, dt) {
+  if (G.state !== 'play') return false;
+  e.fightT = (e.fightT || 0) + dt;
+  // a few seconds in: the blur, and Jon will not stop singing
+  if (!flag('giant_blur') && e.fightT > 4 && !e.hiding) { setFlag('giant_blur'); say(STORY.giant_blur); return true; }
+  // tired at half health: Owen makes the time-out signal, which giants read as a sign of war
+  if (!flag('giant_timeout') && G.player.hp <= G.save.maxHp / 2 && !e.hiding) {
+    setFlag('giant_timeout'); e.warred = true; e.st = 'stalk'; e.t = 0;
+    G.shake = 0.5; Sound.play('boss'); floatText(e.x, e.y - 70, 'SIGN OF WAR!', '#ff6b6b');
+    say(STORY.giant_timeout); return true;
+  }
+  if (flag('giant_timeout')) e.warred = true;   // he stays angry if you leave and come back
+  return false;
 }
