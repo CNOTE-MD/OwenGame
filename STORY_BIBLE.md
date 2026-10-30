@@ -64,6 +64,14 @@ Full answers are in `story/OWEN_ANSWERS.md`. What they settle:
 | Next to build | Finding Storm Peak. |
 | Future ideas | Possessed wombat, squirrel and Carolina dog; a giant peanut-butter lion; Chilly's arch-enemy's palace (he's mad at Chilly, not helpful); a throne-room riddle for a heart piece. |
 
+## Page 7: the blur, the time-out signal, the giants' war (built)
+
+Owen's page plays inside the Forest Giant fight in three beats, in his words. A few seconds in: the blur ("The giant swings, I dodge, I swing, I miss"), Jon sings, Owen tells him to be quiet. At half health Owen is tired and accidentally makes the time-out signal, a T, which giants take as a sign of war: the giant gets faster for the rest of the fight. As the giant hides, Owen remembers the giants' war and gathers his wits; the page's cliffhanger is kept, and the fight continues.
+
+**Giant lore (canon):** the four giant clans are North, South, East and West. North despises South; East despises West. In their war North sided with East and South with West. Ever since, East and North like each other. A rune tablet in the foothills now carries this (replacing the smith's-name tease; the forge tablet still says names have power).
+
+**For Owen's next page:** how does Owen use the giants' war to win? Claim to be from the East? Call the South giants?
+
 ## Page 6: the Forest Giant of the North (built)
 
 Updated from Owen's answers: every third attack the giant wraps a ring of ground in leaves (dash or step out); when he loses he turns back into a log that rolls off the path and snores; the Leaf Rune (the fifth rune) appears in the Muck Forest afterward; the fight plays the Led Zeppelin-sound piece.

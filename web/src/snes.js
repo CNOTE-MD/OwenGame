@@ -190,7 +190,7 @@ function drawSnesEnemy(e, x, y) {
 const TABLET_TOTAL = 8;
 const TABLETS = {
   tab_coast: 'Rune tablet: "HANK WAS HERE. HANK THREW THE AXE. HANK IS SORRY."',
-  tab_hills: 'Rune tablet: "The smith\'s name is a vegetable. Do not laugh. He hears."',
+  tab_hills: 'Rune tablet: "The giants\' war: North and East against South and West. North despises South. East despises West. East and North are friends to this day."',
   tab_lake: 'Rune tablet: "The lake keeps what the lake is given. Unless you have Viking blood. Then it spits."',
   tab_grave: 'Rune tablet: "Chilly cannot stand the sun. He is part vampire and all penguin. In daylight his skin falls off. So he sends birds that cannot fly."',
   tab_volcano: 'Rune tablet: "Names have power. That is why nobody says the smith\'s. Behind the forge door: his notes, and a monster made of tin that guards them."',

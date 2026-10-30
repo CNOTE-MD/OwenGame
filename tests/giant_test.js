@@ -68,6 +68,23 @@ const path = require('path');
   await check('a runestone stands in the forest for the retry', await ev(() => G.ents.some(e => e.kind === 'runestone')));
   await check('the palace is Jjorvic Palace everywhere', await ev(() => /Jjorvic/i.test(STORY.signs.sign_cavern[0][1]) && /Jjorvic/.test(STORY.astrid_2[0][1]) && /Jjorvic/.test(objective() + '')));
 
+  // Owen's page 7: the blur, the time-out signal, the giants' old war
+  await ev(() => { for (const f of ['giant_done', 'log_chopped', 'giant_blur', 'giant_timeout', 'giant_lore']) G.save.flags[f] = false; G.save.flags.giant_woke = true; G.save.flags['tile:overworld:31,5:s'] = false; G.save.flags['tile:overworld:31,6:s'] = false; G.player.hp = 10; });
+  await go('overworld', 26, 9); await talkThrough();
+  await ev(() => { const g = G.ents.find(e => e.type === 'giant'); g.st = 'stalk'; g.fightT = 3.9; });
+  await pg.waitForFunction(() => G.state === 'talk', null, { timeout: 2000 }).catch(() => {});
+  await check('page 7: a few seconds in, the blur, Jon sings, "Jon. Be quiet."', await ev(() => flag('giant_blur') && STORY.giant_blur.some(l => l[1] === 'Jon. Be quiet.')));
+  await talkThrough();
+  await ev(() => { G.player.hp = 5; G.player.inv = 1; });
+  await pg.waitForFunction(() => G.state === 'talk', null, { timeout: 2000 }).catch(() => {});
+  await check('page 7: tired at half health, Owen makes the time-out signal: a sign of war', await ev(() => flag('giant_timeout') && G.ents.find(e => e.type === 'giant').warred && STORY.giant_timeout.some(l => /SIGN OF WAR/.test(l[1]))));
+  await talkThrough();
+  await ev(() => { const g = G.ents.find(e => e.type === 'giant'); g.hp = 6; g.st = 'stalk'; g.t = 0; });
+  await pg.waitForFunction(() => G.state === 'talk', null, { timeout: 2000 }).catch(() => {});
+  await check('page 7: as he hides, Owen remembers the giants\' war and gathers his wits', await ev(() => flag('giant_lore') && G.talk && STORY.giant_lore.some(l => l[1] === G.talk.cur[1]) && STORY.giant_lore.some(l => /gathered my wits/.test(l[1]))));
+  await talkThrough();
+  await check('the giants\' war is carved on a rune tablet', await ev(() => /North and East against South and West/.test(TABLETS.tab_hills)));
+
   console.log('errors:', JSON.stringify(errs));
   console.log('FAILS:', fails + errs.length);
   await b.close();
