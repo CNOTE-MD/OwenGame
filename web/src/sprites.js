@@ -63,6 +63,7 @@ function drawEnemy(e) {
   if (drawCh2Enemy(e, x, y)) return;
   if (drawRedeyeEnemy(e, x, y)) { if (e.boss && e.alive && attendantVisible(e)) bossBar(x, y - 40, e.hp / e.max); return; }
   if (e.type === 'giant') { drawGiantWrap(e); drawGiant(e, x, y); return; }
+  if (drawCritter(e, x, y)) { drawRooted(e); return; }
   if (e.type === 'varg') { drawVarg(e, x, y); drawRooted(e); return; }
   if (e.type === 'spider') { shadowAt(x, y + 3, 0.6); spr(SPR.spider, x, y + 4 + (Math.floor(e.wob) % 2), { white: e.flash > 0 }); drawRooted(e); return; }
   if (drawSnesEnemy(e, x, y)) return;

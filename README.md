@@ -12,6 +12,11 @@
 | `web/src/tech.js` | Engine and SNES-hardware techniques: fixed 60 Hz timestep, Mode 7 taxi ride, HDMA-style heat haze and dream wobble, mosaic and iris transitions, SPC700-style echo, CRT filter (Y), developer overlay (` or F3) |
 | `web/src/pixelfont.js` | The game's hand-built bitmap font (every glyph, accents and symbols included) and the shared window frame `drawPanel()` |
 | `web/src/owen.js` | Built from Owen's Quest Log answers: the Varg, spiders, Jon's Compliment, the Leaf Rune, the giant's leaf wrap and sleeping log, three Arena cards, mini Chillys |
+| `web/src/critters.js` | Owen's "Build the game" answers: possessed wombats, squirrels and Carolina dogs (freed, not killed), the Peanut Butter Lion on the beach, the riddle in Chilly's throne, Baron Blubber's secret sauna, and the choice menu |
+| `web/src/owenscript.js` | OWEN'S SCRIPT (edit any scene, write Chapter 4, saved in the page's shared database), Easy/Normal, chapter title cards, the level-up and boss-defeated moments, the forge door |
+| `web/src/editor.js` | Notebook paper and photos of Owen's real pages, Jon's memories of what you did, the RUSH Ø piano duel, Chilly's night (bolder creatures, Owen's own grave, resting at runestones), Owen's notes |
+| `web/src/art3.js` | Pixel primitives (lines, ellipses, glows in quarter-step alpha), Scale2x/Scale3x for big sprites, framed boss bars, a hand-built Flight 364, villager props and room decor |
+| `web/src/rock.js` | Jon remembers a song for each rune: the outdoor music fills back in layer by layer, a beat marker joins the HUD, chops on the beat hit 1.5x, bosses strike on the beat |
 | `web/src/giant.js` | Owen's page 6: the Forest Giant of the North boss at the log (stalk, slam, stuck window, hide as a tree) |
 | `web/src/better.js` | Objective compass, the Penguin King's Royal Rage with icicles, ambient sound (birds, crickets, wind, drips, subway hum), controller rumble, the nap bench, deeds on the map page |
 | `web/src/magic.js` | Magic and items: Rune Spells (Thunder, Frost, Fire, Mend on the rune meter), the Bag (salmon, lutefisk, shards), Charms (one worn at a time), the SPELLS and BAG menu pages |
@@ -23,7 +28,7 @@
 | `OWEN_QUESTIONS.md` | Prompts to ask Owen after he plays; his answers drive the next build |
 | `STORY_BIBLE.md` | Characters, chapter arc, items, the Red-Eye side quest, Arena mode |
 
-Rebuild: `python3 tools/maps.py && python3 tools/build_web.py`. Test: `NODE_PATH=$(npm root -g) node tests/web_playtest.js`, then `tests/arena_playtest.js`, `tests/ch1_depth_test.js`, `tests/redeye_test.js`, `tests/ch2_test.js`, `tests/jon_test.js`, `tests/pad_test.js`, `tests/snes_test.js`, `tests/magic_test.js`, `tests/better_test.js`, `tests/giant_test.js`, `tests/owen_test.js`, `tests/polish_test.js` and `tests/tech_test.js` the same way.
+Rebuild: `python3 tools/maps.py && python3 tools/build_web.py`. Test: `NODE_PATH=$(npm root -g) node tests/web_playtest.js`, then `tests/arena_playtest.js`, `tests/ch1_depth_test.js`, `tests/redeye_test.js`, `tests/ch2_test.js`, `tests/jon_test.js`, `tests/pad_test.js`, `tests/snes_test.js`, `tests/magic_test.js`, `tests/better_test.js`, `tests/giant_test.js`, `tests/owen_test.js`, `tests/polish_test.js`, `tests/tech_test.js`, `tests/critters_test.js` and `tests/script_test.js` the same way.
 
 ## Godot prototype (frozen)
 

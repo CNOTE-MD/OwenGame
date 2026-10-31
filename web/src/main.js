@@ -90,6 +90,7 @@ function update(dt) {
     }
     case 'talk': updateTalk(dt); return;
     case 'rhythm': updateRhythm(dt); return;
+    case 'choice': updateChoice(dt); return;
     case 'cutscene': return;
     case 'hold':
       G.player.hold.t -= dt;
@@ -173,6 +174,7 @@ function render() {
   if (G.bannerT > 0) { R(0, 92, VW, 34, 'rgba(0,0,0,.8)'); text(G.banner, VW / 2, 113, '#ffd84a', 'center'); }
   if (G.photoCard && G.state === 'talk') drawPhoto(G.photoCard, 128, 82, 104, 118, -0.04);
   if (G.state === 'talk') drawTalk();
+  if (G.state === 'choice') drawChoice();
   if (G.state === 'menu') { if (G.menuPage === 5) drawBagPage(); else if (G.menuPage === 4) drawSpellsPage(); else if (G.menuPage === 3) drawJukebox(); else if (G.menuPage === 2) drawMapPage(); else if (G.menuPage) drawJonPage(); else drawMenu(); drawMenuTabs(G.menuPage || 0); }
   drawBossCard(); drawCombo();
   drawJonLevel(); drawLevelBurst();
@@ -189,7 +191,7 @@ function render() {
 
 let last = performance.now();
 G.menuSel = 0;
-buildAll(); buildSnesArt(); buildAwesomeArt(); buildMagicArt(); buildGiantArt(); buildOwenArt();
+buildAll(); buildSnesArt(); buildAwesomeArt(); buildMagicArt(); buildGiantArt(); buildOwenArt(); buildCritterArt();
 function frame(now) {
   try { runFrame(now); } catch (err) { console.error(err); }   // fixed 60 Hz steps; see tech.js
   requestAnimationFrame(frame);

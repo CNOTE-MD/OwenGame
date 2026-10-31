@@ -448,6 +448,7 @@ function damageEnemy(e, dmg, from, how) {
   const jonHit = how === 'swing' || how === 'throw';
   if (e.flash > 0.05 && jonHit) return false;
   if (snesDamageRule(e, how, jonHit)) return true;
+  { const m = critterHit(e, how, jonHit, from); if (!m) return true; dmg *= m; }
   { const fz = frozenRule(e, how, jonHit); if (fz) dmg *= fz; }
   if (e.type === 'giant') { if (giantDamageRule(e, how, jonHit)) return true; if (how === 'magic') dmg += 1; }
   const dx = from.x - e.x, dy = from.y - e.y, d = Math.hypot(dx, dy) || 1;
@@ -481,7 +482,7 @@ function killEnemy(e) {
   e.alive = false;
   G.ents = G.ents.filter(o => o !== e);
   poof(e.x, e.y, e.boss); Sound.play('kill');
-  snesOnKill(e); awesomeOnKill(e);
+  snesOnKill(e); awesomeOnKill(e); critterOnKill(e);
   if (G.mode !== 'arena') { hitStop(e.boss ? 0.28 : 0.05); deed('kills'); rumble(e.boss ? 400 : 60, e.boss ? 1 : 0.3, e.boss ? 0.6 : 0.2); }
   const s = G.save;
   if (s.items.thunder) s.rune = Math.min(RUNE_MAX, s.rune + G.st.runeKill);
@@ -541,6 +542,10 @@ function updateEnemy(e, dt) {
     case 'spore': updateSpore(e, dt, dx, dy, d); break;
     case 'varg': updateVarg(e, dt, dx, dy, d, mr); break;
     case 'spider': updateSpider(e, dt, dx, dy, d, mr); break;
+    case 'wombat': updateWombat(e, dt, dx, dy, d, mr); break;
+    case 'squirrel': updateSquirrel(e, dt, dx, dy, d, mr); break;
+    case 'cdog': updateCdog(e, dt, dx, dy, d, mr); break;
+    case 'pblion': updateLion(e, dt, dx, dy, d, mr); break;
     case 'slime': updateSlime(e, dt, dx, dy, d, mr); break;
     case 'beetle': updateBeetle(e, dt, dx, dy, d, mr); break;
     case 'knight': case 'captain':
@@ -567,7 +572,7 @@ function updateEnemy(e, dt) {
       } else if (e.st === 'daze') { if (e.t > (e.raged ? 2.6 : 3.4) * bossWindow()) { e.st = 'waddle'; e.t = 0; } }
       break;
   }
-  if (d < e.r + 5 && e.st !== 'daze' && !(e.flipped > 0) && !e.bow && !(e.type === 'attendant' && (e.st === 'hide' || e.st === 'intro'))) hurtPlayer(e.type === 'king' && e.st !== 'slide' ? 1 : e.touch, e);
+  if (d < e.r + 5 && e.st !== 'daze' && !(e.flipped > 0) && !e.bow && !e.safe && !(e.type === 'attendant' && (e.st === 'hide' || e.st === 'intro'))) hurtPlayer(e.type === 'king' && e.st !== 'slide' ? 1 : e.touch, e);
 }
 
 function updatePickup(e, dt) {

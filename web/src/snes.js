@@ -236,9 +236,9 @@ function drawMapPage() {
   text(here || '', 128, 150, '#fff', 'center');
   const h = clockHour(), hh = Math.floor(h), mm = Math.floor((h - hh) * 60);
   text(`${phaseOfDay().toUpperCase()}  ${hh % 12 || 12}:${String(mm).padStart(2, '0')} ${hh < 12 ? 'AM' : 'PM'}`, 128, 160, '#a79fc4', 'center', false);
-  const pieces = ['hp_forest', 'hp_grave', 'c_cave', 'hp_bjarne'].filter(k => flag('got:' + k) || flag('chest:' + k)).length;
+  const pieces = ['hp_forest', 'hp_grave', 'c_cave', 'hp_bjarne', 'hp_squirrels', 'hp_lion', 'hp_riddle', 'hp_baron'].filter(k => flag('got:' + k) || flag('chest:' + k)).length;
   const conts = ['hc_cavern', 'hc_barrow', 'hc_redeye', 'hc_tablets'].filter(k => flag('got:' + k)).length;
-  text(`Heart pieces ${pieces}/4   Containers ${conts}/4`, 20, 174, '#f2ebcc', 'left', false);
+  text(`Heart pieces ${pieces}/8   Containers ${conts}/4`, 20, 174, '#f2ebcc', 'left', false);
   text(`Rune tablets ${tabletsFound()}/${TABLET_TOTAL}` + (tabletsFound() >= TABLET_TOTAL ? '  ✓' : ''), 20, 184, '#c8e8ff', 'left', false);
   text('Side quests ' + ['bjarne_done', 'sven_done'].filter(flag).length + '/2   Chapters ' + (flag('d2done') ? 3 : flag('d1done') ? 2 : 1) + ' of 5', 20, 194, '#f2ebcc', 'left', false);
   drawDeeds();

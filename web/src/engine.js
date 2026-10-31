@@ -137,7 +137,7 @@ window.addEventListener('keydown', e => {
 });
 window.addEventListener('keyup', e => { if (!typing(e)) keys[e.code] = false; });
 window.addEventListener('blur', () => { for (const k in keys) keys[k] = false; for (const k in virt) virt[k] = false; });
-cv.addEventListener('pointerdown', e => { cv.focus(); Sound.unlock(); edge.tap = true; const r = cv.getBoundingClientRect(); G.tapX = r.width ? (e.clientX - r.left) / r.width : 0.5; });
+cv.addEventListener('pointerdown', e => { cv.focus(); Sound.unlock(); edge.tap = true; const r = cv.getBoundingClientRect(); G.tapX = r.width ? (e.clientX - r.left) / r.width : 0.5; G.tapY = r.height ? (e.clientY - r.top) / r.height : 0.5; });
 document.querySelectorAll('.btn[data-a]').forEach(b => {
   const a = b.dataset.a;
   const on = e => { e.preventDefault(); virt[a] = true; edge[a] = true; b.classList.add('on'); Sound.unlock(); };

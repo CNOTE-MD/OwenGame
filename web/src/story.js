@@ -268,3 +268,69 @@ const ITEMS = {
   sheet: { name: 'Sheet Music', icon: 'sheet', lines: [['', 'You found BJARNE\'S SHEET MUSIC! It says "RUSH Ø" at the top. There are WAY too many notes.'], ['Jon', 'Bring it back to Bjarne in Fjordvik. The house on the right.']] },
   ship: { name: 'Toy Longship', icon: 'ship', lines: [['', 'You found SVEN\'S TOY LONGSHIP!'], ['Jon', 'Tiny Vikings. Adorable. Back to Sven at the market.']] },
 };
+
+// ---------- Owen's "Build the game" answers (Quest Log Q41 to Q44) ----------
+// Draft words for Owen to change in OWEN'S SCRIPT. Baron Blubber's name is a placeholder until Owen names him.
+Object.assign(STORY, {
+  lion_wake: [
+    ['', 'Something huge is asleep on the beach. It smells like a sandwich.'],
+    ['Jon', 'Is that... a LION? Made of PEANUT BUTTER?'],
+    ['Owen', 'Why is there a peanut butter lion on the beach where I died?'],
+    ['Jon', 'Norway, Señor. Norway. ...It\'s waking up. It\'s waking up! Don\'t let it hug you!'],
+    ['', 'It pounces, then gets stuck in itself. Chop it while it\'s STUCK.'],
+  ],
+  lion_again: [['Jon', 'The sandwich is awake again! Wait for the pounce. Chop while it\'s stuck.']],
+  lion_down: [
+    ['', 'The Peanut Butter Lion melts into a very large puddle. It looks happy about it.'],
+    ['Jon', 'I am going to be sticky for a WEEK. Do you know how hard it is to clean an axe? You don\'t. You have hands.'],
+    ['Owen', 'At least it was smooth. Not crunchy.'],
+    ['Jon', '...That was almost funny. I\'ll allow it.'],
+  ],
+  throne_riddle: [
+    ['', 'You look closer. Tiny runes are scratched into the armrest, under a fish bone.'],
+    ['Jon', 'A riddle! Chilly carved a RIDDLE into his own chair. Who does that?'],
+    ['Jon', 'Get it right and something in there goes click. Get it wrong and... probably nothing. Probably.'],
+  ],
+  throne_riddle_right: [
+    ['', 'CLICK. A little drawer slides out of the armrest.'],
+    ['Jon', 'Smart AND handsome. Well. Smart. I\'m the handsome one.'],
+  ],
+  baron_1: [
+    ['', 'A walrus in a towel sits in the steam. He wears a monocle. The monocle is fogged up.'],
+    ['Baron Blubber', 'WHO opened my secret door? ...Oh. You\'re not a penguin. Fine. Come in. Close the bush behind you.'],
+    ['Jon', 'Is that a dartboard with Chilly\'s face on it?'],
+    ['Baron Blubber', 'It is. I throw fish at it. Every. Single. Morning.'],
+    ['Owen', 'We\'re going after Chilly. Want to help?'],
+    ['Baron Blubber', 'Help? HELP? I don\'t help. I am MAD at Chilly. That\'s different. Being mad is a full-time job.'],
+    ['Baron Blubber', 'He froze my sauna. My SAUNA, boy. A frozen sauna is just a sad, wet closet.'],
+    ['Baron Blubber', 'So I built a new one next to a volcano. Let him try to freeze THIS one.'],
+    ['Jon', 'He\'s not going to help us, is he.'],
+    ['Baron Blubber', 'No. Now sit. Sweat. Leave. And don\'t touch my trophy.'],
+  ],
+  baron_rants: [
+    'Chilly once called me "a sock full of pudding." I have not forgotten. I will NEVER forget.',
+    'I am not helping you. I want that on the record. Write it down.',
+    'If you see Chilly, tell him Baron Blubber says his cape is TACKY.',
+    'Close the bush, you\'re letting the steam out.',
+    'Chilly\'s cousin lives on top of the Storm Peak. I don\'t like HIM either. I don\'t like anyone. I like steam.',
+    'Every morning: one fish at the dartboard. Every evening: one fish for me. Balance.',
+  ],
+  baron_trophy: [
+    ['', 'A glass case. Inside: a heart piece on a velvet pillow. The label says "STOLEN FROM CHILLY. HA."'],
+    ['Baron Blubber', 'Don\'t touch my trophy.'],
+    ['Jon', 'He stole it from Chilly. So technically, it\'s... evidence.'],
+    ['Baron Blubber', '...FINE. Take it. If Chilly sees YOU with it, he\'ll be twice as mad. That\'s not helping. That\'s revenge.'],
+  ],
+  baron_dartboard: [['', 'A dartboard with Chilly\'s face on it. Two fish are stuck in his nose.'], ['Jon', 'Bullseye. Twice. I respect this walrus.']],
+});
+STORY.signs.sign_nopeng = [['', 'A little sign, half melted: "NO PENGUINS. THIS MEANS YOU, CHILLY."'], ['Jon', 'Somebody around here REALLY doesn\'t like Chilly. I like them already. Look how fluffy that bush is.']];
+Object.assign(JON, {
+  wombat: ['A WOMBAT! Possessed by Chilly! Its butt is a SHIELD, Señor. That\'s a real fact. Chop the face!', 'It digs under you! Watch the dirt!', 'Wombat. Square poop, bony butt, red eyes. Two of those are normal.'],
+  squirrel: ['A squirrel with RED EYES. Chilly got to the squirrels. Nothing is sacred.', 'Acorns incoming! It stops before it throws!', 'Fast little guy. Chop it when it stops to aim.'],
+  cdog: ['Carolina dogs! A whole pack. They circle, then one runs in. Wait for the YIP!', 'Good dogs, bad spell. Free them!', 'They take turns. Very polite. Very bitey.'],
+  wombatbutt: ['BUTT ARMOR! I bounced right off. Go around to the face!', 'Not the butt! The butt is a shield!'],
+  lioncub: ['It SHRANK! Now it\'s a cub! A fast, angry, sticky cub!', 'Half the lion, twice the speed. Keep chopping!'],
+  freed: ['See that? Chilly\'s spell popped right off. They were never bad. Just possessed. Free them all!'],
+  stash: ['The squirrels left us their stash! Squirrels are the best. I take back everything I said.'],
+  saunastairs: ['Stairs. Under a BUSH. Who puts stairs under a bush? Someone with a secret, that\'s who.'],
+});

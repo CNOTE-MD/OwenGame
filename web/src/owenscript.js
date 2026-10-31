@@ -89,6 +89,8 @@ const SCENE_NAMES = {
   'flight.0': 'Flight 364: takeoff', 'flight.1': 'Flight 364: the odd look', 'flight.2': 'Flight 364: DEMON', 'flight.3': 'Flight 364: the cow dream',
   'signs.sign_fjordvik': 'Sign: Fjordvik', 'signs.sign_beach': 'Sign: the beach', 'signs.sign_airstrip': 'Sign: the airstrip', 'signs.sign_cavern': 'Sign: Jjorvic Palace', 'signs.sign_tbane': 'Sign: the T-bane', 'signs.seal_peak': 'Sealed door: Storm Peak',
   'flight.4': 'Flight 364: refreshments', 'flight.5': 'Flight 364: landing', 'taxi_out.0': 'Taxi to the forest (1)', 'taxi_out.1': 'Taxi to the forest (2)',
+  lion_wake: 'Peanut Butter Lion wakes up', lion_again: 'Peanut Butter Lion (again)', lion_down: 'Peanut Butter Lion melts', throne_riddle: 'The riddle in the throne', throne_riddle_right: 'Riddle solved',
+  baron_1: 'Meeting Baron Blubber', baron_trophy: "Baron Blubber's trophy", baron_dartboard: 'The Chilly dartboard', 'signs.sign_nopeng': 'Sign: NO PENGUINS',
 };
 const SCENE_ORDER = Object.keys(SCENE_NAMES);
 function sceneGet(id, from = STORY) { const [k, i] = id.split('.'); const v = from[k]; if (i === undefined) return v; if (Array.isArray(v)) return v[+i] && v[+i].lines; return v && v[i]; }
@@ -219,7 +221,7 @@ function playLines(lines) {
   $('tab-ch4').addEventListener('click', () => { SCRIPT.tab = 'ch4'; renderScript(); });
   $('tab-notebook').addEventListener('click', () => { SCRIPT.tab = 'notebook'; renderScript(); });
   const dl = document.createElement('datalist'); dl.id = 'speakers';
-  dl.innerHTML = ['Owen', 'Jon', 'Astrid', 'Hank', 'Fluffy', 'Walter', 'Chilly', 'Lars', 'Sven', 'Bjarne', 'Ingrid', 'Penguin King', 'Forest Giant'].map(n => `<option value="${n}">`).join('');
+  dl.innerHTML = ['Owen', 'Jon', 'Astrid', 'Hank', 'Fluffy', 'Walter', 'Chilly', 'Lars', 'Sven', 'Bjarne', 'Ingrid', 'Penguin King', 'Forest Giant', 'Baron Blubber'].map(n => `<option value="${n}">`).join('');
   document.body.appendChild(dl);
 })();
 

@@ -152,7 +152,7 @@ OW[(3, 1)] = [  # Volcano road: sealed Walter's Forge (dungeon 3)
     "...#...s...#...T",
     "T......s.......T",
     "T.#....s....#..T",
-    "T......s.......T",
+    "T......s.....b.T",  # a bush hides Baron Blubber's stairs
     "T......s..#....T",
     "TTTTTT.s..TTTTTT",
 ]
@@ -257,6 +257,13 @@ def P(sx, sy, x, y):  # screen-local tile -> global tile
 
 OW_ENT = [
     {"t": "start", "at": P(1, 2, 8, 8)},
+    # Owen's "Build the game" answers: possessed animals (Q41), the peanut butter lion (Q42), Baron Blubber's door (Q43)
+    {"t": "wombat", "at": P(0, 0, 4, 8)}, {"t": "wombat", "at": P(0, 2, 12, 5)},
+    {"t": "squirrel", "at": P(1, 0, 3, 4)}, {"t": "squirrel", "at": P(1, 0, 11, 10)},
+    {"t": "cdog", "at": P(0, 2, 10, 1)}, {"t": "cdog", "at": P(0, 2, 9, 2)}, {"t": "cdog", "at": P(0, 2, 11, 3)},
+    {"t": "pblion", "at": P(2, 2, 10, 6)},
+    {"t": "hiddenstairs", "at": P(3, 1, 13, 11), "to": "sauna", "dest": [8, 11]},
+    {"t": "sign", "at": P(3, 1, 12, 11), "text": "sign_nopeng"},
     {"t": "runestone", "at": P(1, 2, 4, 8)},
     {"t": "sign", "at": P(1, 2, 12, 8), "text": "sign_airstrip"},
     {"t": "cargo", "at": P(1, 2, 13, 5)},
@@ -472,6 +479,29 @@ SUBWAY = [
     "IIIIIIIIIIIIIIII",
     "IIIIIIIIIIIIIIII",
 ]
+SAUNA = [  # Baron Blubber's sauna, next to the volcano so Chilly can't freeze it
+    "ZZZZZZZZZZZZZZZZ",
+    "ZkkFFpppFFFFkkFZ",
+    "ZFFFFFFFFFFFFFFZ",
+    "ZFFFFFFFFFFFFFFZ",
+    "ZFFrrrrrrrrrrFFZ",
+    "ZFFrrrrrrrrrrFFZ",
+    "ZFFrrrrrrrrrrFFZ",
+    "ZFFFFFFFFFFFFFFZ",
+    "ZQQFFFFFFFFFFOOZ",
+    "ZFFFFFFFFFFFFFFZ",
+    "ZFFFFFFFFFFFFFFZ",
+    "ZFFFFFFFFFFFFFFZ",
+    "ZFFFFFFF<FFFFFFZ",
+    "ZZZZZZZZZZZZZZZZ",
+]
+SAUNA_ENT = [
+    {"t": "baron", "at": [7, 5]},
+    {"t": "trophy", "at": [12, 3]},
+    {"t": "dartboard", "at": [10, 1]},
+    {"t": "warp", "at": [8, 12], "to": "overworld", "dest": P(3, 1, 13, 12)},
+]
+check_block("sauna", SAUNA)
 SUBWAY_ENT = [
     {"t": "warp", "at": [8, 1], "to": "overworld", "dest": P(1, 2, 3, 9)},
     {"t": "exchange", "at": [3, 1]},
@@ -666,7 +696,7 @@ for e in CAV_ENT:
         continue
     ok = any((x + dx, y + dy) in cav_seen for dx, dy in ((0, 0), (1, 0), (-1, 0), (0, 1), (0, -1)))
     assert ok, ("cavern unreachable", e)
-for nm, g, ents, start in (("astrid", ASTRID, ASTRID_ENT, (7, 12)), ("bjarne", BJARNE, BJARNE_ENT, (7, 12)), ("cave", CAVE, CAVE_ENT, (8, 11)), ("subway", SUBWAY, SUBWAY_ENT, (8, 2))):
+for nm, g, ents, start in (("astrid", ASTRID, ASTRID_ENT, (7, 12)), ("bjarne", BJARNE, BJARNE_ENT, (7, 12)), ("cave", CAVE, CAVE_ENT, (8, 11)), ("subway", SUBWAY, SUBWAY_ENT, (8, 2)), ("sauna", SAUNA, SAUNA_ENT, (8, 11))):
     seen = reachable([list(r) for r in g], start)
     for e in ents:
         x, y = e["at"]
@@ -707,6 +737,7 @@ out = {
     "astrid_house": {"name": "Astrid's House", "rows": ASTRID, "ents": ASTRID_ENT, "interior": True},
     "bjarne_house": {"name": "Bjarne's House", "rows": BJARNE, "ents": BJARNE_ENT, "interior": True},
     "secret_cave": {"name": "Hidden Cave", "rows": CAVE, "ents": CAVE_ENT, "dark": True},
+    "sauna": {"name": "Baron Blubber's Sauna", "rows": SAUNA, "ents": SAUNA_ENT, "interior": True},
     "subway": {"name": "Fjordvik T-bane", "rows": SUBWAY, "ents": SUBWAY_ENT, "interior": True},
     "barrow": {"name": "The Drowned Barrow", "rows": ["".join(r) for r in br], "ents": BR_ENT, "dungeon": True},
     "redeye": {"name": "The Red-Eye", "rows": RE, "ents": RE_ENT, "dungeon": True, "dark": True, "redeye": True, "nokeys": True},
