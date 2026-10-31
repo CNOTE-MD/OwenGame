@@ -44,7 +44,7 @@ const path = require('path');
 
   // Q9: the plane dream is a one-timer: nothing points you back to it
   await ev(() => { setFlag('d1done'); setFlag('d2done'); setFlag('log_chopped'); });
-  await check('Q9: no compass or objective nudges toward the nightmare', await ev(() => objectiveTarget() === null && !/nap|Flight 364|bench/.test(objective())));
+  await check('Q9: no compass or objective nudges toward the nightmare', await ev(() => { const t = objectiveTarget(); return (!t || t.label === "Walter's Forge") && !/nap|Flight 364|bench/.test(objective()); }));
 
   // Q11, Q12, Q14: Jon's voice
   await check('Q11: "You\'re terrible. Do better." with love', await ev(() => JON.hurt.some(l => /terrible/.test(l)) && JON.kill.some(l => /terrible/.test(l))));

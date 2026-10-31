@@ -28,7 +28,7 @@ const MAPS = {
 "TT.x.x..s..f.......f....s..........ss~~~~~~ss......#...s...#..TT",
 "TT......s....,,.T.......s....b.TT...ss~~~~ss...TT......s......TT",
 "TT.b....s....b,TT..b....s......TT....ssssss....TT.#....s....#.TT",
-"T,,.....s....,,TT.......s......TT......s.......TT......s......TT",
+"T,,.....s....,,TT.......s......TT......s.......TT......s.....bTT",
 "T,,,....s......TT.......s......TT..T...s....T..TT......s..#...TT",
 "TTTTTT.s..TTTTTTTTTTTT.s..TTTTTTTTTTTT.s..TTTTTTTTTTTT.s..TTTTTT",
 "TTTTTT.s..TTTTTTTTTTTT.s..TTTTTTTTTTTT.s..TTTTTTTTTTTT.s..TTTTTT",
@@ -53,6 +53,82 @@ const MAPS = {
 24,
 36
 ]
+},
+{
+"t": "wombat",
+"at": [
+4,
+8
+]
+},
+{
+"t": "wombat",
+"at": [
+12,
+33
+]
+},
+{
+"t": "squirrel",
+"at": [
+19,
+4
+]
+},
+{
+"t": "squirrel",
+"at": [
+27,
+10
+]
+},
+{
+"t": "cdog",
+"at": [
+10,
+29
+]
+},
+{
+"t": "cdog",
+"at": [
+9,
+30
+]
+},
+{
+"t": "cdog",
+"at": [
+11,
+31
+]
+},
+{
+"t": "pblion",
+"at": [
+42,
+34
+]
+},
+{
+"t": "hiddenstairs",
+"at": [
+61,
+25
+],
+"to": "sauna",
+"dest": [
+8,
+11
+]
+},
+{
+"t": "sign",
+"at": [
+60,
+25
+],
+"text": "sign_nopeng"
 },
 {
 "t": "runestone",
@@ -981,7 +1057,7 @@ const MAPS = {
 "name": "Owen's Room, New York",
 "rows": [
 "ZZZZZZZZZZZZZZZZ",
-"ZFFFFFFFFFFFFFFZ",
+"ZFFFFkkFFFFFFkkZ",
 "ZFYYFFFFFFFQQQFZ",
 "ZFYYFFFFFFFFFFFZ",
 "ZFFFFFFFFFFFFFFZ",
@@ -1291,6 +1367,61 @@ const MAPS = {
 }
 ],
 "dark": true
+},
+"sauna": {
+"name": "Baron Blubber's Sauna",
+"rows": [
+"ZZZZZZZZZZZZZZZZ",
+"ZkkFFpppFFFFkkFZ",
+"ZFFFFFFFFFFFFFFZ",
+"ZFFFFFFFFFFFFFFZ",
+"ZFFrrrrrrrrrrFFZ",
+"ZFFrrrrrrrrrrFFZ",
+"ZFFrrrrrrrrrrFFZ",
+"ZFFFFFFFFFFFFFFZ",
+"ZQQFFFFFFFFFFOOZ",
+"ZFFFFFFFFFFFFFFZ",
+"ZFFFFFFFFFFFFFFZ",
+"ZFFFFFFFFFFFFFFZ",
+"ZFFFFFFF<FFFFFFZ",
+"ZZZZZZZZZZZZZZZZ"
+],
+"ents": [
+{
+"t": "baron",
+"at": [
+7,
+5
+]
+},
+{
+"t": "trophy",
+"at": [
+12,
+3
+]
+},
+{
+"t": "dartboard",
+"at": [
+10,
+1
+]
+},
+{
+"t": "warp",
+"at": [
+8,
+12
+],
+"to": "overworld",
+"dest": [
+61,
+26
+]
+}
+],
+"interior": true
 },
 "subway": {
 "name": "Fjordvik T-bane",

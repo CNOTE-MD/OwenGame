@@ -57,11 +57,11 @@ function updateGiant(e, dt, dx, dy, d, mr) {
     }
   } else if (e.st === 'raise') {
     if (e.t < 0.55) e.aim = { x: p.x, y: p.y };   // tracks you, then commits
-    if (e.t > 0.9) { e.st = 'slam'; e.t = 0; slamClub(e); }
+    if (e.t > 0.9 && (e.t > 1.05 || onBeat(0.05))) { e.st = 'slam'; e.t = 0; slamClub(e); }
   } else if (e.st === 'slam') {
     if (e.t > 0.25) { e.st = 'stuck'; e.t = 0; floatText(e.x, e.y - 60, 'STUCK! CHOP!', '#ffd84a'); jonSay('giant_stuck', { force: true, face: 'excited', cooldown: 4 }); }
   } else if (e.st === 'stuck') {
-    if (e.t > (e.hid ? 1.9 : 2.4)) { e.st = 'stalk'; e.t = 0; Sound.play('clank'); }
+    if (e.t > (e.hid ? 1.9 : 2.4) * bossWindow()) { e.st = 'stalk'; e.t = 0; Sound.play('clank'); }
   }
   if (e.st !== 'stuck' && d < e.r + 6) hurtPlayer(1, e);
 }
@@ -123,12 +123,12 @@ function drawGiant(e, x, y) {
   shadowAt(x, foot, 4);
   // the club: up during raise, down and buried while stuck
   const side = e.fx < 0 ? -1 : 1;
-  if (e.st === 'raise') { const lift = Math.min(1, e.t / 0.6); ctx.save(); ctx.translate(x + side * 20, foot - 50 * s / 3 - lift * 20); ctx.rotate(side * (-0.6 - lift * 1.2)); ctx.drawImage(SPR.giant_club, -12, -40, 24, 48); ctx.restore(); }
+  if (e.st === 'raise') { const lift = Math.min(1, e.t / 0.6); ctx.save(); ctx.translate(x + side * 20, foot - 50 * s / 3 - lift * 20); ctx.rotate(side * (-0.6 - lift * 1.2)); ctx.drawImage(up(SPR.giant_club, 3), -12, -40); ctx.restore(); }
   spr(img, x + sway, foot, { scale: s, white });
-  if (e.st === 'slam' || e.st === 'stuck') { const a = e.slamAt; if (a) { const ax = Math.round(a.x - G.cam.x), ay = Math.round(a.y - G.cam.y); ctx.drawImage(SPR.giant_club, ax - 12, ay - 44 + (e.st === 'stuck' ? 6 : 0), 24, 48); if (e.st === 'stuck' && Math.floor(G.t * 6) % 2) R(ax - 10, ay - 2, 20, 3, '#5a3e22'); } }
-  if (e.st === 'raise' && e.aim) { const ax = Math.round(e.aim.x - G.cam.x), ay = Math.round(e.aim.y - G.cam.y), k = Math.min(1, e.t / 0.9); ctx.globalAlpha = 0.35 + k * 0.4; ctx.fillStyle = '#3a2a16'; ctx.beginPath(); ctx.ellipse(ax, ay + 2, 10 + k * 20, 5 + k * 9, 0, 0, Math.PI * 2); ctx.fill(); ctx.globalAlpha = 1; }
+  if (e.st === 'slam' || e.st === 'stuck') { const a = e.slamAt; if (a) { const ax = Math.round(a.x - G.cam.x), ay = Math.round(a.y - G.cam.y); ctx.drawImage(up(SPR.giant_club, 3), ax - 12, ay - 44 + (e.st === 'stuck' ? 6 : 0)); if (e.st === 'stuck' && Math.floor(G.t * 6) % 2) R(ax - 10, ay - 2, 20, 3, '#5a3e22'); } }
+  if (e.st === 'raise' && e.aim) { const ax = Math.round(e.aim.x - G.cam.x), ay = Math.round(e.aim.y - G.cam.y), k = Math.min(1, e.t / 0.9); ctx.globalAlpha = qa(0.35 + k * 0.4); pxEllipseFill(ax, ay + 2, 10 + k * 20, 5 + k * 9, '#3a2a16'); ctx.globalAlpha = 1; }
   // health bar
-  if (e.alive) { R(x - 31, y - 82, 62, 5, '#000'); R(x - 30, y - 81, 60 * Math.max(0, e.hp / e.max), 3, '#9be08a'); }
+  if (e.alive) bossBar(x, y - 81, e.hp / e.max, '#58c040');
   return true;
 }
 function drawFakeTree(t) {

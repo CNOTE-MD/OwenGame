@@ -93,7 +93,7 @@ function useConsumable(id) {
   if (c.heal) { p.hp = Math.min(s.maxHp, p.hp + c.heal); Sound.play('heart'); }
   if (c.rune) { s.rune = RUNE_MAX; Sound.play('heart'); }
   if (c.fuel) { p.fuel = 60; Sound.play('charge'); }
-  if (id === 'lutefisk') JT.queued = 'lutefisk';
+  if (id === 'lutefisk') { JT.queued = 'lutefisk'; setFlag('ate_lutefisk'); }
   G.bagMsg = { text: c.text, t: 2.5 }; writeSave();
   return true;
 }
@@ -192,6 +192,7 @@ function drawSpellBox() {
     if (id !== 'thunder') for (let i = 0; i < sp.cost; i++) R(19 + i * 3, 18, 2, 1, ok ? '#7fd4ff' : '#55577a');
   } else if (s.items.homing) drawItemIcon('homing', 27, 12);
   if (s.charm && hasCharm(s.charm)) drawItemIcon(CHARMS[s.charm].icon, 128, 12);
+  drawBeatMarker();
 }
 
 // ---------------- art ----------------

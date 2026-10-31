@@ -50,7 +50,7 @@ const Music = {
     const c = this.compile(id);
     this.ev = c.ev; this.len = c.len; this.idx = 0; this.start = now + 0.15;
     this.bus = ac.createGain(); this.bus.gain.setValueAtTime(0, now); this.bus.gain.linearRampToValueAtTime(0.32 * c.gain, now + 0.8);
-    this.bus.connect(ac.destination);
+    this.bus.connect(ac.destination); Echo.attach(this.bus);
   },
 
   tick() {
@@ -77,6 +77,7 @@ const Music = {
   osc(type, f, t, end, detune = 0) { const o = Sound.ac.createOscillator(); o.type = type; o.frequency.setValueAtTime(f, t); o.detune.setValueAtTime(detune, t); o.start(t); o.stop(end + 0.6); return o; },
   note(e, t) {
     const ac = Sound.ac, out = this.bus;
+    if (typeof layerOn === 'function' && !layerOn(e)) return;   // Jon's remembered songs decide which layers play
     if (e.inst === 'drum') return this.drum(e, t);
     const end = t + e.d * 0.92;
     for (const f of e.f) {

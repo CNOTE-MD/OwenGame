@@ -2,7 +2,8 @@
 
 function say(lines, done) {
   if (!lines || !lines.length) { if (done) done(); return; }
-  G.talk = { queue: lines.slice(), done: done || null, cur: null, shown: 0, back: G.state === 'talk' ? 'play' : (G.state === 'hold' ? 'play' : G.state) };
+  done = typeof noteAfter === 'function' ? noteAfter(lines, done) : done;
+  G.talk = { paper: typeof isPaper === 'function' && isPaper(lines), queue: lines.slice(), done: done || null, cur: null, shown: 0, back: G.state === 'talk' ? 'play' : (G.state === 'hold' ? 'play' : G.state) };
   if (G.talk.back !== 'play' && G.talk.back !== 'cutscene') G.talk.back = 'play';
   G.state = 'talk';
   nextLine();
@@ -32,31 +33,35 @@ function drawPortrait(who, x, y) {
   else if (who === 'Owen') { const key = G.save && (G.save.voodoo || G.mode === 'arena') ? 'owen' : 'zombie'; spr(SPR[key + '_down_w0'], 0, 7); }
   else if (who === 'Penguin King') { spr(SPR.peng_down_0, 0, 6); spr(SPR.crown, 0, -6); }
   else if (who === 'Forest Giant') { ctx.scale(0.5, 0.5); spr(SPR.giant, 0, 16); }
+  else if (drawPortraitExtra(who)) {}
   else if (PORTRAIT_NPC[who]) spr(SPR['npc_' + PORTRAIT_NPC[who] + (blink ? '_blink' : '')] || SPR.npc_sven, 0, 7);
   else { ctx.restore(); return false; }
   ctx.restore(); return true;
 }
-const HAS_PORTRAIT = who => who === 'Jon' || who === 'Owen' || who === 'Penguin King' || who === 'Forest Giant' || !!PORTRAIT_NPC[who];
+const HAS_PORTRAIT = who => who === 'Jon' || who === 'Owen' || who === 'Penguin King' || who === 'Forest Giant' || ['Hank', 'Draugr Captain', 'Fluffy', 'Driver', 'Announcer'].includes(who) || !!PORTRAIT_NPC[who];
 function drawTalk() {
   const tk = G.talk; if (!tk) return;
   const [who, msg] = tk.cur;
   const inCut = tk.back === 'cutscene';
-  const top = !inCut && G.player && G.player.y - G.cam.y > 140;
-  const by = top ? 30 : 156, bx = 6, bw = 244, bh = 62;
-  drawPanel(bx, by, bw, bh);
+  const ride = inCut && G.cutPages && G.cutPages[G.cut.i] && String(G.cutPages[G.cut.i].art).startsWith('taxi');
+  const top = ride || (!inCut && G.player && G.player.y - G.cam.y > 140);
+  const by = top ? 30 : 156, bx = 6, bw = 244, bh = 62, paper = tk.paper;
+  if (paper) drawPaper(bx, by, bw, bh); else drawPanel(bx, by, bw, bh);
   let tx = bx + 10, tw = bw - 20;
-  if (who && HAS_PORTRAIT(who)) {
+  if (paper) { tx = bx + 22; tw = bw - 30; }
+  else if (who && HAS_PORTRAIT(who)) {
     R(bx + 6, by + 7, 36, 36, '#0a0812'); R(bx + 7, by + 8, 34, 34, '#2a2f66'); R(bx + 7, by + 8, 34, 12, '#343a7a');
     ctx.save(); ctx.beginPath(); ctx.rect(bx + 7, by + 8, 34, 34); ctx.clip(); drawPortrait(who, bx + 24, by + 24); ctx.restore();
     tx = bx + 48; tw = bw - 56;
   }
-  if (who) {
+  if (who && paper) text(who, tx, by + 10, '#c0392b', 'left', false);
+  else if (who) {
     const nw = textWidth(who) + 12;
     drawPanel(tx - 4, by - 9, nw, 14, { plain: true, field: '#2a1a10', top: '#3a2616' });
     text(who, tx + 2, by + 1, '#ffd84a', 'left', false);
   }
-  let left = Math.floor(tk.shown), y = by + 17;
-  for (const l of wrap(msg, tw).slice(0, 4)) { text(l.slice(0, Math.max(0, left)), tx, y, '#f6f0dc', 'left', true); left -= l.length + 1; y += 11; }
+  let left = Math.floor(tk.shown), y = by + (paper && who ? 23 : 17);
+  for (const l of wrap(msg, tw).slice(0, 4)) { text(l.slice(0, Math.max(0, left)), tx, y, paper ? INK : '#f6f0dc', 'left', !paper); left -= l.length + 1; y += 11; }
   if (tk.shown >= msg.length) text('▼', bx + bw - 13, by + bh - 6 + (Math.floor(G.t * 4) % 2), '#ffd84a', 'left', false);
 }
 
@@ -101,7 +106,8 @@ function objective() {
     if (!s.items.dash) return 'Chapter 3: the Drowned Barrow has opened in the north-west foothills. Find what the Draugr Captain guards.';
     return 'Chapter 3: use the Voodoo Dash to cross the water and barriers. Find the big key and free Hank\'s ghost.';
   }
-  return 'Chapter 3 complete! Walter\'s Forge and the Storm Peak wait for Owen\'s next chapters.';
+  if (!SCRIPT.ch4.length) return 'Chapter 4: Walter\'s Forge is on the volcano road, and it opens when Owen writes it. Open OWEN\'S SCRIPT under the screen.';
+  return 'Chapter 4: Walter\'s Forge, east on the volcano road. Read Owen\'s pages at the forge door.';
 }
 const MENU_TABS = ['GEAR', 'JON', 'MAP', 'MUSIC', 'SPELLS', 'BAG'];
 function drawMenuTabs(active) {
@@ -140,6 +146,8 @@ function drawMenu() {
   text('Voodoo bond ' + (s.voodoo ? 'ready' : 'used'), 20, 151, s.voodoo ? '#9be08a' : '#c9a0f0');
   if (side.length) text('Side quests ' + side.join('  '), 20, 162, '#c8e8ff', 'left', false);
   text(Sound.muted ? 'M sound off' : 'M sound on', 236, 140, '#8a8ab0', 'right', false);
+  text((isEasy() ? 'EASY' : 'NORMAL') + ' (X)', 236, 162, isEasy() ? '#9be08a' : '#8a8ab0', 'right', false);
+  text('NOTES ' + (NOTES.on ? 'ON' : 'OFF') + ' (C)', 236, 129, NOTES.on ? '#f4eedb' : '#8a8ab0', 'right', false);
   text(Music.on ? 'N music on' : 'N music off', 236, 151, '#8a8ab0', 'right', false);
   R(16, 169, 224, 1, '#3a3f80');
   text('QUEST', 20, 180, '#ffd84a');
@@ -183,6 +191,7 @@ function drawTitle() {
   for (let k = 0; k < 5; k++) R(sx + 11, sy - 20 + k * 3, 22, 3, k % 2 ? '#e8dcb8' : '#c03a2a');
   ctx.globalAlpha = 0.25; R(sx + 4, sy + 7, 40, 2, '#c03a2a'); ctx.globalAlpha = 1;
   drawTitleExtras();
+  drawPhoto('title', 30, 190, 40, 50, -0.09);
   // the logo: chunky outlined letters, ice-blue with a darker lower half
   const ly = 92;
   text('JÖNTUKA', VW / 2, ly, '#dff6ff', 'center', 'outline', 3);
@@ -208,6 +217,7 @@ function titleOptions() {
   if (has) o.push({ label: 'CONTINUE', id: 'continue' });
   o.push({ label: 'NEW GAME', id: 'new' });
   o.push({ label: 'VALHALLA ARENA', id: 'arena' });
+  o.push({ label: 'MODE: ' + (defaultDiff() === 'easy' ? 'EASY' : 'NORMAL'), id: 'mode' });
   return o;
 }
 
@@ -215,8 +225,10 @@ function titleOptions() {
 function drawCutscene() {
   const c = G.cut, page = (G.cutPages || STORY.flight)[c.i], t = G.t;
   R(0, 0, VW, VH, '#000');
-  if (page.art && page.art.startsWith('taxi')) return drawTaxiScene(page);
-  switch (page.art) {
+  if (page.art && page.art.startsWith('taxi')) return drawRideMode7(page);
+  if (page.art === 'plane' || page.art === 'cabin' || page.art === 'demon') drawFlightArt(page.art, t);
+  else if (page.art === 'land') drawLandArt(t);
+  switch (page.art === 'never' ? page.art : null) {
     case 'plane':
       R(0, 0, VW, 140, '#1b2a55'); for (let i = 0; i < 30; i++) R((i * 71) % VW, (i * 37) % 120, 1, 1, '#8899cc');
       for (let i = 0; i < 4; i++) { const cx = ((i * 90 - t * 20) % 340 + 340) % 340 - 40; R(cx, 100 + i * 8, 40, 8, '#2c3e70'); }
@@ -246,6 +258,7 @@ function drawCutscene() {
       for (let i = 0; i < 5; i++) R(0, 60 + i * 5, VW, 1, '#9cc8ef');
       break;
   }
+  drawPhoto('flight', 214, 80, 62, 84, 0.07);
   text('FLIGHT 364  ·  NEW YORK → NORWAY', VW / 2, 12, '#888', 'center', false);
 }
 function startFlight() {

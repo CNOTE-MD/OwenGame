@@ -51,10 +51,10 @@ Owen answered all fifty Quest Log questions online. His words, unedited except f
 40. Next scene: the fight with the giant (built) and finding Storm Peak.
 
 ## Rune 5: Build the game
-41. Possessed animals: a wombat, a squirrel, and a Carolina dog.
-42. Funny and dangerous: a very large lion made of peanut butter.
-43. Secret: Chilly's arch-enemy's palace. He doesn't help you; he's just mad at Chilly.
-44. Heart-piece puzzle: in Chilly's throne room, observing the throne gives a riddle, like a common internet riddle.
+41. Possessed animals: a wombat, a squirrel, and a Carolina dog. [Built: the wombat tunnels and has butt armor, the squirrel throws acorns, the dogs hunt as a pack. Beaten, they're freed and run home.]
+42. Funny and dangerous: a very large lion made of peanut butter. [The Peanut Butter Lion, asleep on the beach: pounces, gets stuck in itself, shrinks to a cub at half health. Heart piece.]
+43. Secret: Chilly's arch-enemy's palace. He doesn't help you; he's just mad at Chilly. [Baron Blubber's Sauna (a walrus; Owen can rename him), under a bush by a NO PENGUINS sign on the Volcano Road. Heart piece in his trophy case.]
+44. Heart-piece puzzle: in Chilly's throne room, observing the throne gives a riddle, like a common internet riddle. [After you sit on the throne, look again: four riddles take turns; the right answer opens a drawer with a heart piece.]
 45. Fifth rune: a plant-rising rune, hidden in a big, big forest. [Leaf Rune, in the Muck Forest after the giant.]
 46. Lars should sell energy drinks that make the dash last longer. [Fjord Fuel.]
 47. Tablet secret: Hank's real name is not Hank. It's actually Hank with a J. [Tablet.]
