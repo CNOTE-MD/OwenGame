@@ -26,9 +26,9 @@ const path = require('path');
   await ev(() => { G.mode = 'story'; G.save = newSave(); applyJonPerks(); G.player = makePlayer(); G.jon = makeJon(); setFlag('met_astrid'); loadMap('overworld', 20 * 16 + 8, 36 * 16 + 8); G.state = 'menu'; });
   for (let i = 0; i < 6; i++) { await ev(i => { G.menuPage = i; render(); }, i); }
   await check('all six menu pages draw under one tab strip', errs.length === 0 && await ev(() => MENU_TABS.length === 6));
-  await ev(() => { G.state = 'play'; say([['Jon', 'Hello Señor! ¡Vámonos!'], ['Astrid', 'Wipe your feet.'], ['Penguin King', 'AK!'], ['Driver', 'Twenty kroner.']]); });
+  await ev(() => { G.state = 'play'; say([['Jon', 'Hello Señor! ¡Vámonos!'], ['Astrid', 'Wipe your feet.'], ['Penguin King', 'AK!'], ['Stranger', 'Twenty kroner.']]); });
   for (let i = 0; i < 4; i++) { await ev(() => { G.talk.shown = 999; render(); }); await pg.keyboard.press('KeyZ'); await wait(40); }
-  await check('dialogue draws with and without portraits', errs.length === 0 && await ev(() => HAS_PORTRAIT('Jon') && HAS_PORTRAIT('Astrid') && !HAS_PORTRAIT('Driver')));
+  await check('dialogue draws with and without portraits', errs.length === 0 && await ev(() => HAS_PORTRAIT('Jon') && HAS_PORTRAIT('Astrid') && HAS_PORTRAIT('Driver') && !HAS_PORTRAIT('Stranger')));
   await ev(() => { G.state = 'title'; G.titleOpts = null; render(); });
   await check('the title screen draws', errs.length === 0);
   console.log('errors:', JSON.stringify(errs));

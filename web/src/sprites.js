@@ -12,8 +12,9 @@ function drawOwen(x, y) {
     spr(SPR[key + '_hold'], x, y + 7);
     // A Link to the Past item fanfare: rays and twinkles around the prize
     const ix = x, iy = y - 22, t = G.t * 3;
-    ctx.strokeStyle = 'rgba(255,240,170,0.5)'; ctx.lineWidth = 1;
-    for (let i = 0; i < 8; i++) { const a = t * 0.5 + i * Math.PI / 4, r0 = 9, r1 = 14 + 3 * Math.sin(t * 2 + i); ctx.beginPath(); ctx.moveTo(ix + Math.cos(a) * r0, iy + Math.sin(a) * r0); ctx.lineTo(ix + Math.cos(a) * r1, iy + Math.sin(a) * r1); ctx.stroke(); }
+    ctx.globalAlpha = 0.5;
+    for (let i = 0; i < 8; i++) { const a = t * 0.5 + i * Math.PI / 4, r0 = 9, r1 = 14 + 3 * Math.sin(t * 2 + i); pxLine(ix + Math.cos(a) * r0, iy + Math.sin(a) * r0, ix + Math.cos(a) * r1, iy + Math.sin(a) * r1, '#fff0aa'); }
+    ctx.globalAlpha = 1;
     drawItemIcon(p.hold.id, ix, iy);
     for (let i = 0; i < 3; i++) { const a = t + i * 2.1; drawTwinkle(ix + Math.cos(a) * 12, iy + Math.sin(a) * 9, (Math.floor(G.t * 8) + i) % 2); }
     return;
@@ -31,7 +32,7 @@ function drawTwinkle(x, y, big) {
 function drawJonSprite(x, y, spin, blink, face) {
   const img = blink && face !== 'sleepy' ? SPR.jon_blink : (face && SPR['jon_' + face]) || SPR.jon;
   ctx.save(); ctx.translate(Math.round(x), Math.round(y)); ctx.rotate(spin);
-  if (G.save && G.save.items.homing) { ctx.globalAlpha = 0.25 + 0.1 * Math.sin(G.t * 6); ctx.fillStyle = '#ffd84a'; ctx.beginPath(); ctx.arc(1, -2, 10, 0, Math.PI * 2); ctx.fill(); ctx.globalAlpha = 1; }
+  if (G.save && G.save.items.homing) { ctx.globalAlpha = qa(0.25 + 0.1 * Math.sin(G.t * 6)); pxEllipseFill(1, -2, 10, 10, '#ffd84a'); ctx.globalAlpha = 1; }
   ctx.drawImage(img, -img.width / 2 + 1, -img.height / 2);
   ctx.restore();
 }
@@ -41,8 +42,8 @@ function drawSlash() {
   const k = Math.min(1, j.st / (0.2 / G.st.atk)), a0 = j.base - 1.3, a1 = j.base - 1.3 + 2.6 * k;
   const x = p.x - G.cam.x, y = p.y - G.cam.y;
   ctx.lineCap = 'round';
-  ctx.strokeStyle = 'rgba(255,255,255,0.55)'; ctx.lineWidth = 7; ctx.beginPath(); ctx.arc(x, y, 15, Math.max(a0, a1 - 1.6), a1); ctx.stroke();
-  ctx.strokeStyle = 'rgba(160,220,255,0.9)'; ctx.lineWidth = 2; ctx.beginPath(); ctx.arc(x, y, 18, Math.max(a0, a1 - 1.2), a1); ctx.stroke();
+  ctx.globalAlpha = 0.5; pxEllipse(x, y, 15, 15, '#ffffff', 5, Math.max(a0, a1 - 1.6), a1); ctx.globalAlpha = 1;
+  pxEllipse(x, y, 18, 18, '#a0dcff', 2, Math.max(a0, a1 - 1.2), a1);
   ctx.lineCap = 'butt';
 }
 function drawJon() {
@@ -60,7 +61,7 @@ function drawJon() {
 function drawEnemy(e) {
   const x = Math.round(e.x - G.cam.x), y = Math.round(e.y - G.cam.y);
   if (drawCh2Enemy(e, x, y)) return;
-  if (drawRedeyeEnemy(e, x, y)) { if (e.boss && e.alive && attendantVisible(e)) { R(x - 31, y - 41, 62, 5, '#000'); R(x - 30, y - 40, 60 * Math.max(0, e.hp / e.max), 3, '#e23'); } return; }
+  if (drawRedeyeEnemy(e, x, y)) { if (e.boss && e.alive && attendantVisible(e)) bossBar(x, y - 40, e.hp / e.max); return; }
   if (e.type === 'giant') { drawGiantWrap(e); drawGiant(e, x, y); return; }
   if (e.type === 'varg') { drawVarg(e, x, y); drawRooted(e); return; }
   if (e.type === 'spider') { shadowAt(x, y + 3, 0.6); spr(SPR.spider, x, y + 4 + (Math.floor(e.wob) % 2), { white: e.flash > 0 }); drawRooted(e); return; }
@@ -100,8 +101,7 @@ function drawEnemy(e) {
       break; }
     case 'wisp': {
       const g = 0.6 + 0.4 * Math.sin(G.t * 6 + e.wob);
-      const gr = ctx.createRadialGradient(x, y, 0, x, y, 12); gr.addColorStop(0, `rgba(160,230,255,${0.55 * g})`); gr.addColorStop(1, 'rgba(160,230,255,0)');
-      ctx.fillStyle = gr; ctx.fillRect(x - 12, y - 12, 24, 24);
+      pxGlow(x, y, 12, '160,230,255', 0.55 * g);
       R(x - 3, y - 3, 6, 6, e.flash > 0 ? '#fff' : '#dff6ff'); R(x - 2, y - 4, 4, 1, '#dff6ff'); R(x - 1, y - 6 - Math.round(g * 2), 2, 2, '#bfeaff');
       R(x - 2, y - 1, 1, 2, '#123'); R(x + 1, y - 1, 1, 2, '#123');
       break; }
@@ -112,7 +112,7 @@ function drawEnemy(e) {
   }
   if (e.boss && e.alive) {
     const w = 60, bx = x - w / 2, by = y - (e.type === 'king' ? 54 : 40);
-    R(bx - 1, by - 1, w + 2, 5, '#000'); R(bx, by, w * Math.max(0, e.hp / e.max), 3, '#e23');
+    bossBar(x, by, e.hp / e.max);
   }
 }
 function drawShield(e, x, y, s) {
@@ -120,7 +120,7 @@ function drawShield(e, x, y, s) {
   const ox = down ? -e.fy * 9 * s : e.fx * 7 * s, oy = down ? e.fx * 4 * s + 4 : e.fy * 5 * s;
   ctx.save(); ctx.translate(Math.round(x + ox), Math.round(y + oy));
   if (down) ctx.rotate(0.6);
-  const img = SPR.shield, w = img.width * s * 0.9, h = img.height * s * 0.9;
+  const img = s >= 2 ? up(SPR.shield, Math.round(s)) : SPR.shield, w = s >= 2 ? img.width : Math.round(img.width * s * 0.9), h = s >= 2 ? img.height : Math.round(img.height * s * 0.9);
   ctx.drawImage(e.flash > 0 ? whiteOf(img) : img, Math.round(-w / 2), Math.round(-h / 2), w, h);
   ctx.restore();
 }
@@ -131,12 +131,13 @@ function drawPerson(x, y, id, bob) {
   shadowAt(x, y + 6, 1);
   const blink = (G.t + bob) % 3.6 < 0.13;
   spr(SPR['npc_' + id + (blink ? '_blink' : '')] || SPR.npc_sven, x, y + 7 + b);
+  drawPersonExtra(x, y + b, id);
 }
 const LOOKS = {
   bjarne: { shirt: '#3a7a4a', hair: '#e8e8e8', beard: true, hat: '#7a4a22' },
   astrid: { shirt: '#6b3fa0', hair: '#e8e8e8', long: true },
   lars: { shirt: '#b33a2e', hair: '#d9a441', beard: true },
-  sven: { shirt: '#2f8a5a', hair: '#f2d27a' },
+  sven: { shirt: '#2f8a5a', hair: '#f2d27a', kid: true },
   ingrid: { shirt: '#2f5aa8', hair: '#a0522d', long: true, hat: '#e0c040' },
   attendant_ok: { shirt: '#1b2a55', hair: '#3a2a1a', long: true, hat: '#c0392b' },
   commuter: { shirt: '#6a6a7a', hair: '#8a5a2a', hat: '#2a2a2a' },
@@ -165,6 +166,7 @@ function drawThing(e) {
   switch (e.kind) {
     case 'enemy': drawEnemy(e); drawFrozen(e); drawRooted(e); return;
     case 'sleeplog': return drawSleepLog(e);
+    case 'owengrave': return drawOwenGrave(e);
     case 'cargo': if (flag('d1done')) { shadowAt(x, y + 6, 1.4); spr(SPR.bench, x, y + 8); } return;
     case 'tablet': shadowAt(x, y + 6, 0.8); spr(SPR.tablet, x, y + 7 + Math.round(Math.sin(t * 2) * 1)); if (Math.floor(t * 3) % 3 === 0) drawTwinkle(x + 5, y - 6, 0); return;
     case 'throne': spr(SPR.throne, x, y + 8); return;
@@ -199,6 +201,6 @@ function drawThing(e) {
       const on = flag(G.mapId + ':gates');
       R(x - 5, y + 2, 10, 5, '#3a3a4a'); poly([[x, y - 9], [x + 6, y - 2], [x, y + 4], [x - 6, y - 2]], on ? '#7fd4ff' : '#ff9a1f'); R(x - 2, y - 5, 2, 3, '#fff');
       break; }
-    case 'warp': if (e.portal) { for (let i = 0; i < 3; i++) { const r = 4 + ((t * 10 + i * 4) % 10); ctx.strokeStyle = `rgba(127,212,255,${1 - r / 14})`; ctx.lineWidth = 1; ctx.beginPath(); ctx.ellipse(x, y, r, r * 0.6, 0, 0, Math.PI * 2); ctx.stroke(); } } break;
+    case 'warp': if (e.portal) { for (let i = 0; i < 3; i++) { const r = 4 + ((t * 10 + i * 4) % 10); ctx.globalAlpha = qa(1 - r / 14); pxEllipse(x, y, r, r * 0.6, '#7fd4ff'); ctx.globalAlpha = 1; } } break;
   }
 }

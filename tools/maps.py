@@ -486,7 +486,7 @@ check_block("subway", SUBWAY)
 # ---------------- Owen's room (New York) ----------------
 HOME = [
     "ZZZZZZZZZZZZZZZZ",
-    "ZFFFFFFFFFFFFFFZ",
+    "ZFFFFkkFFFFFFkkZ",
     "ZFYYFFFFFFFQQQFZ",
     "ZFYYFFFFFFFFFFFZ",
     "ZFFFFFFFFFFFFFFZ",

@@ -126,16 +126,18 @@ function inputVec() {
   const m = Math.hypot(x, y);
   return m ? { x: x / m, y: y / m } : { x: 0, y: 0 };
 }
+const typing = e => { const t = e.target; return !!(t && (t.tagName === 'INPUT' || t.tagName === 'TEXTAREA' || t.tagName === 'SELECT' || t.isContentEditable)); };
 window.addEventListener('keydown', e => {
+  if (typing(e)) return;
   if (e.code.startsWith('Arrow') || e.code === 'Space' || e.code === 'Tab') e.preventDefault();
   if (e.repeat) return;
   keys[e.code] = true;
   for (const a in ACTIONS) if (ACTIONS[a].includes(e.code)) edge[a] = true;
   Sound.unlock();
 });
-window.addEventListener('keyup', e => { keys[e.code] = false; });
+window.addEventListener('keyup', e => { if (!typing(e)) keys[e.code] = false; });
 window.addEventListener('blur', () => { for (const k in keys) keys[k] = false; for (const k in virt) virt[k] = false; });
-cv.addEventListener('pointerdown', () => { cv.focus(); Sound.unlock(); edge.tap = true; });
+cv.addEventListener('pointerdown', e => { cv.focus(); Sound.unlock(); edge.tap = true; const r = cv.getBoundingClientRect(); G.tapX = r.width ? (e.clientX - r.left) / r.width : 0.5; });
 document.querySelectorAll('.btn[data-a]').forEach(b => {
   const a = b.dataset.a;
   const on = e => { e.preventDefault(); virt[a] = true; edge[a] = true; b.classList.add('on'); Sound.unlock(); };

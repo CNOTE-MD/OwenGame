@@ -59,10 +59,10 @@ function updateHank(e, dt, dx, dy, d) {
       tryMove(e, dx / d * 22 * dt + Math.cos(G.t * 1.3) * 18 * dt, dy / d * 22 * dt + Math.sin(G.t * 1.7) * 14 * dt, 8, 'flyer');
       e.fx = dx / d; e.fy = dy / d;
       e.throwT = (e.throwT || 0) + dt; e.raiseT = (e.raiseT || 0) + dt;
-      if (e.throwT > 2.4) { e.throwT = 0; HK.axes.push({ x: e.x, y: e.y - 20, vx: dx / d * 150, vy: dy / d * 150, t: 0, home: e, spin: 0 }); Sound.play('throw'); }
+      if (e.throwT > (isEasy() ? 2.4 : 1.9)) { e.throwT = 0; HK.axes.push({ x: e.x, y: e.y - 20, vx: dx / d * 150, vy: dy / d * 150, t: 0, home: e, spin: 0 }); Sound.play('throw'); }
       if (e.raiseT > 7.5 && G.ents.filter(o => o.type === 'wisp' && o.alive).length < 2) { e.raiseT = 0; spawnEnemy('wisp', e.x - 30, e.y); spawnEnemy('wisp', e.x + 30, e.y); Sound.play('creep'); }
       break;
-    case 'daze': if (e.t > 2.6) { e.st = 'float'; e.t = 0; e.frozen = true; Sound.play('charge'); floatText(e.x, e.y - 50, 'Frost returns!', '#9fe0ff'); } break;
+    case 'daze': if (e.t > 1.8 * bossWindow()) { e.st = 'float'; e.t = 0; e.frozen = true; Sound.play('charge'); floatText(e.x, e.y - 50, 'Frost returns!', '#9fe0ff'); G.fx.push({ kind: 'ring', x: e.x, y: e.y, vx: 0, vy: 0, t: 0, life: 0.5 }); if (dist(e, p) < 40) hurtPlayer(1, e); } break;
   }
 }
 function updateHankAxes(dt) {
@@ -101,18 +101,17 @@ function drawCh2Enemy(e, x, y) {
     // horned helm and spectral axe
     R(x - 16, y - 36 + bob, 4, 8, '#f2ebcc'); R(x + 12, y - 36 + bob, 4, 8, '#f2ebcc');
     if (e.frozen) {
-      ctx.strokeStyle = `rgba(160,230,255,${0.6 + 0.3 * Math.sin(G.t * 6)})`; ctx.lineWidth = 2;
-      ctx.beginPath(); ctx.ellipse(x, y - 6 + bob, 26, 30, 0, 0, Math.PI * 2); ctx.stroke();
+      ctx.globalAlpha = qa(0.6 + 0.3 * Math.sin(G.t * 6)); pxEllipse(x, y - 6 + bob, 26, 30, '#a0e6ff', 2); ctx.globalAlpha = 1;
       for (let i = 0; i < 6; i++) { const a = G.t * 1.5 + i * 1.05; R(x + Math.cos(a) * 26 - 1, y - 6 + bob + Math.sin(a) * 30 - 1, 3, 3, '#e8f8ff'); }
     }
     if (e.st === 'daze') for (let i = 0; i < 3; i++) { const a = G.t * 5 + i * 2.1; drawStar(x + Math.cos(a) * 18, y - 44 + Math.sin(a) * 4); }
-    R(x - 31, y - 61, 62, 5, '#000'); R(x - 30, y - 60, 60 * Math.max(0, e.hp / e.max), 3, '#e23');
+    bossBar(x, y - 60, e.hp / e.max);
     return true;
   }
   return false;
 }
 function drawHankAxes() {
-  for (const a of HK.axes) { ctx.globalAlpha = 0.8; drawJonSprite(a.x - G.cam.x, a.y - G.cam.y, a.spin); ctx.globalAlpha = 0.35; ctx.fillStyle = '#9fe0ff'; ctx.beginPath(); ctx.arc(a.x - G.cam.x, a.y - G.cam.y, 10, 0, Math.PI * 2); ctx.fill(); ctx.globalAlpha = 1; }
+  for (const a of HK.axes) { ctx.globalAlpha = 0.8; drawJonSprite(a.x - G.cam.x, a.y - G.cam.y, a.spin); pxGlow(a.x - G.cam.x, a.y - G.cam.y, 10, '159,224,255', 0.45); }
 }
 function drawDashGhost(f) {
   const { d, flip } = dirOf(f.fx, f.fy);

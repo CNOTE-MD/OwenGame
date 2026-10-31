@@ -201,10 +201,10 @@ const TABLETS = {
 function tabletsFound() { return Object.keys(TABLETS).filter(k => flag('got:' + k)).length; }
 function readTablet(e) {
   const id = e.def.id;
-  if (flag('got:' + id)) return say([['', TABLETS[id]]]);
+  if (flag('got:' + id)) { const l = [['', TABLETS[id]]]; l.paper = true; return say(l); }
   setFlag('got:' + id); jonXP(8); Sound.play('secret'); JT.queued = 'tablet';
   const n = tabletsFound();
-  const lines = [['', TABLETS[id]], ['', `Rune tablet ${n} of ${TABLET_TOTAL} found.`]];
+  const lines = [['', TABLETS[id]], ['', `Rune tablet ${n} of ${TABLET_TOTAL} found.`]]; lines.paper = true;
   if (n === TABLET_TOTAL) { say(lines, () => { setFlag('got:hc_tablets'); giveItem('container'); }); return; }
   say(lines, () => writeSave());
 }
@@ -263,7 +263,7 @@ function startRide(to) {
   G.cutPages = to === 'forest' ? STORY.taxi_out : STORY.taxi_back;
   G.cut = { i: 0 }; G.rideT0 = G.t;
   G.cutDone = () => {
-    if (to === 'forest') { loadMap('overworld', 23 * T + 8, 12 * T + 8); } else { loadMap('overworld', 20 * T + 8, 37 * T + 8); }
+    if (to === 'forest') { loadMap('overworld', 23 * T + 8, 13 * T + 8); } else { loadMap('overworld', 20 * T + 8, 37 * T + 8); }
     G.state = 'play'; writeSave();
     if (to === 'forest' && !flag('forest_arrival')) { setFlag('forest_arrival'); say(STORY.forest_arrival); }
     JT.queued = 'taxi';

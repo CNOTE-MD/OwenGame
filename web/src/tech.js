@@ -14,6 +14,7 @@ function runFrame(now) {
   const t0 = performance.now();
   let steps = 0;
   pollGamepad();
+  if (SCRIPT.open) PERF.acc = 0;
   while (PERF.acc >= STEP && steps < MAX_STEPS) {
     update(STEP); PERF.acc -= STEP; steps++;
     if (!(G.hitstop > 0)) for (const k in edge) edge[k] = false;
@@ -111,7 +112,7 @@ function drawRideMode7(page) {
   drawMode7(cx, cy, ang, 13, night);
   const bounce = Math.round(Math.sin(G.t * 14));
   shadowAt(128, 196, 3);
-  ctx.save(); ctx.translate(128, 196 + bounce); ctx.scale(2, 2); ctx.drawImage(SPR.taxi, -SPR.taxi.width / 2, -SPR.taxi.height); ctx.restore();
+  { const tx2 = up(SPR.taxi, 2); ctx.drawImage(tx2, Math.round(128 - tx2.width / 2), 196 + bounce - tx2.height); }
   for (let i = 0; i < 4; i++) { ctx.globalAlpha = 0.5 - i * 0.1; R(114 + (i % 2) * 24, 198 + i * 3, 4, 2, '#d8c08a'); }
   ctx.globalAlpha = 1;
   text(night ? 'FJORDVIK → AIRSTRIP' : 'FJORDVIK T-BANE → THE FOREST', VW / 2, 218, '#ffffff', 'center', 'outline');

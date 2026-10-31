@@ -59,7 +59,7 @@ function jonCompliment(dt) {
   if (G.mode === 'arena' || G.state !== 'play' || !s) return;
   JT.compT = Math.max(0, (JT.compT || 0) - dt);
   if (p.hp > 2 || p.hp <= 0 || JT.compT > 0 || p.hp >= s.maxHp) return;
-  JT.compT = 25;
+  JT.compT = isEasy() ? 15 : 25;
   p.hp = Math.min(s.maxHp, p.hp + 1);
   floatText(p.x, p.y - 20, '+½ ♥', '#ff9aa2'); Sound.play('heart');
   jonSay('compliment', { force: true, line: pick(JON_COMPLIMENTS), face: 'excited' });
@@ -96,8 +96,7 @@ function giantWrap(e, dt) {
 function drawGiantWrap(e) {
   if (e.st !== 'wrap' || !e.wrapAt) return;
   const x = Math.round(e.wrapAt.x - G.cam.x), y = Math.round(e.wrapAt.y - G.cam.y), k = Math.min(1, e.t / 0.9);
-  ctx.globalAlpha = 0.3 + 0.5 * k; ctx.strokeStyle = '#58b840'; ctx.lineWidth = 2;
-  ctx.beginPath(); ctx.ellipse(x, y + 2, 26, 15, 0, 0, Math.PI * 2); ctx.stroke(); ctx.globalAlpha = 1;
+  ctx.globalAlpha = qa(0.3 + 0.5 * k); pxEllipse(x, y + 2, 26, 15, '#58b840', 2); ctx.globalAlpha = 1;
 }
 
 // ---------- Q48: three new Arena cards ----------
@@ -122,8 +121,8 @@ function runeShieldBlocks() {
 function drawOwenCards() {
   const p = G.player, cx = G.cam.x, cy = G.cam.y;
   if (A.helheim) { ctx.globalAlpha = 0.3 + 0.06 * Math.sin(G.t * 3); R(0, 0, VW, VH, '#ff3a1f'); ctx.globalAlpha = 1; for (let i = 0; i < 6; i++) { const x = (i * 53 + G.t * 20) % VW, y = VH - ((G.t * 40 + i * 37) % VH); R(x, y, 2, 2, '#ffd84a'); } }
-  if (A.rshield && !(A.rsT > 0)) { ctx.strokeStyle = 'rgba(127,212,255,0.8)'; ctx.lineWidth = 1; ctx.beginPath(); ctx.arc(p.x - cx, p.y - cy - 2, 13, 0, Math.PI * 2); ctx.stroke(); }
-  if (A.infT > 0) { ctx.globalAlpha = 0.5 + 0.3 * Math.sin(G.t * 12); ctx.strokeStyle = '#ffd84a'; ctx.beginPath(); ctx.arc(p.x - cx, p.y - cy - 2, 11, 0, Math.PI * 2); ctx.stroke(); ctx.globalAlpha = 1; text(Math.ceil(A.infT) + 's', p.x - cx, p.y - cy - 22, '#ffd84a', 'center', false); }
+  if (A.rshield && !(A.rsT > 0)) pxEllipse(p.x - cx, p.y - cy - 2, 13, 13, '#7fd4ff');
+  if (A.infT > 0) { ctx.globalAlpha = qa(0.5 + 0.3 * Math.sin(G.t * 12)); pxEllipse(p.x - cx, p.y - cy - 2, 11, 11, '#ffd84a'); ctx.globalAlpha = 1; text(Math.ceil(A.infT) + 's', p.x - cx, p.y - cy - 22, '#ffd84a', 'center', false); }
 }
 
 // ---------- Q28: the giant turns back into a log, rolls off the path and snores ----------

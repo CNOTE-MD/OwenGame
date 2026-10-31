@@ -1,7 +1,7 @@
 <title>Jöntuka</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;700;800&family=Press+Start+2P&display=swap" rel="stylesheet">
 <style>
   /* Layout: one centered 8:7 game screen, a short key legend under it, touch pad only on touch devices. */
   :root {
@@ -34,7 +34,7 @@
   .btn:focus-visible { outline: 3px solid var(--gold); outline-offset: 2px; }
   .ab { display: grid; grid-template-columns: repeat(2, 76px); gap: 10px; }
   .ab .btn { width: 76px; height: 56px; border-radius: 28px; font-size: 9px; }
-  .bar { display: flex; justify-content: space-between; align-items: center; gap: 12px; color: var(--muted); }
+  .bar { display: flex; flex-wrap: wrap; justify-content: space-between; align-items: center; gap: 12px; color: var(--muted); }
   .bar .btn { font-size: 9px; padding: 8px 12px; }
   #padnote { display: none; color: var(--gold); }
   #padnote.on { display: inline; }
@@ -53,12 +53,62 @@
   #exitfs { display: none; }
   body.theater.nopad .pad { display: none; }
   @media (hover: hover) and (pointer: fine) { body.theater .pad { display: none; } }
+  /* Owen's Script: a writer's notebook under the game screen. Pixel font for headings, a readable face for writing. */
+  .btns { display: flex; gap: 8px; flex-wrap: wrap; justify-content: flex-end; }
+  .script { --paper: #1b1830; --line: #2e2a4c; background: var(--paper); border: 3px solid var(--panel); outline: 2px solid var(--gold); padding: 14px; display: flex; flex-direction: column; gap: 12px; position: relative;
+    font-family: "Nunito", ui-rounded, system-ui, sans-serif; font-size: 15px; line-height: 1.45; color: var(--ink); }
+  .script h2, .script h3, .script .tabs button, .script b { font-family: var(--pixel); font-weight: normal; }
+  .st-head { display: flex; justify-content: space-between; align-items: center; gap: 12px; }
+  .st-head h2 { margin: 0; font-size: 12px; color: var(--gold); letter-spacing: .04em; }
+  .script h3 { margin: 0; font-size: 9px; color: var(--axe); line-height: 1.6; min-width: 0; }
+  .tabs { display: flex; gap: 6px; flex-wrap: wrap; border-bottom: 2px solid var(--line); padding-bottom: 8px; }
+  .tabs button { background: none; border: 2px solid var(--line); color: var(--muted); font-size: 9px; padding: 8px 10px; border-radius: 4px; cursor: pointer; }
+  .tabs button[aria-selected="true"] { border-color: var(--gold); color: var(--gold); }
+  .script button { cursor: pointer; }
+  .script button:focus-visible, .script input:focus-visible, .script textarea:focus-visible { outline: 3px solid var(--gold); outline-offset: 1px; }
+  #st-save, .psave, #ch4-new { background: var(--gold); color: #1a1208; border: 0; border-radius: 4px; padding: 9px 14px; font-weight: 800; font-family: inherit; font-size: 14px; }
+  .ghost { background: none; border: 2px solid var(--line); color: var(--ink); border-radius: 4px; padding: 7px 12px; font-family: inherit; font-size: 14px; }
+  .ghost:hover { border-color: var(--axe); }
+  .hint { margin: 0; color: var(--muted); }
+  .empty { margin: 0; color: var(--ink); }
+  .scenes { list-style: none; margin: 0; padding: 0; display: grid; grid-template-columns: repeat(auto-fill, minmax(220px, 1fr)); gap: 6px; }
+  .scene { width: 100%; text-align: left; display: flex; justify-content: space-between; gap: 8px; align-items: baseline; background: #221d3a; border: 1px solid var(--line); color: var(--ink); padding: 9px 10px; border-radius: 4px; font: inherit; }
+  .scene:hover { border-color: var(--axe); }
+  .scene em { font-style: normal; font-size: 12px; color: #9be08a; flex: none; }
+  .row { display: flex; align-items: center; gap: 8px; }
+  .row.wrap { flex-wrap: wrap; }
+  .grow { flex: 1; }
+  .line { display: grid; grid-template-columns: minmax(84px, 130px) 1fr auto; gap: 6px; align-items: start; }
+  .line input, .line textarea, .ptitle { background: #0f0d1e; color: var(--ink); border: 1px solid var(--line); border-radius: 4px; padding: 7px 8px; font: inherit; min-width: 0; }
+  .line textarea { resize: vertical; }
+  .line input { color: var(--gold); font-weight: 700; }
+  .ptitle { flex: 1; }
+  .page .line { grid-template-columns: minmax(84px, 130px) 1fr; }
+  .x { background: none; border: 0; color: var(--muted); font-size: 14px; padding: 7px; }
+  .x:hover { color: #ff8a8a; }
+  .page { display: flex; flex-direction: column; gap: 6px; padding: 10px; border: 1px solid var(--line); border-radius: 4px; background: #221d3a; }
+  .page b { font-size: 9px; color: var(--gold); flex: none; }
+  .st-status { margin: 0; font-size: 13px; color: var(--muted); }
+  .note { display: flex; flex-direction: column; gap: 4px; background: #f4eedb; color: #26305a; padding: 8px 10px 10px 26px; border-radius: 3px; background-image: linear-gradient(90deg, transparent 16px, #e08a8a 16px, #e08a8a 17px, transparent 17px); }
+  .note span { font-weight: 800; font-size: 13px; } .note i { font-weight: 400; color: #5a5a6e; }
+  .note textarea { background: transparent; border: 0; border-bottom: 1px solid #a9c0de; color: #26305a; font: inherit; resize: vertical; }
+  .slots { list-style: none; margin: 0; padding: 0; display: grid; grid-template-columns: repeat(auto-fill, minmax(150px, 1fr)); gap: 8px; }
+  .slot { display: flex; flex-direction: column; gap: 6px; padding: 8px; background: #221d3a; border: 1px solid var(--line); border-radius: 4px; }
+  .slot b { font-size: 8px; color: var(--gold); }
+  .thumb { aspect-ratio: 4 / 3; max-width: 100%; background: #f4eedb; border-radius: 2px; display: grid; place-items: center; overflow: hidden; }
+  .thumb img { width: 100%; height: 100%; object-fit: cover; } .thumb span { color: #8a8098; font-size: 12px; }
+  .up { text-align: center; font-size: 13px; padding: 6px; cursor: pointer; }
+  .thumb img { cursor: zoom-in; }
+  .lightbox { position: fixed; inset: 0; z-index: 20; background: rgba(10,8,18,.92); display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 10px; padding: max(16px, env(safe-area-inset-top, 0px)) max(16px, env(safe-area-inset-right, 0px)) max(16px, env(safe-area-inset-bottom, 0px)) max(16px, env(safe-area-inset-left, 0px)); }
+  .lightbox img { max-width: 100%; max-height: calc(100% - 56px); object-fit: contain; border-radius: 3px; }
+  .toast { position: absolute; right: 14px; top: 12px; background: #9be08a; color: #102010; font-weight: 800; padding: 6px 10px; border-radius: 4px; }
+  @media (max-width: 480px) { .line { grid-template-columns: 1fr auto; } .line input { grid-column: 1 / -1; } .page .line { grid-template-columns: 1fr; } }
 </style>
 <main>
   <div class="screen"><canvas id="g" width="256" height="224" tabindex="0" aria-label="Jöntuka game screen"></canvas></div>
   <div class="bar">
     <span>Controller: <b>stick</b> move · <b>A</b> swing · <b>B</b> throw · <b>X</b> thunder · <b>Y</b> horn · <b>RB/RT</b> dash · <b>Start</b> gear <span id="padnote">· connected ✓</span></span>
-    <button class="btn" id="fsbtn" aria-label="Play full screen">⛶ FULL SCREEN</button>
+    <span class="btns"><button class="btn" id="scriptbtn" aria-controls="script">OWEN'S SCRIPT</button><button class="btn" id="fsbtn" aria-label="Play full screen">FULL SCREEN</button></span>
   </div>
   <button class="btn" id="exitfs" aria-label="Leave full screen">✕</button>
   <div class="legend">
@@ -72,6 +122,13 @@
     <span><b>M</b> all sound</span>
     <span><b>N</b> music</span>
   </div>
+  <section id="script" class="script" hidden aria-label="Owen's Script">
+    <header class="st-head"><h2>OWEN'S SCRIPT</h2><button class="ghost" id="st-close">Close ✕</button></header>
+    <div class="tabs" role="tablist"><button role="tab" id="tab-scenes" aria-selected="true">Every scene</button><button role="tab" id="tab-ch4" aria-selected="false">Chapter 4: Walter's Forge</button><button role="tab" id="tab-notebook" aria-selected="false">Notebook photos</button></div>
+    <div id="st-body"></div>
+    <p class="st-status" id="st-status"></p>
+    <div class="toast" id="st-toast" hidden role="status"></div>
+  </section>
   <div class="pad" aria-label="Touch controls">
     <div class="stick" id="stick" aria-label="Move: drag the thumbstick"><div class="knob" id="knob"></div></div>
     <div class="ab">
@@ -1526,7 +1583,7 @@ const MAPS = {
 "name": "Owen's Room, New York",
 "rows": [
 "ZZZZZZZZZZZZZZZZ",
-"ZFFFFFFFFFFFFFFZ",
+"ZFFFFkkFFFFFFkkZ",
 "ZFYYFFFFFFFQQQFZ",
 "ZFYYFFFFFFFFFFFZ",
 "ZFFFFFFFFFFFFFFZ",
@@ -2319,11 +2376,11 @@ const STORY = {
   ],
   poster: [['', 'A poster of a Viking longship. Under it, in marker: "OWEN\'S ROOM. NO PENGUINS."']],
   flight: [
-    { art: 'plane', lines: [['', 'Flight 364. New York to Norway. Jon is in a checked bag down below.'], ['Owen', 'I tried not to think about my last time in Norway.']] },
-    { art: 'cabin', lines: [['Attendant', 'Refreshments will come around once we reach a steady flying level.'], ['Owen', '(She gave me an odd look.)']] },
+    { art: 'plane', lines: [['', 'Flight 364. New York to Norway. Jon is in a checked bag down below.'], ['Owen', 'I tried not to think about my last time in Norway.'], ['Announcer', '"Flight 364, New York to Norway, now ending boarding."'], ['Owen', 'I almost puked.']] },
+    { art: 'cabin', lines: [['Owen', '(The flight attendant gave me an odd look.)'], ['Attendant', 'Refreshments will come around once we reach a steady flying level.'], ['', 'Then she came by my seat.']] },
     { art: 'demon', lines: [['Owen', '"DEMON!!" my mind screamed.'], ['Attendant', 'Is everything alright, sir?'], ['Owen', 'Yep...']] },
-    { art: 'cabin', lines: [['', 'I fell asleep. My dreams were incredibly weird. One was that I turned into a cow.']] },
-    { art: 'demon', lines: [['Attendant', 'Any refreshments, sir?'], ['', 'Her nails grew into talons. Her teeth into fangs.'], ['Attendant', 'Wonderful...'], ['Owen', 'I tried to call Jon.']] },
+    { art: 'cabin', lines: [['', 'I fell asleep once she left. My dreams were incredibly weird. One was that I turned into a cow.'], ['', 'And the other one was...']] },
+    { art: 'demon', lines: [['Owen', '"DEMON!!" my mind screamed again.'], ['Owen', 'Eh!'], ['Attendant', 'Any refreshments, sir?'], ['Owen', 'Nah, I\'m good.'], ['', 'We conversed. Then her nails grew into talons. Her teeth into fangs.'], ['', '"Wonderful," she hissed.'], ['Owen', 'I tried to call Jon.']] },
     { art: 'land', lines: [['', '...and then the wheels hit the runway. Fjordvik, Norway.'], ['Owen', 'Was that a dream? It had to be a dream.']] },
   ],
   arrival: [
@@ -2428,9 +2485,9 @@ const STORY = {
     sign_cavern_in: [['', 'Locked doors take a small key. The big door takes the BIG key. Crystals switch things.']],
     sign_beach: [['', 'HERE IS THE BEACH WHERE OWEN DIED. (He got better.)']],
     sign_poster: [['', 'A poster of a Viking longship. Under it, in marker: "OWEN\'S ROOM. NO PENGUINS."']],
-    seal_barrow: [['', 'A stone door, sealed by a glowing rune. The DROWNED BARROW. Chapter 2.']],
-    seal_forge: [['', 'A stone door, sealed by a glowing rune. WALTER\'S FORGE. Chapter 3.']],
-    seal_peak: [['', 'A stone door, sealed by a glowing rune. The STORM PEAK. Chapter 4.']],
+    seal_barrow: [['', 'A stone door, sealed by a glowing rune. The DROWNED BARROW. Chapter 3.']],
+    seal_forge: [['', 'A stone door, sealed by a glowing rune. WALTER\'S FORGE. Chapter 4.']],
+    seal_peak: [['', 'A stone door, sealed by a glowing rune. The STORM PEAK. Chapter 5.']],
   },
   house: [['', 'Nobody answers. Someone inside is humming Rush E.']],
   cavern_enter: [['Owen', 'A palace. Filled with penguins. I know, right?'], ['Jon', 'It\'s FREEZING. And fancy. Stay off the ice if you like stopping. Let\'s wreck the place.']],
@@ -2700,16 +2757,18 @@ function inputVec() {
   const m = Math.hypot(x, y);
   return m ? { x: x / m, y: y / m } : { x: 0, y: 0 };
 }
+const typing = e => { const t = e.target; return !!(t && (t.tagName === 'INPUT' || t.tagName === 'TEXTAREA' || t.tagName === 'SELECT' || t.isContentEditable)); };
 window.addEventListener('keydown', e => {
+  if (typing(e)) return;
   if (e.code.startsWith('Arrow') || e.code === 'Space' || e.code === 'Tab') e.preventDefault();
   if (e.repeat) return;
   keys[e.code] = true;
   for (const a in ACTIONS) if (ACTIONS[a].includes(e.code)) edge[a] = true;
   Sound.unlock();
 });
-window.addEventListener('keyup', e => { keys[e.code] = false; });
+window.addEventListener('keyup', e => { if (!typing(e)) keys[e.code] = false; });
 window.addEventListener('blur', () => { for (const k in keys) keys[k] = false; for (const k in virt) virt[k] = false; });
-cv.addEventListener('pointerdown', () => { cv.focus(); Sound.unlock(); edge.tap = true; });
+cv.addEventListener('pointerdown', e => { cv.focus(); Sound.unlock(); edge.tap = true; const r = cv.getBoundingClientRect(); G.tapX = r.width ? (e.clientX - r.left) / r.width : 0.5; });
 document.querySelectorAll('.btn[data-a]').forEach(b => {
   const a = b.dataset.a;
   const on = e => { e.preventDefault(); virt[a] = true; edge[a] = true; b.classList.add('on'); Sound.unlock(); };
@@ -2983,6 +3042,7 @@ const Music = {
   osc(type, f, t, end, detune = 0) { const o = Sound.ac.createOscillator(); o.type = type; o.frequency.setValueAtTime(f, t); o.detune.setValueAtTime(detune, t); o.start(t); o.stop(end + 0.6); return o; },
   note(e, t) {
     const ac = Sound.ac, out = this.bus;
+    if (typeof layerOn === 'function' && !layerOn(e)) return;   // Jon's remembered songs decide which layers play
     if (e.inst === 'drum') return this.drum(e, t);
     const end = t + e.d * 0.92;
     for (const f of e.f) {
@@ -3106,7 +3166,7 @@ const G = {
 
 function newSave() {
   return { map: 'home', x: 0, y: 0, maxHp: 6, hp: 6, kr: 0, rune: 0, potions: 0, pieces: 0,
-    items: {}, flags: {}, keys: {}, bigkeys: {}, voodoo: true, jon: { lvl: 1, xp: 0, perks: {} }, bag: {}, charms: {}, charm: null, spell: null };
+    diff: defaultDiff(), items: {}, flags: {}, keys: {}, bigkeys: {}, voodoo: true, jon: { lvl: 1, xp: 0, perks: {} }, bag: {}, charms: {}, charm: null, spell: null };
 }
 const SAVE_KEY = 'jontuka-save-v1';
 // Stats Owen carries. Story mode uses the defaults; the Arena upgrades them.
@@ -3156,7 +3216,7 @@ function blocked(x, y, r, who, self) {
   const sx = G.scr.x * VW, sy = G.scr.y * VH;
   if (who !== 'player' && !G.map.arena && (x - r < sx || x + r > sx + VW || y - r < sy || y + r > sy + VH)) return true;
   if (who === 'player' || who === 'walker') {
-    for (const e of G.ents) if (e.solid && e !== self && Math.abs(e.x - x) < 7 + r && Math.abs(e.y - y) < 7 + r) return true;
+    for (const e of G.ents) if (e.solid && e !== self && Math.abs(e.x - x) < 7 + r && Math.abs(e.y - y) < 7 + r && !(self && Math.abs(e.x - self.x) < 7 + r && Math.abs(e.y - self.y) < 7 + r)) return true;
   }
   return false;
 }
@@ -3365,6 +3425,7 @@ function makeEnt(d, x, y) {
     case 'cart': return { ...base, kind: 'hazard', type: 'cart', dir: 1, wob: 0 };
     case 'runedoor': return s.flags[d.needs] ? { ...base, kind: 'warp' } : null;
     case 'tablet': return { ...base, solid: true, talk: true };
+    case 'owengrave': return isNight() ? { ...base, solid: true, talk: true } : null;
     case 'throne': return { ...base, solid: true, talk: true };
     case 'exchange': return { ...base, solid: true, talk: true };
     case 'taxi': return { ...base, solid: true, talk: true };
@@ -3382,8 +3443,8 @@ const ENEMY = {
   king: { hp: 8, r: 16, touch: 2, speed: 26, boss: true },
   imp: { hp: 2, r: 5, touch: 1, speed: 0 },
   attendant: { hp: 12, r: 8, touch: 2, speed: 0, boss: true },
-  captain: { hp: 6, r: 10, touch: 2, speed: 24, shield: true, boss: true },
-  hank: { hp: 10, r: 14, touch: 2, speed: 0, boss: true, fly: true },
+  captain: { hp: 8, r: 10, touch: 2, speed: 30, shield: true, boss: true },
+  hank: { hp: 12, r: 14, touch: 2, speed: 0, boss: true, fly: true },
   spore: { hp: 2, r: 6, touch: 1, speed: 0 },
   snowpeng: { hp: 2, r: 6, touch: 1, speed: 66 },
   guard: { hp: 4, r: 7, touch: 1, speed: 30, shield: true },
@@ -3415,8 +3476,8 @@ function drawFx() {
     if (f.kind === 'poof') { const img = POOF[Math.min(3, Math.floor(f.t / f.life * 4))], s = f.scale; ctx.drawImage(img, Math.round(f.x - G.cam.x - 12 * s), Math.round(f.y - G.cam.y - 12 * s), 24 * s, 24 * s); continue; }
     if (f.kind === 'whisper') { drawWhisper(f); continue; }
     if (f.kind === 'ghost') { drawDashGhost(f); continue; }
-    if (f.kind === 'ring') { const k = f.t / f.life; ctx.strokeStyle = `rgba(255,120,90,${1 - k})`; ctx.lineWidth = 2; ctx.beginPath(); ctx.arc(Math.round(f.x - G.cam.x), Math.round(f.y - G.cam.y), 8 + k * 120, 0, Math.PI * 2); ctx.stroke(); continue; }
-    if (f.kind === 'ripple') { if (f.t < 0) continue; const k = f.t / f.life; ctx.strokeStyle = `rgba(220,240,255,${1 - k})`; ctx.lineWidth = 1; ctx.beginPath(); ctx.ellipse(Math.round(f.x - G.cam.x), Math.round(f.y - G.cam.y + 4), 4 + k * 14, 2 + k * 6, 0, 0, Math.PI * 2); ctx.stroke(); continue; }
+    if (f.kind === 'ring') { const k = f.t / f.life; ctx.globalAlpha = qa(1 - k); pxEllipse(f.x - G.cam.x, f.y - G.cam.y, 8 + k * 120, 8 + k * 120, '#ff785a', 2); ctx.globalAlpha = 1; continue; }
+    if (f.kind === 'ripple') { if (f.t < 0) continue; const k = f.t / f.life; ctx.globalAlpha = qa(1 - k); pxEllipse(f.x - G.cam.x, f.y - G.cam.y + 4, 4 + k * 14, 2 + k * 6, '#dcf0ff'); ctx.globalAlpha = 1; continue; }
     if (f.kind === 'leaf') { R(f.x - G.cam.x, f.y - G.cam.y, 2, 1, f.color); R(f.x - G.cam.x + 1, f.y - G.cam.y + 1, 1, 1, '#205818'); continue; }
     R(f.x - G.cam.x, f.y - G.cam.y, f.size, f.size, f.color);
   }
@@ -3484,7 +3545,7 @@ function updatePlayer(dt) {
     p.launching = true; p.lp = 0; p.from = { x: p.x, y: p.y }; p.to = nearestDry(p.x, p.y); p.inv = 1.2;
     ripple(p.x, p.y); ripple(p.x, p.y, 0.15);
     G.jon.mode = 'follow'; Sound.play('splash'); puff(p.x, p.y, '#bfe0ff', 10);
-    floatText(p.x, p.y - 20, 'Lady of the Lake!', '#bfe0ff');
+    floatText(p.x, p.y - 20, 'Lady of the Lake!', '#bfe0ff'); deed('lake');
     return;
   }
   if (here === 'v') { p.falling = 0.6; Sound.play('fall'); return; }
@@ -3539,7 +3600,7 @@ function hurtPlayer(dmg, from, force) {
   if (!force && (p.inv > 0 || p.launching || p.falling > 0 || G.state !== 'play')) return;
   if (!force && runeShieldBlocks()) return;
   if (!force && G.st.armor > 0 && Math.random() < Math.min(0.6, G.st.armor * 0.1)) { p.inv = 0.4; floatText(p.x, p.y - 18, 'BLOCK', '#9fd0ff'); Sound.play('clank'); return; }
-  p.hp -= dmg; p.inv = 1; Sound.play('hurt'); G.shake = 0.15; rumble(120, 0.5, 0.3);
+  p.hp -= dmg * dmgScale(); p.inv = isEasy() ? 1.3 : 1; Sound.play('hurt'); G.shake = 0.15; rumble(120, 0.5, 0.3);
   if (G.mode !== 'arena') jonOnHurt(from);
   if (from) { const d = Math.hypot(p.x - from.x, p.y - from.y) || 1; p.kx = (p.x - from.x) / d * 170; p.ky = (p.y - from.y) / d * 170; }
   if (p.hp > 0) return;
@@ -3570,12 +3631,13 @@ function interact(e) {
   switch (e.kind) {
     case 'sign': return say(STORY.signs[e.def.text] || [['', '...']]);
     case 'tablet': return readTablet(e);
+    case 'owengrave': return owenGrave();
     case 'sleeplog': return say([['', 'The Forest Giant of the North, back to being a log. A snoring log.'], ['Jon', 'Shh. Let him sleep. He had a big boss fight scene.']]);
     case 'exchange': return useExchange();
     case 'taxi': return useTaxi(e);
     case 'throne': return sitOnThrone();
     case 'log': return say([['Jon', 'That log isn\'t going to chop itself. Swing me! (Z)']]);
-    case 'sealed': return say(STORY.signs[e.def.text]);
+    case 'sealed': if (e.def.text === 'seal_forge') return forgeDoor(); return say(STORY.signs[e.def.text]);
     case 'plaque': return say(STORY.plaque, () => setFlag('read_plaque'));
     case 'door': return startWarp(e.def.to, e.def.dest);
     case 'grave':
@@ -3595,9 +3657,11 @@ function interact(e) {
       Sound.play('creep');
       return say(STORY.cargo_open, () => startWarp('redeye', [2, 7]));
     case 'runestone':
+      if (G.lastRune === e && G.t - (G.lastRuneT || 0) < 6 && G.map.outdoor) { G.lastRune = null; return runestoneRest(); }
+      G.lastRune = e; G.lastRuneT = G.t;
       p.hp = s.maxHp; s.voodoo = true; s.voodoo2 = jonHas('bff'); s.cp = { map: G.mapId, x: p.x, y: p.y }; writeSave(); Sound.play('save'); puff(e.x, e.y - 6, '#7fd4ff', 12);
-      return say(STORY.saved);
-    case 'npc': { const lines = npcLines(e.id), after = G.afterTalk; G.afterTalk = null; return say(lines, after); }
+      return say(G.map.outdoor ? [...STORY.saved, ['', isNight() ? 'Talk to it again to rest until morning.' : 'Talk to it again to rest until nightfall.']] : STORY.saved);
+    case 'npc': { G.afterTalk = null; const lines = npcLines(e.id), after = G.afterTalk; G.afterTalk = null; return say(lines, after); }
     case 'shop': return buy(e);
     case 'chest':
       if (e.open) return say([['', 'The chest is empty.']]);
@@ -3608,7 +3672,7 @@ function interact(e) {
 
 function npcLines(id) {
   if (id === 'astrid') {
-    if (!flag('met_astrid')) { setFlag('met_astrid'); G.save.kr += 30; return [...STORY.astrid_1, ['', 'Astrid gave you 30 kroner.']]; }
+    if (!flag('met_astrid')) { setFlag('met_astrid'); G.save.kr += 30; G.afterTalk = () => showChapter(2); return [...STORY.astrid_1, ['', 'Astrid gave you 30 kroner.']]; }
     return flag('d2done') ? STORY.astrid_4 : flag('d1done') ? STORY.astrid_3 : STORY.astrid_2;
   }
   if (id === 'sven') {
@@ -3629,7 +3693,8 @@ function npcLines(id) {
       G.afterTalk = () => { setFlag('got:hp_bjarne'); giveItem('piece'); };
       return STORY.bjarne_thanks;
     }
-    return flag('bjarne_done') ? [...STORY.bjarne_after, ['Bjarne', 'Next I\'m writing Rush P. It\'s mostly the letter P. Very fast.']] : STORY.bjarne_waiting;
+    if (flag('bjarne_done')) { G.afterTalk = offerDuel; return [...STORY.bjarne_after, ['Bjarne', 'Next I\'m writing Rush P. It\'s mostly the letter P. Very fast.'], ['Bjarne', 'But first: play RUSH Ø with me!']]; }
+    return STORY.bjarne_waiting;
   }
   return STORY[id] || [['', '...']];
 }
@@ -3662,7 +3727,6 @@ function applyItem(id) {
     case 'horn': s.items.horn = true; break;
     case 'dash': s.items.dash = true; break;
     case 'kr50': s.kr += 50; break;
-    case 'horn': s.items.horn = true; break;
     default: magicApplyItem(id);
   }
 }
@@ -3790,6 +3854,7 @@ function damageEnemy(e, dmg, from, how) {
   const dx = from.x - e.x, dy = from.y - e.y, d = Math.hypot(dx, dy) || 1;
   // Shields block a hit from the front, but the block knocks the shield aside for a moment:
   // hit-hit always works, and hitting from the side or back works right away.
+  if (jonHit && e.shield && e.boss && e.st === 'wind' && (dx / d * e.fx + dy / d * e.fy) > 0.55) { Sound.play('clank'); puff(e.x + e.fx * 8, e.y + e.fy * 8, '#ffd84a', 3); return true; }
   if (jonHit && e.shield && !(e.guardDown > 0) && (dx / d * e.fx + dy / d * e.fy) > 0.55 && e.st !== 'charge') {
     Sound.play('clank'); puff(e.x + e.fx * 8, e.y + e.fy * 8, '#ffd84a', 4);
     e.guardDown = 1.1; e.kx = -dx / d * 110; e.ky = -dy / d * 110;
@@ -3805,7 +3870,9 @@ function damageEnemy(e, dmg, from, how) {
     return true;
   }
   if ((e.type === 'king' || e.type === 'attendant') && how === 'thunder') { e.st = 'daze'; e.t = 0; dmg = 2; }
+  if (jonHit && G.mode !== 'arena' && songsKnown() > 0 && onBeat()) { dmg *= 1.5; beatHit(e); }
   e.hp -= dmg; e.flash = 0.18; Sound.play('hit');
+  if ((e.type === 'knight' || e.type === 'captain') && jonHit && e.st !== 'charge' && e.hp > dmg && (e.landed = (e.landed || 0) + 1) % 2 === 0) { e.st = 'wind'; e.t = 0; e.guardDown = 0; floatText(e.x, e.y - 22, 'BRACE!', '#ff6b6b'); }
   floatText(e.x, e.y - 12, String(Math.round(dmg * 10) / 10), G.lastCrit ? '#ffd84a' : '#fff');
   const k = (e.boss ? 60 : 150) * G.st.knock; e.kx = -dx / d * k; e.ky = -dy / d * k;
   if (e.hp <= 0) killEnemy(e);
@@ -3821,7 +3888,7 @@ function killEnemy(e) {
   if (s.items.thunder) s.rune = Math.min(RUNE_MAX, s.rune + G.st.runeKill);
   if (G.mode === 'arena') return arenaKill(e);
   jonXP(e.boss ? 25 : e.shield ? 3 : 2); jonOnKill(e);
-  if (e.boss) JT.queued = 'boss';
+  if (e.boss) { JT.queued = 'boss'; bossDefeated(e); }
   if (!e.boss) maybeDrop(e.x, e.y, 0.65);
   if (e.type === 'giant') { giantOnKill(e); return; }
   if (e.type === 'king') { G.shake = 0.6; ICICLES.length = 0; say(STORY.king_down, checkRoomClear); return; }
@@ -3830,7 +3897,7 @@ function killEnemy(e) {
   checkRoomClear();
 }
 function maybeDrop(x, y, chance) {
-  if (Math.random() > chance * (1 + G.st.luck)) return;
+  if (Math.random() > chance * (1 + G.st.luck) * (G.map && G.map.outdoor && isNight() && G.mode !== 'arena' ? 1.3 : 1)) return;
   const r = Math.random();
   const what = r < 0.33 ? 'heart' : r < 0.7 ? 'kr1' : r < 0.85 ? 'kr5' : r < 0.95 ? 'rune' : 'salmon';
   G.ents.push({ kind: 'pickup', what, x, y, life: 9 });
@@ -3880,7 +3947,7 @@ function updateEnemy(e, dt) {
     case 'knight': case 'captain':
       if (e.st === 'intro') { if (G.state === 'play') { e.st = 'chase'; e.t = 0; } break; }
       if (e.st === 'chase') { e.turnT = (e.turnT || 0) + dt; if (e.turnT > 0.5) { e.turnT = 0; e.fx = dx / d; e.fy = dy / d; } tryMove(e, e.fx * e.speed * dt, e.fy * e.speed * dt, mr, who); if (e.t > 2.8) { e.st = 'wind'; e.t = 0; } }
-      else if (e.st === 'wind') { e.fx = dx / d; e.fy = dy / d; if (e.t > 0.5) { e.st = 'charge'; e.t = 0; Sound.play('charge'); } }
+      else if (e.st === 'wind') { if (e.t <= 0.5) { e.fx = dx / d; e.fy = dy / d; } if (e.t > 0.5 && (e.t > 0.65 || onBeat(0.05))) { e.st = 'charge'; e.t = 0; Sound.play('charge'); } }
       else if (e.st === 'charge') { const h = tryMove(e, e.fx * 140 * dt, e.fy * 140 * dt, mr, who); if (e.t > 0.7 || h.hitX || h.hitY) { e.st = 'chase'; e.t = 0; } }
       break;
     case 'king':
@@ -3892,16 +3959,16 @@ function updateEnemy(e, dt) {
       }
       kingRage(e, dt, dx, dy, d, mr, who);
       if (e.st === 'waddle') { e.fx = dx / d; e.fy = dy / d; toward(e.speed * (e.raged ? 1.3 : 1)); if (e.t > (e.raged ? 1.4 : 2.2)) { e.st = 'wind'; e.t = 0; Sound.play('charge'); } }
-      else if (e.st === 'wind') { e.fx = dx / d; e.fy = dy / d; if (e.t > (e.raged ? 0.4 : 0.6)) { e.st = 'slide'; e.t = 0; e.bounces = 0; } }
+      else if (e.st === 'wind') { if (e.t <= (e.raged ? 0.4 : 0.6)) { e.fx = dx / d; e.fy = dy / d; } if (e.t > (e.raged ? 0.4 : 0.6) && (e.t > (e.raged ? 0.55 : 0.75) || onBeat(0.05))) { e.st = 'slide'; e.t = 0; e.bounces = 0; } }
       else if (e.st === 'slide') {
         const h = tryMove(e, e.fx * (e.raged ? 240 : 190) * dt, e.fy * (e.raged ? 240 : 190) * dt, mr, who);
         if (h.hitX) e.fx *= -1; if (h.hitY) e.fy *= -1;
-        if (h.hitX || h.hitY) { e.bounces++; G.shake = 0.15; Sound.play('clank'); if (e.raged && G.mode !== 'arena') dropIcicles(2, p.x, p.y); }
+        if (h.hitX || h.hitY) { e.bounces++; G.shake = 0.15; Sound.play('clank'); if (e.raged && G.mode !== 'arena') dropIcicles(1, p.x, p.y); }
         if (e.bounces >= (e.raged ? 4 : 3) || e.t > 4) { e.st = 'daze'; e.t = 0; }
-      } else if (e.st === 'daze') { if (e.t > (e.raged ? 2.2 : 3)) { e.st = 'waddle'; e.t = 0; } }
+      } else if (e.st === 'daze') { if (e.t > (e.raged ? 2.6 : 3.4) * bossWindow()) { e.st = 'waddle'; e.t = 0; } }
       break;
   }
-  if (d < e.r + 5 && e.st !== 'daze' && !(e.flipped > 0) && !e.bow && !(e.type === 'attendant' && (e.st === 'hide' || e.st === 'intro'))) hurtPlayer(e.touch, e);
+  if (d < e.r + 5 && e.st !== 'daze' && !(e.flipped > 0) && !e.bow && !(e.type === 'attendant' && (e.st === 'hide' || e.st === 'intro'))) hurtPlayer(e.type === 'king' && e.st !== 'slide' ? 1 : e.touch, e);
 }
 
 function updatePickup(e, dt) {
@@ -3953,15 +4020,13 @@ function drawLightning() {
   ctx.fillStyle = `rgba(10,10,40,${Math.min(0.6, t * 1.5)})`; ctx.fillRect(0, 0, VW, VH);
   if (t > 0.3 && t < 1.0) {
     const x0 = j.x - G.cam.x, y1 = j.y - G.cam.y;
-    for (const [w, c] of [[5, 'rgba(127,212,255,0.5)'], [2, '#fff']]) {
-      ctx.strokeStyle = c; ctx.lineWidth = w; ctx.beginPath();
-      let x = x0 + rnd(-20, 20); ctx.moveTo(x, 0);
-      for (let y = 0; y < y1; y += 12) { x = x0 + rnd(-10, 10) * (1 - y / y1); ctx.lineTo(x, y); }
-      ctx.lineTo(x0, y1); ctx.stroke();
-    }
+    const pts = []; let x = x0 + rnd(-20, 20); pts.push([x, 0]);
+    for (let y = 12; y < y1; y += 12) { x = x0 + rnd(-10, 10) * (1 - y / y1); pts.push([x, y]); }
+    pts.push([x0, y1]);
+    for (const [w, c] of [[4, '#7fd4ff'], [2, '#ffffff']]) for (let i = 0; i + 1 < pts.length; i++) pxLine(pts[i][0], pts[i][1], pts[i + 1][0], pts[i + 1][1], c, w);
     for (const e of G.ents) if (e.enemy && e.alive && t > 0.45 && t < 0.7) {
-      ctx.strokeStyle = '#fff'; ctx.lineWidth = 1; ctx.beginPath(); ctx.moveTo(x0, y1);
-      ctx.lineTo((x0 + e.x - G.cam.x) / 2 + rnd(-8, 8), (y1 + e.y - G.cam.y) / 2 + rnd(-8, 8)); ctx.lineTo(e.x - G.cam.x, e.y - G.cam.y); ctx.stroke();
+      const mx = (x0 + e.x - G.cam.x) / 2 + rnd(-8, 8), my = (y1 + e.y - G.cam.y) / 2 + rnd(-8, 8);
+      pxLine(x0, y1, mx, my, '#ffffff'); pxLine(mx, my, e.x - G.cam.x, e.y - G.cam.y, '#ffffff');
     }
   }
 }
@@ -4359,6 +4424,7 @@ function personRows(look) {
   if (look.beard) { r[5] = '....hBBBBBBh....'; r[6] = '.....BBBBBB.....'; }
   if (look.long) { r[5] = '...hhssssssh....'.slice(0, 16); r[6] = '...hhsSSSSshh...'; r[7] = '...htttttttth...'; }
   if (look.hat) { r[0] = '....yyyyyyyy....'; r[1] = '...yyyyyyyyyy...'; }
+  if (look.kid) { r.splice(9, 1); r.splice(10, 1); r.unshift('................', '................'); }
   return r;
 }
 
@@ -4433,10 +4499,11 @@ function whiteOf(c) { let w = WHITE.get(c); if (!w) { w = tinted(c, '#ffffff'); 
 // draw a sprite with its feet at (x, y)
 function spr(c, x, y, opts = {}) {
   if (!c) return;
-  const img = opts.white ? whiteOf(c) : c, sc = opts.scale || 1;
+  let sc = opts.scale || 1; if ((sc === 2 || sc === 3) && typeof up === 'function') { c = up(c, sc); sc = 1; }
+  const img = opts.white ? whiteOf(c) : c;
   const w = img.width * sc, h = img.height * sc;
   if (opts.alpha !== undefined) ctx.globalAlpha = opts.alpha;
-  ctx.drawImage(img, Math.round(x - w / 2), Math.round(y - h + (opts.foot || 1) * sc), w, h);
+  ctx.drawImage(img, Math.round(x - w / 2), Math.round(y - h + (opts.foot || 1) * (opts.scale || 1)), w, h);
   ctx.globalAlpha = 1;
 }
 function shadowAt(x, y, scale = 1) { ctx.globalAlpha = 0.28; const c = SPR.shadow; ctx.drawImage(c, Math.round(x - c.width * scale / 2), Math.round(y - 2 * scale), c.width * scale, c.height * scale); ctx.globalAlpha = 1; }
@@ -5200,7 +5267,7 @@ function bigDrawList() {
       if (b.chimney) {
         for (let i = 0; i < 3; i++) {
           const k = ((G.t * 0.6 + i / 3) % 1), x = sx + b.chimney.x + Math.sin(k * 6 + i) * 2 + k * 6, y = sy + b.chimney.y - k * 18;
-          ctx.globalAlpha = 0.55 * (1 - k); ctx.fillStyle = '#e8e8f0'; ctx.beginPath(); ctx.arc(Math.round(x), Math.round(y), 2 + k * 3, 0, Math.PI * 2); ctx.fill(); ctx.globalAlpha = 1;
+          ctx.globalAlpha = qa(0.55 * (1 - k)); pxEllipseFill(x, y, 2 + k * 3, 2 + k * 3, '#e8e8f0'); ctx.globalAlpha = 1;
         }
       }
     } });
@@ -5286,7 +5353,7 @@ function updateAttendant(e, dt, dx, dy, d, mr) {
       const h = tryMove(e, e.fx * 175 * dt, e.fy * 175 * dt, mr, 'walker');
       if (e.t > 0.5 || h.hitX || h.hitY) { e.st = 'daze'; e.t = 0; }
       break; }
-    case 'daze': if (e.t > 1.4) { e.st = 'hide'; e.t = 0; } break;
+    case 'daze': if (e.t > 1.4 * bossWindow()) { e.st = 'hide'; e.t = 0; } break;
   }
 }
 const attendantVisible = e => e.st !== 'hide' || Math.random() < 0.06 || RE.blackout > 0.5;
@@ -5498,10 +5565,10 @@ function updateHank(e, dt, dx, dy, d) {
       tryMove(e, dx / d * 22 * dt + Math.cos(G.t * 1.3) * 18 * dt, dy / d * 22 * dt + Math.sin(G.t * 1.7) * 14 * dt, 8, 'flyer');
       e.fx = dx / d; e.fy = dy / d;
       e.throwT = (e.throwT || 0) + dt; e.raiseT = (e.raiseT || 0) + dt;
-      if (e.throwT > 2.4) { e.throwT = 0; HK.axes.push({ x: e.x, y: e.y - 20, vx: dx / d * 150, vy: dy / d * 150, t: 0, home: e, spin: 0 }); Sound.play('throw'); }
+      if (e.throwT > (isEasy() ? 2.4 : 1.9)) { e.throwT = 0; HK.axes.push({ x: e.x, y: e.y - 20, vx: dx / d * 150, vy: dy / d * 150, t: 0, home: e, spin: 0 }); Sound.play('throw'); }
       if (e.raiseT > 7.5 && G.ents.filter(o => o.type === 'wisp' && o.alive).length < 2) { e.raiseT = 0; spawnEnemy('wisp', e.x - 30, e.y); spawnEnemy('wisp', e.x + 30, e.y); Sound.play('creep'); }
       break;
-    case 'daze': if (e.t > 2.6) { e.st = 'float'; e.t = 0; e.frozen = true; Sound.play('charge'); floatText(e.x, e.y - 50, 'Frost returns!', '#9fe0ff'); } break;
+    case 'daze': if (e.t > 1.8 * bossWindow()) { e.st = 'float'; e.t = 0; e.frozen = true; Sound.play('charge'); floatText(e.x, e.y - 50, 'Frost returns!', '#9fe0ff'); G.fx.push({ kind: 'ring', x: e.x, y: e.y, vx: 0, vy: 0, t: 0, life: 0.5 }); if (dist(e, p) < 40) hurtPlayer(1, e); } break;
   }
 }
 function updateHankAxes(dt) {
@@ -5540,18 +5607,17 @@ function drawCh2Enemy(e, x, y) {
     // horned helm and spectral axe
     R(x - 16, y - 36 + bob, 4, 8, '#f2ebcc'); R(x + 12, y - 36 + bob, 4, 8, '#f2ebcc');
     if (e.frozen) {
-      ctx.strokeStyle = `rgba(160,230,255,${0.6 + 0.3 * Math.sin(G.t * 6)})`; ctx.lineWidth = 2;
-      ctx.beginPath(); ctx.ellipse(x, y - 6 + bob, 26, 30, 0, 0, Math.PI * 2); ctx.stroke();
+      ctx.globalAlpha = qa(0.6 + 0.3 * Math.sin(G.t * 6)); pxEllipse(x, y - 6 + bob, 26, 30, '#a0e6ff', 2); ctx.globalAlpha = 1;
       for (let i = 0; i < 6; i++) { const a = G.t * 1.5 + i * 1.05; R(x + Math.cos(a) * 26 - 1, y - 6 + bob + Math.sin(a) * 30 - 1, 3, 3, '#e8f8ff'); }
     }
     if (e.st === 'daze') for (let i = 0; i < 3; i++) { const a = G.t * 5 + i * 2.1; drawStar(x + Math.cos(a) * 18, y - 44 + Math.sin(a) * 4); }
-    R(x - 31, y - 61, 62, 5, '#000'); R(x - 30, y - 60, 60 * Math.max(0, e.hp / e.max), 3, '#e23');
+    bossBar(x, y - 60, e.hp / e.max);
     return true;
   }
   return false;
 }
 function drawHankAxes() {
-  for (const a of HK.axes) { ctx.globalAlpha = 0.8; drawJonSprite(a.x - G.cam.x, a.y - G.cam.y, a.spin); ctx.globalAlpha = 0.35; ctx.fillStyle = '#9fe0ff'; ctx.beginPath(); ctx.arc(a.x - G.cam.x, a.y - G.cam.y, 10, 0, Math.PI * 2); ctx.fill(); ctx.globalAlpha = 1; }
+  for (const a of HK.axes) { ctx.globalAlpha = 0.8; drawJonSprite(a.x - G.cam.x, a.y - G.cam.y, a.spin); pxGlow(a.x - G.cam.x, a.y - G.cam.y, 10, '159,224,255', 0.45); }
 }
 function drawDashGhost(f) {
   const { d, flip } = dirOf(f.fx, f.fy);
@@ -5613,7 +5679,7 @@ function updateJonTalk(dt) {
     JT.idle = 0;
   } else {
     JT.idle += dt;
-    if (JT.idle > 9 && JT.idle - dt <= 9) jonSay(Math.random() < 0.35 ? 'sing' : 'idle', { cooldown: 6 });
+    if (JT.idle > 9 && JT.idle - dt <= 9) { const m = Math.random() < 0.4 ? memoryLine() : null; if (m) jonSay('memory', { line: m, force: true, face: 'excited' }); else jonSay(Math.random() < 0.35 ? 'sing' : 'idle', { cooldown: 6 }); }
     if (JT.idle > 16 && JT.idle - dt <= 16) jonSay('sing', { cooldown: 6 });
     if (JT.idle > 22 && !JT.asleep) { JT.asleep = true; jonSay('sleepy', { force: true }); }
     if (JT.asleep && Math.floor(JT.idle) % 6 === 0 && Math.floor(JT.idle - dt) % 6 !== 0) jonSay('sleepy', { force: true });
@@ -5716,11 +5782,13 @@ function maybeJonLevelUp() {
   const avail = JON_PERKS.filter(pk => (d.perks[pk.id] || 0) < pk.max);
   G.jonChoices = [...avail].sort(() => Math.random() - 0.5).slice(0, 3);
   G.jonMilestone = ms || null;
-  G.menuSel = 0;
+  G.menuSel = 0; G.jonLvT = 0;
   G.state = G.jonChoices.length ? 'jonlevel' : 'play';
   if (ms && ms.id === 'bff') G.save.voodoo2 = true;
 }
 function updateJonLevel() {
+  G.jonLvT = (G.jonLvT || 0) + 1 / 60;
+  if (G.jonLvT < LEVEL_GUARD) return;   // a mashed button never picks a perk by accident
   const n = G.jonChoices.length;
   if (just('up')) { G.menuSel = (G.menuSel + n - 1) % n; Sound.play('menu'); }
   if (just('down')) { G.menuSel = (G.menuSel + 1) % n; Sound.play('menu'); }
@@ -5798,7 +5866,7 @@ function drawSpinFx() {
   const p = G.player, j = G.jon;
   if (j.mode === 'spin') {
     const x = p.x - G.cam.x, y = p.y - G.cam.y;
-    ctx.strokeStyle = 'rgba(160,220,255,0.6)'; ctx.lineWidth = 6; ctx.beginPath(); ctx.arc(x, y, 17 * G.st.swing, 0, Math.PI * 2); ctx.stroke();
+    const sr = 17 * G.st.swing; ctx.globalAlpha = 0.5; pxEllipse(x, y, sr, sr, '#a0dcff', 5); ctx.globalAlpha = 1; pxEllipse(x, y, sr + 2, sr + 2, '#dff6ff', 1);
   }
   if ((p.charge || 0) > 0.55 && Math.floor(G.t * 12) % 2) { drawTwinkle(j.x - G.cam.x + 6, j.y - G.cam.y - 10, 1); }
 }
@@ -6007,10 +6075,10 @@ const TABLETS = {
 function tabletsFound() { return Object.keys(TABLETS).filter(k => flag('got:' + k)).length; }
 function readTablet(e) {
   const id = e.def.id;
-  if (flag('got:' + id)) return say([['', TABLETS[id]]]);
+  if (flag('got:' + id)) { const l = [['', TABLETS[id]]]; l.paper = true; return say(l); }
   setFlag('got:' + id); jonXP(8); Sound.play('secret'); JT.queued = 'tablet';
   const n = tabletsFound();
-  const lines = [['', TABLETS[id]], ['', `Rune tablet ${n} of ${TABLET_TOTAL} found.`]];
+  const lines = [['', TABLETS[id]], ['', `Rune tablet ${n} of ${TABLET_TOTAL} found.`]]; lines.paper = true;
   if (n === TABLET_TOTAL) { say(lines, () => { setFlag('got:hc_tablets'); giveItem('container'); }); return; }
   say(lines, () => writeSave());
 }
@@ -6069,7 +6137,7 @@ function startRide(to) {
   G.cutPages = to === 'forest' ? STORY.taxi_out : STORY.taxi_back;
   G.cut = { i: 0 }; G.rideT0 = G.t;
   G.cutDone = () => {
-    if (to === 'forest') { loadMap('overworld', 23 * T + 8, 12 * T + 8); } else { loadMap('overworld', 20 * T + 8, 37 * T + 8); }
+    if (to === 'forest') { loadMap('overworld', 23 * T + 8, 13 * T + 8); } else { loadMap('overworld', 20 * T + 8, 37 * T + 8); }
     G.state = 'play'; writeSave();
     if (to === 'forest' && !flag('forest_arrival')) { setFlag('forest_arrival'); say(STORY.forest_arrival); }
     JT.queued = 'taxi';
@@ -6373,7 +6441,7 @@ function useConsumable(id) {
   if (c.heal) { p.hp = Math.min(s.maxHp, p.hp + c.heal); Sound.play('heart'); }
   if (c.rune) { s.rune = RUNE_MAX; Sound.play('heart'); }
   if (c.fuel) { p.fuel = 60; Sound.play('charge'); }
-  if (id === 'lutefisk') JT.queued = 'lutefisk';
+  if (id === 'lutefisk') { JT.queued = 'lutefisk'; setFlag('ate_lutefisk'); }
   G.bagMsg = { text: c.text, t: 2.5 }; writeSave();
   return true;
 }
@@ -6472,6 +6540,7 @@ function drawSpellBox() {
     if (id !== 'thunder') for (let i = 0; i < sp.cost; i++) R(19 + i * 3, 18, 2, 1, ok ? '#7fd4ff' : '#55577a');
   } else if (s.items.homing) drawItemIcon('homing', 27, 12);
   if (s.charm && hasCharm(s.charm)) drawItemIcon(CHARMS[s.charm].icon, 128, 12);
+  drawBeatMarker();
 }
 
 // ---------------- art ----------------
@@ -6502,6 +6571,7 @@ function objectiveTarget() {
   if (!flag('log_chopped') && !flag('d1done')) return { x: 31, y: 6, label: 'The log' };
   if (!flag('d1done')) return { x: 39, y: 2, label: 'Jjorvic Palace' };
   if (!flag('d2done')) return { x: 7, y: 2, label: 'Drowned Barrow' };
+  if (!flag('ch4_read')) return { x: 61, y: 18, label: "Walter's Forge" };
   return null;
 }
 function drawCompass() {
@@ -6551,7 +6621,7 @@ function updateIcicles(dt) {
 function drawIcicles() {
   for (const c of ICICLES) {
     const x = Math.round(c.x - G.cam.x), y = Math.round(c.y - G.cam.y);
-    if (c.t < c.warn) { const k = c.t / c.warn; ctx.globalAlpha = 0.35 + k * 0.4; ctx.fillStyle = '#9fd0ff'; ctx.beginPath(); ctx.ellipse(x, y + 3, 7 * k + 2, 3 * k + 1, 0, 0, Math.PI * 2); ctx.fill(); ctx.globalAlpha = 1; const fy = y - 120 + k * 120; poly([[x, fy + 8], [x - 3, fy - 6], [x + 3, fy - 6]], '#dff6ff'); R(x - 1, fy - 6, 2, 3, '#ffffff'); }
+    if (c.t < c.warn) { const k = c.t / c.warn; ctx.globalAlpha = qa(0.35 + k * 0.4); pxEllipseFill(x, y + 3, 7 * k + 2, 3 * k + 1, '#9fd0ff'); ctx.globalAlpha = 1; const fy = y - 120 + k * 120; poly([[x, fy + 8], [x - 3, fy - 6], [x + 3, fy - 6]], '#dff6ff'); R(x - 1, fy - 6, 2, 3, '#ffffff'); }
     else { const k = (c.t - c.warn) / c.fall; for (let i = 0; i < 4; i++) R(x - 6 + i * 4, y - 2 - k * 8, 2, 2, '#dff6ff'); }
   }
 }
@@ -6679,11 +6749,11 @@ function updateGiant(e, dt, dx, dy, d, mr) {
     }
   } else if (e.st === 'raise') {
     if (e.t < 0.55) e.aim = { x: p.x, y: p.y };   // tracks you, then commits
-    if (e.t > 0.9) { e.st = 'slam'; e.t = 0; slamClub(e); }
+    if (e.t > 0.9 && (e.t > 1.05 || onBeat(0.05))) { e.st = 'slam'; e.t = 0; slamClub(e); }
   } else if (e.st === 'slam') {
     if (e.t > 0.25) { e.st = 'stuck'; e.t = 0; floatText(e.x, e.y - 60, 'STUCK! CHOP!', '#ffd84a'); jonSay('giant_stuck', { force: true, face: 'excited', cooldown: 4 }); }
   } else if (e.st === 'stuck') {
-    if (e.t > (e.hid ? 1.9 : 2.4)) { e.st = 'stalk'; e.t = 0; Sound.play('clank'); }
+    if (e.t > (e.hid ? 1.9 : 2.4) * bossWindow()) { e.st = 'stalk'; e.t = 0; Sound.play('clank'); }
   }
   if (e.st !== 'stuck' && d < e.r + 6) hurtPlayer(1, e);
 }
@@ -6745,12 +6815,12 @@ function drawGiant(e, x, y) {
   shadowAt(x, foot, 4);
   // the club: up during raise, down and buried while stuck
   const side = e.fx < 0 ? -1 : 1;
-  if (e.st === 'raise') { const lift = Math.min(1, e.t / 0.6); ctx.save(); ctx.translate(x + side * 20, foot - 50 * s / 3 - lift * 20); ctx.rotate(side * (-0.6 - lift * 1.2)); ctx.drawImage(SPR.giant_club, -12, -40, 24, 48); ctx.restore(); }
+  if (e.st === 'raise') { const lift = Math.min(1, e.t / 0.6); ctx.save(); ctx.translate(x + side * 20, foot - 50 * s / 3 - lift * 20); ctx.rotate(side * (-0.6 - lift * 1.2)); ctx.drawImage(up(SPR.giant_club, 3), -12, -40); ctx.restore(); }
   spr(img, x + sway, foot, { scale: s, white });
-  if (e.st === 'slam' || e.st === 'stuck') { const a = e.slamAt; if (a) { const ax = Math.round(a.x - G.cam.x), ay = Math.round(a.y - G.cam.y); ctx.drawImage(SPR.giant_club, ax - 12, ay - 44 + (e.st === 'stuck' ? 6 : 0), 24, 48); if (e.st === 'stuck' && Math.floor(G.t * 6) % 2) R(ax - 10, ay - 2, 20, 3, '#5a3e22'); } }
-  if (e.st === 'raise' && e.aim) { const ax = Math.round(e.aim.x - G.cam.x), ay = Math.round(e.aim.y - G.cam.y), k = Math.min(1, e.t / 0.9); ctx.globalAlpha = 0.35 + k * 0.4; ctx.fillStyle = '#3a2a16'; ctx.beginPath(); ctx.ellipse(ax, ay + 2, 10 + k * 20, 5 + k * 9, 0, 0, Math.PI * 2); ctx.fill(); ctx.globalAlpha = 1; }
+  if (e.st === 'slam' || e.st === 'stuck') { const a = e.slamAt; if (a) { const ax = Math.round(a.x - G.cam.x), ay = Math.round(a.y - G.cam.y); ctx.drawImage(up(SPR.giant_club, 3), ax - 12, ay - 44 + (e.st === 'stuck' ? 6 : 0)); if (e.st === 'stuck' && Math.floor(G.t * 6) % 2) R(ax - 10, ay - 2, 20, 3, '#5a3e22'); } }
+  if (e.st === 'raise' && e.aim) { const ax = Math.round(e.aim.x - G.cam.x), ay = Math.round(e.aim.y - G.cam.y), k = Math.min(1, e.t / 0.9); ctx.globalAlpha = qa(0.35 + k * 0.4); pxEllipseFill(ax, ay + 2, 10 + k * 20, 5 + k * 9, '#3a2a16'); ctx.globalAlpha = 1; }
   // health bar
-  if (e.alive) { R(x - 31, y - 82, 62, 5, '#000'); R(x - 30, y - 81, 60 * Math.max(0, e.hp / e.max), 3, '#9be08a'); }
+  if (e.alive) bossBar(x, y - 81, e.hp / e.max, '#58c040');
   return true;
 }
 function drawFakeTree(t) {
@@ -6848,7 +6918,7 @@ function jonCompliment(dt) {
   if (G.mode === 'arena' || G.state !== 'play' || !s) return;
   JT.compT = Math.max(0, (JT.compT || 0) - dt);
   if (p.hp > 2 || p.hp <= 0 || JT.compT > 0 || p.hp >= s.maxHp) return;
-  JT.compT = 25;
+  JT.compT = isEasy() ? 15 : 25;
   p.hp = Math.min(s.maxHp, p.hp + 1);
   floatText(p.x, p.y - 20, '+½ ♥', '#ff9aa2'); Sound.play('heart');
   jonSay('compliment', { force: true, line: pick(JON_COMPLIMENTS), face: 'excited' });
@@ -6885,8 +6955,7 @@ function giantWrap(e, dt) {
 function drawGiantWrap(e) {
   if (e.st !== 'wrap' || !e.wrapAt) return;
   const x = Math.round(e.wrapAt.x - G.cam.x), y = Math.round(e.wrapAt.y - G.cam.y), k = Math.min(1, e.t / 0.9);
-  ctx.globalAlpha = 0.3 + 0.5 * k; ctx.strokeStyle = '#58b840'; ctx.lineWidth = 2;
-  ctx.beginPath(); ctx.ellipse(x, y + 2, 26, 15, 0, 0, Math.PI * 2); ctx.stroke(); ctx.globalAlpha = 1;
+  ctx.globalAlpha = qa(0.3 + 0.5 * k); pxEllipse(x, y + 2, 26, 15, '#58b840', 2); ctx.globalAlpha = 1;
 }
 
 // ---------- Q48: three new Arena cards ----------
@@ -6911,8 +6980,8 @@ function runeShieldBlocks() {
 function drawOwenCards() {
   const p = G.player, cx = G.cam.x, cy = G.cam.y;
   if (A.helheim) { ctx.globalAlpha = 0.3 + 0.06 * Math.sin(G.t * 3); R(0, 0, VW, VH, '#ff3a1f'); ctx.globalAlpha = 1; for (let i = 0; i < 6; i++) { const x = (i * 53 + G.t * 20) % VW, y = VH - ((G.t * 40 + i * 37) % VH); R(x, y, 2, 2, '#ffd84a'); } }
-  if (A.rshield && !(A.rsT > 0)) { ctx.strokeStyle = 'rgba(127,212,255,0.8)'; ctx.lineWidth = 1; ctx.beginPath(); ctx.arc(p.x - cx, p.y - cy - 2, 13, 0, Math.PI * 2); ctx.stroke(); }
-  if (A.infT > 0) { ctx.globalAlpha = 0.5 + 0.3 * Math.sin(G.t * 12); ctx.strokeStyle = '#ffd84a'; ctx.beginPath(); ctx.arc(p.x - cx, p.y - cy - 2, 11, 0, Math.PI * 2); ctx.stroke(); ctx.globalAlpha = 1; text(Math.ceil(A.infT) + 's', p.x - cx, p.y - cy - 22, '#ffd84a', 'center', false); }
+  if (A.rshield && !(A.rsT > 0)) pxEllipse(p.x - cx, p.y - cy - 2, 13, 13, '#7fd4ff');
+  if (A.infT > 0) { ctx.globalAlpha = qa(0.5 + 0.3 * Math.sin(G.t * 12)); pxEllipse(p.x - cx, p.y - cy - 2, 11, 11, '#ffd84a'); ctx.globalAlpha = 1; text(Math.ceil(A.infT) + 's', p.x - cx, p.y - cy - 22, '#ffd84a', 'center', false); }
 }
 
 // ---------- Q28: the giant turns back into a log, rolls off the path and snores ----------
@@ -6939,8 +7008,9 @@ function drawOwen(x, y) {
     spr(SPR[key + '_hold'], x, y + 7);
     // A Link to the Past item fanfare: rays and twinkles around the prize
     const ix = x, iy = y - 22, t = G.t * 3;
-    ctx.strokeStyle = 'rgba(255,240,170,0.5)'; ctx.lineWidth = 1;
-    for (let i = 0; i < 8; i++) { const a = t * 0.5 + i * Math.PI / 4, r0 = 9, r1 = 14 + 3 * Math.sin(t * 2 + i); ctx.beginPath(); ctx.moveTo(ix + Math.cos(a) * r0, iy + Math.sin(a) * r0); ctx.lineTo(ix + Math.cos(a) * r1, iy + Math.sin(a) * r1); ctx.stroke(); }
+    ctx.globalAlpha = 0.5;
+    for (let i = 0; i < 8; i++) { const a = t * 0.5 + i * Math.PI / 4, r0 = 9, r1 = 14 + 3 * Math.sin(t * 2 + i); pxLine(ix + Math.cos(a) * r0, iy + Math.sin(a) * r0, ix + Math.cos(a) * r1, iy + Math.sin(a) * r1, '#fff0aa'); }
+    ctx.globalAlpha = 1;
     drawItemIcon(p.hold.id, ix, iy);
     for (let i = 0; i < 3; i++) { const a = t + i * 2.1; drawTwinkle(ix + Math.cos(a) * 12, iy + Math.sin(a) * 9, (Math.floor(G.t * 8) + i) % 2); }
     return;
@@ -6958,7 +7028,7 @@ function drawTwinkle(x, y, big) {
 function drawJonSprite(x, y, spin, blink, face) {
   const img = blink && face !== 'sleepy' ? SPR.jon_blink : (face && SPR['jon_' + face]) || SPR.jon;
   ctx.save(); ctx.translate(Math.round(x), Math.round(y)); ctx.rotate(spin);
-  if (G.save && G.save.items.homing) { ctx.globalAlpha = 0.25 + 0.1 * Math.sin(G.t * 6); ctx.fillStyle = '#ffd84a'; ctx.beginPath(); ctx.arc(1, -2, 10, 0, Math.PI * 2); ctx.fill(); ctx.globalAlpha = 1; }
+  if (G.save && G.save.items.homing) { ctx.globalAlpha = qa(0.25 + 0.1 * Math.sin(G.t * 6)); pxEllipseFill(1, -2, 10, 10, '#ffd84a'); ctx.globalAlpha = 1; }
   ctx.drawImage(img, -img.width / 2 + 1, -img.height / 2);
   ctx.restore();
 }
@@ -6968,8 +7038,8 @@ function drawSlash() {
   const k = Math.min(1, j.st / (0.2 / G.st.atk)), a0 = j.base - 1.3, a1 = j.base - 1.3 + 2.6 * k;
   const x = p.x - G.cam.x, y = p.y - G.cam.y;
   ctx.lineCap = 'round';
-  ctx.strokeStyle = 'rgba(255,255,255,0.55)'; ctx.lineWidth = 7; ctx.beginPath(); ctx.arc(x, y, 15, Math.max(a0, a1 - 1.6), a1); ctx.stroke();
-  ctx.strokeStyle = 'rgba(160,220,255,0.9)'; ctx.lineWidth = 2; ctx.beginPath(); ctx.arc(x, y, 18, Math.max(a0, a1 - 1.2), a1); ctx.stroke();
+  ctx.globalAlpha = 0.5; pxEllipse(x, y, 15, 15, '#ffffff', 5, Math.max(a0, a1 - 1.6), a1); ctx.globalAlpha = 1;
+  pxEllipse(x, y, 18, 18, '#a0dcff', 2, Math.max(a0, a1 - 1.2), a1);
   ctx.lineCap = 'butt';
 }
 function drawJon() {
@@ -6987,7 +7057,7 @@ function drawJon() {
 function drawEnemy(e) {
   const x = Math.round(e.x - G.cam.x), y = Math.round(e.y - G.cam.y);
   if (drawCh2Enemy(e, x, y)) return;
-  if (drawRedeyeEnemy(e, x, y)) { if (e.boss && e.alive && attendantVisible(e)) { R(x - 31, y - 41, 62, 5, '#000'); R(x - 30, y - 40, 60 * Math.max(0, e.hp / e.max), 3, '#e23'); } return; }
+  if (drawRedeyeEnemy(e, x, y)) { if (e.boss && e.alive && attendantVisible(e)) bossBar(x, y - 40, e.hp / e.max); return; }
   if (e.type === 'giant') { drawGiantWrap(e); drawGiant(e, x, y); return; }
   if (e.type === 'varg') { drawVarg(e, x, y); drawRooted(e); return; }
   if (e.type === 'spider') { shadowAt(x, y + 3, 0.6); spr(SPR.spider, x, y + 4 + (Math.floor(e.wob) % 2), { white: e.flash > 0 }); drawRooted(e); return; }
@@ -7027,8 +7097,7 @@ function drawEnemy(e) {
       break; }
     case 'wisp': {
       const g = 0.6 + 0.4 * Math.sin(G.t * 6 + e.wob);
-      const gr = ctx.createRadialGradient(x, y, 0, x, y, 12); gr.addColorStop(0, `rgba(160,230,255,${0.55 * g})`); gr.addColorStop(1, 'rgba(160,230,255,0)');
-      ctx.fillStyle = gr; ctx.fillRect(x - 12, y - 12, 24, 24);
+      pxGlow(x, y, 12, '160,230,255', 0.55 * g);
       R(x - 3, y - 3, 6, 6, e.flash > 0 ? '#fff' : '#dff6ff'); R(x - 2, y - 4, 4, 1, '#dff6ff'); R(x - 1, y - 6 - Math.round(g * 2), 2, 2, '#bfeaff');
       R(x - 2, y - 1, 1, 2, '#123'); R(x + 1, y - 1, 1, 2, '#123');
       break; }
@@ -7039,7 +7108,7 @@ function drawEnemy(e) {
   }
   if (e.boss && e.alive) {
     const w = 60, bx = x - w / 2, by = y - (e.type === 'king' ? 54 : 40);
-    R(bx - 1, by - 1, w + 2, 5, '#000'); R(bx, by, w * Math.max(0, e.hp / e.max), 3, '#e23');
+    bossBar(x, by, e.hp / e.max);
   }
 }
 function drawShield(e, x, y, s) {
@@ -7047,7 +7116,7 @@ function drawShield(e, x, y, s) {
   const ox = down ? -e.fy * 9 * s : e.fx * 7 * s, oy = down ? e.fx * 4 * s + 4 : e.fy * 5 * s;
   ctx.save(); ctx.translate(Math.round(x + ox), Math.round(y + oy));
   if (down) ctx.rotate(0.6);
-  const img = SPR.shield, w = img.width * s * 0.9, h = img.height * s * 0.9;
+  const img = s >= 2 ? up(SPR.shield, Math.round(s)) : SPR.shield, w = s >= 2 ? img.width : Math.round(img.width * s * 0.9), h = s >= 2 ? img.height : Math.round(img.height * s * 0.9);
   ctx.drawImage(e.flash > 0 ? whiteOf(img) : img, Math.round(-w / 2), Math.round(-h / 2), w, h);
   ctx.restore();
 }
@@ -7058,12 +7127,13 @@ function drawPerson(x, y, id, bob) {
   shadowAt(x, y + 6, 1);
   const blink = (G.t + bob) % 3.6 < 0.13;
   spr(SPR['npc_' + id + (blink ? '_blink' : '')] || SPR.npc_sven, x, y + 7 + b);
+  drawPersonExtra(x, y + b, id);
 }
 const LOOKS = {
   bjarne: { shirt: '#3a7a4a', hair: '#e8e8e8', beard: true, hat: '#7a4a22' },
   astrid: { shirt: '#6b3fa0', hair: '#e8e8e8', long: true },
   lars: { shirt: '#b33a2e', hair: '#d9a441', beard: true },
-  sven: { shirt: '#2f8a5a', hair: '#f2d27a' },
+  sven: { shirt: '#2f8a5a', hair: '#f2d27a', kid: true },
   ingrid: { shirt: '#2f5aa8', hair: '#a0522d', long: true, hat: '#e0c040' },
   attendant_ok: { shirt: '#1b2a55', hair: '#3a2a1a', long: true, hat: '#c0392b' },
   commuter: { shirt: '#6a6a7a', hair: '#8a5a2a', hat: '#2a2a2a' },
@@ -7092,6 +7162,7 @@ function drawThing(e) {
   switch (e.kind) {
     case 'enemy': drawEnemy(e); drawFrozen(e); drawRooted(e); return;
     case 'sleeplog': return drawSleepLog(e);
+    case 'owengrave': return drawOwenGrave(e);
     case 'cargo': if (flag('d1done')) { shadowAt(x, y + 6, 1.4); spr(SPR.bench, x, y + 8); } return;
     case 'tablet': shadowAt(x, y + 6, 0.8); spr(SPR.tablet, x, y + 7 + Math.round(Math.sin(t * 2) * 1)); if (Math.floor(t * 3) % 3 === 0) drawTwinkle(x + 5, y - 6, 0); return;
     case 'throne': spr(SPR.throne, x, y + 8); return;
@@ -7126,7 +7197,7 @@ function drawThing(e) {
       const on = flag(G.mapId + ':gates');
       R(x - 5, y + 2, 10, 5, '#3a3a4a'); poly([[x, y - 9], [x + 6, y - 2], [x, y + 4], [x - 6, y - 2]], on ? '#7fd4ff' : '#ff9a1f'); R(x - 2, y - 5, 2, 3, '#fff');
       break; }
-    case 'warp': if (e.portal) { for (let i = 0; i < 3; i++) { const r = 4 + ((t * 10 + i * 4) % 10); ctx.strokeStyle = `rgba(127,212,255,${1 - r / 14})`; ctx.lineWidth = 1; ctx.beginPath(); ctx.ellipse(x, y, r, r * 0.6, 0, 0, Math.PI * 2); ctx.stroke(); } } break;
+    case 'warp': if (e.portal) { for (let i = 0; i < 3; i++) { const r = 4 + ((t * 10 + i * 4) % 10); ctx.globalAlpha = qa(1 - r / 14); pxEllipse(x, y, r, r * 0.6, '#7fd4ff'); ctx.globalAlpha = 1; } } break;
   }
 }
 
@@ -7421,8 +7492,7 @@ function drawArenaWorld() {
   for (const m of A.marks) { const a = Math.floor(G.t * 10) % 2; R(m.x - cx - 5, m.y - cy - 1, 10, 2, a ? '#ff4d4d' : '#ffd84a'); R(m.x - cx - 1, m.y - cy - 5, 2, 10, a ? '#ff4d4d' : '#ffd84a'); }
   if (A.frost) {
     const r = 34 + A.frost * 10;
-    ctx.strokeStyle = `rgba(160,220,255,${0.25 + 0.1 * Math.sin(G.t * 4)})`; ctx.lineWidth = 2;
-    ctx.beginPath(); ctx.arc(p.x - cx, p.y - cy, r, 0, Math.PI * 2); ctx.stroke();
+    ctx.globalAlpha = qa(0.25 + 0.1 * Math.sin(G.t * 4)); pxEllipse(p.x - cx, p.y - cy, r, r, '#a0dcff', 2); ctx.globalAlpha = 1;
   }
   for (const t of A.turrets) {
     const x = t.x - cx, y = t.y - cy;
@@ -7441,8 +7511,7 @@ function drawArenaWorld() {
     const a = G.t * 3.2 + i * Math.PI * 2 / A.orbit;
     ctx.globalAlpha = 0.6; drawJonSprite(p.x - cx + Math.cos(a) * 28, p.y - cy + Math.sin(a) * 28, a * 2); ctx.globalAlpha = 1;
   }
-  ctx.strokeStyle = '#cfefff'; ctx.lineWidth = 1;
-  for (const b of A.bolts) { ctx.beginPath(); ctx.moveTo(b.x1 - cx, b.y1 - cy); ctx.lineTo((b.x1 + b.x2) / 2 - cx + rnd(-5, 5), (b.y1 + b.y2) / 2 - cy + rnd(-5, 5)); ctx.lineTo(b.x2 - cx, b.y2 - cy); ctx.stroke(); }
+  for (const b of A.bolts) { const mx = (b.x1 + b.x2) / 2 - cx + rnd(-5, 5), my = (b.y1 + b.y2) / 2 - cy + rnd(-5, 5); pxLine(b.x1 - cx, b.y1 - cy, mx, my, '#cfefff'); pxLine(mx, my, b.x2 - cx, b.y2 - cy, '#cfefff'); }
 }
 
 function drawArenaHud() {
@@ -7526,7 +7595,8 @@ function drawArenaMenus() {
 
 function say(lines, done) {
   if (!lines || !lines.length) { if (done) done(); return; }
-  G.talk = { queue: lines.slice(), done: done || null, cur: null, shown: 0, back: G.state === 'talk' ? 'play' : (G.state === 'hold' ? 'play' : G.state) };
+  done = typeof noteAfter === 'function' ? noteAfter(lines, done) : done;
+  G.talk = { paper: typeof isPaper === 'function' && isPaper(lines), queue: lines.slice(), done: done || null, cur: null, shown: 0, back: G.state === 'talk' ? 'play' : (G.state === 'hold' ? 'play' : G.state) };
   if (G.talk.back !== 'play' && G.talk.back !== 'cutscene') G.talk.back = 'play';
   G.state = 'talk';
   nextLine();
@@ -7556,32 +7626,35 @@ function drawPortrait(who, x, y) {
   else if (who === 'Owen') { const key = G.save && (G.save.voodoo || G.mode === 'arena') ? 'owen' : 'zombie'; spr(SPR[key + '_down_w0'], 0, 7); }
   else if (who === 'Penguin King') { spr(SPR.peng_down_0, 0, 6); spr(SPR.crown, 0, -6); }
   else if (who === 'Forest Giant') { ctx.scale(0.5, 0.5); spr(SPR.giant, 0, 16); }
+  else if (drawPortraitExtra(who)) {}
   else if (PORTRAIT_NPC[who]) spr(SPR['npc_' + PORTRAIT_NPC[who] + (blink ? '_blink' : '')] || SPR.npc_sven, 0, 7);
   else { ctx.restore(); return false; }
   ctx.restore(); return true;
 }
-const HAS_PORTRAIT = who => who === 'Jon' || who === 'Owen' || who === 'Penguin King' || who === 'Forest Giant' || !!PORTRAIT_NPC[who];
+const HAS_PORTRAIT = who => who === 'Jon' || who === 'Owen' || who === 'Penguin King' || who === 'Forest Giant' || ['Hank', 'Draugr Captain', 'Fluffy', 'Driver', 'Announcer'].includes(who) || !!PORTRAIT_NPC[who];
 function drawTalk() {
   const tk = G.talk; if (!tk) return;
   const [who, msg] = tk.cur;
   const inCut = tk.back === 'cutscene';
   const ride = inCut && G.cutPages && G.cutPages[G.cut.i] && String(G.cutPages[G.cut.i].art).startsWith('taxi');
   const top = ride || (!inCut && G.player && G.player.y - G.cam.y > 140);
-  const by = top ? 30 : 156, bx = 6, bw = 244, bh = 62;
-  drawPanel(bx, by, bw, bh);
+  const by = top ? 30 : 156, bx = 6, bw = 244, bh = 62, paper = tk.paper;
+  if (paper) drawPaper(bx, by, bw, bh); else drawPanel(bx, by, bw, bh);
   let tx = bx + 10, tw = bw - 20;
-  if (who && HAS_PORTRAIT(who)) {
+  if (paper) { tx = bx + 22; tw = bw - 30; }
+  else if (who && HAS_PORTRAIT(who)) {
     R(bx + 6, by + 7, 36, 36, '#0a0812'); R(bx + 7, by + 8, 34, 34, '#2a2f66'); R(bx + 7, by + 8, 34, 12, '#343a7a');
     ctx.save(); ctx.beginPath(); ctx.rect(bx + 7, by + 8, 34, 34); ctx.clip(); drawPortrait(who, bx + 24, by + 24); ctx.restore();
     tx = bx + 48; tw = bw - 56;
   }
-  if (who) {
+  if (who && paper) text(who, tx, by + 10, '#c0392b', 'left', false);
+  else if (who) {
     const nw = textWidth(who) + 12;
     drawPanel(tx - 4, by - 9, nw, 14, { plain: true, field: '#2a1a10', top: '#3a2616' });
     text(who, tx + 2, by + 1, '#ffd84a', 'left', false);
   }
-  let left = Math.floor(tk.shown), y = by + 17;
-  for (const l of wrap(msg, tw).slice(0, 4)) { text(l.slice(0, Math.max(0, left)), tx, y, '#f6f0dc', 'left', true); left -= l.length + 1; y += 11; }
+  let left = Math.floor(tk.shown), y = by + (paper && who ? 23 : 17);
+  for (const l of wrap(msg, tw).slice(0, 4)) { text(l.slice(0, Math.max(0, left)), tx, y, paper ? INK : '#f6f0dc', 'left', !paper); left -= l.length + 1; y += 11; }
   if (tk.shown >= msg.length) text('▼', bx + bw - 13, by + bh - 6 + (Math.floor(G.t * 4) % 2), '#ffd84a', 'left', false);
 }
 
@@ -7626,7 +7699,8 @@ function objective() {
     if (!s.items.dash) return 'Chapter 3: the Drowned Barrow has opened in the north-west foothills. Find what the Draugr Captain guards.';
     return 'Chapter 3: use the Voodoo Dash to cross the water and barriers. Find the big key and free Hank\'s ghost.';
   }
-  return 'Chapter 3 complete! Walter\'s Forge and the Storm Peak wait for Owen\'s next chapters.';
+  if (!SCRIPT.ch4.length) return 'Chapter 4: Walter\'s Forge is on the volcano road, and it opens when Owen writes it. Open OWEN\'S SCRIPT under the screen.';
+  return 'Chapter 4: Walter\'s Forge, east on the volcano road. Read Owen\'s pages at the forge door.';
 }
 const MENU_TABS = ['GEAR', 'JON', 'MAP', 'MUSIC', 'SPELLS', 'BAG'];
 function drawMenuTabs(active) {
@@ -7665,6 +7739,8 @@ function drawMenu() {
   text('Voodoo bond ' + (s.voodoo ? 'ready' : 'used'), 20, 151, s.voodoo ? '#9be08a' : '#c9a0f0');
   if (side.length) text('Side quests ' + side.join('  '), 20, 162, '#c8e8ff', 'left', false);
   text(Sound.muted ? 'M sound off' : 'M sound on', 236, 140, '#8a8ab0', 'right', false);
+  text((isEasy() ? 'EASY' : 'NORMAL') + ' (X)', 236, 162, isEasy() ? '#9be08a' : '#8a8ab0', 'right', false);
+  text('NOTES ' + (NOTES.on ? 'ON' : 'OFF') + ' (C)', 236, 129, NOTES.on ? '#f4eedb' : '#8a8ab0', 'right', false);
   text(Music.on ? 'N music on' : 'N music off', 236, 151, '#8a8ab0', 'right', false);
   R(16, 169, 224, 1, '#3a3f80');
   text('QUEST', 20, 180, '#ffd84a');
@@ -7708,6 +7784,7 @@ function drawTitle() {
   for (let k = 0; k < 5; k++) R(sx + 11, sy - 20 + k * 3, 22, 3, k % 2 ? '#e8dcb8' : '#c03a2a');
   ctx.globalAlpha = 0.25; R(sx + 4, sy + 7, 40, 2, '#c03a2a'); ctx.globalAlpha = 1;
   drawTitleExtras();
+  drawPhoto('title', 30, 190, 40, 50, -0.09);
   // the logo: chunky outlined letters, ice-blue with a darker lower half
   const ly = 92;
   text('JÖNTUKA', VW / 2, ly, '#dff6ff', 'center', 'outline', 3);
@@ -7733,6 +7810,7 @@ function titleOptions() {
   if (has) o.push({ label: 'CONTINUE', id: 'continue' });
   o.push({ label: 'NEW GAME', id: 'new' });
   o.push({ label: 'VALHALLA ARENA', id: 'arena' });
+  o.push({ label: 'MODE: ' + (defaultDiff() === 'easy' ? 'EASY' : 'NORMAL'), id: 'mode' });
   return o;
 }
 
@@ -7741,7 +7819,9 @@ function drawCutscene() {
   const c = G.cut, page = (G.cutPages || STORY.flight)[c.i], t = G.t;
   R(0, 0, VW, VH, '#000');
   if (page.art && page.art.startsWith('taxi')) return drawRideMode7(page);
-  switch (page.art) {
+  if (page.art === 'plane' || page.art === 'cabin' || page.art === 'demon') drawFlightArt(page.art, t);
+  else if (page.art === 'land') drawLandArt(t);
+  switch (page.art === 'never' ? page.art : null) {
     case 'plane':
       R(0, 0, VW, 140, '#1b2a55'); for (let i = 0; i < 30; i++) R((i * 71) % VW, (i * 37) % 120, 1, 1, '#8899cc');
       for (let i = 0; i < 4; i++) { const cx = ((i * 90 - t * 20) % 340 + 340) % 340 - 40; R(cx, 100 + i * 8, 40, 8, '#2c3e70'); }
@@ -7771,6 +7851,7 @@ function drawCutscene() {
       for (let i = 0; i < 5; i++) R(0, 60 + i * 5, VW, 1, '#9cc8ef');
       break;
   }
+  drawPhoto('flight', 214, 80, 62, 84, 0.07);
   text('FLIGHT 364  ·  NEW YORK → NORWAY', VW / 2, 12, '#888', 'center', false);
 }
 function startFlight() {
@@ -7810,6 +7891,7 @@ function runFrame(now) {
   const t0 = performance.now();
   let steps = 0;
   pollGamepad();
+  if (SCRIPT.open) PERF.acc = 0;
   while (PERF.acc >= STEP && steps < MAX_STEPS) {
     update(STEP); PERF.acc -= STEP; steps++;
     if (!(G.hitstop > 0)) for (const k in edge) edge[k] = false;
@@ -7907,7 +7989,7 @@ function drawRideMode7(page) {
   drawMode7(cx, cy, ang, 13, night);
   const bounce = Math.round(Math.sin(G.t * 14));
   shadowAt(128, 196, 3);
-  ctx.save(); ctx.translate(128, 196 + bounce); ctx.scale(2, 2); ctx.drawImage(SPR.taxi, -SPR.taxi.width / 2, -SPR.taxi.height); ctx.restore();
+  { const tx2 = up(SPR.taxi, 2); ctx.drawImage(tx2, Math.round(128 - tx2.width / 2), 196 + bounce - tx2.height); }
   for (let i = 0; i < 4; i++) { ctx.globalAlpha = 0.5 - i * 0.1; R(114 + (i % 2) * 24, 198 + i * 3, 4, 2, '#d8c08a'); }
   ctx.globalAlpha = 1;
   text(night ? 'FJORDVIK → AIRSTRIP' : 'FJORDVIK T-BANE → THE FOREST', VW / 2, 218, '#ffffff', 'center', 'outline');
@@ -8017,6 +8099,867 @@ function drawDebug() {
   lines.forEach((l, i) => text(l, 6, VH - 6 - (lines.length - 1 - i) * 10 - 1, '#9be08a', 'left', false));
 }
 
+// ===== owenscript.js =====
+// Easy/Normal difficulty, chapter title cards, a bigger level-up and boss-defeated moment,
+// OWEN'S SCRIPT (edit any line in the game, saved for good), and Chapter 4 written by Owen.
+
+// ---------------- difficulty ----------------
+// Easy: hits cost half as much, boss openings last 40% longer, Jon's compliments come faster.
+const DIFF_KEY = 'jontuka-difficulty';
+function defaultDiff() { try { return localStorage.getItem(DIFF_KEY) === 'easy' ? 'easy' : 'normal'; } catch (e) { return 'normal'; } }
+function isEasy() { return G.mode !== 'arena' && !!G.save && G.save.diff === 'easy'; }
+function dmgScale() { return isEasy() ? 0.5 : 1; }
+function bossWindow() { return isEasy() ? 1.4 : 1; }
+function setDifficulty(d, silent) {
+  if (G.save) G.save.diff = d;
+  try { localStorage.setItem(DIFF_KEY, d); } catch (e) {}
+  if (!silent) { Sound.play('menu'); if (G.save && G.mode === 'story' && G.player) writeSave(); }
+}
+function toggleDifficulty() { setDifficulty(isEasy() || (!G.save && defaultDiff() === 'easy') ? 'normal' : 'easy'); }
+
+// ---------------- chapter title cards ----------------
+const CHAPTERS = {
+  1: 'Unfinished Business',      // Jon's words in Owen's room
+  2: 'Jjorvic Palace',
+  3: 'The Drowned Barrow',
+  4: "Walter's Forge",
+  5: 'The Storm Peak',
+};
+function showChapter(n) {
+  if (!G.save || G.mode === 'arena' || flag('chapter_card:' + n)) return;
+  setFlag('chapter_card:' + n);
+  G.chapterCard = { n, name: CHAPTERS[n] || '', t: 0, life: 3.4 };
+  Sound.play('save');
+}
+function drawChapterCard() {
+  const c = G.chapterCard;
+  if (!c || G.state === 'menu' || G.state === 'title' || G.state === 'jonlevel') return;
+  c.t += 1 / 60;
+  if (c.t > c.life) { G.chapterCard = null; return; }
+  const k = Math.min(1, c.t / 0.5), out = Math.max(0, (c.t - (c.life - 0.6)) / 0.6), a = k * (1 - out);
+  ctx.globalAlpha = 0.82 * a; R(0, 52, VW, 74, '#0a0812'); ctx.globalAlpha = a;
+  R(28, 60, VW - 56, 1, '#ffd84a'); R(28, 118, VW - 56, 1, '#ffd84a');
+  text('CHAPTER ' + c.n, VW / 2, 82, '#ffd84a', 'center', 'outline', 2);
+  // the name types itself out, like a storybook caption
+  const shown = c.name.slice(0, Math.floor(Math.max(0, c.t - 0.4) * 22));
+  text(shown, VW / 2, 104, '#f6f0dc', 'center', true);
+  ctx.globalAlpha = 1;
+}
+
+// ---------------- level up and boss defeated ----------------
+// The level-up screen opens with a burst and ignores button mashing for a moment, so a perk
+// is never picked by accident in the middle of a fight.
+const LEVEL_GUARD = 0.75;
+function drawLevelBurst() {
+  if (G.state !== 'jonlevel') return;
+  const t = G.jonLvT || 0;
+  if (t > LEVEL_GUARD + 0.3) return;
+  const k = Math.min(1, t / 0.35), fade = t > LEVEL_GUARD ? 1 - (t - LEVEL_GUARD) / 0.3 : 1;
+  ctx.globalAlpha = 0.9 * fade; R(0, 0, VW, VH, '#120c22');
+  ctx.strokeStyle = '#ffd84a'; ctx.lineWidth = 2;
+  for (let i = 0; i < 16; i++) { const a = i / 16 * Math.PI * 2 + t * 2, r0 = 20 + k * 20, r1 = 40 + k * 90; pxLine(128 + Math.cos(a) * r0, 104 + Math.sin(a) * r0, 128 + Math.cos(a) * r1, 104 + Math.sin(a) * r1, '#ffd84a', 2); }
+  drawJonSprite(128, 104, t * 9, false, 'excited');
+  text('LEVEL UP!', 128, 150, '#ffd84a', 'center', 'outline', 2);
+  ctx.globalAlpha = 1;
+}
+const DEFEATED = { giant: 'FOREST GIANT', king: 'PENGUIN KING', captain: 'DRAUGR CAPTAIN', hank: "HANK'S GHOST", attendant: 'FLIGHT ATTENDANT', knight: 'PENGUIN KNIGHT' };
+function bossDefeated(e) {
+  if (G.mode === 'arena' || !DEFEATED[e.type]) return;
+  G.bossCard = { name: DEFEATED[e.type], sub: 'DEFEATED!', t: 0, life: 2.6 };
+  G.flash = 0.3; G.flashColor = '#fff';
+  Sound.tone([[523, 0.1], [659, 0.1], [784, 0.1], [1047, 0.18], [784, 0.08], [1047, 0.4]], 0.07);
+  for (let i = 0; i < 26; i++) { const a = Math.random() * Math.PI * 2, sp = rnd(40, 140); G.fx.push({ x: e.x, y: e.y - 10, vx: Math.cos(a) * sp, vy: Math.sin(a) * sp - 40, grav: 160, t: 0, life: 1.1, color: pick(['#ffd84a', '#ffffff', '#ff6b6b', '#7fd4ff']), size: 2 }); }
+}
+
+// ---------------- OWEN'S SCRIPT ----------------
+// Every scene of dialogue in the game, editable in a panel under the screen. Owen's edits are
+// saved in the artifact's shared database (so they follow him to any device, and Claude can read
+// them to build the next chapter); without it they stay in this browser.
+const STORY_ORIG = JSON.parse(JSON.stringify(STORY));
+const SCRIPT = { open: false, db: null, edits: {}, ch4: [], sel: null, tab: 'scenes', status: '' };
+const SCENE_NAMES = {
+  intro: "Owen's room: waking up", plaque: 'The plaque Jon carved', poster: 'The longship poster', arrival: 'Landing in Norway',
+  attendant_ok: 'The (normal) flight attendant', commuter: 'Commuter in the subway', forest_arrival: 'Arriving at the Muck Forest',
+  log_scene: 'The big log', log_wakes: 'The log wakes up', giant_blur: 'Giant fight: the blur', giant_timeout: 'Giant fight: the time-out signal',
+  giant_lore: "Giant fight: the giants' old war", giant_hide: 'Giant hides as a tree', giant_down: 'Giant defeated',
+  cargo: 'Bench by the plane', cargo_open: 'The Red-Eye dream', attendant: 'Flight Attendant boss', attendant_down: 'Flight Attendant defeated',
+  astrid_1: 'Meeting Astrid', astrid_2: 'Astrid: where the palace is', astrid_3: 'Astrid: the Thunder Rune', astrid_4: 'Astrid: after Hank',
+  barrow_enter: 'Entering the Drowned Barrow', fluffy_1: 'Fluffy (first time)', fluffy_2: 'Fluffy (after the dash)', captain: 'Draugr Captain',
+  hank: "Hank's Ghost", hank_down: 'Hank freed', lars: 'Lars at the market', sven_quest: "Sven's lost longship", sven_thanks: 'Sven says thanks',
+  bjarne_quest: "Bjarne's sheet music", bjarne_thanks: 'Bjarne plays RUSH Ø', ingrid: 'Ingrid by the lake', cavern_enter: 'Entering Jjorvic Palace',
+  knight: 'Penguin Knight', king: 'Penguin King', king_down: 'Penguin King defeated', revive: 'Voodoo revive', grave: "Fluffy's grave",
+  'flight.0': 'Flight 364: takeoff', 'flight.1': 'Flight 364: the odd look', 'flight.2': 'Flight 364: DEMON', 'flight.3': 'Flight 364: the cow dream',
+  'signs.sign_fjordvik': 'Sign: Fjordvik', 'signs.sign_beach': 'Sign: the beach', 'signs.sign_airstrip': 'Sign: the airstrip', 'signs.sign_cavern': 'Sign: Jjorvic Palace', 'signs.sign_tbane': 'Sign: the T-bane', 'signs.seal_peak': 'Sealed door: Storm Peak',
+  'flight.4': 'Flight 364: refreshments', 'flight.5': 'Flight 364: landing', 'taxi_out.0': 'Taxi to the forest (1)', 'taxi_out.1': 'Taxi to the forest (2)',
+};
+const SCENE_ORDER = Object.keys(SCENE_NAMES);
+function sceneGet(id, from = STORY) { const [k, i] = id.split('.'); const v = from[k]; if (i === undefined) return v; if (Array.isArray(v)) return v[+i] && v[+i].lines; return v && v[i]; }
+function sceneSet(id, lines) {
+  const [k, i] = id.split('.');
+  if (i === undefined) STORY[k] = lines; else if (Array.isArray(STORY[k])) { if (STORY[k][+i]) STORY[k][+i].lines = lines; } else if (STORY[k]) STORY[k][i] = lines;
+}
+function applyEdits() {
+  for (const id of SCENE_ORDER) {
+    const orig = sceneGet(id, STORY_ORIG);
+    const ed = SCRIPT.edits[id];
+    sceneSet(id, ed ? ed.map(l => [l.who || '', l.text || '']) : JSON.parse(JSON.stringify(orig)));
+  }
+}
+function localScript() { try { return JSON.parse(localStorage.getItem('jontuka-script') || '{}'); } catch (e) { return {}; } }
+function saveLocal() { try { localStorage.setItem('jontuka-script', JSON.stringify({ edits: SCRIPT.edits, ch4: SCRIPT.ch4 })); } catch (e) {} }
+
+(function bootScript() {
+  const l = localScript(); SCRIPT.edits = l.edits || {}; SCRIPT.ch4 = l.ch4 || []; applyEdits();
+  const c = window.claude && window.claude.use;
+  if (!c) return;
+  window.claude.use('db').then(db => {
+    if (!db) { SCRIPT.status = 'Saved in this browser only.'; renderScript(); return; }
+    SCRIPT.db = db;
+    const timer = setTimeout(() => { SCRIPT.status = 'Still loading Owen\'s script…'; renderScript(); }, 10000);
+    db.collection('script').onSnapshot(snap => {
+      clearTimeout(timer);
+      const edits = {};
+      for (const d of snap.docs) { const v = d.data(); if (v && Array.isArray(v.lines)) edits[v.scene || d.id] = v.lines; }
+      SCRIPT.edits = edits; applyEdits(); saveLocal(); SCRIPT.status = 'Saved for good. Works on any device.'; renderScript();
+    }, () => { clearTimeout(timer); SCRIPT.status = 'Could not reach the save. Edits stay in this browser.'; renderScript(); });
+    db.collection('chapter4').onSnapshot(snap => {
+      SCRIPT.ch4 = snap.docs.map(d => ({ id: d.id, ...d.data() })).filter(p => p && Array.isArray(p.lines)).sort((a, b) => (a.order || 0) - (b.order || 0));
+      saveLocal(); renderScript();
+    }, () => {});
+  }).catch(() => {});
+})();
+
+const docId = id => id.replace(/[^a-zA-Z0-9_-]/g, '_');
+async function storeScene(id, lines) {
+  if (lines) SCRIPT.edits[id] = lines; else delete SCRIPT.edits[id];
+  applyEdits(); saveLocal();
+  if (!SCRIPT.db) return true;
+  try {
+    const ref = SCRIPT.db.doc('script/' + docId(id));
+    if (lines) await ref.set({ scene: id, lines, updatedAt: new Date().toISOString() }); else await ref.delete();
+    return true;
+  } catch (e) { SCRIPT.status = e && e.code === 'permission_denied' ? 'This account can read the script but not change it.' : 'Saved in this browser; the shared save did not take.'; return false; }
+}
+async function storePage(page) {
+  const i = SCRIPT.ch4.findIndex(p => p.id === page.id);
+  if (i >= 0) SCRIPT.ch4[i] = page; else SCRIPT.ch4.push(page);
+  saveLocal();
+  if (!SCRIPT.db) return;
+  try { await SCRIPT.db.doc('chapter4/' + page.id).set({ order: page.order, title: page.title, lines: page.lines, updatedAt: new Date().toISOString() }); } catch (e) { SCRIPT.status = 'Saved in this browser; the shared save did not take.'; }
+}
+async function removePage(id) {
+  SCRIPT.ch4 = SCRIPT.ch4.filter(p => p.id !== id); saveLocal();
+  if (SCRIPT.db) { try { await SCRIPT.db.doc('chapter4/' + id).delete(); } catch (e) {} }
+}
+
+// ---- panel ----
+const $ = id => document.getElementById(id);
+function esc(s) { return String(s).replace(/[&<>"]/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c])); }
+function openScript(tab) {
+  SCRIPT.open = true; if (tab) SCRIPT.tab = tab;
+  for (const k in keys) keys[k] = false; for (const k in virt) virt[k] = false;
+  if (document.body.classList.contains('theater')) exitTheater();
+  $('script').hidden = false; renderScript(); $('script').scrollIntoView({ behavior: 'smooth', block: 'start' });
+}
+function closeScript() { SCRIPT.open = false; $('script').hidden = true; cv.focus(); }
+function draftLines(id) { return (SCRIPT.edits[id] || sceneGet(id, STORY_ORIG) || []).map(l => Array.isArray(l) ? { who: l[0], text: l[1] } : { who: l.who, text: l.text }); }
+function renderScript() {
+  const box = $('script'); if (!box || box.hidden) return;
+  $('st-status').textContent = SCRIPT.status;
+  for (const t of ['scenes', 'ch4', 'notebook']) $('tab-' + t).setAttribute('aria-selected', SCRIPT.tab === t);
+  const body = $('st-body');
+  if (SCRIPT.tab === 'ch4') return renderCh4(body);
+  if (SCRIPT.tab === 'notebook') return renderNotebookTab(body);
+  if (!SCRIPT.sel) {
+    body.innerHTML = '<p class="hint">Pick a scene. Change any words you want; they play in the game right away.</p><ul class="scenes">' +
+      SCENE_ORDER.map(id => `<li><button class="scene" data-id="${esc(id)}"><span>${esc(SCENE_NAMES[id])}</span>${SCRIPT.edits[id] ? '<em>edited</em>' : NOTES.map[id] ? '<em>note</em>' : ''}</button></li>`).join('') + '</ul>';
+    body.querySelectorAll('.scene').forEach(b => b.onclick = () => { SCRIPT.sel = b.dataset.id; SCRIPT.draft = draftLines(SCRIPT.sel); renderScript(); });
+    return;
+  }
+  const id = SCRIPT.sel, d = SCRIPT.draft;
+  body.innerHTML = `<div class="row"><button class="ghost" id="st-back">◀ All scenes</button><h3>${esc(SCENE_NAMES[id])}</h3></div>` +
+    '<p class="hint">Leave the name empty for narration.</p>' +
+    d.map((l, i) => `<div class="line"><input id="who-${i}" value="${esc(l.who)}" placeholder="Narration" aria-label="Who is talking, line ${i + 1}" list="speakers"><textarea id="txt-${i}" rows="2" aria-label="Line ${i + 1}">${esc(l.text)}</textarea><button class="x" data-i="${i}" aria-label="Delete line ${i + 1}">✕</button></div>`).join('') +
+    `<label class="note"><span>Owen's note <i>(optional: shows on notebook paper after this scene when notes are on)</i></span><textarea id="st-note" rows="2" placeholder="Why I wrote it this way, a secret, a joke…">${esc(NOTES.map[id] || '')}</textarea></label>` +
+    `<div class="row wrap"><button class="ghost" id="st-add">+ Add a line</button><span class="grow"></span>${SCRIPT.edits[id] ? '<button class="ghost" id="st-reset">Put back the original</button>' : ''}<button class="ghost" id="st-play">▶ Play it</button><button id="st-save">Save</button></div>`;
+  const pull = () => d.forEach((l, i) => { l.who = $('who-' + i).value.trim(); l.text = $('txt-' + i).value; });
+  $('st-back').onclick = () => { SCRIPT.sel = null; renderScript(); };
+  $('st-add').onclick = () => { pull(); d.push({ who: 'Jon', text: '' }); renderScript(); $('txt-' + (d.length - 1)).focus(); };
+  body.querySelectorAll('.x').forEach(b => b.onclick = () => { pull(); d.splice(+b.dataset.i, 1); renderScript(); });
+  $('st-save').onclick = async () => { pull(); const note = $('st-note').value; const lines = d.filter(l => l.text.trim()); SCRIPT.draft = lines; $('st-save').textContent = 'Saving…'; const orig = JSON.stringify((sceneGet(id, STORY_ORIG) || []).map(l => [l[0], l[1]])); if (SCRIPT.edits[id] || JSON.stringify(lines.map(l => [l.who, l.text])) !== orig) await storeScene(id, lines); await storeNote(id, note); renderScript(); flashSaved(); };
+  if ($('st-reset')) $('st-reset').onclick = async () => { await storeScene(id, null); SCRIPT.draft = draftLines(id); renderScript(); flashSaved('Original back'); };
+  $('st-play').onclick = () => { pull(); playLines(d.filter(l => l.text.trim()).map(l => [l.who, l.text])); };
+}
+function renderCh4(body) {
+  const pages = SCRIPT.ch4;
+  body.innerHTML = '<p class="hint">Chapter 4 is Walter\'s Forge, on the volcano road. Write it page by page: who says what, and what happens. After Hank is freed, the forge door plays your pages.</p>' +
+    (pages.length ? '' : '<p class="empty">No pages yet. Start with what Owen sees when the forge door opens.</p>') +
+    pages.map((p, n) => `<section class="page" data-id="${esc(p.id)}"><div class="row"><b>Page ${n + 1}</b><input class="ptitle" value="${esc(p.title || '')}" placeholder="What happens on this page" aria-label="Page ${n + 1} title"><button class="x del" aria-label="Delete page ${n + 1}">✕</button></div>` +
+      p.lines.map((l, i) => `<div class="line"><input class="pw" data-i="${i}" value="${esc(l.who || '')}" placeholder="Narration" list="speakers" aria-label="Who, line ${i + 1}"><textarea class="pt" data-i="${i}" rows="2" aria-label="Line ${i + 1}">${esc(l.text || '')}</textarea></div>`).join('') +
+      `<div class="row wrap"><button class="ghost padd">+ Add a line</button><span class="grow"></span><button class="ghost pplay">▶ Play it</button><button class="psave">Save page</button></div></section>`).join('') +
+    '<div class="row"><button id="ch4-new">+ New page</button></div>';
+  $('ch4-new').onclick = () => { const p = { id: 'p' + Date.now().toString(36), order: Date.now(), title: '', lines: [{ who: '', text: '' }] }; SCRIPT.ch4.push(p); renderScript(); };
+  body.querySelectorAll('.page').forEach(sec => {
+    const p = SCRIPT.ch4.find(x => x.id === sec.dataset.id);
+    const pull = () => { p.title = sec.querySelector('.ptitle').value; sec.querySelectorAll('.pw').forEach(w => p.lines[+w.dataset.i].who = w.value.trim()); sec.querySelectorAll('.pt').forEach(t => p.lines[+t.dataset.i].text = t.value); };
+    sec.querySelector('.padd').onclick = () => { pull(); p.lines.push({ who: 'Jon', text: '' }); renderScript(); };
+    sec.querySelector('.psave').onclick = async () => { pull(); p.lines = p.lines.filter(l => l.text.trim()); if (!p.lines.length) p.lines = [{ who: '', text: '' }]; await storePage(p); renderScript(); flashSaved(); };
+    sec.querySelector('.pplay').onclick = () => { pull(); playLines(p.lines.filter(l => l.text.trim()).map(l => [l.who, l.text])); };
+    sec.querySelector('.del').onclick = () => { if (sec.dataset.confirm) { removePage(p.id).then(renderScript); } else { sec.dataset.confirm = '1'; sec.querySelector('.del').textContent = 'Delete?'; } };
+  });
+}
+function flashSaved(msg = 'Saved') { const t = $('st-toast'); t.textContent = msg + (SCRIPT.db ? '' : ' (this browser)'); t.hidden = false; clearTimeout(t._h); t._h = setTimeout(() => { t.hidden = true; }, 1800); }
+function playLines(lines) {
+  if (!lines.length) return;
+  if (G.state !== 'play' || !G.player || !G.map) { SCRIPT.status = 'Start or continue the game, then press Play it.'; renderScript(); return; }
+  closeScript(); say(lines);
+}
+(function wireScript() {
+  const b = $('scriptbtn'); if (b) b.addEventListener('click', () => SCRIPT.open ? closeScript() : openScript());
+  const c = $('st-close'); if (c) c.addEventListener('click', closeScript);
+  $('tab-scenes').addEventListener('click', () => { SCRIPT.tab = 'scenes'; renderScript(); });
+  $('tab-ch4').addEventListener('click', () => { SCRIPT.tab = 'ch4'; renderScript(); });
+  $('tab-notebook').addEventListener('click', () => { SCRIPT.tab = 'notebook'; renderScript(); });
+  const dl = document.createElement('datalist'); dl.id = 'speakers';
+  dl.innerHTML = ['Owen', 'Jon', 'Astrid', 'Hank', 'Fluffy', 'Walter', 'Chilly', 'Lars', 'Sven', 'Bjarne', 'Ingrid', 'Penguin King', 'Forest Giant'].map(n => `<option value="${n}">`).join('');
+  document.body.appendChild(dl);
+})();
+
+// ---------------- Chapter 4: Walter's Forge, from Owen's pages ----------------
+function forgeDoor() {
+  if (!flag('d2done')) return say(STORY.signs.seal_forge);
+  const pages = SCRIPT.ch4.filter(p => p.lines.some(l => l.text && l.text.trim()));
+  if (!pages.length) return say([['', 'A stone door, sealed by a glowing rune. WALTER\'S FORGE. The rune is warm now.'], ['Jon', 'It\'s waiting for the next part of the story, Señor. Open OWEN\'S SCRIPT under the screen and write Chapter 4.']]);
+  showChapter(4);
+  const all = [];
+  pages.forEach((p, i) => { if (p.title) all.push(['', `Page ${i + 1}: ${p.title}`]); for (const l of p.lines) if (l.text && l.text.trim()) all.push([l.who || '', l.text]); });
+  all.paper = true;
+  all.push(['Jon', 'That\'s as far as Owen has written. The forge gets built from these pages. No pressure. Some pressure.']);
+  say(all, () => { setFlag('ch4_read'); jonXP(10); writeSave(); });
+}
+
+// ===== editor.js =====
+// The editor's pass: Owen's notebook as the look of the story (paper, plus photos of his real
+// pages), Jon remembers what you did, the RUSH Ø duel at Bjarne's piano, Chilly's night,
+// and Owen's notes (director's commentary he writes himself).
+
+// ---------------- notebook paper ----------------
+function drawPaper(x, y, w, h, tilt = 0) {
+  ctx.save(); ctx.translate(x + w / 2, y + h / 2); ctx.rotate(tilt); ctx.translate(-w / 2, -h / 2);
+  R(2, 3, w, h, 'rgba(0,0,0,.35)');                       // shadow
+  R(0, 0, w, h, '#f4eedb');
+  for (let ly = 14; ly < h - 2; ly += 11) R(2, ly, w - 4, 1, '#a9c0de');
+  R(16, 0, 1, h, '#e08a8a');                               // the red margin
+  for (let i = 0; i < 3; i++) { R(6, 10 + i * (h - 24) / 2, 4, 4, '#d8d0b8'); R(7, 11 + i * (h - 24) / 2, 2, 2, '#b8b098'); }   // binder holes
+  for (let tx = 0; tx < w; tx += 3) if (hash(tx, h) % 3 === 0) R(tx, h - 1, 2, 1, '#d8d0b8');   // a rough bottom edge
+  R(w / 2 - 14, -4, 28, 8, 'rgba(255,240,170,.75)');     // tape
+  ctx.restore();
+}
+const INK = '#26305a', PENCIL = '#5a5a6e';
+function isPaper(lines) { return !!lines && (lines.paper === true || Object.values(STORY.signs).includes(lines)); }
+
+// ---------------- photos of Owen's real notebook ----------------
+// Slots: chapter cards and boss cards. Photos are uploaded from OWEN'S SCRIPT → Notebook.
+const NOTEBOOK = { slots: {}, assets: null };
+const PHOTO_SLOTS = [['title', 'Title screen'], ['flight', 'Flight 364 cutscene'], ['grave', "Owen's grave (at night)"], ['chapter:1', 'Chapter 1 card'], ['chapter:2', 'Chapter 2 card'], ['chapter:3', 'Chapter 3 card'], ['chapter:4', 'Chapter 4 card'], ['chapter:5', 'Chapter 5 card'],
+  ['boss:giant', 'Forest Giant'], ['boss:knight', 'Penguin Knight'], ['boss:king', 'Penguin King'], ['boss:attendant', 'Flight Attendant'], ['boss:captain', 'Draugr Captain'], ['boss:hank', "Hank's Ghost"]];
+function slotImage(slot) {
+  const s = NOTEBOOK.slots[slot]; if (!s || !s.assetId) return null;
+  if (!s.img) { s.img = new Image(); s.img.src = '/_blob/' + s.assetId; }
+  return s.img.complete && s.img.naturalWidth ? s.img : null;
+}
+function drawPhoto(slot, cx, cy, maxW, maxH, tilt) {
+  const img = slotImage(slot); if (!img) return false;
+  const k = Math.min(maxW / img.naturalWidth, maxH / img.naturalHeight), w = Math.round(img.naturalWidth * k), h = Math.round(img.naturalHeight * k);
+  ctx.save(); ctx.translate(cx, cy); ctx.rotate(tilt);
+  R(-w / 2 - 3, -h / 2 - 3, w + 6, h + 9, '#fbf8ef'); R(-w / 2 - 2, -h / 2 + h + 6, w + 6, 2, 'rgba(0,0,0,.3)');
+  ctx.imageSmoothingEnabled = true; ctx.drawImage(img, -w / 2, -h / 2, w, h); ctx.imageSmoothingEnabled = false;
+  R(-6, -h / 2 - 7, 12, 6, 'rgba(255,240,170,.8)');
+  ctx.restore(); return true;
+}
+// the chapter card, now a torn notebook page
+drawChapterCard = function () {
+  const c = G.chapterCard;
+  if (!c || G.state === 'menu' || G.state === 'title' || G.state === 'jonlevel') return;
+  c.t += 1 / 60;
+  if (c.t > c.life) { G.chapterCard = null; return; }
+  const k = Math.min(1, c.t / 0.45), out = Math.max(0, (c.t - (c.life - 0.5)) / 0.5);
+  const drop = Math.round((1 - k) * -90 + out * 140);
+  const photo = !!slotImage('chapter:' + c.n), w = photo ? 220 : 180, x = (VW - w) / 2, y = 54 + drop;
+  ctx.globalAlpha = 1 - out;
+  drawPaper(x, y, w, 76, -0.03);
+  const tx = photo ? x + 100 : VW / 2;
+  text('CHAPTER ' + c.n, tx + (photo ? 0 : 0), y + 30, INK, 'center', false, 2);
+  text(c.name.slice(0, Math.floor(Math.max(0, c.t - 0.3) * 22)), tx, y + 50, PENCIL, 'center', false);
+  if (photo) drawPhoto('chapter:' + c.n, x + 40, y + 38, 56, 60, 0.06);
+  ctx.globalAlpha = 1;
+};
+// a boss card with Owen's drawing of that boss pinned to it
+const _drawBossCard = drawBossCard;
+drawBossCard = function () {
+  _drawBossCard();
+  const c = G.bossCard;
+  if (!c || !c.type || G.state === 'menu' || G.state === 'title' || G.state === 'jonlevel') return;
+  const k = Math.min(1, c.t / 0.4), out = Math.max(0, (c.t - (c.life - 0.4)) / 0.4);
+  ctx.globalAlpha = 1 - out; drawPhoto('boss:' + c.type, VW - 46, 64 - (1 - k) * 60, 70, 60, 0.08); ctx.globalAlpha = 1;
+};
+const _showBossCard = showBossCard;
+showBossCard = function (type) { _showBossCard(type); if (G.bossCard) G.bossCard.type = type; };
+
+// ---------------- Jon remembers ----------------
+// He keeps a running memory of Owen's deeds and brings them up later, a couple of times each at most.
+function deeds() { return (G.save && G.save.deeds) || {}; }
+const MEMORIES = [
+  { id: 'tsign', ok: () => flag('giant_timeout'), line: () => 'Remember when you made the T at the giant? Do NOT do that here.' },
+  { id: 'naps', ok: () => (deeds().deaths || 0) >= 1, line: () => { const n = deeds().deaths; return `You've napped ${n} time${n === 1 ? '' : 's'} so far. Zombies need naps. I get it.`; } },
+  { id: 'combo', ok: () => (deeds().combo || 0) >= 5, line: () => `Best combo so far: x${deeds().combo}. I'm still telling everyone.` },
+  { id: 'chops', ok: () => (deeds().kills || 0) >= 50, line: () => `That's ${Math.floor(deeds().kills / 10) * 10}-something chops together. I count every one.` },
+  { id: 'king', ok: () => flag('king_owen'), line: () => 'Still can\'t believe you sat on the fish-bone throne. Your Majesty.' },
+  { id: 'lutefisk', ok: () => flag('ate_lutefisk'), line: () => 'You ate lutefisk once. ONCE. I can still smell it.' },
+  { id: 'lake', ok: () => (deeds().lake || 0) >= 3, line: () => `The lake has spat you out ${deeds().lake} times. It really doesn't want you.` },
+  { id: 'rush', ok: () => (G.save && G.save.rushBest) > 0, line: () => `You hit ${G.save.rushBest}% of RUSH Ø. Bjarne put it on his fridge.` },
+  { id: 'palace', ok: () => flag('d1done') && G.mapId === 'barrow', line: () => 'First a penguin palace, now a tomb. We are on a ROLL.' },
+  { id: 'redeye', ok: () => flag('redeye_done'), line: () => 'Scarier than the flight attendant? Nah. Nothing is.' },
+];
+function memoryLine() {
+  if (!G.save || G.mode === 'arena') return null;
+  const used = G.save.mem || (G.save.mem = {});
+  const pool = MEMORIES.filter(m => (used[m.id] || 0) < 2 && m.ok());
+  if (!pool.length) return null;
+  const m = pick(pool); used[m.id] = (used[m.id] || 0) + 1;
+  return m.line();
+}
+// before a boss fight, Jon brings one up
+function jonBossMemory() {
+  if (G.state !== 'talk' || !G.talk) return;
+  const boss = G.ents.find(e => e.boss && e.alive);
+  if (!boss || flag('mem_boss:' + boss.type)) return;
+  const line = memoryLine(); if (!line) return;
+  setFlag('mem_boss:' + boss.type);
+  G.talk.queue.push(['Jon', line]);
+}
+
+// ---------------- RUSH Ø: a duel at Bjarne's piano ----------------
+// Notes fall into three keys. ◀ / Z / ▶ (or tap the left, middle or right of the screen) on the beat.
+const RH_LANES = [{ key: '◀', f: 659 }, { key: 'Z', f: 784 }, { key: '▶', f: 988 }];
+const RH_FALL = 1.5, RH_HITY = 182;
+function startDuel() {
+  const gap = isEasy() ? 0.62 : 0.48, toks = SCORE.bjarne.sections.A.pluck.split(/[\s|]+/).filter(t => /[A-G]/.test(t));
+  const notes = [];
+  for (let i = 0; i < 36; i++) {
+    const tok = toks[(i * 3) % toks.length], n = { C: 0, D: 1, E: 2, F: 0, G: 1, A: 2, B: 0 }[tok[0]];
+    const extra = i > 12 && i % 5 === 0 ? 0.5 : 0;      // a few quick doubles once he warms up
+    notes.push({ t: 2.2 + i * gap - extra * gap, lane: n, hit: 0 });
+  }
+  G.rh = { t: 0, notes, hits: 0, perfect: 0, combo: 0, maxCombo: 0, flash: [0, 0, 0], judge: null, started: false };
+  G.state = 'rhythm'; Sound.play('menu');
+}
+function rhLaneInput() {
+  const out = [];
+  if (just('left')) out.push(0); if (just('a') || just('down') || just('up')) out.push(1); if (just('right')) out.push(2);
+  if (just('tap') && G.tapX !== undefined) out.push(G.tapX < 0.36 ? 0 : G.tapX > 0.64 ? 2 : 1);
+  return out;
+}
+function updateRhythm(dt) {
+  const r = G.rh;
+  if (!r.started) {
+    if (just('a') || just('tap')) { r.started = true; r.t = 0; Sound.play('save'); }
+    if (just('b') || just('menu')) { G.state = 'play'; G.rh = null; say([['Bjarne', 'Another time! RUSH Ø waits for no one. Except you.']]); }
+    return;
+  }
+  r.t += dt;
+  const win = isEasy() ? 0.2 : 0.15, perfect = 0.06;
+  for (const lane of rhLaneInput()) {
+    r.flash[lane] = 0.15;
+    const n = r.notes.filter(n => !n.hit && n.lane === lane).sort((a, b) => Math.abs(a.t - r.t) - Math.abs(b.t - r.t))[0];
+    if (n && Math.abs(n.t - r.t) <= win) {
+      const p = Math.abs(n.t - r.t) <= perfect;
+      n.hit = 1; r.hits++; if (p) r.perfect++; r.combo++; r.maxCombo = Math.max(r.maxCombo, r.combo);
+      r.judge = { text: p ? 'PERFECT!' : 'GOOD', t: 0.5, color: p ? '#ffd84a' : '#9be08a' };
+      Sound.tone([[RH_LANES[lane].f * (p ? 2 : 1), 0.09, 'square']], 0.05);
+    }
+  }
+  for (const n of r.notes) if (!n.hit && r.t > n.t + win) { n.hit = -1; r.combo = 0; r.judge = { text: 'miss', t: 0.4, color: '#ff8a8a' }; }
+  for (let i = 0; i < 3; i++) r.flash[i] = Math.max(0, r.flash[i] - dt);
+  if (r.judge) { r.judge.t -= dt; if (r.judge.t <= 0) r.judge = null; }
+  if (r.t > r.notes[r.notes.length - 1].t + 1) finishDuel();
+}
+function finishDuel() {
+  const r = G.rh, pct = Math.round(100 * r.hits / r.notes.length), s = G.save;
+  const first = pct >= 60 && !flag('rush_cleared');
+  s.rushBest = Math.max(s.rushBest || 0, pct);
+  G.state = 'play'; G.rh = null;
+  const lines = [['', `RUSH Ø: ${pct}% of the notes. Best streak ${r.maxCombo}. Perfect ${r.perfect}.`]];
+  if (pct >= 90) lines.push(['Bjarne', 'You... you played it FASTER than me. I need to sit down. I am sitting down.']);
+  else if (pct >= 60) lines.push(['Bjarne', 'MAGNIFICENT! Most people faint at note four.']);
+  else lines.push(['Bjarne', 'A fine start! Rush Ø humbles everyone. Even me. Mostly me.']);
+  if (first) { setFlag('rush_cleared'); s.kr += 40; lines.push(['', 'Bjarne gave you 40 kroner.']); jonXP(20); }
+  lines.push(['Jon', pct >= 60 ? 'I knew every note. EVERY note. You played them. Same thing.' : 'Again! I wasn\'t ready. I was ready. Again!']);
+  say(lines, writeSave);
+}
+function drawRhythm() {
+  const r = G.rh;
+  R(0, 0, VW, VH, '#20140c');
+  for (let y = 0; y < VH; y += 8) R(0, y, VW, 1, '#2a1a10');
+  text('RUSH Ø', VW / 2, 18, '#ffd84a', 'center', 'outline', 2);
+  text('Bjarne\'s Masterpiece', VW / 2, 32, '#e8c890', 'center', false);
+  spr(SPR.npc_bjarne, 30, 62, { scale: 2 }); text('Bjarne', 30, 74, '#e8c890', 'center', false);
+  drawJonSprite(VW - 30, 50, Math.sin(G.t * 6) * 0.3, false, 'excited');
+  const lx = l => 68 + l * 60;
+  for (let l = 0; l < 3; l++) {
+    const x = lx(l);
+    R(x - 18, 40, 36, RH_HITY - 34, 'rgba(255,240,200,.05)');
+    R(x - 1, 40, 2, RH_HITY - 40, 'rgba(255,240,200,.12)');
+    R(x - 20, RH_HITY + 6, 40, 30, r.flash[l] > 0 ? '#ffd84a' : '#f4eedb'); R(x - 20, RH_HITY + 34, 40, 2, '#8a6a4a');
+    text(RH_LANES[l].key, x, RH_HITY + 26, '#2a1a10', 'center', false);
+  }
+  R(40, RH_HITY, 176, 2, '#ffd84a');
+  if (!r.started) {
+    drawPaper(48, 92, 160, 64, 0.02);
+    text('Play RUSH Ø with Bjarne', 128, 112, INK, 'center', false);
+    text('◀  Z  ▶  on the beat', 128, 126, PENCIL, 'center', false);
+    text('Z: play    X: not now', 128, 144, INK, 'center', false);
+    return;
+  }
+  for (const n of r.notes) {
+    if (n.hit === 1) continue;
+    const k = 1 - (n.t - r.t) / RH_FALL; if (k < 0 || k > 1.15) continue;
+    const x = lx(n.lane), y = 40 + k * (RH_HITY - 40);
+    ctx.globalAlpha = n.hit === -1 ? 0.3 : 1;
+    pxEllipseFill(x, y, 6, 4, '#f4eedb');
+    R(x + 4, y - 16, 2, 16, '#f4eedb'); R(x + 5, y - 16, 5, 2, '#f4eedb');
+    ctx.globalAlpha = 1;
+  }
+  if (r.judge) text(r.judge.text, VW / 2, 92, r.judge.color, 'center', 'outline', 2);
+  if (r.combo >= 4) text('x' + r.combo, VW / 2, 110, '#ffd84a', 'center', 'outline');
+  const done = r.notes.filter(n => n.hit === 1).length;
+  text(`${done} / ${r.notes.length}`, VW - 10, 220, '#e8c890', 'right', false);
+}
+function offerDuel() { if (G.state === 'play') startDuel(); }
+
+// ---------------- Chilly's night ----------------
+// Chilly can't walk in daylight, so his creatures get bolder after dark: faster, and they drop
+// more. And a zombie has a grave of his own on the beach, which only shows up at night.
+const NIGHT_BOLD = new Set(['penguin', 'snowpeng', 'draugr', 'varg', 'wisp', 'slime', 'beetle']);
+function nightBold(e) { return G.mode !== 'arena' && G.map && G.map.outdoor && isNight() && NIGHT_BOLD.has(e.type); }
+MAPS.overworld.ents.push({ t: 'owengrave', at: [45, 30] });
+function owenGrave() {
+  G.photoCard = 'grave';
+  if (flag('owen_grave')) return say([['', '"HERE LIES OWEN. HE GOT BETTER."'], ['Jon', 'Still weird. Visiting your own grave. At night. With an axe.']], () => { G.photoCard = null; });
+  return say([['', 'A pale gravestone glows in the moonlight. It was not here this afternoon.'], ['', '"HERE LIES OWEN. HE GOT BETTER."'], ['Owen', 'That\'s... mine. From last time.'],
+    ['Jon', 'Only a zombie can see it. Only a zombie would WANT to. Look, there\'s something in the flowers.']], () => {
+    setFlag('owen_grave'); G.save.kr += 60; G.save.rune = RUNE_MAX; jonXP(25); Sound.play('secret');
+    say([['', 'You found 60 kroner and a rune shard someone left for you. Your rune meter is full.']], () => { G.photoCard = null; writeSave(); });
+  });
+}
+function drawOwenGrave(e) {
+  const x = Math.round(e.x - G.cam.x), y = Math.round(e.y - G.cam.y), g = 0.6 + 0.3 * Math.sin(G.t * 2);
+  ctx.globalAlpha = qa(g * 0.4); pxEllipseFill(x, y + 4, 14, 6, '#bfe0ff');
+  ctx.globalAlpha = g; R(x - 6, y - 10, 12, 16, '#d8e4f0'); R(x - 5, y - 12, 10, 2, '#d8e4f0'); R(x - 1, y - 8, 2, 7, '#8aa0c0'); R(x - 3, y - 6, 6, 2, '#8aa0c0');
+  ctx.globalAlpha = 1;
+}
+// resting at a runestone: talk to it twice to sleep until nightfall (or morning)
+function runestoneRest() {
+  const night = isNight();
+  G.save.clock = night ? 7.5 : 20.5;
+  G.flash = 0.6; G.flashColor = '#000'; Sound.play('save');
+  return say(night ? [['', 'You rest against the runestone until the sun comes up.'], ['Jon', 'Morning! Chilly hates this part.']]
+    : [['', 'You rest against the runestone until the stars come out.'], ['Jon', 'Night. Chilly\'s critters get brave now. Stay sharp. Zombies see things at night, you know.']]);
+}
+
+// ---------------- Owen's notes (director's commentary) ----------------
+// Owen writes a note for any scene in OWEN'S SCRIPT. With notes on, it appears on notebook paper
+// right after that scene plays. Nothing here is written for him: no note, no card.
+const NOTES = { map: {}, on: true };
+try { NOTES.on = localStorage.getItem('jontuka-notes') !== '0'; } catch (e) {}
+try { NOTES.map = JSON.parse(localStorage.getItem('jontuka-notes-text') || '{}'); } catch (e) {}
+function toggleNotes() { NOTES.on = !NOTES.on; try { localStorage.setItem('jontuka-notes', NOTES.on ? '1' : '0'); } catch (e) {} Sound.play('menu'); }
+function sceneOf(lines) { for (const id of SCENE_ORDER) if (sceneGet(id) === lines) return id; return null; }
+function noteAfter(lines, done) {
+  if (!NOTES.on || G.mode === 'arena') return done;
+  const id = sceneOf(lines), note = id && NOTES.map[id];
+  if (!note || !note.trim()) return done;
+  const card = [["Owen's note", note]]; card.paper = true;
+  return () => say(card, done);
+}
+async function storeNote(id, note) {
+  if (note && note.trim()) NOTES.map[id] = note.trim(); else delete NOTES.map[id];
+  try { localStorage.setItem('jontuka-notes-text', JSON.stringify(NOTES.map)); } catch (e) {}
+  if (!SCRIPT.db) return;
+  try { const ref = SCRIPT.db.doc('notes/' + docId(id)); if (NOTES.map[id]) await ref.set({ scene: id, note: NOTES.map[id], updatedAt: new Date().toISOString() }); else await ref.delete(); } catch (e) {}
+}
+
+// ---------------- wiring: shared storage for notes and photos ----------------
+(function bootEditor() {
+  if (!window.claude || !window.claude.use) return;
+  window.claude.use('db').then(db => {
+    if (!db) return;
+    db.collection('notes').onSnapshot(snap => {
+      const m = {}; for (const d of snap.docs) { const v = d.data(); if (v && v.note) m[v.scene || d.id] = v.note; }
+      NOTES.map = m; try { localStorage.setItem('jontuka-notes-text', JSON.stringify(m)); } catch (e) {} renderScript();
+    }, () => {});
+    db.collection('notebook').onSnapshot(snap => {
+      const m = {}; for (const d of snap.docs) { const v = d.data(); if (v && v.assetId) m[v.slot || d.id] = { assetId: v.assetId }; }
+      for (const k in m) if (NOTEBOOK.slots[k] && NOTEBOOK.slots[k].assetId === m[k].assetId) m[k] = NOTEBOOK.slots[k];
+      NOTEBOOK.slots = m; renderScript();
+    }, () => {});
+  }).catch(() => {});
+  window.claude.use('assets').then(a => { NOTEBOOK.assets = a; renderScript(); }).catch(() => {});
+})();
+async function uploadPhoto(slot, file) {
+  if (!NOTEBOOK.assets || !SCRIPT.db || !file) return;
+  SCRIPT.status = 'Uploading…'; renderScript();
+  try {
+    const old = NOTEBOOK.slots[slot];
+    const res = await NOTEBOOK.assets.upload(file);
+    await SCRIPT.db.doc('notebook/' + docId(slot)).set({ slot, assetId: res.id, updatedAt: new Date().toISOString() });
+    NOTEBOOK.slots[slot] = { assetId: res.id };
+    if (old && old.assetId && !Object.values(NOTEBOOK.slots).some(v => v.assetId === old.assetId)) { try { await NOTEBOOK.assets.delete(old.assetId); } catch (e) {} }
+    SCRIPT.status = 'Photo added. It shows in the game.';
+  } catch (e) { SCRIPT.status = 'That photo did not upload. Try a JPG or PNG under 20 MB.'; }
+  renderScript();
+}
+async function removePhoto(slot) {
+  const old = NOTEBOOK.slots[slot]; delete NOTEBOOK.slots[slot];
+  if (SCRIPT.db) { try { await SCRIPT.db.doc('notebook/' + docId(slot)).delete(); } catch (e) {} }
+  if (old && old.assetId && NOTEBOOK.assets && !Object.values(NOTEBOOK.slots).some(v => v.assetId === old.assetId)) { try { await NOTEBOOK.assets.delete(old.assetId); } catch (e) {} }
+  renderScript();
+}
+function renderNotebookTab(body) {
+  const can = !!(NOTEBOOK.assets && SCRIPT.db);
+  body.innerHTML = '<p class="hint">Photograph pages from Owen\'s real notebook: drawings, maps, a page of the story. Each photo shows up in the game on that chapter\'s title card or pinned to that boss\'s card.</p>' +
+    (can ? '' : '<p class="empty">Adding photos needs the page\'s owner to be signed in. Photos already added still show.</p>') +
+    '<ul class="slots">' + PHOTO_SLOTS.map(([slot, name]) => { const has = NOTEBOOK.slots[slot]; return `<li class="slot"><div class="thumb">${has ? `<img src="/_blob/${esc(has.assetId)}" alt="Owen's page for ${esc(name)}">` : '<span>no photo</span>'}</div><b>${esc(name)}</b>` +
+      (can ? `<label class="ghost up">${has ? 'Replace' : 'Add photo'}<input type="file" accept="image/*" data-slot="${esc(slot)}" hidden></label>${has ? `<button class="x rm" data-slot="${esc(slot)}" aria-label="Remove photo for ${esc(name)}">Remove</button>` : ''}` : '') + '</li>'; }).join('') + '</ul>';
+  body.querySelectorAll('input[type=file]').forEach(i => i.onchange = () => uploadPhoto(i.dataset.slot, i.files[0]));
+  body.querySelectorAll('.rm').forEach(b => b.onclick = () => removePhoto(b.dataset.slot));
+  body.querySelectorAll('.thumb img').forEach(img => { img.tabIndex = 0; img.onclick = () => openPage(img.src, img.alt); img.onkeydown = e => { if (e.key === 'Enter') openPage(img.src, img.alt); }; });
+}
+function openPage(src, alt) {
+  const box = document.createElement('div'); box.className = 'lightbox'; box.setAttribute('role', 'dialog'); box.setAttribute('aria-label', alt);
+  box.innerHTML = `<img src="${esc(src)}" alt="${esc(alt)}"><button class="ghost">Close ✕</button>`;
+  const close = () => box.remove(); box.onclick = close; document.body.appendChild(box); box.querySelector('button').focus();
+}
+
+// ===== art3.js =====
+// Graphics pass: crisp pixel primitives (no smooth vector lines in a pixel world), bosses drawn at
+// native resolution (Scale2x/Scale3x instead of chunky blown-up pixels), framed boss bars,
+// a hand-drawn Flight 364, more distinct villagers and portraits, and props for empty rooms.
+
+// ---------------- pixel primitives ----------------
+const qa = a => Math.round(clamp(a, 0, 1) * 4) / 4;          // alpha in quarter steps, like SNES color math
+function pxLine(x0, y0, x1, y1, color, t = 1) {
+  x0 = Math.round(x0); y0 = Math.round(y0); x1 = Math.round(x1); y1 = Math.round(y1);
+  const dx = Math.abs(x1 - x0), dy = -Math.abs(y1 - y0), sx = x0 < x1 ? 1 : -1, sy = y0 < y1 ? 1 : -1;
+  let err = dx + dy, n = 0;
+  while (n++ < 600) { R(x0 - (t >> 1), y0 - (t >> 1), t, t, color); if (x0 === x1 && y0 === y1) break; const e2 = 2 * err; if (e2 >= dy) { err += dy; x0 += sx; } if (e2 <= dx) { err += dx; y0 += sy; } }
+}
+function pxEllipse(cx, cy, rx, ry, color, t = 1, a0 = 0, a1 = Math.PI * 2) {
+  cx = Math.round(cx); cy = Math.round(cy);
+  const n = Math.max(16, Math.round((rx + ry) * 3 * (a1 - a0) / (Math.PI * 2)));
+  let lx = null, ly = null;
+  for (let i = 0; i <= n; i++) { const a = a0 + (a1 - a0) * i / n, x = Math.round(cx + Math.cos(a) * rx), y = Math.round(cy + Math.sin(a) * ry); if (x !== lx || y !== ly) R(x - (t >> 1), y - (t >> 1), t, t, color); lx = x; ly = y; }
+}
+function pxEllipseFill(cx, cy, rx, ry, color) {
+  cx = Math.round(cx); cy = Math.round(cy); rx = Math.max(1, Math.round(rx)); ry = Math.max(1, Math.round(ry));
+  for (let y = -ry; y <= ry; y++) { const w = Math.round(rx * Math.sqrt(Math.max(0, 1 - (y * y) / (ry * ry)))); R(cx - w, cy + y, w * 2 + 1, 1, color); }
+}
+// a glow: three stepped discs instead of a soft gradient
+function pxGlow(cx, cy, r, rgb, a) {
+  for (const [k, m] of [[1, 0.25], [0.66, 0.5], [0.36, 1]]) { ctx.globalAlpha = qa(a * m); pxEllipseFill(cx, cy, r * k, r * k, `rgb(${rgb})`); }
+  ctx.globalAlpha = 1;
+}
+function pxPoly(pts, color) {
+  const ys = pts.map(p => p[1]), y0 = Math.ceil(Math.min(...ys)), y1 = Math.floor(Math.max(...ys));
+  for (let y = y0; y <= y1; y++) {
+    const xs = [];
+    for (let i = 0; i < pts.length; i++) { const [ax, ay] = pts[i], [bx, by] = pts[(i + 1) % pts.length]; if ((ay <= y && by > y) || (by <= y && ay > y)) xs.push(ax + (y - ay) / (by - ay) * (bx - ax)); }
+    xs.sort((a, b) => a - b);
+    for (let i = 0; i + 1 < xs.length; i += 2) R(Math.round(xs[i]), y, Math.round(xs[i + 1]) - Math.round(xs[i]) + 1, 1, color);
+  }
+}
+
+// ---------------- native-resolution scaling (Scale2x / Scale3x) ----------------
+// Sprites drawn at 2x or 3x are re-drawn with the classic EPX/AdvMAME algorithms: the shape grows,
+// but every pixel stays the size of the world's pixels, with smoothed diagonals instead of stairs.
+const UP = new Map();
+function up(c, s) {
+  if (!c || (s !== 2 && s !== 3)) return c;
+  let m = UP.get(c); if (!m) { m = {}; UP.set(c, m); }
+  if (m[s]) return m[s];
+  const w = c.width, h = c.height, src = new Uint32Array(c.getContext('2d').getImageData(0, 0, w, h).data.buffer);
+  const out = mkCanvas(w * s, h * s), og = out.getContext('2d'), img = og.createImageData(w * s, h * s), dst = new Uint32Array(img.data.buffer);
+  const P = (x, y) => src[clamp(y, 0, h - 1) * w + clamp(x, 0, w - 1)], W = w * s;
+  for (let y = 0; y < h; y++) for (let x = 0; x < w; x++) {
+    const E = P(x, y), B = P(x, y - 1), D = P(x - 1, y), F = P(x + 1, y), H = P(x, y + 1);
+    const o = (y * s) * W + x * s;
+    if (s === 2) {
+      dst[o] = D === B && B !== F && D !== H ? D : E;
+      dst[o + 1] = B === F && B !== D && F !== H ? F : E;
+      dst[o + W] = D === H && D !== B && H !== F ? D : E;
+      dst[o + W + 1] = H === F && D !== H && B !== F ? F : E;
+    } else {
+      const A = P(x - 1, y - 1), C = P(x + 1, y - 1), Gp = P(x - 1, y + 1), I = P(x + 1, y + 1);
+      const db = D === B && B !== F && D !== H, bf = B === F && B !== D && F !== H, dh = D === H && D !== B && H !== F, hf = H === F && D !== H && B !== F;
+      dst[o] = db ? D : E;
+      dst[o + 1] = (db && E !== C) || (bf && E !== A) ? B : E;
+      dst[o + 2] = bf ? F : E;
+      dst[o + W] = (db && E !== Gp) || (dh && E !== A) ? D : E;
+      dst[o + W + 1] = E;
+      dst[o + W + 2] = (bf && E !== I) || (hf && E !== C) ? F : E;
+      dst[o + 2 * W] = dh ? D : E;
+      dst[o + 2 * W + 1] = (dh && E !== I) || (hf && E !== Gp) ? H : E;
+      dst[o + 2 * W + 2] = hf ? F : E;
+    }
+  }
+  og.putImageData(img, 0, 0);
+  return (m[s] = out);
+}
+
+// ---------------- framed bars ----------------
+function bossBar(cx, y, frac, color = '#e23') {
+  const w = 60, x = Math.round(cx - w / 2); y = Math.round(y);
+  R(x - 3, y - 3, w + 6, 9, '#0a0812'); R(x - 2, y - 2, w + 4, 7, '#e8dcb8'); R(x - 1, y - 1, w + 2, 5, '#0a0812');
+  const f = Math.round(w * clamp(frac, 0, 1));
+  if (f) { R(x, y, f, 3, color); R(x, y, f, 1, 'rgba(255,255,255,.45)'); }
+  for (const rx of [x - 3, x + w + 1]) R(rx, y - 1, 2, 2, '#ffd84a');
+}
+
+// ---------------- Flight 364, hand-built ----------------
+const CUT = {};
+function cutImg(key, w, h, draw) { return CUT[key] || (CUT[key] = makeImg(w, h, draw)); }
+function airlinerSide() {
+  return cutImg('liner', 112, 34, (P) => {
+    const rect = (x, y, w, h, c) => { for (let yy = y; yy < y + h; yy++) for (let xx = x; xx < x + w; xx++) P(xx, yy, c); };
+    for (let x = 6; x < 104; x++) { const top = x < 18 ? 14 - Math.round(Math.sqrt(Math.max(0, 36 - (x - 12) * (x - 12)))) * 0.9 : 9, bot = 22; for (let y = Math.round(top); y < bot; y++) P(x, y, y < 12 ? '#ffffff' : y < 17 ? '#e6eaf0' : y < 20 ? '#c8ced8' : '#a8aeb8'); }
+    for (let x = 104; x < 110; x++) for (let y = 10 + (x - 104); y < 20; y++) P(x, y, '#c8ced8');
+    for (let y = 0; y < 10; y++) for (let x = 92 + Math.round(y * 0.8); x < 104; x++) P(x, y, y < 3 ? '#e05040' : '#c0392b');
+    rect(10, 17, 92, 1, '#c0392b'); rect(10, 18, 92, 1, '#2a4a8a');
+    for (let x = 24; x < 88; x += 5) { P(x, 13, '#1e2a48'); P(x + 1, 13, '#1e2a48'); P(x, 14, '#3a5a8a'); P(x + 1, 14, '#3a5a8a'); }
+    for (const [x, y] of [[9, 13], [10, 13], [12, 12], [13, 12], [15, 12]]) P(x, y, '#1a2a4a');
+    for (let k = 0; k < 9; k++) for (let x = 46 + k * 2; x < 72 - k; x++) P(x, 22 + k, k > 6 ? '#9aa2ae' : '#c4cad4');
+    rect(52, 26, 12, 5, '#7a808c'); rect(52, 26, 12, 1, '#a8aeba'); rect(51, 27, 2, 3, '#20242c');
+  });
+}
+// outline a finished image with the game's dark outline
+function outlined(c) {
+  const w = c.width, h = c.height, g = c.getContext('2d'), d = g.getImageData(0, 0, w, h), a = (x, y) => x >= 0 && y >= 0 && x < w && y < h && d.data[(y * w + x) * 4 + 3] > 0;
+  const o = mkCanvas(w + 2, h + 2), og = o.getContext('2d'); og.fillStyle = OUTLINE;
+  for (let y = -1; y <= h; y++) for (let x = -1; x <= w; x++) if (!a(x, y) && (a(x + 1, y) || a(x - 1, y) || a(x, y + 1) || a(x, y - 1))) og.fillRect(x + 1, y + 1, 1, 1);
+  og.drawImage(c, 1, 1); return o;
+}
+let LINER = null;
+const liner = () => LINER || (LINER = outlined(airlinerSide()));
+// the flight attendant, full height for the cutscene: normal and demon
+const ATT_BIG = [
+  '......hhhhhh......', '.....hhhhhhhh.....', '....hhhhhhhhhh....', '...hhhrrrrrrhhh...', '...hhrrRRRRrrhh...', '...hsssssssssh....', '...hsSsssssSsh....',
+  '...hseesssseesh...', '...hsssssssssh....', '....sssSSSsss.....', '....ssmmmmmss.....', '.....sssssss......', '......sssss.......', '....rrrwwwwrrr....',
+  '...uurrrwwrrruu...', '..uuuurrrrrruuuu..', '..uuuuuuggguuuuu..', '.suuuuuuuuuuuuuus.', '.suuUuuuuuuuuUuus.', '.suuUuuuuuuuuUuus.', 'ss.uUuuuuuuuuUu.ss',
+  's..uuuuuuuuuuuu..s', 's..uuuuuuuuuuuu..s', '...uuuuuuuuuuuu...', '...UUUUUUUUUUUU...', '...uuuuuuuuuuuu...', '..uuuuuuuuuuuuuu..', '..uuuuuuuuuuuuuu..',
+  '..UUUUUUUUUUUUUU..', '....ssss..ssss....', '....ssss..ssss....', '....ssss..ssss....', '....kkkk..kkkk....', '...kkkkk..kkkkk...',
+];
+const PAL_ATT_BIG = { h: '#3a2418', r: '#c0182b', R: '#e84050', s: '#ecd2c0', S: '#c8a090', e: '#20141c', m: '#b04050', u: '#1e2a5a', U: '#141c40', w: '#f4f4f8', g: '#ffd84a', k: '#1a1a1a' };
+const ATT_BIG_DEMON = ATT_BIG.map((r, i) => i === 7 ? '...hsRRsssssRRsh...'.slice(0, 18) : i === 9 ? '....sssSSSsss.....' : i === 10 ? '....smwmwmwms.....' : i === 11 ? '.....swsswss......' : i === 20 ? 'kk.uUuuuuuuuuUu.kk' : i === 21 ? 'k..uuuuuuuuuuuu..k' : i === 22 ? 'k..uuuuuuuuuuuu..k' : i < 3 ? r.replace(/h/g, 'H') : r);
+let ATTS = null;
+function attBig(demon) {
+  if (!ATTS) ATTS = { n: buildSprite(ATT_BIG, PAL_ATT_BIG), d: buildSprite(ATT_BIG_DEMON, { ...PAL_ATT_BIG, R: '#ff2020', H: '#1a0a10', s: '#d8e8d0', S: '#a8b8a0' }) };
+  return demon ? ATTS.d : ATTS.n;
+}
+function seatBack(dark) {
+  return cutImg('seat' + (dark ? 'd' : ''), 26, 30, (P) => {
+    for (let y = 0; y < 30; y++) for (let x = 0; x < 26; x++) {
+      const inside = (y > 2 || (x > 2 && x < 23)) && x > 0 && x < 25;
+      if (!inside) continue;
+      let c = dark ? '#1a2244' : '#2f5aa8';
+      if (x < 4) c = dark ? '#141a36' : '#24488a'; else if (x > 21) c = dark ? '#10162c' : '#1e3a78';
+      if (y < 9 && x > 4 && x < 21) c = dark ? '#8a8a9a' : '#e8e8f0';      // headrest cover
+      if (y === 9 && x > 4 && x < 21) c = dark ? '#5a5a6a' : '#b8b8c8';
+      if (y > 20 && y < 24 && x > 6 && x < 19) c = dark ? '#262c4a' : '#3e6cc8'; // seat-back pocket
+      P(x, y, c);
+    }
+  });
+}
+function drawFlightArt(art, t) {
+  if (art === 'plane') {
+    const SKY = ['#0a0c24', '#101436', '#161c46', '#1e2858', '#283468', '#344278'];
+    SKY.forEach((c, i) => R(0, i * 24, VW, 24, c));
+    for (let i = 0; i < 6; i++) for (let x = (i % 2); x < VW; x += 2) R(x, i * 24 + 23, 1, 1, SKY[Math.min(5, i + 1)]);   // dithered band edges
+    for (let i = 0; i < 40; i++) R((i * 71) % VW, (i * 37) % 110, 1, 1, i % 5 ? '#6a72a8' : '#e8e8ff');
+    pxEllipseFill(206, 30, 9, 9, '#f2ecd0'); pxEllipseFill(210, 27, 8, 8, '#344278');          // a crescent moon
+    for (let i = 0; i < 5; i++) { const cx = ((i * 83 - t * 14) % 330 + 330) % 330 - 40, cy = 104 + (i % 3) * 12; for (const [dx, dy, r] of [[0, 0, 10], [12, -4, 12], [24, 0, 9]]) pxEllipseFill(cx + dx, cy + dy, r, r * 0.55, i % 2 ? '#3a4682' : '#2e3a72'); }
+    const bob = Math.round(Math.sin(t * 1.4) * 2), px = 70, py = 62 + bob;
+    for (let i = 1; i < 8; i++) R(px - i * 7, py + 15 + (i % 2), 4, 1, `rgba(220,230,255,${qa(0.5 - i * 0.06)})`);
+    ctx.drawImage(liner(), px, py);
+    if (Math.floor(t * 2) % 2) { R(px + 54, py + 31, 2, 2, '#ff3030'); R(px + 106, py + 14, 2, 2, '#ffffff'); }
+    return;
+  }
+  // cabin and demon share the room
+  const demon = art === 'demon', flick = demon && Math.sin(t * 23) > 0.6;
+  R(0, 0, VW, 150, flick ? '#060608' : '#3a3a48');
+  R(0, 0, VW, 22, flick ? '#0a0a0e' : '#5a5a6c'); R(0, 22, VW, 2, flick ? '#000' : '#2a2a36');          // overhead bins
+  for (let x = 4; x < VW; x += 42) { R(x, 4, 38, 14, flick ? '#121218' : '#6a6a7e'); R(x + 16, 13, 6, 2, flick ? '#000' : '#3a3a4a'); }
+  for (let i = 0; i < 5; i++) { const wx = 12 + i * 52; R(wx, 32, 20, 16, OUTLINE); R(wx + 1, 33, 18, 14, flick ? '#000' : '#0c1030'); R(wx + 1, 33, 18, 3, flick ? '#000' : '#1a2048'); if (!flick && i % 2) R(wx + 6, 38, 1, 1, '#e8e8ff'); }
+  R(0, 50, VW, 100, flick ? '#0c0c12' : '#2a2f44');
+  for (let y = 50; y < 150; y += 4) R(110, y, 36, 2, flick ? '#140808' : '#4a2a3a');                  // the aisle carpet
+  const seat = seatBack(flick);
+  for (let row = 0; row < 3; row++) {
+    const y = 58 + row * 30;
+    for (const x of [8, 36, 64, 152, 180, 208]) ctx.drawImage(seat, x + (row % 2), y);
+  }
+  // the attendant stands in the aisle; in the demon pages she changes
+  const a = attBig(demon), ax = 128 - a.width / 2 + (demon && Math.floor(t * 18) % 4 === 0 ? 1 : 0), ay = 150 - a.height + (demon ? 0 : 0);
+  ctx.globalAlpha = 0.3; pxEllipseFill(128, 148, 12, 3, '#000'); ctx.globalAlpha = 1;
+  ctx.drawImage(a, Math.round(ax), Math.round(ay));
+  if (demon) {
+    ctx.globalAlpha = qa(0.25 + 0.15 * Math.sin(t * 3)); R(0, 0, VW, 150, '#600010'); ctx.globalAlpha = 1;
+    pxGlow(124, ay + 9, 5, '255,40,40', 0.6); pxGlow(132, ay + 9, 5, '255,40,40', 0.6);
+  }
+}
+function drawLandArt(t) {
+  const SKY = ['#3a4a8a', '#6a5a9a', '#c8708a', '#f09a6a', '#f8c070', '#fbe0a0'];
+  SKY.forEach((c, i) => R(0, i * 14, VW, 14, c));
+  for (let i = 0; i < 5; i++) for (let x = i % 2; x < VW; x += 2) R(x, i * 14 + 13, 1, 1, SKY[i + 1]);
+  pxEllipseFill(196, 84, 12, 12, '#fff2c0');
+  pxPoly([[0, 96], [30, 62], [58, 84], [92, 50], [128, 88], [160, 58], [196, 82], [230, 54], [256, 76], [256, 100], [0, 100]], '#4a4a7a');
+  for (const [x, y] of [[30, 62], [92, 50], [160, 58], [230, 54]]) pxPoly([[x - 8, y + 9], [x, y], [x + 8, y + 9]], '#e8e8f8');
+  R(0, 96, VW, 54, '#2f6a3a'); R(0, 96, VW, 2, '#3a7a44');
+  pxPoly([[96, 98], [160, 98], [256, 150], [0, 150]], '#5a5a62');                                     // runway in perspective
+  for (let i = 0; i < 6; i++) { const k = ((t * 0.9 + i / 6) % 1), y = 100 + k * k * 50, w = 1 + k * 6; R(128 - w / 2, y, w, 1 + k * 3, '#f4f4f4'); }
+  for (let i = 0; i < 8; i++) { const k = i / 8, y = 99 + k * k * 51; R(96 - k * 96 - 2, y, 2, 2, Math.floor(t * 4 + i) % 2 ? '#ffd84a' : '#a07a20'); R(160 + k * 96, y, 2, 2, Math.floor(t * 4 + i) % 2 ? '#ffd84a' : '#a07a20'); }
+  const k = clamp((t % 6) / 4, 0, 1), px = 40 + k * 70, py = 40 + k * 46;
+  ctx.drawImage(liner(), Math.round(px), Math.round(py));
+  if (k >= 1) for (let i = 0; i < 4; i++) R(Math.round(px) + 40 + i * 5, Math.round(py) + 34 + (i % 2), 3, 1, '#d8d8d8');
+}
+
+// ---------------- distinct villagers and portraits ----------------
+function drawPersonExtra(x, y, id) {
+  const top = y - 10;
+  switch (id) {
+    case 'astrid': pxLine(x + 8, top + 2, x + 8, y + 7, '#7a4a22'); R(x + 7, top - 1, 3, 3, Math.floor(G.t * 2) % 2 ? '#7fd4ff' : '#4aa0d8'); break;        // a rune staff
+    case 'lars': R(x - 4, y - 2, 8, 6, '#f0ece0'); R(x - 4, y - 2, 8, 1, '#c8c4b8'); R(x - 1, y, 2, 2, '#b33a2e'); break;                                // a market apron
+    case 'sven': if (flag('sven_done')) { R(x + 5, y, 6, 2, '#8a5428'); R(x + 7, y - 4, 1, 4, '#e02838'); R(x + 8, y - 4, 2, 2, '#e02838'); } else R(x + 6, y - 6, 1, 7, '#c8c8d8'); break;   // wooden sword, or his longship back
+    case 'ingrid': pxLine(x + 6, y, x + 18, top - 6, '#6b4322'); pxLine(x + 18, top - 6, x + 20, y + 4, 'rgba(255,255,255,.7)'); R(x + 19, y + 4, 2, 2, '#e02838'); break;   // fishing rod
+    case 'bjarne': R(x + 5, y - 3, 6, 7, '#f4ecd0'); for (let i = 0; i < 3; i++) R(x + 6, y - 2 + i * 2, 4, 1, '#3a2a1a'); break;                       // sheet music
+    case 'commuter': R(x - 6, y - 3, 12, 7, '#e8e4d8'); R(x - 5, y - 2, 5, 1, '#5a5a6a'); R(x - 5, y, 9, 1, '#9a9aa8'); R(x - 5, y + 2, 9, 1, '#9a9aa8'); break;   // a newspaper
+    case 'attendant_ok': R(x - 2, y - 4, 4, 2, '#c0182b'); R(x - 3, y - 1, 2, 1, '#ffd84a'); R(x + 1, y - 1, 2, 1, '#ffd84a'); break;                      // scarf and wings pin
+  }
+}
+function drawPortraitExtra(who) {
+  // called inside drawPortrait's 2x transform, centered on (0, 0)
+  if (who === 'Hank') { spr(SPR.draugr_down_0, 0, 7); R(-8, -10, 2, 5, '#f2ebcc'); R(6, -10, 2, 5, '#f2ebcc'); return true; }
+  if (who === 'Draugr Captain') { spr(SPR.draugr_down_0, 0, 7); R(-5, -8, 10, 2, '#c9a227'); return true; }
+  if (who === 'Fluffy') { ctx.globalAlpha = 0.85; spr(SPR.fluffy, 0, 4); ctx.globalAlpha = 1; return true; }
+  if (who === 'Driver') { spr(SPR.npc_commuter, 0, 7); R(-6, -9, 12, 2, '#ffd84a'); return true; }
+  if (who === 'Announcer') { R(-6, -6, 6, 10, '#8a8a9c'); R(-5, -5, 4, 8, '#5a5a6c'); pxPoly([[0, -6], [7, -10], [7, 8], [0, 4]], '#a8a8bc'); for (const r of [3, 6]) pxEllipse(9, -1, r, r + 2, '#ffd84a', 1, -0.9, 0.9); return true; }
+  return false;
+}
+
+// ---------------- props for rooms that were empty ----------------
+const DECOR = {
+  home: [
+    { x: 12 * 16 + 8, y: 10 * 16 + 10, tall: false, draw: (x, y) => { R(x - 6, y - 8, 12, 10, '#c0392b'); R(x - 6, y - 8, 12, 2, '#e05a40'); R(x - 4, y - 5, 8, 4, '#a8302a'); R(x - 3, y - 11, 6, 3, '#7a2018'); R(x + 3, y - 6, 4, 3, '#f4f4f8'); R(x + 4, y - 5, 2, 1, '#2f5aa8'); R(x + 1, y - 7, 2, 2, '#d8d0b8'); } },   // backpack with a luggage tag, packed for Norway
+    { x: 13 * 16 + 4, y: 11 * 16 + 12, tall: false, draw: (x, y) => { R(x - 6, y - 3, 5, 3, '#f4f4f8'); R(x - 6, y - 1, 5, 1, '#c03a2a'); R(x + 1, y - 2, 5, 3, '#f4f4f8'); R(x + 1, y, 5, 1, '#c03a2a'); } },                                               // sneakers
+    { x: 4 * 16, y: 9 * 16 + 8, tall: false, draw: (x, y) => { pxEllipseFill(x, y, 10, 7, '#2f8a5a'); pxEllipseFill(x - 2, y - 2, 6, 4, '#3aa06a'); } },                                                                                       // a bean bag
+  ],
+  overworld: [
+    { x: 30 * 16 + 8, y: 30 * 16 + 12, tall: true, draw: (x, y) => { R(x, y - 30, 2, 30, '#8a8a9c'); const w = Math.round(Math.sin(G.t * 3) * 2); for (let i = 0; i < 4; i++) R(x + 2 + i * 4, y - 29 + Math.round(w * i / 3), 4, 5 - Math.floor(i / 2), i % 2 ? '#f4f4f8' : '#ff6a1a'); } },   // windsock
+    { x: 26 * 16 + 8, y: 38 * 16 + 12, tall: true, draw: (x, y) => { R(x - 12, y - 6, 24, 3, '#8a8a9c'); R(x - 11, y - 3, 2, 3, '#3a3a4a'); R(x + 9, y - 3, 2, 3, '#3a3a4a'); R(x - 10, y - 14, 9, 8, '#b33a2e'); R(x - 10, y - 14, 9, 1, '#e05a40'); R(x, y - 12, 10, 6, '#2f5aa8'); R(x + 2, y - 18, 7, 6, '#3a7a4a'); R(x - 7, y - 15, 3, 1, '#3a2a1a'); } },   // luggage cart
+    { x: 16 * 16 + 8, y: 35 * 16 + 12, tall: true, draw: (x, y) => { for (const dx of [0, 10]) { pxPoly([[x + dx - 3, y], [x + dx, y - 8], [x + dx + 3, y]], '#ff6a1a'); R(x + dx - 2, y - 4, 4, 1, '#ffffff'); } } },                                                                 // traffic cones
+  ],
+};
+function decorOnScreen(d) { const sx = d.x - G.cam.x, sy = (d.wall ? 0 : d.y) - G.cam.y; return sx > -30 && sx < VW + 30 && sy > -40 && sy < VH + 40; }
+function drawDecorGround() {
+  const list = DECOR[G.mapId]; if (!list) return;
+  for (const d of list) if (!d.tall && decorOnScreen(d)) d.wall ? d.draw(Math.round(d.x - G.cam.x)) : d.draw(Math.round(d.x - G.cam.x), Math.round(d.y - G.cam.y));
+  // runway stripes along the airstrip path
+  if (G.mapId === 'overworld' && G.scr.x === 1 && G.scr.y === 2) for (let tx = 16; tx < 32; tx++) if (tile(tx, 34) === 's' && tx % 2 === 0) R(tx * 16 + 4 - G.cam.x, 34 * 16 + 7 - G.cam.y, 8, 2, 'rgba(255,255,255,.75)');
+}
+function decorSorted() {
+  const list = DECOR[G.mapId] || [];
+  return list.filter(d => d.tall && decorOnScreen(d)).map(d => ({ y: d.y, f: () => d.draw(Math.round(d.x - G.cam.x), Math.round(d.y - G.cam.y)) }));
+}
+
+// ===== rock.js =====
+// Jon remembers who he is. Walter carved runes into Jon, and each rune is also a song. When Owen
+// finds one, Jon remembers that song: the outdoor music gains a layer, a beat marker joins the HUD,
+// chops on the beat hit harder, and bosses start striking on the beat.
+
+// which song each rune brings back (titles are the game's own homages)
+const SONG_OF = { fire: 'aero', frost: 'cold', thunder: 'zep', mend: 'journey', leaf: 'chop' };
+const SONG_LINES = {
+  fire: 'Walk This Fjord! Da na na na! I KNEW I knew that one.',
+  frost: 'Cold as fjooord... I remember this! It was carved right next to the frost.',
+  thunder: 'Stairway to Valhalla. All of it. Every note. Astrid was right: I remember who I am.',
+  mend: 'Don\'t stop choppin\'... hold on to that feeling. That one makes me feel better. Literally.',
+  leaf: 'We will, we will, CHOP you! Stomp stomp clap. The plants are stomping along.',
+};
+function songsKnown() { const s = G.save; return s && G.mode !== 'arena' ? Object.keys(SONG_OF).filter(id => s.items[id]).length : 5; }
+
+// ---- the outdoor music fills back in, one layer per song ----
+// 0 songs: bass and kick, Jon's humming over a quiet world. 1: the full drum kit. 2: rhythm guitar
+// and piano. 3: the lead melody. 4 and up: everything, choir and bells included.
+const LAYERED = new Set(['overworld', 'cold', 'journey']);
+function layerOn(e) {
+  if (!LAYERED.has(Music.name) || G.mode === 'arena' || !G.save || G.state === 'title') return true;
+  const n = songsKnown();
+  if (e.inst === 'drum') return e.kind === 'k' || n >= 1;
+  if (e.inst === 'bass' || e.inst === 'pad' || e.inst === 'pluck' || e.inst === 'flute') return true;
+  if (e.inst === 'gtr' || e.inst === 'piano') return n >= 2;
+  if (e.inst === 'lead') return n >= 3;
+  return n >= 4;
+}
+
+// ---- the beat ----
+// Read from the music engine's own clock, so the marker and the bonus match what you hear.
+// With sound off, a steady 120 bpm clock keeps the beat visible.
+function beatInfo() {
+  const ac = Sound.ac, tr = Music.name && SCORE[Music.name];
+  if (ac && Music.bus && tr && Music.on && !Sound.muted) {
+    const q = 60 / tr.bpm, t = ac.currentTime - Music.start;
+    const ph = ((t % q) + q) % q;
+    return { q, ph, d: Math.min(ph, q - ph) };
+  }
+  const q = 0.5, ph = ((G.t % q) + q) % q;
+  return { q, ph, d: Math.min(ph, q - ph) };
+}
+function onBeat(w) { return beatInfo().d <= (w || (isEasy() ? 0.12 : 0.09)); }
+function beatHit(e) {
+  floatText(e.x, e.y - 22, 'ON BEAT!', '#ffd84a');
+  G.beatFlash = 0.12;
+  Sound.tone([[1320, 0.04, 'square'], [1760, 0.06, 'square']], 0.035);
+  if (G.save.items.thunder) G.save.rune = Math.min(RUNE_MAX, G.save.rune + 1);
+}
+// the HUD's beat marker: a note that pops on every beat once Jon knows a song
+function drawBeatMarker() {
+  if (G.mode === 'arena' || !G.save || songsKnown() < 1) return;
+  const b = beatInfo(), k = 1 - Math.min(1, b.ph / (b.q * 0.5)), on = b.d <= 0.09;
+  const x = 108, y = 12;
+  if (on) { R(x - 5, y - 6, 11, 11, 'rgba(255,216,74,.35)'); }
+  text('♪', x - 2, y + 4 - Math.round(k * 2), on ? '#ffd84a' : '#8a8ab0', 'left', 'outline');
+  for (let i = 0; i < 5; i++) R(x - 4 + i * 3, y + 9, 2, 2, i < songsKnown() ? '#ffd84a' : 'rgba(255,255,255,.18)');
+  if (G.beatFlash > 0) { G.beatFlash -= 1 / 60; ctx.globalAlpha = 0.25; R(0, 0, VW, VH, '#ffd84a'); ctx.globalAlpha = 1; }
+}
+
+// ---- the moment Jon remembers ----
+function rememberSong(id) {
+  const song = SONG_OF[id]; if (!song || flag('song:' + id)) return;
+  setFlag('song:' + id); markHeard(song);
+  const n = songsKnown(), name = SCORE[song].name.replace(/ \(.*\)$/, '');
+  const layer = n === 1 ? 'The drums come back to the music of Norway.' : n === 2 ? 'The guitar and piano come back.' : n === 3 ? 'The melody comes back.' : n === 4 ? 'The choir and bells come back. Norway is loud again.' : 'Every song is back.';
+  const lines = [['', `JON REMEMBERS A SONG: "${name}"`], ['Jon', SONG_LINES[id]], ['', layer]];
+  if (n === 1) lines.push(['Jon', 'Feel that? Chop on the beat and I hit HARDER. Watch the little note up top.']);
+  lines.paper = true;
+  G.banner = '♪ ' + name.toUpperCase(); G.bannerT = 3; setJonFace('excited', 3);
+  say(lines, writeSave);
+}
+const _giveItem = giveItem;
+giveItem = function (id, after) {
+  if (SONG_OF[id] && !flag('song:' + id) && G.mode !== 'arena') { const a = after; after = () => { if (a) a(); rememberSong(id); }; }
+  return _giveItem(id, after);
+};
+MEMORIES.push({ id: 'songs', ok: () => songsKnown() >= 2 && songsKnown() < 5, line: () => `I remember ${songsKnown()} songs now. There are more runes out there. I can feel the gaps.` });
+MEMORIES.push({ id: 'allsongs', ok: () => songsKnown() >= 5, line: () => 'All five songs. I remember EVERYTHING. Walter, the forge, the lake... mostly the lake.' });
+
 // ===== main.js =====
 // State machine and main loop.
 
@@ -8027,11 +8970,11 @@ function newGame() {
   const st = MAPS.home.ents.find(e => e.t === 'start').at;
   G.state = 'play';
   loadMap('home', st[0] * T + 8, st[1] * T + 8);
-  say(STORY.intro);
+  say(STORY.intro, () => showChapter(1));
 }
 function continueGame(fromCheckpoint) {
   G.mode = 'story'; resetJon();
-  G.save = readSave() || newSave(); applyJonPerks();
+  G.save = readSave() || newSave(); if (!G.save.diff) G.save.diff = defaultDiff(); applyJonPerks();
   G.player = makePlayer(); G.jon = makeJon();
   G.player.hp = G.save.maxHp;
   G.state = 'play';
@@ -8062,12 +9005,13 @@ function onEnterScreen() {
   if (has('knight') && !flag('intro:knight')) { setFlag('intro:knight'); Sound.play('boss'); showBossCard('knight'); say(STORY.knight); }
   if (G.map.redeye) redeyeEnter();
   HK.axes = [];
-  if (G.mapId === 'barrow' && !flag('intro:barrow')) { setFlag('intro:barrow'); say(STORY.barrow_enter); }
+  if (G.mapId === 'barrow' && !flag('intro:barrow')) { setFlag('intro:barrow'); say(STORY.barrow_enter, () => showChapter(3)); }
   if (has('captain') && !flag('intro:captain')) { setFlag('intro:captain'); Sound.play('boss'); showBossCard('captain'); say(STORY.captain); }
   if (has('hank')) { Sound.play('boss'); showBossCard('hank'); say(flag('intro:hank') ? [['Hank', 'TURN... BACK...']] : STORY.hank); setFlag('intro:hank'); }
   if (has('attendant') && !flag('intro:attendant')) { setFlag('intro:attendant'); showBossCard('attendant'); say(STORY.attendant); }
   if (has('giant') && G.ents.find(e => e.type === 'giant').st === 'intro') { Sound.play('boss'); showBossCard('giant'); say(flag('intro:giant') ? [['Forest Giant', 'BACK FOR MORE, TREE-CHOPPER?']] : giantIntroLines()); setFlag('intro:giant'); }
   if (has('king')) { Sound.play('boss'); showBossCard('king'); say(flag('intro:king') ? [['Penguin King', 'AK! Back for more?']] : STORY.king); setFlag('intro:king'); }
+  jonBossMemory();
   if (G.mapId === 'overworld' && flag('d2done') && !flag('chapter2_banner') && G.scr.x === 0 && G.scr.y === 0) {
     setFlag('chapter2_banner'); G.banner = 'CHAPTER 3 COMPLETE'; G.bannerT = 4; Sound.play('secret'); writeSave();
   }
@@ -8097,6 +9041,7 @@ function update(dt) {
         const o = opts[G.menuSel];
         if (o.disabled) { Sound.play('clank'); break; }
         if (o.id === 'arena') { startArena(); break; }
+        if (o.id === 'mode') { setDifficulty(defaultDiff() === 'easy' ? 'normal' : 'easy'); G.titleOpts = null; break; }
         if (o.id === 'continue') continueGame();
         else if (o.id === 'new') {
           if (readSave() && !G.confirmErase) { G.confirmErase = true; break; }
@@ -8107,6 +9052,7 @@ function update(dt) {
       return;
     }
     case 'talk': updateTalk(dt); return;
+    case 'rhythm': updateRhythm(dt); return;
     case 'cutscene': return;
     case 'hold':
       G.player.hold.t -= dt;
@@ -8117,6 +9063,8 @@ function update(dt) {
       if (just('right')) { G.menuPage = ((G.menuPage || 0) + 1) % 6; Sound.play('menu'); }
       if (just('left')) { G.menuPage = ((G.menuPage || 0) + 5) % 6; Sound.play('menu'); }
       if (G.menuPage >= 3) { if (G.menuPage === 3) updateJukebox(); else if (G.menuPage === 4) updateSpellsPage(); else updateBagPage(); if (just('menu') || just('tap')) { G.state = 'play'; G.jukebox = null; Sound.play('menu'); } return; }
+      if (!G.menuPage && just('b')) { toggleDifficulty(); return; }
+      if (!G.menuPage && just('c')) { toggleNotes(); return; }
       if (just('menu') || just('a') || just('tap')) { G.state = 'play'; G.jukebox = null; Sound.play('menu'); }
       return;
     case 'over':
@@ -8147,7 +9095,7 @@ function update(dt) {
   for (const e of G.ents.slice()) {
     if (e.kind === 'enemy' && e.alive && e.freeze > 0) { e.freeze -= dt; e.flash = Math.max(0, e.flash - dt); }
     else if (e.kind === 'enemy' && e.alive && e.root > 0) { e.root -= dt; e.flash = Math.max(0, e.flash - dt); }
-    else if (e.kind === 'enemy' && e.alive) { if (e.slow > 0) { e.slow -= dt; updateEnemy(e, dt * 0.5); } else updateEnemy(e, dt); }
+    else if (e.kind === 'enemy' && e.alive) { const nd = nightBold(e) ? dt * 1.2 : dt; if (e.slow > 0) { e.slow -= dt; updateEnemy(e, nd * 0.5); } else updateEnemy(e, nd); }
     else if (e.kind === 'pickup') updatePickup(e, dt);
     else if (e.kind === 'hazard') updateCart(e, dt);
     else if (e.kind === 'switch' || e.kind === 'log' || e.kind === 'faketree') e.cd = Math.max(0, e.cd - dt);
@@ -8162,14 +9110,15 @@ function render() {
   ctx.setTransform(1, 0, 0, 1, 0, 0);
   ctx.clearRect(0, 0, VW, VH);
   if (G.state === 'title') return drawTitle();
+  if (G.state === 'rhythm' && G.rh) return drawRhythm();
   if (G.state === 'cutscene' || (G.state === 'talk' && G.talk && G.talk.back === 'cutscene')) { drawCutscene(); drawTalk(); return; }
   if (G.shake > 0) ctx.setTransform(1, 0, 0, 1, Math.round(rnd(-2, 2)), Math.round(rnd(-2, 2)));
-  drawMap();
+  drawMap(); drawDecorGround();
   drawIceGlints();
   const p = G.player;
   const list = G.ents.filter(e => e.kind !== 'warp' || e.portal).map(e => ({ y: e.y, f: () => drawThing(e) }));
   list.push({ y: p.y, f: () => drawOwen(p.x - G.cam.x, p.y - G.cam.y) });
-  list.push(...bigDrawList());
+  list.push(...bigDrawList(), ...decorSorted());
   list.sort((a, b) => a.y - b.y).forEach(o => o.f());
   if (G.mode === 'arena') drawArenaWorld();
   drawHankAxes();
@@ -8185,10 +9134,12 @@ function render() {
   if (G.mode === 'arena') drawArenaHud(); else { drawHud(); drawCompass(); }
   if (G.state === 'warp' && G.warp.kind !== 'iris') { ctx.globalAlpha = 0.55 * clamp(1 - Math.abs(G.warp.t - 0.35) / 0.35, 0, 1); R(0, 0, VW, VH, '#000'); ctx.globalAlpha = 1; }
   if (G.bannerT > 0) { R(0, 92, VW, 34, 'rgba(0,0,0,.8)'); text(G.banner, VW / 2, 113, '#ffd84a', 'center'); }
+  if (G.photoCard && G.state === 'talk') drawPhoto(G.photoCard, 128, 82, 104, 118, -0.04);
   if (G.state === 'talk') drawTalk();
   if (G.state === 'menu') { if (G.menuPage === 5) drawBagPage(); else if (G.menuPage === 4) drawSpellsPage(); else if (G.menuPage === 3) drawJukebox(); else if (G.menuPage === 2) drawMapPage(); else if (G.menuPage) drawJonPage(); else drawMenu(); drawMenuTabs(G.menuPage || 0); }
   drawBossCard(); drawCombo();
-  drawJonLevel();
+  drawJonLevel(); drawLevelBurst();
+  drawChapterCard();
   drawArenaMenus();
   if (G.state === 'over') {
     R(0, 0, VW, VH, 'rgba(40,0,0,.8)');

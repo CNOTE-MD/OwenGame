@@ -77,6 +77,7 @@ const Music = {
   osc(type, f, t, end, detune = 0) { const o = Sound.ac.createOscillator(); o.type = type; o.frequency.setValueAtTime(f, t); o.detune.setValueAtTime(detune, t); o.start(t); o.stop(end + 0.6); return o; },
   note(e, t) {
     const ac = Sound.ac, out = this.bus;
+    if (typeof layerOn === 'function' && !layerOn(e)) return;   // Jon's remembered songs decide which layers play
     if (e.inst === 'drum') return this.drum(e, t);
     const end = t + e.d * 0.92;
     for (const f of e.f) {

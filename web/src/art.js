@@ -390,6 +390,7 @@ function personRows(look) {
   if (look.beard) { r[5] = '....hBBBBBBh....'; r[6] = '.....BBBBBB.....'; }
   if (look.long) { r[5] = '...hhssssssh....'.slice(0, 16); r[6] = '...hhsSSSSshh...'; r[7] = '...htttttttth...'; }
   if (look.hat) { r[0] = '....yyyyyyyy....'; r[1] = '...yyyyyyyyyy...'; }
+  if (look.kid) { r.splice(9, 1); r.splice(10, 1); r.unshift('................', '................'); }
   return r;
 }
 
@@ -464,10 +465,11 @@ function whiteOf(c) { let w = WHITE.get(c); if (!w) { w = tinted(c, '#ffffff'); 
 // draw a sprite with its feet at (x, y)
 function spr(c, x, y, opts = {}) {
   if (!c) return;
-  const img = opts.white ? whiteOf(c) : c, sc = opts.scale || 1;
+  let sc = opts.scale || 1; if ((sc === 2 || sc === 3) && typeof up === 'function') { c = up(c, sc); sc = 1; }
+  const img = opts.white ? whiteOf(c) : c;
   const w = img.width * sc, h = img.height * sc;
   if (opts.alpha !== undefined) ctx.globalAlpha = opts.alpha;
-  ctx.drawImage(img, Math.round(x - w / 2), Math.round(y - h + (opts.foot || 1) * sc), w, h);
+  ctx.drawImage(img, Math.round(x - w / 2), Math.round(y - h + (opts.foot || 1) * (opts.scale || 1)), w, h);
   ctx.globalAlpha = 1;
 }
 function shadowAt(x, y, scale = 1) { ctx.globalAlpha = 0.28; const c = SPR.shadow; ctx.drawImage(c, Math.round(x - c.width * scale / 2), Math.round(y - 2 * scale), c.width * scale, c.height * scale); ctx.globalAlpha = 1; }

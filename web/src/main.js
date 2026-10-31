@@ -7,11 +7,11 @@ function newGame() {
   const st = MAPS.home.ents.find(e => e.t === 'start').at;
   G.state = 'play';
   loadMap('home', st[0] * T + 8, st[1] * T + 8);
-  say(STORY.intro);
+  say(STORY.intro, () => showChapter(1));
 }
 function continueGame(fromCheckpoint) {
   G.mode = 'story'; resetJon();
-  G.save = readSave() || newSave(); applyJonPerks();
+  G.save = readSave() || newSave(); if (!G.save.diff) G.save.diff = defaultDiff(); applyJonPerks();
   G.player = makePlayer(); G.jon = makeJon();
   G.player.hp = G.save.maxHp;
   G.state = 'play';
@@ -42,12 +42,13 @@ function onEnterScreen() {
   if (has('knight') && !flag('intro:knight')) { setFlag('intro:knight'); Sound.play('boss'); showBossCard('knight'); say(STORY.knight); }
   if (G.map.redeye) redeyeEnter();
   HK.axes = [];
-  if (G.mapId === 'barrow' && !flag('intro:barrow')) { setFlag('intro:barrow'); say(STORY.barrow_enter); }
+  if (G.mapId === 'barrow' && !flag('intro:barrow')) { setFlag('intro:barrow'); say(STORY.barrow_enter, () => showChapter(3)); }
   if (has('captain') && !flag('intro:captain')) { setFlag('intro:captain'); Sound.play('boss'); showBossCard('captain'); say(STORY.captain); }
   if (has('hank')) { Sound.play('boss'); showBossCard('hank'); say(flag('intro:hank') ? [['Hank', 'TURN... BACK...']] : STORY.hank); setFlag('intro:hank'); }
   if (has('attendant') && !flag('intro:attendant')) { setFlag('intro:attendant'); showBossCard('attendant'); say(STORY.attendant); }
   if (has('giant') && G.ents.find(e => e.type === 'giant').st === 'intro') { Sound.play('boss'); showBossCard('giant'); say(flag('intro:giant') ? [['Forest Giant', 'BACK FOR MORE, TREE-CHOPPER?']] : giantIntroLines()); setFlag('intro:giant'); }
   if (has('king')) { Sound.play('boss'); showBossCard('king'); say(flag('intro:king') ? [['Penguin King', 'AK! Back for more?']] : STORY.king); setFlag('intro:king'); }
+  jonBossMemory();
   if (G.mapId === 'overworld' && flag('d2done') && !flag('chapter2_banner') && G.scr.x === 0 && G.scr.y === 0) {
     setFlag('chapter2_banner'); G.banner = 'CHAPTER 3 COMPLETE'; G.bannerT = 4; Sound.play('secret'); writeSave();
   }
@@ -77,6 +78,7 @@ function update(dt) {
         const o = opts[G.menuSel];
         if (o.disabled) { Sound.play('clank'); break; }
         if (o.id === 'arena') { startArena(); break; }
+        if (o.id === 'mode') { setDifficulty(defaultDiff() === 'easy' ? 'normal' : 'easy'); G.titleOpts = null; break; }
         if (o.id === 'continue') continueGame();
         else if (o.id === 'new') {
           if (readSave() && !G.confirmErase) { G.confirmErase = true; break; }
@@ -87,6 +89,7 @@ function update(dt) {
       return;
     }
     case 'talk': updateTalk(dt); return;
+    case 'rhythm': updateRhythm(dt); return;
     case 'cutscene': return;
     case 'hold':
       G.player.hold.t -= dt;
@@ -97,6 +100,8 @@ function update(dt) {
       if (just('right')) { G.menuPage = ((G.menuPage || 0) + 1) % 6; Sound.play('menu'); }
       if (just('left')) { G.menuPage = ((G.menuPage || 0) + 5) % 6; Sound.play('menu'); }
       if (G.menuPage >= 3) { if (G.menuPage === 3) updateJukebox(); else if (G.menuPage === 4) updateSpellsPage(); else updateBagPage(); if (just('menu') || just('tap')) { G.state = 'play'; G.jukebox = null; Sound.play('menu'); } return; }
+      if (!G.menuPage && just('b')) { toggleDifficulty(); return; }
+      if (!G.menuPage && just('c')) { toggleNotes(); return; }
       if (just('menu') || just('a') || just('tap')) { G.state = 'play'; G.jukebox = null; Sound.play('menu'); }
       return;
     case 'over':
@@ -127,7 +132,7 @@ function update(dt) {
   for (const e of G.ents.slice()) {
     if (e.kind === 'enemy' && e.alive && e.freeze > 0) { e.freeze -= dt; e.flash = Math.max(0, e.flash - dt); }
     else if (e.kind === 'enemy' && e.alive && e.root > 0) { e.root -= dt; e.flash = Math.max(0, e.flash - dt); }
-    else if (e.kind === 'enemy' && e.alive) { if (e.slow > 0) { e.slow -= dt; updateEnemy(e, dt * 0.5); } else updateEnemy(e, dt); }
+    else if (e.kind === 'enemy' && e.alive) { const nd = nightBold(e) ? dt * 1.2 : dt; if (e.slow > 0) { e.slow -= dt; updateEnemy(e, nd * 0.5); } else updateEnemy(e, nd); }
     else if (e.kind === 'pickup') updatePickup(e, dt);
     else if (e.kind === 'hazard') updateCart(e, dt);
     else if (e.kind === 'switch' || e.kind === 'log' || e.kind === 'faketree') e.cd = Math.max(0, e.cd - dt);
@@ -142,14 +147,15 @@ function render() {
   ctx.setTransform(1, 0, 0, 1, 0, 0);
   ctx.clearRect(0, 0, VW, VH);
   if (G.state === 'title') return drawTitle();
+  if (G.state === 'rhythm' && G.rh) return drawRhythm();
   if (G.state === 'cutscene' || (G.state === 'talk' && G.talk && G.talk.back === 'cutscene')) { drawCutscene(); drawTalk(); return; }
   if (G.shake > 0) ctx.setTransform(1, 0, 0, 1, Math.round(rnd(-2, 2)), Math.round(rnd(-2, 2)));
-  drawMap();
+  drawMap(); drawDecorGround();
   drawIceGlints();
   const p = G.player;
   const list = G.ents.filter(e => e.kind !== 'warp' || e.portal).map(e => ({ y: e.y, f: () => drawThing(e) }));
   list.push({ y: p.y, f: () => drawOwen(p.x - G.cam.x, p.y - G.cam.y) });
-  list.push(...bigDrawList());
+  list.push(...bigDrawList(), ...decorSorted());
   list.sort((a, b) => a.y - b.y).forEach(o => o.f());
   if (G.mode === 'arena') drawArenaWorld();
   drawHankAxes();
@@ -165,10 +171,12 @@ function render() {
   if (G.mode === 'arena') drawArenaHud(); else { drawHud(); drawCompass(); }
   if (G.state === 'warp' && G.warp.kind !== 'iris') { ctx.globalAlpha = 0.55 * clamp(1 - Math.abs(G.warp.t - 0.35) / 0.35, 0, 1); R(0, 0, VW, VH, '#000'); ctx.globalAlpha = 1; }
   if (G.bannerT > 0) { R(0, 92, VW, 34, 'rgba(0,0,0,.8)'); text(G.banner, VW / 2, 113, '#ffd84a', 'center'); }
+  if (G.photoCard && G.state === 'talk') drawPhoto(G.photoCard, 128, 82, 104, 118, -0.04);
   if (G.state === 'talk') drawTalk();
   if (G.state === 'menu') { if (G.menuPage === 5) drawBagPage(); else if (G.menuPage === 4) drawSpellsPage(); else if (G.menuPage === 3) drawJukebox(); else if (G.menuPage === 2) drawMapPage(); else if (G.menuPage) drawJonPage(); else drawMenu(); drawMenuTabs(G.menuPage || 0); }
   drawBossCard(); drawCombo();
-  drawJonLevel();
+  drawJonLevel(); drawLevelBurst();
+  drawChapterCard();
   drawArenaMenus();
   if (G.state === 'over') {
     R(0, 0, VW, VH, 'rgba(40,0,0,.8)');
