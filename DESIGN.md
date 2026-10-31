@@ -44,3 +44,12 @@ Names, dialogue, enemy stats and level layouts live in plain data files under `d
 - **Menus:** one tab strip (GEAR, JON, MAP, MUSIC, SPELLS, BAG) across all six pages.
 - **Title:** aurora borealis over a fjord, two mountain ranges, a longship crossing the water, a three-times-scale outlined logo.
 - **World:** the lake has an organic shoreline; palace ice catches moving glints.
+
+## Engine (October 2026 technical pass)
+
+- **Fixed timestep:** the simulation advances in 1/60 s steps from an accumulator (`runFrame` in `web/src/tech.js`), at most 6 per display frame, so 30, 60, 120 and 144 Hz displays play identically. Input edges are consumed by the first step that runs; a frame with no step keeps them. Negative or huge frame gaps are clamped.
+- **Mode 7:** the taxi ride is a perspective-mapped ground plane rendered scanline by scanline from an 8-texel-per-tile texture of the real overworld, with a banded sky, a mountain range that turns with the camera, and distance haze.
+- **HDMA-style scanline effects:** per-row horizontal offsets for heat haze on the volcano road and a dream wobble in the nightmare (stronger during blackouts).
+- **Transitions:** an iris wipe centred on Owen when entering buildings and dungeons; a mosaic dissolve when stepping out to the world; a mosaic on the way to the game-over screen.
+- **Audio:** music runs through an SPC700-style echo (delay, feedback, low-pass): almost dry outdoors, wet in the palace, barrow and dungeons, very wet in the nightmare.
+- **Display:** an optional CRT filter (Y) with scanlines and a tube vignette, drawn on the presented image only. A developer overlay (` or F3) shows fps, frame time, sim steps, state, map, entities, particles, prescale, effects and echo.

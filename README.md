@@ -9,6 +9,7 @@
 | `web/src/story.js` | Every word in the game, including everything Jon says on his own (`JON`). Owen can edit this. |
 | `web/src/jon.js` | Jon's personality (faces, when he talks) and growth (XP, levels, perks, abilities) |
 | `tools/maps.py` | ASCII maps for Norway, the Penguin Palace, the subway, the Barrow and Owen's room, plus a reachability checker |
+| `web/src/tech.js` | Engine and SNES-hardware techniques: fixed 60 Hz timestep, Mode 7 taxi ride, HDMA-style heat haze and dream wobble, mosaic and iris transitions, SPC700-style echo, CRT filter (Y), developer overlay (` or F3) |
 | `web/src/pixelfont.js` | The game's hand-built bitmap font (every glyph, accents and symbols included) and the shared window frame `drawPanel()` |
 | `web/src/owen.js` | Built from Owen's Quest Log answers: the Varg, spiders, Jon's Compliment, the Leaf Rune, the giant's leaf wrap and sleeping log, three Arena cards, mini Chillys |
 | `web/src/giant.js` | Owen's page 6: the Forest Giant of the North boss at the log (stalk, slam, stuck window, hide as a tree) |
@@ -22,7 +23,7 @@
 | `OWEN_QUESTIONS.md` | Prompts to ask Owen after he plays; his answers drive the next build |
 | `STORY_BIBLE.md` | Characters, chapter arc, items, the Red-Eye side quest, Arena mode |
 
-Rebuild: `python3 tools/maps.py && python3 tools/build_web.py`. Test: `NODE_PATH=$(npm root -g) node tests/web_playtest.js`, then `tests/arena_playtest.js`, `tests/ch1_depth_test.js`, `tests/redeye_test.js`, `tests/ch2_test.js`, `tests/jon_test.js`, `tests/pad_test.js`, `tests/snes_test.js`, `tests/magic_test.js`, `tests/better_test.js`, `tests/giant_test.js`, `tests/owen_test.js` and `tests/polish_test.js` the same way.
+Rebuild: `python3 tools/maps.py && python3 tools/build_web.py`. Test: `NODE_PATH=$(npm root -g) node tests/web_playtest.js`, then `tests/arena_playtest.js`, `tests/ch1_depth_test.js`, `tests/redeye_test.js`, `tests/ch2_test.js`, `tests/jon_test.js`, `tests/pad_test.js`, `tests/snes_test.js`, `tests/magic_test.js`, `tests/better_test.js`, `tests/giant_test.js`, `tests/owen_test.js`, `tests/polish_test.js` and `tests/tech_test.js` the same way.
 
 ## Godot prototype (frozen)
 

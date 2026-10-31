@@ -41,7 +41,8 @@ function drawTalk() {
   const tk = G.talk; if (!tk) return;
   const [who, msg] = tk.cur;
   const inCut = tk.back === 'cutscene';
-  const top = !inCut && G.player && G.player.y - G.cam.y > 140;
+  const ride = inCut && G.cutPages && G.cutPages[G.cut.i] && String(G.cutPages[G.cut.i].art).startsWith('taxi');
+  const top = ride || (!inCut && G.player && G.player.y - G.cam.y > 140);
   const by = top ? 30 : 156, bx = 6, bw = 244, bh = 62;
   drawPanel(bx, by, bw, bh);
   let tx = bx + 10, tw = bw - 20;
@@ -215,7 +216,7 @@ function titleOptions() {
 function drawCutscene() {
   const c = G.cut, page = (G.cutPages || STORY.flight)[c.i], t = G.t;
   R(0, 0, VW, VH, '#000');
-  if (page.art && page.art.startsWith('taxi')) return drawTaxiScene(page);
+  if (page.art && page.art.startsWith('taxi')) return drawRideMode7(page);
   switch (page.art) {
     case 'plane':
       R(0, 0, VW, 140, '#1b2a55'); for (let i = 0; i < 30; i++) R((i * 71) % VW, (i * 37) % 120, 1, 1, '#8899cc');

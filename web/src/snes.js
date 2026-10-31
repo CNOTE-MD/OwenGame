@@ -261,7 +261,7 @@ function useTaxi(e) {
 function startRide(to) {
   G.state = 'cutscene';
   G.cutPages = to === 'forest' ? STORY.taxi_out : STORY.taxi_back;
-  G.cut = { i: 0 };
+  G.cut = { i: 0 }; G.rideT0 = G.t;
   G.cutDone = () => {
     if (to === 'forest') { loadMap('overworld', 23 * T + 8, 12 * T + 8); } else { loadMap('overworld', 20 * T + 8, 37 * T + 8); }
     G.state = 'play'; writeSave();

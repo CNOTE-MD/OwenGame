@@ -22,7 +22,8 @@ function continueGame(fromCheckpoint) {
 }
 
 function startWarp(to, dest) {
-  G.state = 'warp'; G.warp = { to, dest, t: 0, done: false };
+  const M = MAPS[to] || {};
+  G.state = 'warp'; G.warp = { to, dest, t: 0, done: false, kind: M.dungeon || M.interior || M.dark || M.redeye ? 'iris' : 'mosaic' };
   Sound.play('door');
 }
 function updateWarp(dt) {
@@ -62,6 +63,7 @@ function update(dt) {
   G.shake = Math.max(0, G.shake - dt); G.flash = Math.max(0, G.flash - dt); G.bannerT = Math.max(0, G.bannerT - dt);
   if (G.state !== 'play') { JT.t = Math.max(0, JT.t - dt); JT.faceT = Math.max(0, JT.faceT - dt); }
   if (just('mute')) Sound.muted = !Sound.muted;
+  techKeys();
   if (just('music')) Music.on = !Music.on;
   switch (G.state) {
     case 'title': {
@@ -161,7 +163,7 @@ function render() {
   drawRedeyeOverlay();
   if (G.flash > 0) { ctx.globalAlpha = Math.min(1, G.flash * 3); R(0, 0, VW, VH, G.flashColor || '#fff'); ctx.globalAlpha = 1; }
   if (G.mode === 'arena') drawArenaHud(); else { drawHud(); drawCompass(); }
-  if (G.state === 'warp') { ctx.globalAlpha = clamp(1 - Math.abs(G.warp.t - 0.35) / 0.35, 0, 1); R(0, 0, VW, VH, '#000'); ctx.globalAlpha = 1; }
+  if (G.state === 'warp' && G.warp.kind !== 'iris') { ctx.globalAlpha = 0.55 * clamp(1 - Math.abs(G.warp.t - 0.35) / 0.35, 0, 1); R(0, 0, VW, VH, '#000'); ctx.globalAlpha = 1; }
   if (G.bannerT > 0) { R(0, 92, VW, 34, 'rgba(0,0,0,.8)'); text(G.banner, VW / 2, 113, '#ffd84a', 'center'); }
   if (G.state === 'talk') drawTalk();
   if (G.state === 'menu') { if (G.menuPage === 5) drawBagPage(); else if (G.menuPage === 4) drawSpellsPage(); else if (G.menuPage === 3) drawJukebox(); else if (G.menuPage === 2) drawMapPage(); else if (G.menuPage) drawJonPage(); else drawMenu(); drawMenuTabs(G.menuPage || 0); }
@@ -181,9 +183,7 @@ let last = performance.now();
 G.menuSel = 0;
 buildAll(); buildSnesArt(); buildAwesomeArt(); buildMagicArt(); buildGiantArt(); buildOwenArt();
 function frame(now) {
-  const dt = Math.min(0.05, (now - last) / 1000); last = now;
-  try { pollGamepad(); update(dt); render(); if ((G.fitT = (G.fitT || 0) - dt) <= 0) { G.fitT = 0.5; fitScreen(); } present(); const mid = musicFor(); markHeard(mid); Music.want(mid); Music.tick(); Ambience.tick(dt); } catch (err) { console.error(err); }
-  if (!(G.hitstop > 0)) for (const k in edge) edge[k] = false;   // a tap during hit-stop still counts
+  try { runFrame(now); } catch (err) { console.error(err); }   // fixed 60 Hz steps; see tech.js
   requestAnimationFrame(frame);
 }
 (document.fonts && document.fonts.load ? document.fonts.load('8px "Press Start 2P"').catch(() => {}) : Promise.resolve())

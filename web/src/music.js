@@ -50,7 +50,7 @@ const Music = {
     const c = this.compile(id);
     this.ev = c.ev; this.len = c.len; this.idx = 0; this.start = now + 0.15;
     this.bus = ac.createGain(); this.bus.gain.setValueAtTime(0, now); this.bus.gain.linearRampToValueAtTime(0.32 * c.gain, now + 0.8);
-    this.bus.connect(ac.destination);
+    this.bus.connect(ac.destination); Echo.attach(this.bus);
   },
 
   tick() {

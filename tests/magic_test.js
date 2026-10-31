@@ -77,7 +77,7 @@ const path = require('path');
   await ev(() => { const s = G.ents.find(e => e.kind === 'shop' && e.item === 'tooth'); G.player.x = s.x; G.player.y = s.y + 14; G.player.fy = -1; G.player.fx = 0; G.player.cd = 0; G.save.kr = 100; });
   await pg.keyboard.press('KeyZ'); await wait(60); await talkThrough();
   await check('Troll Tooth bought, worn, and raises luck', await ev(() => hasCharm('tooth') && G.save.charm === 'tooth' && G.st.luck > 0.5));
-  await ev(() => { G.player.hp = 1; });
+  await ev(() => { G.player.hp = 1; JT.compT = 99; });   // hold Jon's compliment so it can't heal first
   await pg.keyboard.press('Enter'); await wait(60); await ev(() => { G.menuPage = 5; G.bagSel = 0; }); await wait(60);
   await pg.screenshot({ path: SHOTS + '/magic_bag.png' });
   await pg.keyboard.press('KeyZ'); await wait(60);
