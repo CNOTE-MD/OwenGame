@@ -182,6 +182,6 @@ function musicFor() {
   if (G.scr.y === 1 && G.scr.x <= 1) return 'village';
   if (G.ents.some(e => e.type === 'giant' && e.alive)) return 'zep';   // Owen: more Led Zeppelin
   if (G.scr.y === 0 && G.scr.x === 1) return 'journey';   // the Muck Forest: don't stop choppin'
-  if (G.scr.y === 0 && G.scr.x >= 2) return 'cold';       // the Frozen Path and Storm Peak
+  if (G.scr.y === 0 && G.scr.x >= 2) return 'cold';       // the Deep Forest and Storm Peak
   return 'overworld';
 }

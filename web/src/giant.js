@@ -59,6 +59,7 @@ function updateGiant(e, dt, dx, dy, d, mr) {
     if (e.t < 0.55) e.aim = { x: p.x, y: p.y };   // tracks you, then commits
     if (e.t > 0.9 && (e.t > 1.05 || onBeat(0.05))) { e.st = 'slam'; e.t = 0; slamClub(e); }
   } else if (e.st === 'slam') {
+    if (e.t > 0.25 && e.parleyAgain && !flag('giant_peace')) { giantParley(e, true); return; }
     if (e.t > 0.25) { e.st = 'stuck'; e.t = 0; floatText(e.x, e.y - 60, 'STUCK! CHOP!', '#ffd84a'); jonSay('giant_stuck', { force: true, face: 'excited', cooldown: 4 }); }
   } else if (e.st === 'stuck') {
     if (e.t > (e.hid ? 1.9 : 2.4) * bossWindow()) { e.st = 'stalk'; e.t = 0; Sound.play('clank'); }
@@ -77,7 +78,7 @@ function startGiantHide(e) {
   e.hid = true; e.hiding = true; e.hideT = 0; e.st = 'stalk'; e.t = 0;
   for (let i = 0; i < 24; i++) leaves(e.x + rnd(-24, 24), e.y + rnd(-40, 10), ['#58b840', '#2f7a2a', '#a8723a']);
   Sound.play('secret');
-  if (!flag('giant_lore')) { setFlag('giant_lore'); say([...STORY.giant_lore, ...STORY.giant_hide]); } else say(STORY.giant_hide);
+  say(STORY.giant_hide);
   // three trees sprout on the screen; one of them is him
   const spots = [];
   for (let tries = 0; tries < 200 && spots.length < 3; tries++) {
@@ -102,6 +103,8 @@ function revealGiant(e, x, y, found) {
   G.shake = 0.4; Sound.play('boss');
   floatText(x, y - 60, found ? 'FOUND HIM!' : 'HE\'S BACK', found ? '#ffd84a' : '#ff6b6b');
   if (found) jonSay('giant_found', { force: true, face: 'excited' });
+  if (flag('giant_peace')) return;
+  if (found) giantParley(e); else e.parleyAgain = true;   // Owen's page 8: once he's found, Owen says STOP
 }
 function updateGiantHide(e, dt) {
   e.hideT += dt;
@@ -139,13 +142,45 @@ function drawFakeTree(t) {
   if (img) ctx.drawImage(img, x - img.width / 2 + shiver, y - img.height + 8); else { R(x - 10, y - 26, 20, 26, '#2f7a2a'); R(x - 3, y - 6, 6, 12, '#6b4322'); }
 }
 function giantOnKill(e) {
-  G.ents = G.ents.filter(o => o.kind !== 'faketree');
   G.shake = 0.8; rumble(600, 1, 1);
-  // he falls: the log tiles become path, for good, and Jon gets his timber
+  giantLeavesPath();
+  say(STORY.giant_down, () => { writeSave(); checkRoomClear(); });
+}
+// either way he ends (beaten, or talked past) the log is off the path for good and snores beside it
+function giantLeavesPath() {
+  G.ents = G.ents.filter(o => o.kind !== 'faketree');
   const lx = 31;
   for (const yy of [5, 6]) if (tile(lx, yy) === 'o') { setTile(lx, yy, 's'); setFlag(`tile:overworld:${lx},${yy}:s`); leaves(lx * T + 8, yy * T + 8, ['#a8723a', '#6e4420', '#c89058']); }
   setFlag('log_chopped'); setFlag('giant_done');
-  say(STORY.giant_down, () => { writeSave(); checkRoomClear(); });
+  const d = MAPS.overworld.ents.find(o => o.t === 'sleeplog');
+  if (G.mapId === 'overworld' && d && !G.ents.some(o => o.kind === 'sleeplog')) { const s = makeEnt(d, d.at[0] * T + 8, d.at[1] * T + 8); if (s) G.ents.push(s); }
+}
+
+// ---------- Owen's page 8: "STOP!", the giant of the east, and Jon's idea ----------
+// Owen remembers the giants' war (north likes east), says stop, and talks his way past. The
+// answers come from the page; a wrong one sends the fight on until the club sticks again.
+function giantParley(e, again) {
+  e.parleyAgain = false; e.st = 'stuck'; e.t = -99;   // he holds still while they talk
+  const lines = again ? STORY.giant_again : [...(flag('giant_lore') ? [] : STORY.giant_lore), ...STORY.giant_stop];
+  setFlag('giant_lore');
+  say(lines, () => ask(STORY.giant_ask_who, ['The giant of the SOUTH sent us!', 'The giant of the EAST sent us!', 'Nobody. We\'re just lost.'], i => {
+    if (i !== 1) return giantResume(e, i === 0 ? STORY.giant_wrong_south : STORY.giant_wrong_nobody, i === 0);
+    say(STORY.giant_east, () => ask(STORY.giant_ask_why, ['Because he was bored.', 'Jon\'s idea: penguins invaded his luxurious apartment/townhome getaway.', 'Because penguins smell like fish.'],
+      j => j === 1 ? giantPeace(e) : giantResume(e, STORY.giant_wrong_why, false)));
+  }));
+}
+function giantResume(e, lines, angry) {
+  say(lines, () => { e.st = 'stalk'; e.t = 0; e.parleyAgain = true; if (angry) { e.warred = true; G.shake = 0.4; Sound.play('boss'); } });
+}
+function giantPeace(e) {
+  say(STORY.giant_peace, () => {
+    e.alive = false; G.ents = G.ents.filter(o => o !== e);
+    setFlag('giant_peace'); giantLeavesPath();
+    G.bossCard = { name: 'FOREST GIANT OF THE NORTH', sub: 'PEACE!', t: 0, life: 2.8 };
+    G.flash = 0.3; G.flashColor = '#fff'; G.shake = 0.5; Sound.play('secret'); rumble(400, 0.6, 0.6);
+    for (let i = 0; i < 24; i++) leaves(e.x + rnd(-24, 24), e.y + rnd(-40, 10), ['#58b840', '#a8e070', '#a8723a']);
+    jonXP(25); writeSave(); checkRoomClear();
+  });
 }
 
 // ---------- Owen's page 7: the blur, the time-out signal, and the giants' old war ----------

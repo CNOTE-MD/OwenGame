@@ -609,15 +609,15 @@ const MAPS = {
 "TMMMMMMMMMMMMMMTTTTTTTTTTTTTTTTTTMMMMMMMMMMMMMMTTMMMMMMMMMMMMMMT",
 "TMMMMMMXMMMMMMMTT,,,,b%%%%,,bbbTTMMMMMMEMMMMMMMTTMMMMMMXMMMMMMMT",
 "TT.....s.......TT,T,,%%%%%,T,b,TTnnnnnnsnnnnnn#TTnnnnnnsnnnnnnnT",
-"TT.T...s...b...TT,,,,TT%%%,,bbbTTnTnnnnsnnnnnnnTTnn#nnnsnnnnTnnT",
-"TT.....s........,,%%%%%%%%,,,,,onnnnnnnsnnnTnnnnnnnnnnnsnnnnnnnT",
-"TT.b...sssssssssss%%%%%%%%sssssosssssssssnnnnnnnnnnnnnnsnnnnnnnT",
-"TT.....s........%%%%%%%f%%%%,,,Tnnnnnnnsnnnnnnnnnnnnnnnsnn#nnnnT",
-"TTT....s....T...%%T%%%%%%TT%%,,TnnTnnnnsnnnn#nnnnnnnnnnsnnnnnnnT",
-"TT.....s.....b.TT%%%%b%%%%%%%T,TTnnnnnnsnnnnnn#TTnnTnnnsnnnnnnnT",
-"TTbb...s.......TT,,TT%%%%b,,,,,TTnn#nnnsnnnTnnnTTnnnnnnsnnnnnTnT",
-"TT.....s..T....TT,,,,,%%T,,,T,,TTnnnnnnsnnnnnnnTTnnn#nnsnnnnnnnT",
-"TT.....s.......TTT,,b,,,,,,,,,,TTnnnnnTsnnnnnnnTTnnnnnnsnnnnnnnT",
+"TT.T...s...b...TT,,,,TT%%%,,bbbTTnTnnnnsnnnTnnnTTnn#nnnsnnnnTnnT",
+"TT.....s........,,%%%%%%%%,,,,,o,.TT.,.s,nnnnnnnnnnnnnnsnnnnnnnT",
+"TT.b...sssssssssss%%%%%%%%sssssosssssssss,,nnnnnnnnnnnnsnnnnnnnT",
+"TT.....s........%%%%%%%f%%%%,,,T.,T..T.sT,.,nnnnnnnnnnnsnn#nnnnT",
+"TTT....s....T...%%T%%%%%%TT%%,,TTT.,TT.s.TT,..nnnnnnnnnsnnnnnnnT",
+"TT.....s.....b.TT%%%%b%%%%%%%T,TT.T.T,.s,T.T,.nTTnnTnnnsnnnnnnnT",
+"TTbb...s.......TT,,TT%%%%b,,,,,TTT,..T.s.,TT..,TTnnnnnnsnnnnnTnT",
+"TT.....s..T....TT,,,,,%%T,,,T,,TT,.T..,s.T.,T.TTTnnn#nnsnnnnnnnT",
+"TT.....s.......TTT,,b,,,,,,,,,,TTT.T,TTsTT.T,T.TTnnnnnnsnnnnnnnT",
 "TTTTTT.s..TTTTTTTTTTTT,s,,TTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTT",
 "TTTTTT.s..TTTTTTTTTTTT.s..TTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTT",
 "TT.....s.......TT......s.......TT.....ss.......TT#.....s....lllT",
@@ -2561,6 +2561,40 @@ const STORY = {
   ],
   giant_hide: [['Forest Giant', 'ENOUGH. You will never find me among my brothers.'], ['', 'He steps backward into the forest and is gone. Three trees stand where there were none.'], ['Jon', 'One of those trees is HIM. Throw me at the one that can\'t hold still!']],
   giant_down: [['Forest Giant', 'The penguins... said... you were small...'], ['', 'The Forest Giant of the North topples, slowly, like a tree. Then he shrinks, and stiffens, and turns back into a log.'], ['', 'The log rolls off the path, bumps into a bush, and starts to snore.'], ['Jon', 'TIMBER! For REAL this time! Did you see that? Did you SEE that?'], ['Owen', 'I saw it, Jon.'], ['Jon', 'Big boss fight scene: complete. Jjorvic Palace is east, through the snow. Let\'s go wreck it.']],
+  // Owen's page 8: he says STOP, and talks his way past the giant
+  giant_stop: [
+    ['Owen', 'STOP!'],
+    ['Forest Giant', 'WHAT?!'],
+    ['Jon', '(in my mind) Señor. What are you doing. He is FIFTY FEET TALL.'],
+    ['Owen', '(in my mind) Gathering my wits. Out loud.'],
+  ],
+  giant_ask_who: 'The giant glares down. Who do you say sent you?',
+  giant_east: [
+    ['Owen', 'The giant of the east sent us!!'],
+    ['Forest Giant', 'Pah!! I doubt he sent you here to bother me!'],
+    ['Owen', '"You\'re absolutely right!" my mind screamed. But thankfully I kept that to myself, and carried on with my majestically wonderful peace-giving speech.'],
+    ['Owen', 'He sent me to take down this palace full of penguins for him.'],
+    ['Forest Giant', 'Why?'],
+    ['Owen', 'Because...'],
+    ['Jon', '(in my mind) Oh, I have one!'],
+    ['Owen', '(also in my mind) Alright!'],
+  ],
+  giant_ask_why: 'Why did the giant of the east send you? (Jon has an idea...)',
+  giant_peace: [
+    ['Owen', 'He sent us because penguins were invading his luxurious apartment/townhome getaway.'],
+    ['', 'I followed as Jon instructed me.'],
+    ['Forest Giant', 'Ahhh...'],
+    ['Forest Giant', 'KNÖRVIC does like his luxurious getaways.'],
+    ['Owen', 'I hoped this faux story would get us through his guard, and it actually did (for once).'],
+    ['Forest Giant', 'Thou shall pass into the deep forest.'],
+    ['Owen', 'Thank you.'],
+    ['', 'The Forest Giant of the North steps aside. He shrinks, and stiffens, and turns back into a log, which rolls off the path and starts to snore.'],
+    ['Jon', '(in my mind) We talked our way past a FIFTY FOOT GIANT. With a LIE. About a TOWNHOME. Best boss fight scene EVER.'],
+  ],
+  giant_wrong_south: [['Owen', 'The giant of the SOUTH sent us!'], ['Forest Giant', 'THE SOUTH?! The south are my ENEMIES!'], ['Jon', '(in my mind) North HATES south! You literally JUST remembered that! Dodge! DODGE!']],
+  giant_wrong_nobody: [['Owen', 'Um. Nobody. We\'re just lost.'], ['Forest Giant', 'Then you are TREE-CHOPPERS in MY forest!'], ['Jon', '(in my mind) Bad answer. Really bad answer. Try again when his club gets stuck.']],
+  giant_wrong_why: [['Forest Giant', 'LIES! Knörvic would NEVER say that!'], ['Jon', '(in my mind) I SAID I had one! You were supposed to use MINE! Next time his club sticks, try again.']],
+  giant_again: [['Owen', 'STOP! Wait! Let me try that again.'], ['Forest Giant', '...Speak, tree-chopper. Quickly.']],
   log_chopped: [['Jon', 'TIMBER!']],
   cargo: [
     ['', 'A bench by the plane. You could sit for a minute. ...Something is scratching inside the cargo hold. Slowly. Like long fingernails.'],
@@ -2582,10 +2616,10 @@ const STORY = {
     ['Astrid', 'He was hiding it from Chilly, the Frost Demon. Chilly wants Jontuka. With it, he could crack open the volcano and freeze the whole world.'],
     ['Astrid', 'Chilly cannot walk in daylight. So he possesses creatures that do not belong here. Like penguins.'],
     ['Jon', 'Told you.'],
-    ['Astrid', 'His penguins have built themselves a PALACE of ice up the Frozen Path, north-east, past the Muck Forest. Whatever rules it sits on a throne at the top.'],
+    ['Astrid', 'His penguins have built themselves a PALACE of ice past the Muck Forest, through the deep forest, north-east. Whatever rules it sits on a throne at the top.'],
     ['Astrid', 'Take this. Every bit of coin helps. Lars at the market sells lingonberry juice. It brings you back from almost anything.'],
   ],
-  astrid_2: [['Astrid', 'Jjorvic Palace, the penguins\' palace, is up the Frozen Path, north-east. Mind the slippery floors. Penguins love ice.']],
+  astrid_2: [['Astrid', 'Jjorvic Palace, the penguins\' palace, is through the deep forest, north-east, past the Muck Forest. Mind the slippery floors. Penguins love ice.']],
   astrid_3: [
     ['Astrid', 'The Thunder Rune! Walter carved that rune for the axe himself. Jontuka remembers who he is.'],
     ['Astrid', 'And the thunder woke the old runes. The seal on the Drowned Barrow in the north-west foothills has broken.'],
@@ -2714,7 +2748,7 @@ const JON = {
     cavern: 'A penguin PALACE. Fancy. Hate it.',
     subway: 'Subway! Smells like... subway.',
     forest: 'The Muck Forest. Nobody said muck. Somebody should have said muck.',
-    frozen: 'The Frozen Path! Cold as fjord, baby.',
+    frozen: 'The deep forest! The giant SAID we could. Cold as fjord in here, baby.',
     barrow: 'Hank\'s tomb. Be cool.',
     redeye: 'I don\'t like this. At all.',
     secret_cave: 'Fluffy\'s tunnel! Good boy.',
@@ -3344,7 +3378,7 @@ function musicFor() {
   if (G.scr.y === 1 && G.scr.x <= 1) return 'village';
   if (G.ents.some(e => e.type === 'giant' && e.alive)) return 'zep';   // Owen: more Led Zeppelin
   if (G.scr.y === 0 && G.scr.x === 1) return 'journey';   // the Muck Forest: don't stop choppin'
-  if (G.scr.y === 0 && G.scr.x >= 2) return 'cold';       // the Frozen Path and Storm Peak
+  if (G.scr.y === 0 && G.scr.x >= 2) return 'cold';       // the Deep Forest and Storm Peak
   return 'overworld';
 }
 
@@ -6287,7 +6321,7 @@ function readTablet(e) {
 
 // ---------------- world map page ----------------
 function markSeen() { if (G.mapId === 'overworld') setFlag(`seen:${G.scr.x},${G.scr.y}`); }
-const SCREEN_NAMES = { '0,0': 'Foothills', '1,0': 'Muck Forest', '2,0': 'Frozen Path', '3,0': 'Storm Peak', '0,1': 'Fjordvik', '1,1': 'Market', '2,1': 'Lake Jöntuka', '3,1': 'Volcano Road', '0,2': 'Fjord Coast', '1,2': 'Airstrip', '2,2': 'The Beach', '3,2': 'Graveyard' };
+const SCREEN_NAMES = { '0,0': 'Foothills', '1,0': 'Muck Forest', '2,0': 'Deep Forest', '3,0': 'Storm Peak', '0,1': 'Fjordvik', '1,1': 'Market', '2,1': 'Lake Jöntuka', '3,1': 'Volcano Road', '0,2': 'Fjord Coast', '1,2': 'Airstrip', '2,2': 'The Beach', '3,2': 'Graveyard' };
 function drawMapPage() {
   const s = G.save;
   R(0, 0, VW, VH, 'rgba(5,5,20,.92)'); drawPanel(8, 8, 240, 208);
@@ -6953,6 +6987,7 @@ function updateGiant(e, dt, dx, dy, d, mr) {
     if (e.t < 0.55) e.aim = { x: p.x, y: p.y };   // tracks you, then commits
     if (e.t > 0.9 && (e.t > 1.05 || onBeat(0.05))) { e.st = 'slam'; e.t = 0; slamClub(e); }
   } else if (e.st === 'slam') {
+    if (e.t > 0.25 && e.parleyAgain && !flag('giant_peace')) { giantParley(e, true); return; }
     if (e.t > 0.25) { e.st = 'stuck'; e.t = 0; floatText(e.x, e.y - 60, 'STUCK! CHOP!', '#ffd84a'); jonSay('giant_stuck', { force: true, face: 'excited', cooldown: 4 }); }
   } else if (e.st === 'stuck') {
     if (e.t > (e.hid ? 1.9 : 2.4) * bossWindow()) { e.st = 'stalk'; e.t = 0; Sound.play('clank'); }
@@ -6971,7 +7006,7 @@ function startGiantHide(e) {
   e.hid = true; e.hiding = true; e.hideT = 0; e.st = 'stalk'; e.t = 0;
   for (let i = 0; i < 24; i++) leaves(e.x + rnd(-24, 24), e.y + rnd(-40, 10), ['#58b840', '#2f7a2a', '#a8723a']);
   Sound.play('secret');
-  if (!flag('giant_lore')) { setFlag('giant_lore'); say([...STORY.giant_lore, ...STORY.giant_hide]); } else say(STORY.giant_hide);
+  say(STORY.giant_hide);
   // three trees sprout on the screen; one of them is him
   const spots = [];
   for (let tries = 0; tries < 200 && spots.length < 3; tries++) {
@@ -6996,6 +7031,8 @@ function revealGiant(e, x, y, found) {
   G.shake = 0.4; Sound.play('boss');
   floatText(x, y - 60, found ? 'FOUND HIM!' : 'HE\'S BACK', found ? '#ffd84a' : '#ff6b6b');
   if (found) jonSay('giant_found', { force: true, face: 'excited' });
+  if (flag('giant_peace')) return;
+  if (found) giantParley(e); else e.parleyAgain = true;   // Owen's page 8: once he's found, Owen says STOP
 }
 function updateGiantHide(e, dt) {
   e.hideT += dt;
@@ -7033,13 +7070,45 @@ function drawFakeTree(t) {
   if (img) ctx.drawImage(img, x - img.width / 2 + shiver, y - img.height + 8); else { R(x - 10, y - 26, 20, 26, '#2f7a2a'); R(x - 3, y - 6, 6, 12, '#6b4322'); }
 }
 function giantOnKill(e) {
-  G.ents = G.ents.filter(o => o.kind !== 'faketree');
   G.shake = 0.8; rumble(600, 1, 1);
-  // he falls: the log tiles become path, for good, and Jon gets his timber
+  giantLeavesPath();
+  say(STORY.giant_down, () => { writeSave(); checkRoomClear(); });
+}
+// either way he ends (beaten, or talked past) the log is off the path for good and snores beside it
+function giantLeavesPath() {
+  G.ents = G.ents.filter(o => o.kind !== 'faketree');
   const lx = 31;
   for (const yy of [5, 6]) if (tile(lx, yy) === 'o') { setTile(lx, yy, 's'); setFlag(`tile:overworld:${lx},${yy}:s`); leaves(lx * T + 8, yy * T + 8, ['#a8723a', '#6e4420', '#c89058']); }
   setFlag('log_chopped'); setFlag('giant_done');
-  say(STORY.giant_down, () => { writeSave(); checkRoomClear(); });
+  const d = MAPS.overworld.ents.find(o => o.t === 'sleeplog');
+  if (G.mapId === 'overworld' && d && !G.ents.some(o => o.kind === 'sleeplog')) { const s = makeEnt(d, d.at[0] * T + 8, d.at[1] * T + 8); if (s) G.ents.push(s); }
+}
+
+// ---------- Owen's page 8: "STOP!", the giant of the east, and Jon's idea ----------
+// Owen remembers the giants' war (north likes east), says stop, and talks his way past. The
+// answers come from the page; a wrong one sends the fight on until the club sticks again.
+function giantParley(e, again) {
+  e.parleyAgain = false; e.st = 'stuck'; e.t = -99;   // he holds still while they talk
+  const lines = again ? STORY.giant_again : [...(flag('giant_lore') ? [] : STORY.giant_lore), ...STORY.giant_stop];
+  setFlag('giant_lore');
+  say(lines, () => ask(STORY.giant_ask_who, ['The giant of the SOUTH sent us!', 'The giant of the EAST sent us!', 'Nobody. We\'re just lost.'], i => {
+    if (i !== 1) return giantResume(e, i === 0 ? STORY.giant_wrong_south : STORY.giant_wrong_nobody, i === 0);
+    say(STORY.giant_east, () => ask(STORY.giant_ask_why, ['Because he was bored.', 'Jon\'s idea: penguins invaded his luxurious apartment/townhome getaway.', 'Because penguins smell like fish.'],
+      j => j === 1 ? giantPeace(e) : giantResume(e, STORY.giant_wrong_why, false)));
+  }));
+}
+function giantResume(e, lines, angry) {
+  say(lines, () => { e.st = 'stalk'; e.t = 0; e.parleyAgain = true; if (angry) { e.warred = true; G.shake = 0.4; Sound.play('boss'); } });
+}
+function giantPeace(e) {
+  say(STORY.giant_peace, () => {
+    e.alive = false; G.ents = G.ents.filter(o => o !== e);
+    setFlag('giant_peace'); giantLeavesPath();
+    G.bossCard = { name: 'FOREST GIANT OF THE NORTH', sub: 'PEACE!', t: 0, life: 2.8 };
+    G.flash = 0.3; G.flashColor = '#fff'; G.shake = 0.5; Sound.play('secret'); rumble(400, 0.6, 0.6);
+    for (let i = 0; i < 24; i++) leaves(e.x + rnd(-24, 24), e.y + rnd(-40, 10), ['#58b840', '#a8e070', '#a8723a']);
+    jonXP(25); writeSave(); checkRoomClear();
+  });
 }
 
 // ---------- Owen's page 7: the blur, the time-out signal, and the giants' old war ----------
@@ -7896,7 +7965,7 @@ function objective() {
   if (!flag('exchanged') && !flag('d1done')) return 'Chapter 2: find the subway station south-west of the airstrip. Exchange your dollars for kroner.';
   if (flag('giant_woke') && !flag('log_chopped')) return 'Chapter 2: the log was the Forest Giant of the North. Dodge the club. When it sticks in the muck, chop him. Fire burns him.';
   if (!flag('log_chopped') && !flag('d1done')) return 'Chapter 2: take a taxi (or walk) to the Muck Forest. Trudge east. Something is in the way.';
-  if (!s.items.homing && !flag('d1done')) return 'Chapter 2: Jjorvic Palace is up the Frozen Path, east of the forest. Find the treasure behind the Penguin Knight.';
+  if (!s.items.homing && !flag('d1done')) return 'Chapter 2: Jjorvic Palace is through the deep forest, east of the Muck Forest. Find the treasure behind the Penguin Knight.';
   if (!flag('d1done')) return 'Chapter 2: destroy Jjorvic Palace. Whatever rules it sits on the throne at the top.';
   if (!flag('d2done')) {
     if (!s.items.dash) return 'Chapter 3: the Drowned Barrow has opened in the north-west foothills. Find what the Draugr Captain guards.';
@@ -8395,6 +8464,7 @@ const SCENE_NAMES = {
   'signs.sign_fjordvik': 'Sign: Fjordvik', 'signs.sign_beach': 'Sign: the beach', 'signs.sign_airstrip': 'Sign: the airstrip', 'signs.sign_cavern': 'Sign: Jjorvic Palace', 'signs.sign_tbane': 'Sign: the T-bane', 'signs.seal_peak': 'Sealed door: Storm Peak',
   'flight.4': 'Flight 364: refreshments', 'flight.5': 'Flight 364: landing', 'taxi_out.0': 'Taxi to the forest (1)', 'taxi_out.1': 'Taxi to the forest (2)',
   lion_wake: 'Peanut Butter Lion wakes up', lion_again: 'Peanut Butter Lion (again)', lion_down: 'Peanut Butter Lion melts', throne_riddle: 'The riddle in the throne', throne_riddle_right: 'Riddle solved',
+  giant_stop: 'Giant fight: STOP!', giant_east: 'Giant fight: the giant of the east sent us', giant_peace: 'Giant fight: Thou shall pass', giant_wrong_south: 'Giant fight: wrong answer (south)', giant_wrong_nobody: 'Giant fight: wrong answer (nobody)', giant_wrong_why: 'Giant fight: wrong reason', giant_again: 'Giant fight: trying again',
   baron_1: 'Meeting Baron Blubber', baron_trophy: "Baron Blubber's trophy", baron_dartboard: 'The Chilly dartboard', 'signs.sign_nopeng': 'Sign: NO PENGUINS',
 };
 const SCENE_ORDER = Object.keys(SCENE_NAMES);
@@ -8526,7 +8596,7 @@ function playLines(lines) {
   $('tab-ch4').addEventListener('click', () => { SCRIPT.tab = 'ch4'; renderScript(); });
   $('tab-notebook').addEventListener('click', () => { SCRIPT.tab = 'notebook'; renderScript(); });
   const dl = document.createElement('datalist'); dl.id = 'speakers';
-  dl.innerHTML = ['Owen', 'Jon', 'Astrid', 'Hank', 'Fluffy', 'Walter', 'Chilly', 'Lars', 'Sven', 'Bjarne', 'Ingrid', 'Penguin King', 'Forest Giant', 'Baron Blubber'].map(n => `<option value="${n}">`).join('');
+  dl.innerHTML = ['Owen', 'Jon', 'Astrid', 'Hank', 'Fluffy', 'Walter', 'Chilly', 'Lars', 'Sven', 'Bjarne', 'Ingrid', 'Penguin King', 'Forest Giant', 'Baron Blubber', 'Knörvic'].map(n => `<option value="${n}">`).join('');
   document.body.appendChild(dl);
 })();
 
@@ -9548,25 +9618,31 @@ function updateChoice(dt) {
   if (just('up')) { c.sel = (c.sel + c.opts.length - 1) % c.opts.length; Sound.play('menu'); }
   let pickI = null;
   if (c.t > 0.25 && just('a')) pickI = c.sel;
-  if (c.t > 0.25 && just('tap') && G.tapY !== undefined) { const row = Math.floor((G.tapY * VH - CHOICE_Y0) / 14); if (row >= 0 && row < c.opts.length) pickI = row; }
+  if (c.t > 0.25 && just('tap') && G.tapY !== undefined) { const ty = G.tapY * VH, row = choiceRows(c).find(r => ty >= r.y - 10 && ty < r.y - 10 + r.h); if (row) pickI = row.i; }
   if (c.t > 0.25 && just('b')) pickI = -1;
   if (pickI === null) return;
   G.choice = null; G.state = 'play'; Sound.play('menu');
   c.cb(pickI);
 }
+// long answers wrap onto a second line, so each option is one or more rows of text
 const CHOICE_Y0 = 104;
+function choiceRows(c) {
+  let y = CHOICE_Y0 + 6;
+  return c.opts.map((o, i) => { const lines = wrap(o, 168), r = { i, lines, y, h: lines.length * 11 + 3 }; y += r.h; return r; });
+}
 function drawChoice() {
   const c = G.choice; if (!c) return;
   ctx.globalAlpha = 0.55; R(0, 0, VW, VH, '#000'); ctx.globalAlpha = 1;
   drawPaper(22, 30, 212, 60, -0.01);
   const lines = wrap(c.prompt, 176);
   lines.slice(0, 3).forEach((l, i) => text(l, 44, 50 + i * 12, INK, 'left', false));
-  drawPanel(40, CHOICE_Y0 - 8, 176, c.opts.length * 14 + 10);
-  c.opts.forEach((o, i) => {
-    const y = CHOICE_Y0 + i * 14 + 6, on = i === c.sel;
-    if (on) { R(46, y - 9, 164, 13, 'rgba(255,216,74,.18)'); text('▶', 52, y, '#ffd84a', 'left', false); }
-    text(o, 66, y, on ? '#ffd84a' : '#f6f0dc', 'left', true);
-  });
+  const rows = choiceRows(c), last = rows[rows.length - 1];
+  drawPanel(24, CHOICE_Y0 - 8, 208, last.y + last.h - CHOICE_Y0 + 6);
+  for (const r of rows) {
+    const on = r.i === c.sel;
+    if (on) { R(30, r.y - 9, 196, r.h, 'rgba(255,216,74,.18)'); text('▶', 36, r.y, '#ffd84a', 'left', false); }
+    r.lines.forEach((l, k) => text(l, 50, r.y + k * 11, on ? '#ffd84a' : '#f6f0dc', 'left', true));
+  }
 }
 
 // ---------------- Q43: Chilly's arch-enemy, Baron Blubber, and his sauna ----------------
@@ -9837,11 +9913,11 @@ function render() {
   if (G.bannerT > 0) { R(0, 92, VW, 34, 'rgba(0,0,0,.8)'); text(G.banner, VW / 2, 113, '#ffd84a', 'center'); }
   if (G.photoCard && G.state === 'talk') drawPhoto(G.photoCard, 128, 82, 104, 118, -0.04);
   if (G.state === 'talk') drawTalk();
-  if (G.state === 'choice') drawChoice();
   if (G.state === 'menu') { if (G.menuPage === 5) drawBagPage(); else if (G.menuPage === 4) drawSpellsPage(); else if (G.menuPage === 3) drawJukebox(); else if (G.menuPage === 2) drawMapPage(); else if (G.menuPage) drawJonPage(); else drawMenu(); drawMenuTabs(G.menuPage || 0); }
   drawBossCard(); drawCombo();
   drawJonLevel(); drawLevelBurst();
   drawChapterCard();
+  if (G.state === 'choice') drawChoice();
   drawArenaMenus();
   if (G.state === 'over') {
     R(0, 0, VW, VH, 'rgba(40,0,0,.8)');

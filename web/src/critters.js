@@ -380,25 +380,31 @@ function updateChoice(dt) {
   if (just('up')) { c.sel = (c.sel + c.opts.length - 1) % c.opts.length; Sound.play('menu'); }
   let pickI = null;
   if (c.t > 0.25 && just('a')) pickI = c.sel;
-  if (c.t > 0.25 && just('tap') && G.tapY !== undefined) { const row = Math.floor((G.tapY * VH - CHOICE_Y0) / 14); if (row >= 0 && row < c.opts.length) pickI = row; }
+  if (c.t > 0.25 && just('tap') && G.tapY !== undefined) { const ty = G.tapY * VH, row = choiceRows(c).find(r => ty >= r.y - 10 && ty < r.y - 10 + r.h); if (row) pickI = row.i; }
   if (c.t > 0.25 && just('b')) pickI = -1;
   if (pickI === null) return;
   G.choice = null; G.state = 'play'; Sound.play('menu');
   c.cb(pickI);
 }
+// long answers wrap onto a second line, so each option is one or more rows of text
 const CHOICE_Y0 = 104;
+function choiceRows(c) {
+  let y = CHOICE_Y0 + 6;
+  return c.opts.map((o, i) => { const lines = wrap(o, 168), r = { i, lines, y, h: lines.length * 11 + 3 }; y += r.h; return r; });
+}
 function drawChoice() {
   const c = G.choice; if (!c) return;
   ctx.globalAlpha = 0.55; R(0, 0, VW, VH, '#000'); ctx.globalAlpha = 1;
   drawPaper(22, 30, 212, 60, -0.01);
   const lines = wrap(c.prompt, 176);
   lines.slice(0, 3).forEach((l, i) => text(l, 44, 50 + i * 12, INK, 'left', false));
-  drawPanel(40, CHOICE_Y0 - 8, 176, c.opts.length * 14 + 10);
-  c.opts.forEach((o, i) => {
-    const y = CHOICE_Y0 + i * 14 + 6, on = i === c.sel;
-    if (on) { R(46, y - 9, 164, 13, 'rgba(255,216,74,.18)'); text('▶', 52, y, '#ffd84a', 'left', false); }
-    text(o, 66, y, on ? '#ffd84a' : '#f6f0dc', 'left', true);
-  });
+  const rows = choiceRows(c), last = rows[rows.length - 1];
+  drawPanel(24, CHOICE_Y0 - 8, 208, last.y + last.h - CHOICE_Y0 + 6);
+  for (const r of rows) {
+    const on = r.i === c.sel;
+    if (on) { R(30, r.y - 9, 196, r.h, 'rgba(255,216,74,.18)'); text('▶', 36, r.y, '#ffd84a', 'left', false); }
+    r.lines.forEach((l, k) => text(l, 50, r.y + k * 11, on ? '#ffd84a' : '#f6f0dc', 'left', true));
+  }
 }
 
 // ---------------- Q43: Chilly's arch-enemy, Baron Blubber, and his sauna ----------------

@@ -60,20 +60,20 @@ OW[(1, 0)] = [  # Muck Forest (Owen's page 5): muck and grime, tall grass, and t
     "TT,,b,,,,,,,,,,T",
     "TTTTTT,s,,TTTTTT",
 ]
-OW[(2, 0)] = [  # Frozen Path: Penguin Palace (chapter 2); only reached past the log
-    "TTTTTTTTTTTTTTTT",
+OW[(2, 0)] = [  # The Deep Forest (Owen's page 8: "Thou shall pass into the deep forest"): thick woods
+    "TTTTTTTTTTTTTTTT",  # thinning to snow under the glacier where Jjorvic Palace is carved; only reached past the giant
     "TMMMMMMMMMMMMMMT",
     "TMMMMMMEMMMMMMMT",
     "Tnnnnnnsnnnnnn#T",
-    "TnTnnnnsnnnnnnnT",
-    "nnnnnnnsnnnTnnnn",
-    "sssssssssnnnnnnn",
-    "nnnnnnnsnnnnnnnn",
-    "nnTnnnnsnnnn#nnn",
-    "Tnnnnnnsnnnnnn#T",
-    "Tnn#nnnsnnnTnnnT",
-    "TnnnnnnsnnnnnnnT",
-    "TnnnnnTsnnnnnnnT",
+    "TnTnnnnsnnnTnnnT",
+    ",.TT.,.s,nnnnnnn",
+    "sssssssss,,nnnnn",
+    ".,T..T.sT,.,nnnn",
+    "TT.,TT.s.TT,..nn",
+    "T.T.T,.s,T.T,.nT",
+    "TT,..T.s.,TT..,T",
+    "T,.T..,s.T.,T.TT",
+    "TT.T,TTsTT.T,T.T",
     "TTTTTTTTTTTTTTTT",
 ]
 OW[(3, 0)] = [  # Storm Peak base: sealed (dungeon 4)
@@ -124,7 +124,7 @@ OW[(1, 1)] = [  # Fjordvik market: Lars's stall
     "T.......s......T",
     "TTTTTT.s..TTTTTT",
 ]
-OW[(2, 1)] = [  # Lake Jontuka, north shore (cliffs to the north; the Frozen Path is only reached through the Muck Forest)
+OW[(2, 1)] = [  # Lake Jontuka, north shore (cliffs to the north; the Deep Forest is only reached through the Muck Forest)
     "TTTTTTTTTTTTTTTT",
     "T.....ss.......T",
     "T....ssssss....T",
@@ -684,9 +684,9 @@ for e in OW_ENT:
     x, y = e["at"]
     ok = any((x + dx, y + dy) in ow_seen for dx, dy in ((0, 0), (1, 0), (-1, 0), (0, 1), (0, -1)))
     assert ok, ("overworld unreachable", e)
-# Owen's log is the only way to the Frozen Path and Storm Peak
+# Owen's log (the giant) is the only way to the Deep Forest and Storm Peak
 no_log = reachable(ow, OW_ENT[0]["at"])
-assert tuple(P(2, 0, 7, 3)) not in no_log, "the Frozen Path must need the log chopped"
+assert tuple(P(2, 0, 7, 3)) not in no_log, "the Deep Forest must need the giant to let you pass"
 assert tuple(P(3, 0, 7, 3)) not in no_log, "Storm Peak must need the log chopped"
 assert tuple(P(1, 0, 14, 6)) in no_log, "you must be able to walk up to the log"
 cav_seen = reachable(cav, P(1, 3, 7, 12))

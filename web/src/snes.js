@@ -211,7 +211,7 @@ function readTablet(e) {
 
 // ---------------- world map page ----------------
 function markSeen() { if (G.mapId === 'overworld') setFlag(`seen:${G.scr.x},${G.scr.y}`); }
-const SCREEN_NAMES = { '0,0': 'Foothills', '1,0': 'Muck Forest', '2,0': 'Frozen Path', '3,0': 'Storm Peak', '0,1': 'Fjordvik', '1,1': 'Market', '2,1': 'Lake Jöntuka', '3,1': 'Volcano Road', '0,2': 'Fjord Coast', '1,2': 'Airstrip', '2,2': 'The Beach', '3,2': 'Graveyard' };
+const SCREEN_NAMES = { '0,0': 'Foothills', '1,0': 'Muck Forest', '2,0': 'Deep Forest', '3,0': 'Storm Peak', '0,1': 'Fjordvik', '1,1': 'Market', '2,1': 'Lake Jöntuka', '3,1': 'Volcano Road', '0,2': 'Fjord Coast', '1,2': 'Airstrip', '2,2': 'The Beach', '3,2': 'Graveyard' };
 function drawMapPage() {
   const s = G.save;
   R(0, 0, VW, VH, 'rgba(5,5,20,.92)'); drawPanel(8, 8, 240, 208);

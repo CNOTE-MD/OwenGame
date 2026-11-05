@@ -90,6 +90,7 @@ const SCENE_NAMES = {
   'signs.sign_fjordvik': 'Sign: Fjordvik', 'signs.sign_beach': 'Sign: the beach', 'signs.sign_airstrip': 'Sign: the airstrip', 'signs.sign_cavern': 'Sign: Jjorvic Palace', 'signs.sign_tbane': 'Sign: the T-bane', 'signs.seal_peak': 'Sealed door: Storm Peak',
   'flight.4': 'Flight 364: refreshments', 'flight.5': 'Flight 364: landing', 'taxi_out.0': 'Taxi to the forest (1)', 'taxi_out.1': 'Taxi to the forest (2)',
   lion_wake: 'Peanut Butter Lion wakes up', lion_again: 'Peanut Butter Lion (again)', lion_down: 'Peanut Butter Lion melts', throne_riddle: 'The riddle in the throne', throne_riddle_right: 'Riddle solved',
+  giant_stop: 'Giant fight: STOP!', giant_east: 'Giant fight: the giant of the east sent us', giant_peace: 'Giant fight: Thou shall pass', giant_wrong_south: 'Giant fight: wrong answer (south)', giant_wrong_nobody: 'Giant fight: wrong answer (nobody)', giant_wrong_why: 'Giant fight: wrong reason', giant_again: 'Giant fight: trying again',
   baron_1: 'Meeting Baron Blubber', baron_trophy: "Baron Blubber's trophy", baron_dartboard: 'The Chilly dartboard', 'signs.sign_nopeng': 'Sign: NO PENGUINS',
 };
 const SCENE_ORDER = Object.keys(SCENE_NAMES);
@@ -221,7 +222,7 @@ function playLines(lines) {
   $('tab-ch4').addEventListener('click', () => { SCRIPT.tab = 'ch4'; renderScript(); });
   $('tab-notebook').addEventListener('click', () => { SCRIPT.tab = 'notebook'; renderScript(); });
   const dl = document.createElement('datalist'); dl.id = 'speakers';
-  dl.innerHTML = ['Owen', 'Jon', 'Astrid', 'Hank', 'Fluffy', 'Walter', 'Chilly', 'Lars', 'Sven', 'Bjarne', 'Ingrid', 'Penguin King', 'Forest Giant', 'Baron Blubber'].map(n => `<option value="${n}">`).join('');
+  dl.innerHTML = ['Owen', 'Jon', 'Astrid', 'Hank', 'Fluffy', 'Walter', 'Chilly', 'Lars', 'Sven', 'Bjarne', 'Ingrid', 'Penguin King', 'Forest Giant', 'Baron Blubber', 'Knörvic'].map(n => `<option value="${n}">`).join('');
   document.body.appendChild(dl);
 })();
 
