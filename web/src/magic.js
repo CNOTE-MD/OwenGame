@@ -171,7 +171,7 @@ function drawBagPage() {
   R(0, 0, VW, VH, 'rgba(5,5,20,.92)'); drawPanel(8, 8, 240, 208);
   text('◀ SPELLS', 20, 26, '#8a8ab0', 'left', false); text('BAG', 128, 26, '#ffe64d', 'center'); text('GEAR ▶', 236, 26, '#8a8ab0', 'right', false);
   text(`Hearts ${Math.ceil(G.player.hp / 2)}/${G.save.maxHp / 2}   Kroner ${G.save.kr}`, 20, 46, '#f2ebcc', 'left', false);
-  if (!list.length) text('Empty. Lars sells salmon. Chests hide charms.', 20, 70, '#55577a', 'left', false);
+  if (!list.length) { text('Empty.', 20, 70, '#8a8ab0', 'left', false); text('Lars sells salmon at the market.', 20, 84, '#8a8ab0', 'left', false); text('Chests hide charms.', 20, 96, '#8a8ab0', 'left', false); }
   list.forEach((e, i) => {
     const y = 66 + i * 24, sel = i === (G.bagSel || 0);
     if (sel) R(18, y - 11, 220, 23, '#232860');

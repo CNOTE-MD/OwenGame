@@ -851,13 +851,6 @@ const MAPS = {
 ]
 },
 {
-"t": "slime",
-"at": [
-28,
-10
-]
-},
-{
 "t": "beetle",
 "at": [
 52,
@@ -1285,15 +1278,15 @@ const MAPS = {
 {
 "t": "draugr",
 "at": [
-20,
-8
+35,
+9
 ]
 },
 {
 "t": "wisp",
 "at": [
-27,
-10
+44,
+8
 ]
 },
 {
@@ -6755,7 +6748,7 @@ function drawBagPage() {
   R(0, 0, VW, VH, 'rgba(5,5,20,.92)'); drawPanel(8, 8, 240, 208);
   text('◀ SPELLS', 20, 26, '#8a8ab0', 'left', false); text('BAG', 128, 26, '#ffe64d', 'center'); text('GEAR ▶', 236, 26, '#8a8ab0', 'right', false);
   text(`Hearts ${Math.ceil(G.player.hp / 2)}/${G.save.maxHp / 2}   Kroner ${G.save.kr}`, 20, 46, '#f2ebcc', 'left', false);
-  if (!list.length) text('Empty. Lars sells salmon. Chests hide charms.', 20, 70, '#55577a', 'left', false);
+  if (!list.length) { text('Empty.', 20, 70, '#8a8ab0', 'left', false); text('Lars sells salmon at the market.', 20, 84, '#8a8ab0', 'left', false); text('Chests hide charms.', 20, 96, '#8a8ab0', 'left', false); }
   list.forEach((e, i) => {
     const y = 66 + i * 24, sel = i === (G.bagSel || 0);
     if (sel) R(18, y - 11, 220, 23, '#232860');
@@ -6971,6 +6964,7 @@ function wakeGiant(x, y) {
 function updateGiant(e, dt, dx, dy, d, mr) {
   const p = G.player;
   if (e.st === 'intro') { if (G.state === 'play') { e.st = 'stalk'; e.t = 0; e.fightT = 0; } return; }
+  for (const o of G.ents) if (o.enemy && o.alive && !o.boss) o.fear = 1;   // everything else in the forest runs from him
   if (giantPage7(e, dt)) return;
   if (e.hiding) { updateGiantHide(e, dt); return; }
   if (!e.hid && e.hp <= 6) { startGiantHide(e); return; }
@@ -8007,7 +8001,7 @@ function drawMenu() {
   });
   const sq = (n, start, done) => flag(start) ? n + (flag(done) ? ' ✓' : ' …') : null;
   const side = [sq('Bjarne', 'quest_bjarne', 'bjarne_done'), sq('Sven', 'quest_sven', 'sven_done')].filter(Boolean);
-  text('Heart pieces ' + s.pieces + '/4', 20, 140, '#f2ebcc');
+  text('Next heart: ' + s.pieces + '/4 pieces', 20, 140, '#f2ebcc');
   text('Voodoo bond ' + (s.voodoo ? 'ready' : 'used'), 20, 151, s.voodoo ? '#9be08a' : '#c9a0f0');
   if (side.length) text('Side quests ' + side.join('  '), 20, 162, '#c8e8ff', 'left', false);
   text(Sound.muted ? 'M sound off' : 'M sound on', 236, 140, '#8a8ab0', 'right', false);
@@ -9412,7 +9406,7 @@ function updateLion(e, dt, dx, dy, d, mr) {
       if (e.t > (big ? 1.8 : 1.1)) { e.t = 0; e.n = (e.n || 0) + 1; if (e.n % 3 === 0) e.st = 'roar'; else { e.st = 'crouch'; e.aim = { x: p.x, y: p.y }; } }
       break; }
     case 'crouch':
-      if (e.t < 0.35) e.aim = { x: p.x, y: p.y };
+      if (e.t < 0.2) e.aim = { x: p.x, y: p.y };   // commits early, so a moving Owen gets clear
       e.fx = Math.sign(e.aim.x - e.x) || e.fx;
       if (e.t > 0.65 * (isEasy() ? 1.25 : 1)) { e.st = 'pounce'; e.t = 0; e.from = { x: e.x, y: e.y }; e.to = lionLanding(e); Sound.play('charge'); }
       break;
@@ -9423,7 +9417,7 @@ function updateLion(e, dt, dx, dy, d, mr) {
       if (k >= 1) {
         e.z = 0; e.st = 'stuck'; e.t = 0; G.shake = big ? 0.35 : 0.2; Sound.play('clank');
         CR.puddles.push({ x: e.x, y: e.y + 4, r: big ? 20 : 13, t: 0, life: 9 });
-        if (dist(e, p) < (big ? 26 : 18) && !(p.dashing > 0)) hurtPlayer(big ? 2 : 1, e);
+        if (dist(e, p) < (big ? 22 : 15) && !(p.dashing > 0)) hurtPlayer(big ? 2 : 1, e);
         floatText(e.x, e.y - (big ? 44 : 26), 'STUCK!', '#fadca0');
       }
       break; }
@@ -9720,7 +9714,7 @@ drawThing = function (e) {
   return _drawThing(e);
 };
 const _groundSpeed = groundSpeed;
-groundSpeed = p => _groundSpeed(p) * (CR.puddles.length && inPeanutButter(p) ? 0.45 : 1);
+groundSpeed = p => _groundSpeed(p) * (CR.puddles.length && inPeanutButter(p) ? 0.6 : 1);
 const _updateShots = updateShots;
 updateShots = function (dt) { _updateShots(dt); updateCritterWorld(dt); };
 const _drawShots = drawShots;
@@ -9920,11 +9914,13 @@ function render() {
   if (G.state === 'choice') drawChoice();
   drawArenaMenus();
   if (G.state === 'over') {
-    R(0, 0, VW, VH, 'rgba(40,0,0,.8)');
-    text('GAME OVER', VW / 2, 96, '#ff6b6b', 'center');
-    text('Even zombies need a nap.', VW / 2, 116, '#fff', 'center');
-    text('Press Z to continue', VW / 2, 140, '#ffd84a', 'center');
-    text('from your last runestone', VW / 2, 154, '#ffd84a', 'center');
+    R(0, 0, VW, VH, 'rgba(24,0,6,.86)');
+    drawPanel(28, 62, 200, 108);
+    text('GAME OVER', VW / 2, 92, '#ff6b6b', 'center', 'outline', 2);
+    text('Even zombies need a nap.', VW / 2, 112, '#f6f0dc', 'center', true);
+    drawJonSprite(VW / 2, 128, Math.sin(G.t * 2) * 0.15, false, 'worried');
+    text('Tap or press Z to continue', VW / 2, 150, '#ffd84a', 'center', true);
+    text('from your last runestone', VW / 2, 162, '#ffd84a', 'center', true);
   }
 }
 

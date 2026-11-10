@@ -181,11 +181,13 @@ function render() {
   if (G.state === 'choice') drawChoice();
   drawArenaMenus();
   if (G.state === 'over') {
-    R(0, 0, VW, VH, 'rgba(40,0,0,.8)');
-    text('GAME OVER', VW / 2, 96, '#ff6b6b', 'center');
-    text('Even zombies need a nap.', VW / 2, 116, '#fff', 'center');
-    text('Press Z to continue', VW / 2, 140, '#ffd84a', 'center');
-    text('from your last runestone', VW / 2, 154, '#ffd84a', 'center');
+    R(0, 0, VW, VH, 'rgba(24,0,6,.86)');
+    drawPanel(28, 62, 200, 108);
+    text('GAME OVER', VW / 2, 92, '#ff6b6b', 'center', 'outline', 2);
+    text('Even zombies need a nap.', VW / 2, 112, '#f6f0dc', 'center', true);
+    drawJonSprite(VW / 2, 128, Math.sin(G.t * 2) * 0.15, false, 'worried');
+    text('Tap or press Z to continue', VW / 2, 150, '#ffd84a', 'center', true);
+    text('from your last runestone', VW / 2, 162, '#ffd84a', 'center', true);
   }
 }
 

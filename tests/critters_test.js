@@ -75,7 +75,7 @@ const path = require('path');
   await ev(() => { const l = G.ents.find(o => o.type === 'pblion'); l.flash = 0; damageEnemy(l, 1, G.player, 'swing'); });
   await check('stuck, it takes full damage', Math.abs((await one('pblion')).hp - 12) < 1e-9);
   await ev(() => { const q = CR.puddles[0]; G.player.x = q.x; G.player.y = q.y - 4; });
-  await check('peanut butter puddles slow Owen down', await ev(() => groundSpeed(G.player) < 0.6));
+  await check('peanut butter puddles slow Owen down', await ev(() => groundSpeed(G.player) < 0.7));
   await ev(() => { const l = G.ents.find(o => o.type === 'pblion'); l.hp = 7; l.st = 'prowl'; });
   await wait(100); await talkThrough();
   await check('at half health it melts down to a cub', (await one('pblion')).cub);

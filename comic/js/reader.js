@@ -6,7 +6,7 @@
 function panelSVG(p) {
   DEFS = [];
   const [W, H] = p.vb;
-  LETTER_MIN = W >= 600 ? 21 : 15;
+  LETTER_MIN = W >= 600 ? 21 : 18;
   let body = '';
   const frames = p.frames ? p.frames.map(f => ({ d: typeof f.d === 'function' ? f.d(W, H) : f.d, art: f.art })) : [{ d: `M0,0 H${W} V${H} H0Z`, art: p.art }];
   for (const f of frames) {

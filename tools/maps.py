@@ -276,7 +276,7 @@ OW_ENT = [
     {"t": "chest", "id": "c_leaf", "at": P(1, 0, 2, 12), "item": "leaf", "needs": "giant_done"},
     {"t": "varg", "at": P(0, 0, 12, 8)},
     {"t": "log", "id": "biglog", "at": P(1, 0, 15, 5)},
-    {"t": "varg", "at": P(1, 0, 6, 3)}, {"t": "varg", "at": P(1, 0, 11, 8)}, {"t": "slime", "at": P(1, 0, 4, 7)}, {"t": "slime", "at": P(1, 0, 12, 10)},
+    {"t": "varg", "at": P(1, 0, 6, 3)}, {"t": "varg", "at": P(1, 0, 11, 8)}, {"t": "slime", "at": P(1, 0, 4, 7)},
     {"t": "beetle", "at": P(3, 0, 4, 9)}, {"t": "beetle", "at": P(3, 2, 3, 3)},
     {"t": "tablet", "id": "tab_coast", "at": P(0, 2, 2, 3)},
     {"t": "tablet", "id": "tab_hills", "at": P(0, 0, 13, 11)},
@@ -322,7 +322,7 @@ OW_ENT = [
     {"t": "penguin", "at": P(2, 2, 5, 3)}, {"t": "penguin", "at": P(2, 2, 10, 4)}, {"t": "penguin", "at": P(2, 2, 7, 8)},
     {"t": "snowpeng", "at": P(2, 0, 4, 7)}, {"t": "penguin", "at": P(2, 0, 12, 9)},
     {"t": "snowpeng", "at": P(3, 0, 10, 6)}, {"t": "wisp", "at": P(3, 0, 5, 10)}, {"t": "snowpeng", "at": P(3, 0, 3, 11)},
-    {"t": "draugr", "at": P(1, 0, 4, 8)}, {"t": "wisp", "at": P(1, 0, 11, 10)},
+    {"t": "draugr", "at": P(2, 0, 3, 9)}, {"t": "wisp", "at": P(2, 0, 12, 8)},   # moved out of the Muck Forest into the deep forest
     {"t": "draugr", "at": P(3, 2, 4, 5)}, {"t": "draugr", "at": P(3, 2, 11, 9)}, {"t": "wisp", "at": P(3, 2, 7, 11)},
     {"t": "wisp", "at": P(0, 0, 10, 9)}, {"t": "penguin", "at": P(0, 0, 4, 11)},
     {"t": "draugr", "at": P(3, 1, 9, 9)}, {"t": "wisp", "at": P(3, 1, 4, 3)},

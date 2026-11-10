@@ -174,7 +174,7 @@ function updateLion(e, dt, dx, dy, d, mr) {
       if (e.t > (big ? 1.8 : 1.1)) { e.t = 0; e.n = (e.n || 0) + 1; if (e.n % 3 === 0) e.st = 'roar'; else { e.st = 'crouch'; e.aim = { x: p.x, y: p.y }; } }
       break; }
     case 'crouch':
-      if (e.t < 0.35) e.aim = { x: p.x, y: p.y };
+      if (e.t < 0.2) e.aim = { x: p.x, y: p.y };   // commits early, so a moving Owen gets clear
       e.fx = Math.sign(e.aim.x - e.x) || e.fx;
       if (e.t > 0.65 * (isEasy() ? 1.25 : 1)) { e.st = 'pounce'; e.t = 0; e.from = { x: e.x, y: e.y }; e.to = lionLanding(e); Sound.play('charge'); }
       break;
@@ -185,7 +185,7 @@ function updateLion(e, dt, dx, dy, d, mr) {
       if (k >= 1) {
         e.z = 0; e.st = 'stuck'; e.t = 0; G.shake = big ? 0.35 : 0.2; Sound.play('clank');
         CR.puddles.push({ x: e.x, y: e.y + 4, r: big ? 20 : 13, t: 0, life: 9 });
-        if (dist(e, p) < (big ? 26 : 18) && !(p.dashing > 0)) hurtPlayer(big ? 2 : 1, e);
+        if (dist(e, p) < (big ? 22 : 15) && !(p.dashing > 0)) hurtPlayer(big ? 2 : 1, e);
         floatText(e.x, e.y - (big ? 44 : 26), 'STUCK!', '#fadca0');
       }
       break; }
@@ -482,7 +482,7 @@ drawThing = function (e) {
   return _drawThing(e);
 };
 const _groundSpeed = groundSpeed;
-groundSpeed = p => _groundSpeed(p) * (CR.puddles.length && inPeanutButter(p) ? 0.45 : 1);
+groundSpeed = p => _groundSpeed(p) * (CR.puddles.length && inPeanutButter(p) ? 0.6 : 1);
 const _updateShots = updateShots;
 updateShots = function (dt) { _updateShots(dt); updateCritterWorld(dt); };
 const _drawShots = drawShots;

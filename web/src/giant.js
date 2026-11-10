@@ -43,6 +43,7 @@ function wakeGiant(x, y) {
 function updateGiant(e, dt, dx, dy, d, mr) {
   const p = G.player;
   if (e.st === 'intro') { if (G.state === 'play') { e.st = 'stalk'; e.t = 0; e.fightT = 0; } return; }
+  for (const o of G.ents) if (o.enemy && o.alive && !o.boss) o.fear = 1;   // everything else in the forest runs from him
   if (giantPage7(e, dt)) return;
   if (e.hiding) { updateGiantHide(e, dt); return; }
   if (!e.hid && e.hp <= 6) { startGiantHide(e); return; }

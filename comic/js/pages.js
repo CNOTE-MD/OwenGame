@@ -124,7 +124,7 @@ page('Page 1: Get up, you oaf!', [
       let s = bedroom(W, H, { wx: 450 });
       s += bed(40, 270, 360);
       s += speedLines(150, 200, 40, 120, 18, INK, 5, 2);
-      s += G('translate(150 206) rotate(-80) scale(1.35)', owenHead({ ex: 'shock' }));
+      s += G('translate(150 206) rotate(-80) scale(1.35)', owenHead({ ex: 'shock', zombie: true }));
       s += motionLines(520, 150, 140, 80, 9, -25, '#ffffff', 4);
       s += axe({ x: 470, y: 200, s: 1.05, rot: -25, face: 'yell', aura: '#5fe8ff' });
       return s;
@@ -135,7 +135,7 @@ page('Page 1: Get up, you oaf!', [
     vb: [420, 420], alt: 'Owen sits up, bleary, while Jon grins beside him.',
     art: (W, H) => {
       let s = bedroom(W, H, { wx: 250 });
-      s += owenBust({ x: 140, y: 350, s: 1.6, ex: 'tired', look: [1, 0] });
+      s += owenBust({ x: 140, y: 350, s: 1.6, ex: 'tired', zombie: true, look: [1, 0] });
       s += P('M0,330 Q140,300 300,340 L300,420 L0,420Z', '#3a5ab8', 3.5) + PF('M0,330 Q140,300 300,340 L300,420 L0,420Z', 'url(#hatch)', 'opacity=".3"');
       s += axe({ x: 320, y: 270, s: 0.95, rot: 12, face: 'grin', aura: '#5fe8ff' });
       s += sfx('Z', 60, 200, 30, { fill: '#bfe8ff', rot: -10 }) + sfx('z', 90, 170, 22, { fill: '#bfe8ff', rot: -10 });
@@ -153,7 +153,7 @@ page('Page 1: Get up, you oaf!', [
       s += P('M120,190 L230,190 L224,250 L126,250Z', '#f4eedb', 3) + textBlock(['RUSH E'], 175, 210, 18, 18, BANG_FONT, INK, 400) + [224, 232, 240].map(y => L(132, y, 218, y, 1.2)).join('');
       s += axe({ x: 210, y: 210, s: 0.85, rot: -40, face: 'sing', aura: '#ffe14a' });
       s += musicNote(70, 170, 1, '#ffe14a', -10) + musicNote(320, 120, 0.8, '#5fe8ff', 12) + musicNote(110, 90, 0.7, '#ffffff', -20) + musicNote(360, 220, 0.9, '#ffe14a', 8);
-      s += owenBust({ x: 370, y: 430, s: 0.9, ex: 'annoyed', flip: true });
+      s += owenBust({ x: 370, y: 430, s: 0.9, ex: 'annoyed', zombie: true, flip: true });
       return s;
     },
     text: (W) => caption({ x: 12, y: 12, w: 396, t: "If you think that's weird, just know that he can recite Rush E note for note, from memory.", size: FH }) + sfx('PLINKA-PLINK-PLINK!', 170, 380, 34, { fill: '#5fe8ff', rot: -6 }),
@@ -229,7 +229,7 @@ page('Page 2: TA DA!', [
       for (let i = 0; i < 9; i++) s += P(`M${40 + i * 70},${60 + i * 30} L${110 + i * 70},${60 + i * 30} L${110 + i * 70},${H} L${40 + i * 70},${H}Z`, i % 2 ? '#7a4418' : '#8a5428', 3);
       s += L(20, 30, W, 300, 6, '#5a3418') + Array.from({ length: 9 }, (_, i) => L(60 + i * 70, 40 + i * 30, 60 + i * 70, 0, 4, '#5a3418')).join('');
       s += motionLines(60, 80, 220, 120, 10, 22, '#ffffff', 5);
-      s += owen({ x: 300, y: 200, s: 0.95, pose: 'run', ex: 'shock', rot: 22, shadow: false });
+      s += owen({ x: 300, y: 200, s: 0.95, pose: 'run', ex: 'shock', zombie: true, rot: 22, shadow: false });
       s += axe({ x: 430, y: 200, s: 0.75, rot: 70, face: 'excited', aura: '#ffe14a' });
       s += P('M378,124 Q404,140 420,170', 'none', 4);
       return s;
@@ -253,14 +253,14 @@ page('Page 2: TA DA!', [
       s += axe({ x: 560, y: 120, s: 0.9, rot: 28, face: 'excited', aura: '#5fe8ff' });
       return s;
     },
-    pop: (W, H) => owenBust({ x: 70, y: 470, s: 1.25, ex: 'shock', look: [1, -0.3] }),
+    pop: (W, H) => owenBust({ x: 70, y: 470, s: 1.25, ex: 'shock', zombie: true, look: [1, -0.3] }),
     text: (W) => balloon({ kind: 'yell', x: 330, y: 74, w: 230, t: 'TA DA!', tail: [500, 110], size: 52, seed: 21 }),
   }],
   [{
     vb: [420, 380], alt: 'Owen stares at the sign with an awkward smile. Jon waits.',
     art: (W, H) => {
       let s = Rect(0, 0, W, H, lin(['#7a4ab8', '#3a2a78'])) + halftoneRect(0, 0, W, H, 'htp', 0.5);
-      s += owenBust({ x: 190, y: 360, s: 2.1, ex: 'awk', look: [-0.4, 0] });
+      s += owenBust({ x: 190, y: 360, s: 2.1, ex: 'awk', zombie: true, look: [-0.4, 0] });
       s += P('M318,170 Q326,186 318,196 Q308,186 318,170Z', '#bfe8ff', 2.4);
       return s;
     },
@@ -270,7 +270,7 @@ page('Page 2: TA DA!', [
     art: (W, H) => {
       let s = Rect(0, 0, W, H, lin(['#2ad0d8', '#1a6a9a'])) + speedLines(260, 230, 30, 400, 30, '#ffffff', 6, 3) + halftoneRect(0, 0, W, H, 'htc', 0.4);
       s += axe({ x: 210, y: 300, s: 1.5, rot: 8, face: 'excited', aura: '#ffe14a' });
-      s += owenBust({ x: 380, y: 400, s: 0.95, ex: 'worried', flip: true });
+      s += owenBust({ x: 380, y: 400, s: 0.95, ex: 'worried', zombie: true, flip: true });
       return s;
     },
     text: (W) => balloon({ x: 140, y: 64, w: 220, t: 'Are you gonna put it in our room?!?', tail: [250, 170], size: FH + 2 }) + caption({ x: 12, y: 290, w: 270, t: "I wasn't sure how it fit in the house, much less my living room.", size: FH - 3, rot: 1 }) + balloon({ kind: 'whisper', x: 352, y: 296, w: 90, t: 'Um, sure...', tail: [386, 350], size: FH - 2 }),
@@ -279,7 +279,7 @@ page('Page 2: TA DA!', [
     vb: [420, 360], alt: 'Jon says they should get going. Owen asks, where exactly?',
     art: (W, H) => {
       let s = bedroom(W, H, { wx: 270 });
-      s += owen({ x: 120, y: 350, s: 1.15, pose: 'think', ex: 'annoyed', look: [1, -0.4] });
+      s += owen({ x: 120, y: 350, s: 1.15, pose: 'think', ex: 'annoyed', zombie: true, look: [1, -0.4] });
       s += axe({ x: 300, y: 230, s: 0.85, rot: -10, face: 'smug' });
       return s;
     },
@@ -299,7 +299,7 @@ page('Page 2: TA DA!', [
     art: (W, H) => {
       let s = Rect(0, 0, W, H, '#c0182b') + P(`M0,${H * 0.36} H${W} V${H * 0.64} H0Z`, '#ffffff', 0) + P(`M180,0 H300 V${H} H180Z`, '#ffffff', 0) + P(`M0,${H * 0.42} H${W} V${H * 0.58} H0Z`, '#1e2a8a', 0) + P(`M204,0 H276 V${H} H204Z`, '#1e2a8a', 0);
       s += speedLines(470, 200, 60, 600, 46, INK, 6, 21).replace(/<polygon/g, '<polygon opacity=".45"') + halftoneRect(0, 0, W, H, 'ht', 0.25);
-      s += owenBust({ x: 480, y: 360, s: 2.0, ex: 'scream', look: [0, -1] });
+      s += owenBust({ x: 480, y: 360, s: 2.0, ex: 'scream', zombie: true, look: [0, -1] });
       s += axe({ x: 110, y: 230, s: 0.85, rot: -20, face: 'excited', aura: '#ffe14a' });
       return s;
     },
@@ -415,7 +415,7 @@ page('Page 3: How I died', [
       s += owen({ x: 140, y: 440, s: 1.25, pose: 'swing', ex: 'yell', zombie: true, glowEyes: true, jon: { face: 'yell', rot: 30, aura: '#9dff6a' } });
       return s;
     },
-    text: (W) => caption({ x: 12, y: 10, w: 396, t: 'So, I got un-unalived and (with the help of Jon the flying, talking, and singing magical Viking axe)', size: FH - 2 }) + sfx('CHOP!', 320, 160, 60, { fill: '#ffe14a', rot: -10 }) + caption({ x: 196, y: 316, w: 214, t: 'I killed the penguin while he was shocked about me turning into an undead voodoo magic zombie on a lake beach in Norway.', size: FH - 6, rot: 1 }),
+    text: (W) => caption({ x: 12, y: 10, w: 396, t: 'So, I got un-unalived and (with the help of Jon the flying, talking, and singing magical Viking axe)', size: FH - 2 }) + sfx('CHOP!', 320, 160, 60, { fill: '#ffe14a', rot: -10 }) + caption({ x: 150, y: 330, w: 262, t: 'I killed the penguin while he was shocked about me turning into an undead voodoo magic zombie on a lake beach in Norway.', size: FH - 6, rot: 1 }),
   }, {
     vb: [420, 460], alt: 'Night: zombie Owen lies wide awake while Jon makes penguin noises in the dark.',
     art: (W, H) => {

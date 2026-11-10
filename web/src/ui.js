@@ -142,7 +142,7 @@ function drawMenu() {
   });
   const sq = (n, start, done) => flag(start) ? n + (flag(done) ? ' ✓' : ' …') : null;
   const side = [sq('Bjarne', 'quest_bjarne', 'bjarne_done'), sq('Sven', 'quest_sven', 'sven_done')].filter(Boolean);
-  text('Heart pieces ' + s.pieces + '/4', 20, 140, '#f2ebcc');
+  text('Next heart: ' + s.pieces + '/4 pieces', 20, 140, '#f2ebcc');
   text('Voodoo bond ' + (s.voodoo ? 'ready' : 'used'), 20, 151, s.voodoo ? '#9be08a' : '#c9a0f0');
   if (side.length) text('Side quests ' + side.join('  '), 20, 162, '#c8e8ff', 'left', false);
   text(Sound.muted ? 'M sound off' : 'M sound on', 236, 140, '#8a8ab0', 'right', false);
