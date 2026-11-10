@@ -11,6 +11,7 @@ function objectiveTarget() {
   if (!flag('log_chopped') && !flag('d1done')) return { x: 31, y: 6, label: 'The log' };
   if (!flag('d1done')) return { x: 39, y: 2, label: 'Jjorvic Palace' };
   if (!flag('d2done')) return { x: 7, y: 2, label: 'Drowned Barrow' };
+  if (!flag('ch4_read')) return { x: 61, y: 18, label: "Walter's Forge" };
   return null;
 }
 function drawCompass() {
@@ -60,7 +61,7 @@ function updateIcicles(dt) {
 function drawIcicles() {
   for (const c of ICICLES) {
     const x = Math.round(c.x - G.cam.x), y = Math.round(c.y - G.cam.y);
-    if (c.t < c.warn) { const k = c.t / c.warn; ctx.globalAlpha = 0.35 + k * 0.4; ctx.fillStyle = '#9fd0ff'; ctx.beginPath(); ctx.ellipse(x, y + 3, 7 * k + 2, 3 * k + 1, 0, 0, Math.PI * 2); ctx.fill(); ctx.globalAlpha = 1; const fy = y - 120 + k * 120; poly([[x, fy + 8], [x - 3, fy - 6], [x + 3, fy - 6]], '#dff6ff'); R(x - 1, fy - 6, 2, 3, '#ffffff'); }
+    if (c.t < c.warn) { const k = c.t / c.warn; ctx.globalAlpha = qa(0.35 + k * 0.4); pxEllipseFill(x, y + 3, 7 * k + 2, 3 * k + 1, '#9fd0ff'); ctx.globalAlpha = 1; const fy = y - 120 + k * 120; poly([[x, fy + 8], [x - 3, fy - 6], [x + 3, fy - 6]], '#dff6ff'); R(x - 1, fy - 6, 2, 3, '#ffffff'); }
     else { const k = (c.t - c.warn) / c.fall; for (let i = 0; i < 4; i++) R(x - 6 + i * 4, y - 2 - k * 8, 2, 2, '#dff6ff'); }
   }
 }

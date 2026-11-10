@@ -12,7 +12,7 @@ const G = {
 
 function newSave() {
   return { map: 'home', x: 0, y: 0, maxHp: 6, hp: 6, kr: 0, rune: 0, potions: 0, pieces: 0,
-    items: {}, flags: {}, keys: {}, bigkeys: {}, voodoo: true, jon: { lvl: 1, xp: 0, perks: {} }, bag: {}, charms: {}, charm: null, spell: null };
+    diff: defaultDiff(), items: {}, flags: {}, keys: {}, bigkeys: {}, voodoo: true, jon: { lvl: 1, xp: 0, perks: {} }, bag: {}, charms: {}, charm: null, spell: null };
 }
 const SAVE_KEY = 'jontuka-save-v1';
 // Stats Owen carries. Story mode uses the defaults; the Arena upgrades them.
@@ -62,7 +62,7 @@ function blocked(x, y, r, who, self) {
   const sx = G.scr.x * VW, sy = G.scr.y * VH;
   if (who !== 'player' && !G.map.arena && (x - r < sx || x + r > sx + VW || y - r < sy || y + r > sy + VH)) return true;
   if (who === 'player' || who === 'walker') {
-    for (const e of G.ents) if (e.solid && e !== self && Math.abs(e.x - x) < 7 + r && Math.abs(e.y - y) < 7 + r) return true;
+    for (const e of G.ents) if (e.solid && e !== self && Math.abs(e.x - x) < 7 + r && Math.abs(e.y - y) < 7 + r && !(self && Math.abs(e.x - self.x) < 7 + r && Math.abs(e.y - self.y) < 7 + r)) return true;
   }
   return false;
 }

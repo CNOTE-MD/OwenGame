@@ -60,20 +60,20 @@ OW[(1, 0)] = [  # Muck Forest (Owen's page 5): muck and grime, tall grass, and t
     "TT,,b,,,,,,,,,,T",
     "TTTTTT,s,,TTTTTT",
 ]
-OW[(2, 0)] = [  # Frozen Path: Penguin Palace (chapter 2); only reached past the log
-    "TTTTTTTTTTTTTTTT",
+OW[(2, 0)] = [  # The Deep Forest (Owen's page 8: "Thou shall pass into the deep forest"): thick woods
+    "TTTTTTTTTTTTTTTT",  # thinning to snow under the glacier where Jjorvic Palace is carved; only reached past the giant
     "TMMMMMMMMMMMMMMT",
     "TMMMMMMEMMMMMMMT",
     "Tnnnnnnsnnnnnn#T",
-    "TnTnnnnsnnnnnnnT",
-    "nnnnnnnsnnnTnnnn",
-    "sssssssssnnnnnnn",
-    "nnnnnnnsnnnnnnnn",
-    "nnTnnnnsnnnn#nnn",
-    "Tnnnnnnsnnnnnn#T",
-    "Tnn#nnnsnnnTnnnT",
-    "TnnnnnnsnnnnnnnT",
-    "TnnnnnTsnnnnnnnT",
+    "TnTnnnnsnnnTnnnT",
+    ",.TT.,.s,nnnnnnn",
+    "sssssssss,,nnnnn",
+    ".,T..T.sT,.,nnnn",
+    "TT.,TT.s.TT,..nn",
+    "T.T.T,.s,T.T,.nT",
+    "TT,..T.s.,TT..,T",
+    "T,.T..,s.T.,T.TT",
+    "TT.T,TTsTT.T,T.T",
     "TTTTTTTTTTTTTTTT",
 ]
 OW[(3, 0)] = [  # Storm Peak base: sealed (dungeon 4)
@@ -124,7 +124,7 @@ OW[(1, 1)] = [  # Fjordvik market: Lars's stall
     "T.......s......T",
     "TTTTTT.s..TTTTTT",
 ]
-OW[(2, 1)] = [  # Lake Jontuka, north shore (cliffs to the north; the Frozen Path is only reached through the Muck Forest)
+OW[(2, 1)] = [  # Lake Jontuka, north shore (cliffs to the north; the Deep Forest is only reached through the Muck Forest)
     "TTTTTTTTTTTTTTTT",
     "T.....ss.......T",
     "T....ssssss....T",
@@ -152,7 +152,7 @@ OW[(3, 1)] = [  # Volcano road: sealed Walter's Forge (dungeon 3)
     "...#...s...#...T",
     "T......s.......T",
     "T.#....s....#..T",
-    "T......s.......T",
+    "T......s.....b.T",  # a bush hides Baron Blubber's stairs
     "T......s..#....T",
     "TTTTTT.s..TTTTTT",
 ]
@@ -257,6 +257,13 @@ def P(sx, sy, x, y):  # screen-local tile -> global tile
 
 OW_ENT = [
     {"t": "start", "at": P(1, 2, 8, 8)},
+    # Owen's "Build the game" answers: possessed animals (Q41), the peanut butter lion (Q42), Baron Blubber's door (Q43)
+    {"t": "wombat", "at": P(0, 0, 4, 8)}, {"t": "wombat", "at": P(0, 2, 12, 5)},
+    {"t": "squirrel", "at": P(1, 0, 3, 4)}, {"t": "squirrel", "at": P(1, 0, 11, 10)},
+    {"t": "cdog", "at": P(0, 2, 10, 1)}, {"t": "cdog", "at": P(0, 2, 9, 2)}, {"t": "cdog", "at": P(0, 2, 11, 3)},
+    {"t": "pblion", "at": P(2, 2, 10, 6)},
+    {"t": "hiddenstairs", "at": P(3, 1, 13, 11), "to": "sauna", "dest": [8, 11]},
+    {"t": "sign", "at": P(3, 1, 12, 11), "text": "sign_nopeng"},
     {"t": "runestone", "at": P(1, 2, 4, 8)},
     {"t": "sign", "at": P(1, 2, 12, 8), "text": "sign_airstrip"},
     {"t": "cargo", "at": P(1, 2, 13, 5)},
@@ -269,7 +276,7 @@ OW_ENT = [
     {"t": "chest", "id": "c_leaf", "at": P(1, 0, 2, 12), "item": "leaf", "needs": "giant_done"},
     {"t": "varg", "at": P(0, 0, 12, 8)},
     {"t": "log", "id": "biglog", "at": P(1, 0, 15, 5)},
-    {"t": "varg", "at": P(1, 0, 6, 3)}, {"t": "varg", "at": P(1, 0, 11, 8)}, {"t": "slime", "at": P(1, 0, 4, 7)}, {"t": "slime", "at": P(1, 0, 12, 10)},
+    {"t": "varg", "at": P(1, 0, 6, 3)}, {"t": "varg", "at": P(1, 0, 11, 8)}, {"t": "slime", "at": P(1, 0, 4, 7)},
     {"t": "beetle", "at": P(3, 0, 4, 9)}, {"t": "beetle", "at": P(3, 2, 3, 3)},
     {"t": "tablet", "id": "tab_coast", "at": P(0, 2, 2, 3)},
     {"t": "tablet", "id": "tab_hills", "at": P(0, 0, 13, 11)},
@@ -315,7 +322,7 @@ OW_ENT = [
     {"t": "penguin", "at": P(2, 2, 5, 3)}, {"t": "penguin", "at": P(2, 2, 10, 4)}, {"t": "penguin", "at": P(2, 2, 7, 8)},
     {"t": "snowpeng", "at": P(2, 0, 4, 7)}, {"t": "penguin", "at": P(2, 0, 12, 9)},
     {"t": "snowpeng", "at": P(3, 0, 10, 6)}, {"t": "wisp", "at": P(3, 0, 5, 10)}, {"t": "snowpeng", "at": P(3, 0, 3, 11)},
-    {"t": "draugr", "at": P(1, 0, 4, 8)}, {"t": "wisp", "at": P(1, 0, 11, 10)},
+    {"t": "draugr", "at": P(2, 0, 3, 9)}, {"t": "wisp", "at": P(2, 0, 12, 8)},   # moved out of the Muck Forest into the deep forest
     {"t": "draugr", "at": P(3, 2, 4, 5)}, {"t": "draugr", "at": P(3, 2, 11, 9)}, {"t": "wisp", "at": P(3, 2, 7, 11)},
     {"t": "wisp", "at": P(0, 0, 10, 9)}, {"t": "penguin", "at": P(0, 0, 4, 11)},
     {"t": "draugr", "at": P(3, 1, 9, 9)}, {"t": "wisp", "at": P(3, 1, 4, 3)},
@@ -472,6 +479,29 @@ SUBWAY = [
     "IIIIIIIIIIIIIIII",
     "IIIIIIIIIIIIIIII",
 ]
+SAUNA = [  # Baron Blubber's sauna, next to the volcano so Chilly can't freeze it
+    "ZZZZZZZZZZZZZZZZ",
+    "ZkkFFpppFFFFkkFZ",
+    "ZFFFFFFFFFFFFFFZ",
+    "ZFFFFFFFFFFFFFFZ",
+    "ZFFrrrrrrrrrrFFZ",
+    "ZFFrrrrrrrrrrFFZ",
+    "ZFFrrrrrrrrrrFFZ",
+    "ZFFFFFFFFFFFFFFZ",
+    "ZQQFFFFFFFFFFOOZ",
+    "ZFFFFFFFFFFFFFFZ",
+    "ZFFFFFFFFFFFFFFZ",
+    "ZFFFFFFFFFFFFFFZ",
+    "ZFFFFFFF<FFFFFFZ",
+    "ZZZZZZZZZZZZZZZZ",
+]
+SAUNA_ENT = [
+    {"t": "baron", "at": [7, 5]},
+    {"t": "trophy", "at": [12, 3]},
+    {"t": "dartboard", "at": [10, 1]},
+    {"t": "warp", "at": [8, 12], "to": "overworld", "dest": P(3, 1, 13, 12)},
+]
+check_block("sauna", SAUNA)
 SUBWAY_ENT = [
     {"t": "warp", "at": [8, 1], "to": "overworld", "dest": P(1, 2, 3, 9)},
     {"t": "exchange", "at": [3, 1]},
@@ -486,7 +516,7 @@ check_block("subway", SUBWAY)
 # ---------------- Owen's room (New York) ----------------
 HOME = [
     "ZZZZZZZZZZZZZZZZ",
-    "ZFFFFFFFFFFFFFFZ",
+    "ZFFFFkkFFFFFFkkZ",
     "ZFYYFFFFFFFQQQFZ",
     "ZFYYFFFFFFFFFFFZ",
     "ZFFFFFFFFFFFFFFZ",
@@ -654,9 +684,9 @@ for e in OW_ENT:
     x, y = e["at"]
     ok = any((x + dx, y + dy) in ow_seen for dx, dy in ((0, 0), (1, 0), (-1, 0), (0, 1), (0, -1)))
     assert ok, ("overworld unreachable", e)
-# Owen's log is the only way to the Frozen Path and Storm Peak
+# Owen's log (the giant) is the only way to the Deep Forest and Storm Peak
 no_log = reachable(ow, OW_ENT[0]["at"])
-assert tuple(P(2, 0, 7, 3)) not in no_log, "the Frozen Path must need the log chopped"
+assert tuple(P(2, 0, 7, 3)) not in no_log, "the Deep Forest must need the giant to let you pass"
 assert tuple(P(3, 0, 7, 3)) not in no_log, "Storm Peak must need the log chopped"
 assert tuple(P(1, 0, 14, 6)) in no_log, "you must be able to walk up to the log"
 cav_seen = reachable(cav, P(1, 3, 7, 12))
@@ -666,7 +696,7 @@ for e in CAV_ENT:
         continue
     ok = any((x + dx, y + dy) in cav_seen for dx, dy in ((0, 0), (1, 0), (-1, 0), (0, 1), (0, -1)))
     assert ok, ("cavern unreachable", e)
-for nm, g, ents, start in (("astrid", ASTRID, ASTRID_ENT, (7, 12)), ("bjarne", BJARNE, BJARNE_ENT, (7, 12)), ("cave", CAVE, CAVE_ENT, (8, 11)), ("subway", SUBWAY, SUBWAY_ENT, (8, 2))):
+for nm, g, ents, start in (("astrid", ASTRID, ASTRID_ENT, (7, 12)), ("bjarne", BJARNE, BJARNE_ENT, (7, 12)), ("cave", CAVE, CAVE_ENT, (8, 11)), ("subway", SUBWAY, SUBWAY_ENT, (8, 2)), ("sauna", SAUNA, SAUNA_ENT, (8, 11))):
     seen = reachable([list(r) for r in g], start)
     for e in ents:
         x, y = e["at"]
@@ -707,6 +737,7 @@ out = {
     "astrid_house": {"name": "Astrid's House", "rows": ASTRID, "ents": ASTRID_ENT, "interior": True},
     "bjarne_house": {"name": "Bjarne's House", "rows": BJARNE, "ents": BJARNE_ENT, "interior": True},
     "secret_cave": {"name": "Hidden Cave", "rows": CAVE, "ents": CAVE_ENT, "dark": True},
+    "sauna": {"name": "Baron Blubber's Sauna", "rows": SAUNA, "ents": SAUNA_ENT, "interior": True},
     "subway": {"name": "Fjordvik T-bane", "rows": SUBWAY, "ents": SUBWAY_ENT, "interior": True},
     "barrow": {"name": "The Drowned Barrow", "rows": ["".join(r) for r in br], "ents": BR_ENT, "dungeon": True},
     "redeye": {"name": "The Red-Eye", "rows": RE, "ents": RE_ENT, "dungeon": True, "dark": True, "redeye": True, "nokeys": True},

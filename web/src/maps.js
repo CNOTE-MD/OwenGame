@@ -7,15 +7,15 @@ const MAPS = {
 "TMMMMMMMMMMMMMMTTTTTTTTTTTTTTTTTTMMMMMMMMMMMMMMTTMMMMMMMMMMMMMMT",
 "TMMMMMMXMMMMMMMTT,,,,b%%%%,,bbbTTMMMMMMEMMMMMMMTTMMMMMMXMMMMMMMT",
 "TT.....s.......TT,T,,%%%%%,T,b,TTnnnnnnsnnnnnn#TTnnnnnnsnnnnnnnT",
-"TT.T...s...b...TT,,,,TT%%%,,bbbTTnTnnnnsnnnnnnnTTnn#nnnsnnnnTnnT",
-"TT.....s........,,%%%%%%%%,,,,,onnnnnnnsnnnTnnnnnnnnnnnsnnnnnnnT",
-"TT.b...sssssssssss%%%%%%%%sssssosssssssssnnnnnnnnnnnnnnsnnnnnnnT",
-"TT.....s........%%%%%%%f%%%%,,,Tnnnnnnnsnnnnnnnnnnnnnnnsnn#nnnnT",
-"TTT....s....T...%%T%%%%%%TT%%,,TnnTnnnnsnnnn#nnnnnnnnnnsnnnnnnnT",
-"TT.....s.....b.TT%%%%b%%%%%%%T,TTnnnnnnsnnnnnn#TTnnTnnnsnnnnnnnT",
-"TTbb...s.......TT,,TT%%%%b,,,,,TTnn#nnnsnnnTnnnTTnnnnnnsnnnnnTnT",
-"TT.....s..T....TT,,,,,%%T,,,T,,TTnnnnnnsnnnnnnnTTnnn#nnsnnnnnnnT",
-"TT.....s.......TTT,,b,,,,,,,,,,TTnnnnnTsnnnnnnnTTnnnnnnsnnnnnnnT",
+"TT.T...s...b...TT,,,,TT%%%,,bbbTTnTnnnnsnnnTnnnTTnn#nnnsnnnnTnnT",
+"TT.....s........,,%%%%%%%%,,,,,o,.TT.,.s,nnnnnnnnnnnnnnsnnnnnnnT",
+"TT.b...sssssssssss%%%%%%%%sssssosssssssss,,nnnnnnnnnnnnsnnnnnnnT",
+"TT.....s........%%%%%%%f%%%%,,,T.,T..T.sT,.,nnnnnnnnnnnsnn#nnnnT",
+"TTT....s....T...%%T%%%%%%TT%%,,TTT.,TT.s.TT,..nnnnnnnnnsnnnnnnnT",
+"TT.....s.....b.TT%%%%b%%%%%%%T,TT.T.T,.s,T.T,.nTTnnTnnnsnnnnnnnT",
+"TTbb...s.......TT,,TT%%%%b,,,,,TTT,..T.s.,TT..,TTnnnnnnsnnnnnTnT",
+"TT.....s..T....TT,,,,,%%T,,,T,,TT,.T..,s.T.,T.TTTnnn#nnsnnnnnnnT",
+"TT.....s.......TTT,,b,,,,,,,,,,TTT.T,TTsTT.T,T.TTnnnnnnsnnnnnnnT",
 "TTTTTT.s..TTTTTTTTTTTT,s,,TTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTT",
 "TTTTTT.s..TTTTTTTTTTTT.s..TTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTT",
 "TT.....s.......TT......s.......TT.....ss.......TT#.....s....lllT",
@@ -28,7 +28,7 @@ const MAPS = {
 "TT.x.x..s..f.......f....s..........ss~~~~~~ss......#...s...#..TT",
 "TT......s....,,.T.......s....b.TT...ss~~~~ss...TT......s......TT",
 "TT.b....s....b,TT..b....s......TT....ssssss....TT.#....s....#.TT",
-"T,,.....s....,,TT.......s......TT......s.......TT......s......TT",
+"T,,.....s....,,TT.......s......TT......s.......TT......s.....bTT",
 "T,,,....s......TT.......s......TT..T...s....T..TT......s..#...TT",
 "TTTTTT.s..TTTTTTTTTTTT.s..TTTTTTTTTTTT.s..TTTTTTTTTTTT.s..TTTTTT",
 "TTTTTT.s..TTTTTTTTTTTT.s..TTTTTTTTTTTT.s..TTTTTTTTTTTT.s..TTTTTT",
@@ -53,6 +53,82 @@ const MAPS = {
 24,
 36
 ]
+},
+{
+"t": "wombat",
+"at": [
+4,
+8
+]
+},
+{
+"t": "wombat",
+"at": [
+12,
+33
+]
+},
+{
+"t": "squirrel",
+"at": [
+19,
+4
+]
+},
+{
+"t": "squirrel",
+"at": [
+27,
+10
+]
+},
+{
+"t": "cdog",
+"at": [
+10,
+29
+]
+},
+{
+"t": "cdog",
+"at": [
+9,
+30
+]
+},
+{
+"t": "cdog",
+"at": [
+11,
+31
+]
+},
+{
+"t": "pblion",
+"at": [
+42,
+34
+]
+},
+{
+"t": "hiddenstairs",
+"at": [
+61,
+25
+],
+"to": "sauna",
+"dest": [
+8,
+11
+]
+},
+{
+"t": "sign",
+"at": [
+60,
+25
+],
+"text": "sign_nopeng"
 },
 {
 "t": "runestone",
@@ -170,13 +246,6 @@ const MAPS = {
 "at": [
 20,
 7
-]
-},
-{
-"t": "slime",
-"at": [
-28,
-10
 ]
 },
 {
@@ -607,15 +676,15 @@ const MAPS = {
 {
 "t": "draugr",
 "at": [
-20,
-8
+35,
+9
 ]
 },
 {
 "t": "wisp",
 "at": [
-27,
-10
+44,
+8
 ]
 },
 {
@@ -981,7 +1050,7 @@ const MAPS = {
 "name": "Owen's Room, New York",
 "rows": [
 "ZZZZZZZZZZZZZZZZ",
-"ZFFFFFFFFFFFFFFZ",
+"ZFFFFkkFFFFFFkkZ",
 "ZFYYFFFFFFFQQQFZ",
 "ZFYYFFFFFFFFFFFZ",
 "ZFFFFFFFFFFFFFFZ",
@@ -1291,6 +1360,61 @@ const MAPS = {
 }
 ],
 "dark": true
+},
+"sauna": {
+"name": "Baron Blubber's Sauna",
+"rows": [
+"ZZZZZZZZZZZZZZZZ",
+"ZkkFFpppFFFFkkFZ",
+"ZFFFFFFFFFFFFFFZ",
+"ZFFFFFFFFFFFFFFZ",
+"ZFFrrrrrrrrrrFFZ",
+"ZFFrrrrrrrrrrFFZ",
+"ZFFrrrrrrrrrrFFZ",
+"ZFFFFFFFFFFFFFFZ",
+"ZQQFFFFFFFFFFOOZ",
+"ZFFFFFFFFFFFFFFZ",
+"ZFFFFFFFFFFFFFFZ",
+"ZFFFFFFFFFFFFFFZ",
+"ZFFFFFFF<FFFFFFZ",
+"ZZZZZZZZZZZZZZZZ"
+],
+"ents": [
+{
+"t": "baron",
+"at": [
+7,
+5
+]
+},
+{
+"t": "trophy",
+"at": [
+12,
+3
+]
+},
+{
+"t": "dartboard",
+"at": [
+10,
+1
+]
+},
+{
+"t": "warp",
+"at": [
+8,
+12
+],
+"to": "overworld",
+"dest": [
+61,
+26
+]
+}
+],
+"interior": true
 },
 "subway": {
 "name": "Fjordvik T-bane",

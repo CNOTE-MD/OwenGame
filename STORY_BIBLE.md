@@ -64,6 +64,22 @@ Full answers are in `story/OWEN_ANSWERS.md`. What they settle:
 | Next to build | Finding Storm Peak. |
 | Future ideas | Possessed wombat, squirrel and Carolina dog; a giant peanut-butter lion; Chilly's arch-enemy's palace (he's mad at Chilly, not helpful); a throne-room riddle for a heart piece. |
 
+## Owen's game ideas, built (Quest Log Q41 to Q44, October 2026)
+
+- **Possessed animals:** a wombat, a squirrel and a pack of Carolina dogs, red-eyed under Chilly's spell. Owen frees them rather than killing them; the spell pops off and they run home.
+- **The Peanut Butter Lion:** very large, made of peanut butter, asleep on the beach where Owen died. Jon: "I am going to be sticky for a WEEK."
+- **Chilly's arch-enemy:** a walrus called **Baron Blubber** (placeholder; Owen names him) in a towel and a monocle. Chilly froze his sauna, so he built a new one beside the volcano. He does not help Owen. He is just mad at Chilly, and throws a fish at a Chilly dartboard every morning. He mentions Chilly's cousin on top of the Storm Peak (Owen's Q36) only to say he doesn't like him either.
+- **The throne riddle:** carved into the armrest of Chilly's throne, under a fish bone.
+
+## Page 8: STOP, the giant of the east, and the deep forest (built)
+
+Owen ends the fight with words. He yells STOP, tells the Forest Giant of the North that the Giant of the East sent him to take down the penguin palace, and, when the giant asks why, uses Jon's idea (Jon talks inside Owen's head now): penguins were invading the East giant's luxurious apartment/townhome getaway. The giant says "KNÖRVIC does like his luxurious getaways" and lets them pass into the deep forest.
+
+- **Knörvic**, the Giant of the East, likes luxurious getaways. Ally of the North giant.
+- **Jon can talk inside Owen's head**, and Owen can answer the same way.
+- **The deep forest** lies past the giant, between the Muck Forest and Jjorvic Palace. The screen once called the Frozen Path is now the Deep Forest: thick snowy woods under the glacier.
+- **In the game:** after Owen finds the giant hiding among the trees, he remembers the giants' war and says STOP. Two choices follow Owen's page. A wrong answer (the South sent us, or nobody did, or any reason but Jon's) sends the fight on until the club sticks again, and then Owen gets another try. The card reads PEACE!, not DEFEATED. Beating him the old way still works.
+
 ## Page 7: the blur, the time-out signal, the giants' war (built)
 
 Owen's page plays inside the Forest Giant fight in three beats, in his words. A few seconds in: the blur ("The giant swings, I dodge, I swing, I miss"), Jon sings, Owen tells him to be quiet. At half health Owen is tired and accidentally makes the time-out signal, a T, which giants take as a sign of war: the giant gets faster for the rest of the fight. As the giant hides, Owen remembers the giants' war and gathers his wits; the page's cliffhanger is kept, and the fight continues.
@@ -148,3 +164,6 @@ Jon hums all four when Owen stands still.
 3. Is Chilly really the villain, or is someone else behind the penguins?
 4. What Jon's carved sign does in the game. It could become a save point, or a trophy wall.
 5. Arena weapon and skill ideas: as many as he wants.
+6. Chilly's arch-enemy's real name (Baron Blubber is a placeholder), and whether he's a walrus.
+7. Chapter 4, Walter's Forge: Owen writes it in OWEN'S SCRIPT under the game.
+8. How the Giant of the East's name is spelled: KNÖRVIC (as built) or KNCÖRVIC.

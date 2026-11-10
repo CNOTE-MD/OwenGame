@@ -230,7 +230,7 @@ function bigDrawList() {
       if (b.chimney) {
         for (let i = 0; i < 3; i++) {
           const k = ((G.t * 0.6 + i / 3) % 1), x = sx + b.chimney.x + Math.sin(k * 6 + i) * 2 + k * 6, y = sy + b.chimney.y - k * 18;
-          ctx.globalAlpha = 0.55 * (1 - k); ctx.fillStyle = '#e8e8f0'; ctx.beginPath(); ctx.arc(Math.round(x), Math.round(y), 2 + k * 3, 0, Math.PI * 2); ctx.fill(); ctx.globalAlpha = 1;
+          ctx.globalAlpha = qa(0.55 * (1 - k)); pxEllipseFill(x, y, 2 + k * 3, 2 + k * 3, '#e8e8f0'); ctx.globalAlpha = 1;
         }
       }
     } });

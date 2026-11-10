@@ -36,6 +36,7 @@ const path = require('path');
   await wait(100);
   await check('level-up screen offers 3 perks', await ev(() => G.state === 'jonlevel' && G.jonChoices.length === 3));
   await ev(() => { G.jonChoices[0] = JON_PERKS.find(p => p.id === 'edge'); G.menuSel = 0; });
+  await wait(900);   // LEVEL_GUARD: a mashed button can't pick a perk in the first moment
   await pg.keyboard.press('KeyZ'); await wait(80);
   await check('picking Sharper Edge raises damage', await ev(() => G.save.jon.lvl === 2 && Math.abs(G.st.dmg - 1.2) < 1e-9 && G.state === 'play'));
   await ev(() => writeSave());
@@ -70,6 +71,7 @@ const path = require('path');
   // thumbstick
   await pg.addStyleTag({ content: '.pad { display: flex !important; }' });
   await ev(() => { G.state = 'play'; G.talk = null; G.ents = G.ents.filter(e => !e.enemy); loadMap('overworld', 8 * 16 + 8, 34 * 16 + 8); G.state = 'play'; G.talk = null; });
+  await (await pg.$('#stick')).scrollIntoViewIfNeeded();
   const box = await (await pg.$('#stick')).boundingBox();
   const cx = box.x + box.width / 2, cy = box.y + box.height / 2;
   const x0 = await ev(() => G.player.x);

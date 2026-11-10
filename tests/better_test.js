@@ -33,7 +33,9 @@ const path = require('path');
   await check('no compass indoors', await ev(() => objectiveTarget() === null));
   await ev(() => { setFlag('d1done'); setFlag('d2done'); setFlag('redeye_done'); });
   await go('overworld', 20, 36);
-  await check('compass rests when every chapter is done', await ev(() => objectiveTarget() === null));
+  await check('with chapters 1 to 3 done the compass points at Walter\'s Forge', await ev(() => { const t = objectiveTarget(); return t && t.label === "Walter's Forge"; }));
+  await ev(() => setFlag('ch4_read'));
+  await check('compass rests once the forge pages are read', await ev(() => objectiveTarget() === null));
 
   // ambience
   await check('ambience: birds by day on the overworld', await ev(() => { G.save.clock = 12; return Ambience.for() === 'birds'; }));

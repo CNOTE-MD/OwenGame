@@ -33,7 +33,7 @@ function updateJonTalk(dt) {
     JT.idle = 0;
   } else {
     JT.idle += dt;
-    if (JT.idle > 9 && JT.idle - dt <= 9) jonSay(Math.random() < 0.35 ? 'sing' : 'idle', { cooldown: 6 });
+    if (JT.idle > 9 && JT.idle - dt <= 9) { const m = Math.random() < 0.4 ? memoryLine() : null; if (m) jonSay('memory', { line: m, force: true, face: 'excited' }); else jonSay(Math.random() < 0.35 ? 'sing' : 'idle', { cooldown: 6 }); }
     if (JT.idle > 16 && JT.idle - dt <= 16) jonSay('sing', { cooldown: 6 });
     if (JT.idle > 22 && !JT.asleep) { JT.asleep = true; jonSay('sleepy', { force: true }); }
     if (JT.asleep && Math.floor(JT.idle) % 6 === 0 && Math.floor(JT.idle - dt) % 6 !== 0) jonSay('sleepy', { force: true });
@@ -50,7 +50,7 @@ function updateJonTalk(dt) {
   // near water or a penguin
   if (G.mapId === 'overworld' && tileAt(p.x + p.fx * 20, p.y + p.fy * 20) === '~') jonSay('water', { cooldown: 40, face: 'worried' });
   if (G.ents.some(e => e.type === 'penguin' && e.alive && dist(e, p) < 70)) jonSay('penguin', { cooldown: 45 });
-  for (const t of ['beetle', 'slime', 'varg', 'spider', 'guard', 'snowpeng']) if (G.ents.some(e => e.type === t && e.alive && dist(e, p) < 80)) jonSay(t, { cooldown: 70 });
+  for (const t of ['beetle', 'slime', 'varg', 'spider', 'guard', 'snowpeng', 'wombat', 'squirrel', 'cdog']) if (G.ents.some(e => e.type === t && e.alive && dist(e, p) < 80)) jonSay(t, { cooldown: 70 });
   // the weather and the hour
   if (G.map.outdoor) {
     if (typeof isNight === 'function' && isNight()) jonSay('night', { cooldown: 150 });
@@ -136,11 +136,13 @@ function maybeJonLevelUp() {
   const avail = JON_PERKS.filter(pk => (d.perks[pk.id] || 0) < pk.max);
   G.jonChoices = [...avail].sort(() => Math.random() - 0.5).slice(0, 3);
   G.jonMilestone = ms || null;
-  G.menuSel = 0;
+  G.menuSel = 0; G.jonLvT = 0;
   G.state = G.jonChoices.length ? 'jonlevel' : 'play';
   if (ms && ms.id === 'bff') G.save.voodoo2 = true;
 }
 function updateJonLevel() {
+  G.jonLvT = (G.jonLvT || 0) + 1 / 60;
+  if (G.jonLvT < LEVEL_GUARD) return;   // a mashed button never picks a perk by accident
   const n = G.jonChoices.length;
   if (just('up')) { G.menuSel = (G.menuSel + n - 1) % n; Sound.play('menu'); }
   if (just('down')) { G.menuSel = (G.menuSel + 1) % n; Sound.play('menu'); }
@@ -218,7 +220,7 @@ function drawSpinFx() {
   const p = G.player, j = G.jon;
   if (j.mode === 'spin') {
     const x = p.x - G.cam.x, y = p.y - G.cam.y;
-    ctx.strokeStyle = 'rgba(160,220,255,0.6)'; ctx.lineWidth = 6; ctx.beginPath(); ctx.arc(x, y, 17 * G.st.swing, 0, Math.PI * 2); ctx.stroke();
+    const sr = 17 * G.st.swing; ctx.globalAlpha = 0.5; pxEllipse(x, y, sr, sr, '#a0dcff', 5); ctx.globalAlpha = 1; pxEllipse(x, y, sr + 2, sr + 2, '#dff6ff', 1);
   }
   if ((p.charge || 0) > 0.55 && Math.floor(G.t * 12) % 2) { drawTwinkle(j.x - G.cam.x + 6, j.y - G.cam.y - 10, 1); }
 }

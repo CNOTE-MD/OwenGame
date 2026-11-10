@@ -75,7 +75,7 @@ function updateAttendant(e, dt, dx, dy, d, mr) {
       const h = tryMove(e, e.fx * 175 * dt, e.fy * 175 * dt, mr, 'walker');
       if (e.t > 0.5 || h.hitX || h.hitY) { e.st = 'daze'; e.t = 0; }
       break; }
-    case 'daze': if (e.t > 1.4) { e.st = 'hide'; e.t = 0; } break;
+    case 'daze': if (e.t > 1.4 * bossWindow()) { e.st = 'hide'; e.t = 0; } break;
   }
 }
 const attendantVisible = e => e.st !== 'hide' || Math.random() < 0.06 || RE.blackout > 0.5;

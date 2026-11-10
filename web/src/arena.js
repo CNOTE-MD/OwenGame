@@ -288,8 +288,7 @@ function drawArenaWorld() {
   for (const m of A.marks) { const a = Math.floor(G.t * 10) % 2; R(m.x - cx - 5, m.y - cy - 1, 10, 2, a ? '#ff4d4d' : '#ffd84a'); R(m.x - cx - 1, m.y - cy - 5, 2, 10, a ? '#ff4d4d' : '#ffd84a'); }
   if (A.frost) {
     const r = 34 + A.frost * 10;
-    ctx.strokeStyle = `rgba(160,220,255,${0.25 + 0.1 * Math.sin(G.t * 4)})`; ctx.lineWidth = 2;
-    ctx.beginPath(); ctx.arc(p.x - cx, p.y - cy, r, 0, Math.PI * 2); ctx.stroke();
+    ctx.globalAlpha = qa(0.25 + 0.1 * Math.sin(G.t * 4)); pxEllipse(p.x - cx, p.y - cy, r, r, '#a0dcff', 2); ctx.globalAlpha = 1;
   }
   for (const t of A.turrets) {
     const x = t.x - cx, y = t.y - cy;
@@ -308,8 +307,7 @@ function drawArenaWorld() {
     const a = G.t * 3.2 + i * Math.PI * 2 / A.orbit;
     ctx.globalAlpha = 0.6; drawJonSprite(p.x - cx + Math.cos(a) * 28, p.y - cy + Math.sin(a) * 28, a * 2); ctx.globalAlpha = 1;
   }
-  ctx.strokeStyle = '#cfefff'; ctx.lineWidth = 1;
-  for (const b of A.bolts) { ctx.beginPath(); ctx.moveTo(b.x1 - cx, b.y1 - cy); ctx.lineTo((b.x1 + b.x2) / 2 - cx + rnd(-5, 5), (b.y1 + b.y2) / 2 - cy + rnd(-5, 5)); ctx.lineTo(b.x2 - cx, b.y2 - cy); ctx.stroke(); }
+  for (const b of A.bolts) { const mx = (b.x1 + b.x2) / 2 - cx + rnd(-5, 5), my = (b.y1 + b.y2) / 2 - cy + rnd(-5, 5); pxLine(b.x1 - cx, b.y1 - cy, mx, my, '#cfefff'); pxLine(mx, my, b.x2 - cx, b.y2 - cy, '#cfefff'); }
 }
 
 function drawArenaHud() {
