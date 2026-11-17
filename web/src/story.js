@@ -71,6 +71,22 @@ const STORY = {
   ],
   giant_hide: [['Forest Giant', 'ENOUGH. You will never find me among my brothers.'], ['', 'He steps backward into the forest and is gone. Three trees stand where there were none.'], ['Jon', 'One of those trees is HIM. Throw me at the one that can\'t hold still!']],
   giant_down: [['Forest Giant', 'The penguins... said... you were small...'], ['', 'The Forest Giant of the North topples, slowly, like a tree. Then he shrinks, and stiffens, and turns back into a log.'], ['', 'The log rolls off the path, bumps into a bush, and starts to snore.'], ['Jon', 'TIMBER! For REAL this time! Did you see that? Did you SEE that?'], ['Owen', 'I saw it, Jon.'], ['Jon', 'Big boss fight scene: complete. Jjorvic Palace is east, through the snow. Let\'s go wreck it.']],
+  // Owen's page 9: Jjorvic Palace from the deep forest
+  palace_view: [
+    ['Owen', 'The palace looked like a five star hotel and a cathedral were put in a bowl and mixed into one.'],
+    ['Owen', 'There were at least 10 arches I could see from my observation point in the forest.'],
+    ['Owen', 'On top of the numerous arches, though, were penguins. (Yay!)'],
+    ['Jon', '(hissing) Imperial Ruby, as I suspected.'],
+    ['Owen', 'What\'s that?'],
+    ['Jon', 'The meanest and second sharpest axe-making material in the nine realms.'],
+    ['Owen', 'Ohh...'],
+    ['Owen', '(I pretended to get it.) To cheer him up, I asked: What\'s the sharpest?'],
+    ['Jon', 'Obviously ME. I can cut anything Jotuns, Gods, and Humans throw at me.'],
+    ['Owen', 'So is that why you\'re so bad at catch? Because you normally cut, and don\'t catch, MLB baseballs?'],
+    ['Jon', 'No... I just choose to purposefully look bad, so that I don\'t destroy you at it every time we play.'],
+    ['', 'A new voice said:'],
+    ['???', 'How can I be of service?'],
+  ],
   // Owen's page 8: he says STOP, and talks his way past the giant
   giant_stop: [
     ['Owen', 'STOP!'],

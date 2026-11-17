@@ -62,10 +62,10 @@ OW[(1, 0)] = [  # Muck Forest (Owen's page 5): muck and grime, tall grass, and t
 ]
 OW[(2, 0)] = [  # The Deep Forest (Owen's page 8: "Thou shall pass into the deep forest"): thick woods
     "TTTTTTTTTTTTTTTT",  # thinning to snow under the glacier where Jjorvic Palace is carved; only reached past the giant
+    "TMMMMMMMMMMMMMMT",  # rows 1-3: the palace front (Owen's page 9), drawn over these tiles in palace.js
     "TMMMMMMMMMMMMMMT",
     "TMMMMMMEMMMMMMMT",
     "Tnnnnnnsnnnnnn#T",
-    "TnTnnnnsnnnTnnnT",
     ",.TT.,.s,nnnnnnn",
     "sssssssss,,nnnnn",
     ".,T..T.sT,.,nnnn",
@@ -301,14 +301,14 @@ OW_ENT = [
     {"t": "npc", "id": "sven", "at": P(1, 1, 12, 9)},
     {"t": "npc", "id": "ingrid", "at": P(0, 2, 9, 8)},
     {"t": "sign", "at": P(0, 1, 10, 7), "text": "sign_fjordvik"},
-    {"t": "runestone", "at": P(2, 0, 10, 4)},
-    {"t": "sign", "at": P(2, 0, 9, 3), "text": "sign_cavern"},
+    {"t": "runestone", "at": P(2, 0, 10, 5)},
+    {"t": "sign", "at": P(2, 0, 9, 4), "text": "sign_cavern"},
     {"t": "sealed", "at": P(0, 0, 7, 2), "text": "seal_barrow", "opensWith": "d1done"},
     {"t": "runedoor", "at": P(0, 0, 7, 2), "needs": "d1done", "to": "barrow", "dest": [24, 40]},
     {"t": "sealed", "at": P(3, 0, 7, 2), "text": "seal_peak"},
     {"t": "sealed", "at": P(3, 1, 13, 3), "text": "seal_forge"},
     {"t": "sign", "at": P(2, 2, 6, 9), "text": "sign_beach"},
-    {"t": "warp", "at": P(2, 0, 7, 2), "to": "cavern", "dest": [24, 54]},
+    {"t": "warp", "at": P(2, 0, 7, 3), "to": "cavern", "dest": [24, 54]},
     {"t": "door", "at": P(0, 1, 4, 4), "to": "astrid_house", "dest": [7, 12]},
     {"t": "door", "at": P(0, 1, 13, 5), "to": "bjarne_house", "dest": [7, 12]},
     {"t": "qitem", "id": "sheet", "at": P(2, 2, 11, 9), "needs": "quest_bjarne"},
@@ -394,8 +394,8 @@ for (sx, sy), b in cav_blocks.items():
             cav[sy * SH + y][sx * SW + x] = c
 
 CAV_ENT = [
-    {"t": "warp", "at": P(1, 3, 7, 13), "to": "overworld", "dest": P(2, 0, 7, 3)},
-    {"t": "warp", "at": P(1, 3, 8, 13), "to": "overworld", "dest": P(2, 0, 7, 3)},
+    {"t": "warp", "at": P(1, 3, 7, 13), "to": "overworld", "dest": P(2, 0, 7, 4)},
+    {"t": "warp", "at": P(1, 3, 8, 13), "to": "overworld", "dest": P(2, 0, 7, 4)},
     {"t": "runestone", "at": P(1, 3, 4, 6)},
     {"t": "sign", "at": P(1, 3, 10, 6), "text": "sign_cavern_in"},
     {"t": "penguin", "at": P(1, 2, 5, 5)}, {"t": "guard", "at": P(1, 2, 10, 5)}, {"t": "penguin", "at": P(1, 2, 8, 9)},
@@ -414,7 +414,7 @@ CAV_ENT = [
     {"t": "chest", "id": "cv_frost", "at": P(0, 1, 12, 2), "item": "frost", "clear": True},
     {"t": "chest", "id": "cv_thunder", "at": P(1, 0, 8, 4), "item": "thunder", "clear": True},
     {"t": "container", "id": "hc_cavern", "at": P(1, 0, 6, 7), "clear": True},
-    {"t": "warp", "at": P(1, 0, 10, 7), "to": "overworld", "dest": P(2, 0, 7, 4), "clear": True, "portal": True},
+    {"t": "warp", "at": P(1, 0, 10, 7), "to": "overworld", "dest": P(2, 0, 7, 5), "clear": True, "portal": True},
 ]
 
 
@@ -686,7 +686,7 @@ for e in OW_ENT:
     assert ok, ("overworld unreachable", e)
 # Owen's log (the giant) is the only way to the Deep Forest and Storm Peak
 no_log = reachable(ow, OW_ENT[0]["at"])
-assert tuple(P(2, 0, 7, 3)) not in no_log, "the Deep Forest must need the giant to let you pass"
+assert tuple(P(2, 0, 7, 4)) not in no_log, "the Deep Forest must need the giant to let you pass"
 assert tuple(P(3, 0, 7, 3)) not in no_log, "Storm Peak must need the log chopped"
 assert tuple(P(1, 0, 14, 6)) in no_log, "you must be able to walk up to the log"
 cav_seen = reachable(cav, P(1, 3, 7, 12))

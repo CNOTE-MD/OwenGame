@@ -88,8 +88,8 @@ const SHOTS = process.env.SHOTS || '/tmp';
   await pg.waitForFunction(() => !G.player.launching, null, { timeout: 5000 }).catch(() => {});
   await check('lake spits Owen out', await ev(() => tileAt(G.player.x, G.player.y) !== '~' && !G.player.launching));
 
-  // enter the cavern through the cave mouth (39,2)
-  await goScreen('overworld', 39, 4); await place(39, 3, 0, -1);
+  // enter the palace through its front door (39,3)
+  await goScreen('overworld', 39, 5); await place(39, 4, 0, -1);
   await pg.keyboard.down('ArrowUp'); await wait(300); await pg.keyboard.up('ArrowUp'); await wait(900); await talkThrough();
   await check('entered Ice Cavern', await ev(() => G.mapId === 'cavern'));
   await check('music: Penguin Rhapsody in the palace', await ev(() => musicFor() === 'palace'));
@@ -187,7 +187,7 @@ const SHOTS = process.env.SHOTS || '/tmp';
   await ev(() => { G.player.inv = 0; G.state = 'play'; hurtPlayer(99, G.player); });
   await pg.waitForFunction(() => G.state !== 'dying', null, { timeout: 5000 });
   await check('game over after voodoo used', await ev(() => G.state === 'over'));
-  await ev(() => { G.save.cp = { map: 'overworld', x: 39 * 16 + 8, y: 4 * 16 + 8 }; writeSave(); });
+  await ev(() => { G.save.cp = { map: 'overworld', x: 39 * 16 + 8, y: 5 * 16 + 8 }; writeSave(); });
   await pg.keyboard.press('KeyZ'); await wait(150); await talkThrough();
   await check('continue after game over -> last runestone, voodoo back', await ev(() => G.mapId === 'overworld' && G.save.voodoo && Math.floor(G.player.x / 16) === 39));
 
