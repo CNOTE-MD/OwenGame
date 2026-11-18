@@ -9,7 +9,7 @@ function objectiveTarget() {
   if (!flag('met_astrid')) return { x: 4, y: 19, label: 'Astrid' };
   if (!flag('exchanged') && !flag('d1done')) return { x: 19, y: 38, label: 'Subway' };
   if (!flag('log_chopped') && !flag('d1done')) return { x: 31, y: 6, label: 'The log' };
-  if (!flag('d1done')) return { x: 39, y: 2, label: 'Jjorvic Palace' };
+  if (!flag('d1done')) return { x: 39, y: 3, label: 'Jjorvic Palace' };
   if (!flag('d2done')) return { x: 7, y: 2, label: 'Drowned Barrow' };
   if (!flag('ch4_read')) return { x: 61, y: 18, label: "Walter's Forge" };
   return null;

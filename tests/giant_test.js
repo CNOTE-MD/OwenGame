@@ -106,6 +106,19 @@ const path = require('path');
   await check('page 8: the giant lets them pass; no defeat, but the way east opens for good', await ev(() => flag('giant_peace') && flag('giant_done') && tile(31, 5) === 's' && !G.ents.some(e => e.type === 'giant') && G.ents.some(e => e.kind === 'sleeplog')));
   await check('the card says PEACE, not DEFEATED', await ev(() => G.bossCard && G.bossCard.sub === 'PEACE!'));
   await check('past the giant is the Deep Forest', await ev(() => SCREEN_NAMES['2,0'] === 'Deep Forest'));
+  // Owen's page 9: Jjorvic Palace from the deep forest
+  await ev(() => { G.state = 'play'; G.talk = null; G.bossCard = null; loadMap('overworld', 34 * 16 + 8, 6 * 16 + 8); });
+  await wait(150);
+  await check('page 9: first sight of the palace plays Owen\'s page', await ev(() => flag('page9') && G.state === 'talk' && STORY.palace_view.some(l => /five star hotel and a cathedral/.test(l[1]))));
+  await check('...Imperial Ruby, the second sharpest axe-making material in the nine realms', await ev(() => STORY.palace_view.some(l => /Imperial Ruby/.test(l[1])) && STORY.palace_view.some(l => /second sharpest axe-making material in the nine realms/.test(l[1]))));
+  await check('...Jon is "so bad at catch" (on purpose, he says)', await ev(() => STORY.palace_view.some(l => /bad at catch/.test(l[1])) && STORY.palace_view.some(l => /purposefully look bad/.test(l[1]))));
+  await check('...and it ends on Owen\'s cliffhanger: "How can I be of service?"', await ev(() => { const v = STORY.palace_view; return v[v.length - 1][0] === '???' && /How can I be of service/.test(v[v.length - 1][1]); }));
+  await pg.screenshot({ path: SHOTS + '/palace_front.png' });
+  await talkThrough();
+  await check('the palace front has at least 10 arches, with penguins on top', await ev(() => PALACE_ARCHES.length >= 10 && PALACE_PENGUINS.length >= 5));
+  await ev(() => { G.state = 'play'; G.talk = null; loadMap('overworld', 34 * 16 + 8, 6 * 16 + 8); }); await wait(150);
+  await check('it plays once', await ev(() => G.state !== 'talk'));
+  await check('the front door is still the way in', await ev(() => tile(39, 3) === 'E' && MAPS.overworld.ents.some(e => e.t === 'warp' && e.to === 'cavern' && e.at[0] === 39 && e.at[1] === 3)));
   await check('the giants\' war is carved on a rune tablet', await ev(() => /North and East against South and West/.test(TABLETS.tab_hills)));
 
   console.log('errors:', JSON.stringify(errs));

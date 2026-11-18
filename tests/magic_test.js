@@ -50,7 +50,8 @@ const path = require('path');
   await place(20, 36, 1, 0); await pg.keyboard.press('KeyC'); await wait(500);
   await check('fireball hits for 2', await ev(() => !G.ents.some(e => e.type === 'penguin')) || (await ev(() => G.ents.find(e => e.type === 'penguin').hp)) === hp0 - 2);
   await ev(() => { giveItem('mend'); }); await talkThrough();
-  await ev(() => { G.save.spell = 'mend'; G.save.rune = 10; G.player.hp = 1; }); await place(20, 36, 1, 0);
+  // hold Jon's half-heart compliment (it fires at low health) so only the Mend is measured
+  await ev(() => { G.save.spell = 'mend'; G.save.rune = 10; G.player.hp = 1; JT.compT = 99; }); await place(20, 36, 1, 0);
   await pg.keyboard.press('KeyC'); await wait(60);
   await check('Mend heals two hearts for 6 rune', await ev(() => G.player.hp === 5 && G.save.rune === 4));
   await pg.keyboard.press('Enter'); await wait(60); await ev(() => { G.menuPage = 4; }); await wait(60);

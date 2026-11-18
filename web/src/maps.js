@@ -5,9 +5,9 @@ const MAPS = {
 "rows": [
 "TTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTT",
 "TMMMMMMMMMMMMMMTTTTTTTTTTTTTTTTTTMMMMMMMMMMMMMMTTMMMMMMMMMMMMMMT",
-"TMMMMMMXMMMMMMMTT,,,,b%%%%,,bbbTTMMMMMMEMMMMMMMTTMMMMMMXMMMMMMMT",
-"TT.....s.......TT,T,,%%%%%,T,b,TTnnnnnnsnnnnnn#TTnnnnnnsnnnnnnnT",
-"TT.T...s...b...TT,,,,TT%%%,,bbbTTnTnnnnsnnnTnnnTTnn#nnnsnnnnTnnT",
+"TMMMMMMXMMMMMMMTT,,,,b%%%%,,bbbTTMMMMMMMMMMMMMMTTMMMMMMXMMMMMMMT",
+"TT.....s.......TT,T,,%%%%%,T,b,TTMMMMMMEMMMMMMMTTnnnnnnsnnnnnnnT",
+"TT.T...s...b...TT,,,,TT%%%,,bbbTTnnnnnnsnnnnnn#TTnn#nnnsnnnnTnnT",
 "TT.....s........,,%%%%%%%%,,,,,o,.TT.,.s,nnnnnnnnnnnnnnsnnnnnnnT",
 "TT.b...sssssssssss%%%%%%%%sssssosssssssss,,nnnnnnnnnnnnsnnnnnnnT",
 "TT.....s........%%%%%%%f%%%%,,,T.,T..T.sT,.,nnnnnnnnnnnsnn#nnnnT",
@@ -461,14 +461,14 @@ const MAPS = {
 "t": "runestone",
 "at": [
 42,
-4
+5
 ]
 },
 {
 "t": "sign",
 "at": [
 41,
-3
+4
 ],
 "text": "sign_cavern"
 },
@@ -522,7 +522,7 @@ const MAPS = {
 "t": "warp",
 "at": [
 39,
-2
+3
 ],
 "to": "cavern",
 "dest": [
@@ -816,7 +816,7 @@ const MAPS = {
 "to": "overworld",
 "dest": [
 39,
-3
+4
 ]
 },
 {
@@ -828,7 +828,7 @@ const MAPS = {
 "to": "overworld",
 "dest": [
 39,
-3
+4
 ]
 },
 {
@@ -1037,7 +1037,7 @@ const MAPS = {
 "to": "overworld",
 "dest": [
 39,
-4
+5
 ],
 "clear": true,
 "portal": true

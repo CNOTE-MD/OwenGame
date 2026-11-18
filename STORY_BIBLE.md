@@ -71,6 +71,17 @@ Full answers are in `story/OWEN_ANSWERS.md`. What they settle:
 - **Chilly's arch-enemy:** a walrus called **Baron Blubber** (placeholder; Owen names him) in a towel and a monocle. Chilly froze his sauna, so he built a new one beside the volcano. He does not help Owen. He is just mad at Chilly, and throws a fish at a Chilly dartboard every morning. He mentions Chilly's cousin on top of the Storm Peak (Owen's Q36) only to say he doesn't like him either.
 - **The throne riddle:** carved into the armrest of Chilly's throne, under a fish bone.
 
+## Page 9: Jjorvic Palace, Imperial Ruby, and catch (built)
+
+From an observation point in the deep forest, Owen sees Jjorvic Palace: "a five star hotel and a cathedral put in a bowl and mixed into one", with at least ten arches and penguins sitting on top of them. Jon hisses: Imperial Ruby, the meanest and second sharpest axe-making material in the nine realms. Jon is the sharpest; he can cut anything Jotuns, Gods and Humans throw at him. Owen asks if that's why Jon is so bad at catch with MLB baseballs. Jon says he looks bad on purpose so he doesn't destroy Owen every time. Then a new voice: "How can I be of service?"
+
+- **Jjorvic Palace, outside:** hotel and cathedral, at least ten arches, penguins on the arches. Owen's earlier answer (carved into a glacier) still fits: the game sets the front into the glacier.
+- **Imperial Ruby:** second sharpest axe material in the nine realms. Built as the palace's arches; Owen can say what it really is.
+- **The nine realms, Jotuns and Gods** are part of Jon's world.
+- **Owen and Jon play catch** with MLB baseballs. Jon is bad at it, on purpose.
+- **Open:** who says "How can I be of service?" (Owen's next page). The game ends the scene on "???" and TO BE CONTINUED.
+- **In the game:** the palace's cliff on the Deep Forest screen is now its front: two storeys of marble, eleven ruby arches with warm hotel windows below, stained-glass arches above, a cathedral gable with a rose window and spire, side towers with ruby flags, a pointed ruby door under five gold stars, a red carpet, and seven penguins sitting on the arches. The first time Owen sees it, his page plays.
+
 ## Page 8: STOP, the giant of the east, and the deep forest (built)
 
 Owen ends the fight with words. He yells STOP, tells the Forest Giant of the North that the Giant of the East sent him to take down the penguin palace, and, when the giant asks why, uses Jon's idea (Jon talks inside Owen's head now): penguins were invading the East giant's luxurious apartment/townhome getaway. The giant says "KNÖRVIC does like his luxurious getaways" and lets them pass into the deep forest.
@@ -167,3 +178,4 @@ Jon hums all four when Owen stands still.
 6. Chilly's arch-enemy's real name (Baron Blubber is a placeholder), and whether he's a walrus.
 7. Chapter 4, Walter's Forge: Owen writes it in OWEN'S SCRIPT under the game.
 8. How the Giant of the East's name is spelled: KNÖRVIC (as built) or KNCÖRVIC.
+9. Who says "How can I be of service?" at the palace, and what Imperial Ruby is part of.
