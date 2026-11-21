@@ -43,9 +43,32 @@ const path = require('path');
   // ---- the concierge ----
   await ev(() => { G.state = 'play'; G.talk = null; loadMap('cavern', 24 * 16 + 8, 52 * 16 + 8); G.talk = null; G.state = 'play'; }); await wait(150);
   await check('the elf is in the palace lobby', await ev(() => G.ents.some(e => e.kind === 'elf')));
+
+  // ---- Owen's answer: "Come on, over here" leads into the palace and into "dead Chilly" ----
+  await check('"dead Chilly" lies across the lobby, in a cape, on his back', await ev(() => G.ents.filter(e => e.kind === 'deadchilly').length === 2 && SPR.deadchilly.width >= 28));
+  await check('the elf starts just inside the doors and hops ahead to him', await ev(() => { const e = G.ents.find(o => o.kind === 'elf'); return e.path.length > 0 && e.y > 50 * 16 && !flag('dead_chilly'); }));
+  await pg.waitForFunction(() => G.state === 'talk', null, { timeout: 12000 }).catch(() => {});
+  await check('...and presents him: slain, by the warrior of Hüngrruk Alkāmö', await ev(() => { const e = G.ents.find(o => o.kind === 'elf'), all = JSON.stringify([G.talk.cur, ...G.talk.queue]); return G.state === 'talk' && flag('dead_chilly') && Math.floor(e.x / 16) === 26 && Math.floor(e.y / 16) === 46 && /Here we are\. Chilly\./.test(all) && /Hüngrruk Alkāmö/.test(all); }));
+  await pg.screenshot({ path: SHOTS + '/elf_deadchilly.png' });
+  await check('Owen\'s answer on the warrior: we don\'t know yet', await ev(() => STORY.dead_chilly.some(l => l[0] === 'Elf' && /We don't know yet/.test(l[1])) && STORY.elf_warrior.some(l => /We don't know yet/.test(l[1]))));
+  await check('the game does not give away that the elf is wrong: Jon is only suspicious', await ev(() => { const t = JSON.stringify([STORY.dead_chilly, STORY.dead_chilly_look, STORY.elf_warrior]); return /nothing is ever that easy/.test(t) && !/alive|not dead|faking|fake|lying/i.test(t); }));
+  await talkThrough(); await wait(100);
+  await pg.screenshot({ path: SHOTS + '/elf_deadchilly2.png' });
+  await ev(() => { const c = G.ents.find(e => e.kind === 'deadchilly'); const p = G.player; p.x = c.x; p.y = c.y + 14; p.fx = 0; p.fy = -1; }); await wait(80);
+  await check('he is in the way: Owen has to walk around him', await ev(() => { const c = G.ents.filter(e => e.kind === 'deadchilly'); return c.every(e => blocked(e.x, e.y, 5, 'player', G.player)) && !blocked(c[0].x - 32, c[0].y, 5, 'player', G.player); }));
+  await pg.keyboard.press('KeyZ'); await wait(80);
+  await check('Owen can look at (and poke) "DEAD CHILLY"', await ev(() => G.state === 'talk' && /"DEAD CHILLY\."/.test(G.talk.cur[1])));
+  await talkThrough();
+  await ev(() => { G.state = 'play'; G.talk = null; loadMap('cavern', 24 * 16 + 8, 52 * 16 + 8); }); await wait(200);
+  await check('the scene plays once; after that the elf just waits beside him', await ev(() => { const e = G.ents.find(o => o.kind === 'elf'); return G.state === 'play' && !e.path && Math.floor(e.x / 16) === 26 && Math.floor(e.y / 16) === 46; }));
+
   await ev(() => interact(G.ents.find(e => e.kind === 'elf'))); await talkThrough(); await wait(60);
-  await check('"How can I be of service?" offers help', await ev(() => G.state === 'choice' && G.choice.opts.length === 3));
+  await check('"How can I be of service?" offers help', await ev(() => G.state === 'choice' && G.choice.opts.length === 4));
   await pg.screenshot({ path: SHOTS + '/elf_lobby.png' });
+  await ev(() => { G.choice.t = 1; G.choice.sel = 2; }); await pg.keyboard.press('KeyZ'); await wait(80);
+  await check('"Who slew Chilly?": the warrior of Hüngrruk Alkāmö, and nobody knows who that is yet', await ev(() => G.state === 'talk' && JSON.stringify([G.talk.cur, ...G.talk.queue]) === JSON.stringify(STORY.elf_warrior)));
+  await talkThrough();
+  await ev(() => interact(G.ents.find(e => e.kind === 'elf'))); await talkThrough(); await wait(60);
   await ev(() => { G.choice.t = 1; G.choice.sel = 0; }); await pg.keyboard.press('KeyZ'); await wait(80);
   await check('first hint: two small keys, west and east', await ev(() => G.state === 'talk' && /Two small keys/.test(G.talk.cur[1])));
   await talkThrough();

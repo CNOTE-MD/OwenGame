@@ -76,7 +76,9 @@ Full answers are in `story/OWEN_ANSWERS.md`. What they settle:
 The voice belongs to an elf (maybe a dwarf with a pointy hat on) no bigger than a lawn chair: minuscule for a Norwegian elf, large for a Christmas elf. Jon shouts the cover story ("We've come to slay Chilly, and the ice penguins, due to their fondness of the east's giant's apartment home getaway!"). The elf answers that Chilly has already been slain, by a mighty warrior whose name they can't pronounce: "the warrior of the north eastern village of Hüngrruk Alkāmö". Owen: "Uhh... What?" The elf: "Come on, over here."
 
 - **The Elf:** he, she or they (Owen uses all three); the game says "the Elf" and they. Polite, helpful, hotel-staff manner ("How can I be of service?").
-- **Chilly may already be dead.** Owen's biggest twist so far. The game does not decide whether the elf is right.
+- **Chilly is not dead (Owen, November 2026).** The elf is not right. The game keeps this a secret for now: nobody says it, and Jon is only suspicious.
+- **The warrior:** "We don't know yet" (Owen). The elf says the same.
+- **"Come on, over here" leads into Chilly's palace and into "dead Chilly"** (Owen's words, his quotation marks). Built: on Owen's first visit to the lobby the elf hops ahead and presents an enormous penguin in a purple cape, flat on his back in the middle of the floor, X's for eyes. Owen can look at him and poke him. His look and the scene's lines are a draft.
 - **Hüngrruk Alkāmö:** a village in the north-east with a mighty warrior.
 - **In the game (Owen's page):** after the page 9 scene the elf pops up behind Owen, the page plays, and the elf hops to the palace doors and waits.
 - **In the game (draft, built on "How can I be of service?"):** the elf is the palace's concierge. In the lobby they offer a hint for wherever Owen is in the palace, and the MAP page shows the palace's floor plan. They say the penguins are still here because nobody has told them the owner is gone. West of the lobby is housekeeping: an ice-block puzzle (slide two blocks onto two plates) that gives the Ice Skates charm, so ice can't make Owen slide.
@@ -191,4 +193,7 @@ Jon hums all four when Owen stands still.
 7. Chapter 4, Walter's Forge: Owen writes it in OWEN'S SCRIPT under the game.
 8. How the Giant of the East's name is spelled: KNÖRVIC (as built) or KNCÖRVIC.
 9. What Imperial Ruby is part of.
-10. Is the elf telling the truth about Chilly? Who is the warrior of Hüngrruk Alkāmö? Where does "Come on, over here" lead?
+10. ~~Is the elf telling the truth about Chilly? Who is the warrior? Where does "Come on, over here" lead?~~ Answered: no; we don't know yet; into Chilly's palace and into "dead Chilly".
+11. What is "dead Chilly" really? A fake, Chilly pretending, or somebody else? What does he look like?
+12. Does the elf know they are wrong (lying), or have they been fooled too?
+13. When does Owen find out, and how?

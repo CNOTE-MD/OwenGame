@@ -403,7 +403,9 @@ CAV_ENT = [
     {"t": "warp", "at": P(1, 3, 8, 13), "to": "overworld", "dest": P(2, 0, 7, 4)},
     {"t": "runestone", "at": P(1, 3, 4, 6)},
     {"t": "sign", "at": P(1, 3, 10, 6), "text": "sign_cavern_in"},
-    {"t": "elf", "at": P(1, 3, 11, 9)},
+    # Owen's answer: "Come on, over here" leads into the palace and into "dead Chilly". He lies across the lobby (two tiles); the elf waits beside him
+    {"t": "elf", "at": P(1, 3, 10, 4)},
+    {"t": "deadchilly", "at": P(1, 3, 7, 4)}, {"t": "deadchilly", "at": P(1, 3, 8, 4), "half": True},
     # the ice block puzzle: two blocks, two plates; the chest rises when both plates are covered
     {"t": "plate", "at": P(0, 3, 4, 3)}, {"t": "plate", "at": P(0, 3, 11, 3)},
     {"t": "iceblock", "at": P(0, 3, 7, 8)}, {"t": "iceblock", "at": P(0, 3, 11, 8)},

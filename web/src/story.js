@@ -108,6 +108,11 @@ const STORY = {
   elf_lobby: [['Elf', 'How can I be of service?']],
   elf_place: [['Elf', 'Jjorvic Palace. Five stars. Also a cathedral. We don\'t like to choose.'], ['Elf', 'The previous owner? Slain, as I said. The penguins are still here, though. Nobody has told them.'], ['Jon', 'A hotel full of penguins who don\'t know their boss is gone. Señor, this is going to be loud.']],
   elf_bye: [['Elf', 'Enjoy your stay. Mind the ice.']],
+  // Owen's answers (Nov 2026): "Come on, over here" leads into Chilly's palace and into "dead Chilly"; nobody knows who the
+  // warrior is yet; and the elf is NOT right about Chilly. The game keeps that last one a secret. The words here are a draft.
+  dead_chilly: [['Elf', 'Here we are. Chilly.'], ['', 'In the middle of the lobby lies an enormous penguin in a purple cape, flat on his back. Frost all over him. X\'s where his eyes should be.'], ['Elf', 'Slain. As I said. By the warrior of Hüngrruk Alkāmö.'], ['Owen', 'Who IS the warrior of Hüngrruk Alkāmö?'], ['Elf', 'We don\'t know yet.'], ['Jon', '...Huh. That was easy. Señor, nothing is ever that easy.']],
+  dead_chilly_look: [['', '"DEAD CHILLY." He is very cold. To be fair, he was always very cold.'], ['Jon', 'Don\'t poke him. ...Okay. Poke him once.'], ['', 'Poke.'], ['Jon', 'Hm.']],
+  elf_warrior: [['Elf', 'The warrior of the north eastern village of Hüngrruk Alkāmö.'], ['Owen', 'Okay, but WHO is that?'], ['Elf', 'We don\'t know yet, sir.'], ['Jon', 'Very helpful. Five stars.']],
   puzzle_intro: [['Jon', 'Ice blocks. And two glowy plates on the floor. I bet they want to meet.'], ['Jon', 'Push a block and it slides until something stops it. If you mess it up, step out and come back in. I won\'t tell anyone.']],
   puzzle_done: [['', 'CLUNK. Both plates sink into the floor. A chest rises out of the ice.'], ['Jon', 'Housekeeping! ...Is what I would say, if I worked here.']],
   // the Drowned Barrow's bell crypt (draft): Owen can rewrite all of it in OWEN'S SCRIPT

@@ -18,7 +18,7 @@
 | `web/src/art3.js` | Pixel primitives (lines, ellipses, glows in quarter-step alpha), Scale2x/Scale3x for big sprites, framed boss bars, a hand-built Flight 364, villager props and room decor |
 | `web/src/rock.js` | Jon remembers a song for each rune: the outdoor music fills back in layer by layer, a beat marker joins the HUD, chops on the beat hit 1.5x, bosses strike on the beat |
 | `web/src/barrow.js` | The Drowned Barrow pass (a draft for Owen): Fluffy as the Barrow's guide (Jon translates a hint for wherever you are), the bell crypt (ring three spirit bells little, middle, big with the Voodoo Dash) and the Spirit Bell charm |
-| `web/src/elf.js` | Owen's page 10: the elf. Also the palace concierge (hints), the ice-block puzzle room and Ice Skates, and the dungeon floor plan on the MAP page |
+| `web/src/elf.js` | Owen's page 10: the elf, and his answer that the elf leads into the palace and into "dead Chilly". Also the palace concierge (hints), the ice-block puzzle room and Ice Skates, and the dungeon floor plan on the MAP page |
 | `web/src/finish.js` | The finishing layer: credits with your stats, Jon's Trophy Wall, the options screen, fast-forward, control prompts, and fixes found by playing it through (see `REVIEW.md`) |
 | `web/src/palace.js` | Owen's page 9: the front of Jjorvic Palace (hotel and cathedral, ten-plus Imperial Ruby arches, penguins on top) and his scene at the observation point |
 | `web/src/giant.js` | Owen's page 6: the Forest Giant of the North boss at the log (stalk, slam, stuck window, hide as a tree) |

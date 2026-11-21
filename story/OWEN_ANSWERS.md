@@ -61,3 +61,11 @@ Owen answered all fifty Quest Log questions online. His words, unedited except f
 48. Arena cards: Fire of Helheim (the whole map becomes lava land), infinity health for 30 seconds, and Rune Shield. [All three.]
 49. Final Arena wave: just a bunch of miniature Chillys. [Wave 20.]
 50. Bjarne's next song: Rush P. [Bjarne says so.]
+
+## After page 10 (November 2026)
+Asked: is the elf telling the truth about Chilly? Who is the warrior of Hüngrruk Alkāmö? Where does "Come on, over here" lead?
+
+51. Is the elf right that Chilly has been slain? **No.** [Kept secret in the game. Nobody says so; Jon is only suspicious ("nothing is ever that easy").]
+52. Who is the warrior of Hüngrruk Alkāmö? **We don't know yet.** [The elf says exactly that, in the lobby scene and under "Who slew Chilly?".]
+53. Where does "Come on, over here" lead? **Into Chilly's palace and into "dead Chilly".** [The first time Owen is in the palace lobby the elf hops ahead to an enormous penguin in a cape lying on his back and presents him. He blocks the middle of the lobby; Owen can look at him and poke him. What he looks like and every word of the scene are a draft.]
+

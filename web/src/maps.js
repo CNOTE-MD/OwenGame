@@ -884,9 +884,24 @@ const MAPS = {
 {
 "t": "elf",
 "at": [
-27,
-51
+26,
+46
 ]
+},
+{
+"t": "deadchilly",
+"at": [
+23,
+46
+]
+},
+{
+"t": "deadchilly",
+"at": [
+24,
+46
+],
+"half": true
 },
 {
 "t": "plate",

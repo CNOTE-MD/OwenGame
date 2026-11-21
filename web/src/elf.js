@@ -13,6 +13,7 @@ const ELF_ROWS = [
 function buildElfArt() {
   ELF_ROWS.forEach((r, i) => { SPR['elf_' + i] = buildSprite(r, PAL_ELF); });
   SPR.npc_elf = SPR.elf_0; SPR.npc_elf_blink = buildSprite(ELF_ROWS[0].map(r => r.replace(/e/g, 's')), PAL_ELF);
+  buildDeadChilly();
   SPR.icon_skates = buildSprite(['.ww.....', '.ww.....', '.www....', '.wwwww..', '.wwwwww.', '..k..k..', 'bbbbbbbb', '........'], { w: '#f4f4f8', k: '#8a8a9c', b: '#7fd4ff' });
 }
 PORTRAIT_NPC.Elf = 'elf';
@@ -31,9 +32,10 @@ function elfArrives(late) {
 function talkElf(e) {
   G.player.cd = 0.2;
   if (G.mapId !== 'cavern') return say(STORY.elf_door);
-  say(STORY.elf_lobby, () => ask('How can I be of service?', ['Where do I go next?', 'What is this place?', 'Nothing, thanks.'], i => {
+  say(STORY.elf_lobby, () => ask('How can I be of service?', ['Where do I go next?', 'What is this place?', 'Who slew Chilly?', 'Nothing, thanks.'], i => {
     if (i === 0) return say([['Elf', palaceHint()]]);
     if (i === 1) return say(STORY.elf_place);
+    if (i === 2) return say(STORY.elf_warrior);
     say(STORY.elf_bye);
   }));
 }
@@ -53,6 +55,50 @@ function drawElf(e) {
   shadowAt(x, y + 5, 0.8);
   spr(SPR['elf_' + (moving ? Math.floor(G.t * 8) % 2 : 0)], x, y + 6 - hop);
   if (!moving && G.mapId === 'cavern' && Math.floor(G.t * 0.8) % 3 === 0) text('?', x + 7, y - 12, '#9be08a', 'left', 'outline');
+}
+
+// ---------------- "dead Chilly" ----------------
+// Owen's answer to "where does 'Come on, over here' lead?": into Chilly's palace and into "dead Chilly".
+// The first time Owen is in the lobby the elf hops ahead to the body and presents it. Owen also says
+// the elf is not right about Chilly; the game does not give that away (Jon is only suspicious).
+const inLobby = () => G.mapId === 'cavern' && G.scr && G.scr.x === 1 && G.scr.y === 3;
+function buildDeadChilly() {
+  // the Chilly sprite at three times the size (as big as the Penguin King), laid on his back with his head to the left
+  const src = SPR.chilly_down_0, k = 3, w = src.width * k, h = src.height * k;
+  const c = mkCanvas(h, w), g = c.getContext('2d'); g.imageSmoothingEnabled = false;
+  g.translate(0, w); g.rotate(-Math.PI / 2); g.drawImage(src, 0, 0, w, h); g.setTransform(1, 0, 0, 1, 0, 0);
+  // his red eyes become X's
+  const d = g.getImageData(0, 0, h, w), red = [];
+  for (let y = 0; y < w; y++) for (let x = 0; x < h; x++) { const i = (y * h + x) * 4; if (d.data[i + 3] && d.data[i] > 240 && d.data[i + 1] < 70 && d.data[i + 2] < 70) red.push([x, y]); }
+  if (red.length) {
+    red.sort((a, b) => a[1] - b[1]);
+    let cut = 1, gap = -1; for (let i = 1; i < red.length; i++) if (red[i][1] - red[i - 1][1] > gap) { gap = red[i][1] - red[i - 1][1]; cut = i; }
+    g.fillStyle = PAL_CHILLY.n; for (const [x, y] of red) g.fillRect(x, y, 1, 1);
+    g.fillStyle = '#dfe7f2';
+    for (const grp of [red.slice(0, cut), red.slice(cut)]) {
+      if (!grp.length) continue;
+      const cx = Math.round(grp.reduce((a, q) => a + q[0], 0) / grp.length), cy = Math.round(grp.reduce((a, q) => a + q[1], 0) / grp.length);
+      for (const [dx, dy] of [[0, 0], [-1, -1], [1, 1], [-1, 1], [1, -1]]) g.fillRect(cx + dx, cy + dy, 1, 1);
+    }
+  }
+  SPR.deadchilly = c;
+}
+function drawDeadChilly(e) {
+  if (e.def.half) return;
+  const img = SPR.deadchilly, x = Math.round(e.x - G.cam.x) + 8, y = Math.round(e.y - G.cam.y);
+  ctx.globalAlpha = 0.3; ctx.fillStyle = '#000'; ctx.beginPath(); ctx.ellipse(x, y + 9, img.width / 2 + 2, 7, 0, 0, 7); ctx.fill(); ctx.globalAlpha = 1;
+  R(x - img.width / 2 - 3, y - 6, img.width + 6, 14, '#7a1a8a'); R(x - img.width / 2 - 1, y - 8, img.width + 2, 2, '#7a1a8a'); R(x - img.width / 2 - 1, y + 8, img.width + 2, 2, '#5a1268');   // the cape he is lying on
+  ctx.drawImage(img, x - img.width / 2, y - Math.round(img.height / 2));
+  // frost on him, and a glint now and then
+  for (const [dx, dy] of [[-16, -13], [-6, -16], [6, -15], [16, -12], [-12, 10], [10, 11], [0, 13]]) R(x + dx, y + dy, 3, 1, '#dff6ff');
+  const i = Math.floor(G.t * 1.5) % 7; if (i < 3) { const [dx, dy] = [[-13, -9], [3, -12], [15, 5]][i]; R(x + dx, y + dy - 1, 1, 3, '#ffffff'); R(x + dx - 1, y + dy, 3, 1, '#ffffff'); }
+}
+// the elf leads the way: from just inside the doors to beside the body
+function elfLeadsToChilly() {
+  const e = G.ents.find(o => o.kind === 'elf'); if (!e) return;
+  const home = [e.def.at[0] * T + 8, e.def.at[1] * T + 8];
+  e.x = home[0] - T; e.y = home[1] + 6 * T; e.solid = false; e.showing = true;
+  e.path = [[home[0] - T, home[1] + 2 * T], home];
 }
 
 // ---------------- housekeeping: the ice block puzzle ----------------
@@ -147,7 +193,10 @@ function updateElfWorld(dt) {
   for (const e of G.ents) {
     if (e.kind !== 'elf' || !e.path || !e.path.length) continue;
     const [tx, ty] = e.path[0], dx = tx - e.x, dy = ty - e.y, d = Math.hypot(dx, dy), step = 70 * dt;
-    if (d <= step) { e.x = tx; e.y = ty; e.path.shift(); if (!e.path.length) e.solid = true; } else { e.x += dx / d * step; e.y += dy / d * step; }
+    if (d <= step) {
+      e.x = tx; e.y = ty; e.path.shift();
+      if (!e.path.length) { e.solid = true; if (e.showing && !flag('dead_chilly')) { e.showing = false; setFlag('dead_chilly'); say(STORY.dead_chilly, writeSave); } }
+    } else { e.x += dx / d * step; e.y += dy / d * step; }
   }
   if (G.mapId === 'cavern') updateIceBlocks(dt);
 }
@@ -157,6 +206,7 @@ makeEnt = function (d, x, y) {
   switch (d.t) {
     case 'elf': return s.flags.page10 ? { ...base, solid: true, talk: true } : null;
     case 'plate': return { ...base };
+    case 'deadchilly': return s.flags.page10 ? { ...base, solid: true, talk: true } : null;
     case 'iceblock': {
       // once solved, the blocks rest on the plates
       if (s.flags.puzzle_palace) { const M = MAPS[G.mapId], i = M.ents.filter(o => o.t === 'iceblock').indexOf(d), pl = M.ents.filter(o => o.t === 'plate')[i]; if (pl) return { ...base, x: pl.at[0] * T + 8, y: pl.at[1] * T + 8, solid: true }; }
@@ -166,10 +216,10 @@ makeEnt = function (d, x, y) {
   return _makeEntE(d, x, y);
 };
 const _interactE = interact;
-interact = function (e) { if (e.kind === 'elf') return talkElf(e); return _interactE(e); };
+interact = function (e) { if (e.kind === 'elf') return talkElf(e); if (e.kind === 'deadchilly') { G.player.cd = 0.2; return say(STORY.dead_chilly_look); } return _interactE(e); };
 const _drawThingE = drawThing;
 drawThing = function (e) {
-  switch (e.kind) { case 'elf': return drawElf(e); case 'iceblock': return drawIceBlock(e); case 'plate': return; }
+  switch (e.kind) { case 'elf': return drawElf(e); case 'iceblock': return drawIceBlock(e); case 'plate': return; case 'deadchilly': return drawDeadChilly(e); }
   return _drawThingE(e);
 };
 const _drawDecorGroundE = drawDecorGround;
@@ -177,6 +227,7 @@ drawDecorGround = function () { _drawDecorGroundE(); for (const e of G.ents) if 
 const _onEnterScreenE = onEnterScreen;
 onEnterScreen = function () {
   _onEnterScreenE();
+  if (inLobby() && flag('page10') && !flag('dead_chilly')) elfLeadsToChilly();
   if (G.mapId === 'cavern' && G.scr.x === 0 && G.scr.y === 3 && !flag('intro:puzzle') && G.state === 'play') { setFlag('intro:puzzle'); say(STORY.puzzle_intro); }
 };
 TROPHIES.splice(TROPHIES.findIndex(t => t.id === 'king'), 0,
