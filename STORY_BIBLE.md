@@ -71,6 +71,18 @@ Full answers are in `story/OWEN_ANSWERS.md`. What they settle:
 - **Chilly's arch-enemy:** a walrus called **Baron Blubber** (placeholder; Owen names him) in a towel and a monocle. Chilly froze his sauna, so he built a new one beside the volcano. He does not help Owen. He is just mad at Chilly, and throws a fish at a Chilly dartboard every morning. He mentions Chilly's cousin on top of the Storm Peak (Owen's Q36) only to say he doesn't like him either.
 - **The throne riddle:** carved into the armrest of Chilly's throne, under a fish bone.
 
+## Page 10: the elf, and Chilly "already slain" (built)
+
+The voice belongs to an elf (maybe a dwarf with a pointy hat on) no bigger than a lawn chair: minuscule for a Norwegian elf, large for a Christmas elf. Jon shouts the cover story ("We've come to slay Chilly, and the ice penguins, due to their fondness of the east's giant's apartment home getaway!"). The elf answers that Chilly has already been slain, by a mighty warrior whose name they can't pronounce: "the warrior of the north eastern village of Hüngrruk Alkāmö". Owen: "Uhh... What?" The elf: "Come on, over here."
+
+- **The Elf:** he, she or they (Owen uses all three); the game says "the Elf" and they. Polite, helpful, hotel-staff manner ("How can I be of service?").
+- **Chilly is not dead (Owen, November 2026).** The elf is not right. The game keeps this a secret for now: nobody says it, and Jon is only suspicious.
+- **The warrior:** "We don't know yet" (Owen). The elf says the same.
+- **"Come on, over here" leads into Chilly's palace and into "dead Chilly"** (Owen's words, his quotation marks). Built: on Owen's first visit to the lobby the elf hops ahead and presents an enormous penguin in a purple cape, flat on his back in the middle of the floor, X's for eyes. Owen can look at him and poke him. His look and the scene's lines are a draft.
+- **Hüngrruk Alkāmö:** a village in the north-east with a mighty warrior.
+- **In the game (Owen's page):** after the page 9 scene the elf pops up behind Owen, the page plays, and the elf hops to the palace doors and waits.
+- **In the game (draft, built on "How can I be of service?"):** the elf is the palace's concierge. In the lobby they offer a hint for wherever Owen is in the palace, and the MAP page shows the palace's floor plan. They say the penguins are still here because nobody has told them the owner is gone. West of the lobby is housekeeping: an ice-block puzzle (slide two blocks onto two plates) that gives the Ice Skates charm, so ice can't make Owen slide.
+
 ## Page 9: Jjorvic Palace, Imperial Ruby, and catch (built)
 
 From an observation point in the deep forest, Owen sees Jjorvic Palace: "a five star hotel and a cathedral put in a bowl and mixed into one", with at least ten arches and penguins sitting on top of them. Jon hisses: Imperial Ruby, the meanest and second sharpest axe-making material in the nine realms. Jon is the sharpest; he can cut anything Jotuns, Gods and Humans throw at him. Owen asks if that's why Jon is so bad at catch with MLB baseballs. Jon says he looks bad on purpose so he doesn't destroy Owen every time. Then a new voice: "How can I be of service?"
@@ -131,7 +143,9 @@ You don't have to do it. After the Penguin Palace you can sit on the bench by th
 
 ## Chapter 3 draft notes (the Drowned Barrow; for Owen to change)
 
-Chilly froze Hank's ghost to guard the barrow until the axe came home. Fluffy's ghost points the way. Hank, freed, apologizes for throwing Jon in a lake, sends Owen to Walter's Forge, and almost says Walter's real name.
+Chilly froze Hank's ghost to guard the barrow until the axe came home. Fluffy's ghost points the way. (Built: Fluffy gives a hint for wherever Owen is, with Jon translating.) Hank, freed, apologizes for throwing Jon in a lake, sends Owen to Walter's Forge, and almost says Walter's real name.
+
+**The bell crypt (draft, not from Owen's pages).** North of the big key room. Three spirit bells over black water; only the Voodoo Dash can ring them, and they must ring little, middle, big. The chest holds the Spirit Bell charm (the dash is ready again twice as fast). Nothing in it says anything new about Hank, Chilly or Fluffy. Questions for Owen: are there bells in Hank's tomb at all? What would Fluffy really do while Owen solves a puzzle?
 
 ## Magic: Rune Spells
 
@@ -178,4 +192,8 @@ Jon hums all four when Owen stands still.
 6. Chilly's arch-enemy's real name (Baron Blubber is a placeholder), and whether he's a walrus.
 7. Chapter 4, Walter's Forge: Owen writes it in OWEN'S SCRIPT under the game.
 8. How the Giant of the East's name is spelled: KNÖRVIC (as built) or KNCÖRVIC.
-9. Who says "How can I be of service?" at the palace, and what Imperial Ruby is part of.
+9. What Imperial Ruby is part of.
+10. ~~Is the elf telling the truth about Chilly? Who is the warrior? Where does "Come on, over here" lead?~~ Answered: no; we don't know yet; into Chilly's palace and into "dead Chilly".
+11. What is "dead Chilly" really? A fake, Chilly pretending, or somebody else? What does he look like?
+12. Does the elf know they are wrong (lying), or have they been fooled too?
+13. When does Owen find out, and how?

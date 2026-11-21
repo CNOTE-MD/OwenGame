@@ -69,3 +69,23 @@ Names, dialogue, enemy stats and level layouts live in plain data files under `d
 - **Chilly's arch-enemy (Q43):** Baron Blubber, a walrus in a towel and monocle (placeholder name until Owen picks one), lives in a sauna by the volcano so Chilly can't freeze it again. His door is under a bush beside a NO PENGUINS sign on the Volcano Road. He does not help. He is just mad at Chilly. His trophy case holds a heart piece he stole from Chilly.
 - **Heart pieces:** eight now (forest, grave, cave, Bjarne, squirrel stash, lion, riddle, Baron), so two full hearts.
 
+## The finishing layer (November 2026, from the critics' review)
+
+See `REVIEW.md` for the review that led to this. All of it lives in `web/src/finish.js`.
+
+- **Credits:** after Hank is freed and the CHAPTER 3 COMPLETE banner clears, credits roll: written by Owen, the cast with their sprites, the bands, your stats (time, chops, best combo, naps, animals freed, trophies) and a rank from Jon. The top rank is the one Jon carved in Owen's room. Hold Z to speed up. Play continues afterwards.
+- **Jon's Trophy Wall:** a seventh menu tab. 22 trophies for things Owen does, five of them secret (shown as ??? until earned), with a completion percent. A toast slides in when one is earned and waits for a quiet moment to do it.
+- **Options:** C on the gear page. Difficulty, text speed (normal, fast, instant), screen shake, flash strength, Owen's notes, sound, music and the TV filter. Remembered between sessions.
+- **Fast-forward:** hold THROW (X) during a conversation to run through it.
+- **Prompts:** a small button label bounces over anything Owen is facing that he can talk to or read. Four first-time hints (walk, look, fight, menu) show once each and name the right button for touch or keyboard.
+- **Robustness:** Owen slides out of any wall he overlaps; floating words stack; the walk from the Foothills to the Muck Forest is blocked by deep muck until the first taxi ride, so Owen's page 5 is how you get there.
+
+## Owen's page 10 and the palace (November 2026)
+
+- **The elf (Owen's page):** see `STORY_BIBLE.md`. After page 9's scene the elf appears behind Owen, page 10 plays, and the elf hops to the palace doors.
+- **Concierge (draft):** in the lobby the elf asks "How can I be of service?" and offers a hint (`palaceHint()`), which follows progress: small keys, the knight, the crystal switch, the big key, the throne room, then housekeeping.
+- **Ice-block puzzle (draft):** the room west of the lobby. A pushed block slides until a wall, pillar or other block stops it. Two blocks, two plates, three correct pushes. A wrong push can jam it; leaving the room resets it. Solving it raises a chest with the **Ice Skates** charm: ice no longer makes Owen slide.
+- **Bell crypt (draft):** the Barrow's room north of the big key. Four islands around a drowned pillar; a spirit bell hangs over three of the four gaps. A dash that crosses a bell's water and lands rings it (a dash that sinks rings nothing). Order is little, middle, big; a bell out of order silences all three, and so does leaving. The south-east gap has no bell, which is the way around. Reward: the Spirit Bell charm (dash cooldown halved). Fluffy sits in the room and hints by how many bells are ringing.
+- **Touch devices:** open in the full-window layout by default (also when launched from the home screen). `[hidden]` is forced to `display: none` so a closed panel can never draw over the game.
+- **Floor plan:** inside a dungeon the MAP page shows its rooms: entered or not, doorways, unopened chests, bosses not yet beaten, and where Owen is.
+

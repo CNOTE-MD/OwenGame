@@ -13,7 +13,7 @@ const path = require('path');
   async function talkThrough(max = 60) { for (let i = 0; i < max; i++) { const st = await ev(() => G.state); if (st !== 'talk' && st !== 'hold') return; await pg.keyboard.press('KeyZ'); await wait(40); } }
 
   await pg.goto('file://' + path.resolve(__dirname, '../web/index.html'));
-  await ev(() => { try { localStorage.clear(); } catch (e) {} G.mode = 'story'; G.save = newSave(); applyJonPerks(); G.player = makePlayer(); G.jon = makeJon(); setFlag('met_astrid'); loadMap('overworld', 20 * 16 + 8, 22 * 16 + 8); G.state = 'play'; G.talk = null; G.ents = G.ents.filter(e => !e.enemy); });
+  await ev(() => { try { localStorage.clear(); } catch (e) {} G.mode = 'story'; G.save = newSave(); applyJonPerks(); G.player = makePlayer(); G.jon = makeJon(); setFlag('met_astrid'); G.save.trophies = Object.fromEntries(TROPHIES.map(t => [t.id, true])); loadMap('overworld', 20 * 16 + 8, 22 * 16 + 8); G.state = 'play'; G.talk = null; G.ents = G.ents.filter(e => !e.enemy); });
   await wait(100);
 
   // personality

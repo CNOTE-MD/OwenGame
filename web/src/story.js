@@ -71,6 +71,7 @@ const STORY = {
   ],
   giant_hide: [['Forest Giant', 'ENOUGH. You will never find me among my brothers.'], ['', 'He steps backward into the forest and is gone. Three trees stand where there were none.'], ['Jon', 'One of those trees is HIM. Throw me at the one that can\'t hold still!']],
   giant_down: [['Forest Giant', 'The penguins... said... you were small...'], ['', 'The Forest Giant of the North topples, slowly, like a tree. Then he shrinks, and stiffens, and turns back into a log.'], ['', 'The log rolls off the path, bumps into a bush, and starts to snore.'], ['Jon', 'TIMBER! For REAL this time! Did you see that? Did you SEE that?'], ['Owen', 'I saw it, Jon.'], ['Jon', 'Big boss fight scene: complete. Jjorvic Palace is east, through the snow. Let\'s go wreck it.']],
+  roadblock: [['', 'Muck. Deep, sucking, boot-stealing muck, all the way to the trees.'], ['Jon', 'That\'s two hours of trudging, Señor, and that\'s if it doesn\'t eat you. Take the T-bane by the airstrip and get a taxi like a civilized zombie.']],
   // Owen's page 9: Jjorvic Palace from the deep forest
   palace_view: [
     ['Owen', 'The palace looked like a five star hotel and a cathedral were put in a bowl and mixed into one.'],
@@ -87,6 +88,37 @@ const STORY = {
     ['', 'A new voice said:'],
     ['???', 'How can I be of service?'],
   ],
+  // Owen's page 10: the elf
+  elf_meet: [
+    ['', 'Behind us was an elf (maybe a dwarf with a pointy hat on) no bigger than a lawn chair,'],
+    ['', 'which made him minuscule compared to most Norwegian elves. But, of course, large by Christmas elf standards.'],
+    ['Elf', 'How can I be of service?'],
+    ['', 'he (or she) repeated.'],
+    ['Owen', 'Uhhh...'],
+    ['Jon', 'We\'ve come to slay Chilly (and the ice penguins) due to their fondness of the east\'s giant\'s apartment home getaway!'],
+    ['Elf', 'Oh, well wouldn\'t you be lucky. He\'s already been slain, by a mighty warrior whose name I can not even begin to pronounce correctly.'],
+    ['Elf', 'Something like: The warrior of the north eastern village of Hüngrruk Alkāmö.'],
+    ['Owen', 'Uhh... What?'],
+    ['', 'I said, still confused from the quick change of events.'],
+    ['Elf', 'Come on, over here.'],
+  ],
+  elf_late: [['', 'A voice behind us said:'], ['???', 'How can I be of service?']],
+  // drafts for Owen to change: what the elf says after his page ends
+  elf_door: [['Elf', 'Come on, over here. Right through the front doors.'], ['Jon', 'I don\'t trust anyone that cheerful, Señor. ...Fine. After you.']],
+  elf_lobby: [['Elf', 'How can I be of service?']],
+  elf_place: [['Elf', 'Jjorvic Palace. Five stars. Also a cathedral. We don\'t like to choose.'], ['Elf', 'The previous owner? Slain, as I said. The penguins are still here, though. Nobody has told them.'], ['Jon', 'A hotel full of penguins who don\'t know their boss is gone. Señor, this is going to be loud.']],
+  elf_bye: [['Elf', 'Enjoy your stay. Mind the ice.']],
+  // Owen's answers (Nov 2026): "Come on, over here" leads into Chilly's palace and into "dead Chilly"; nobody knows who the
+  // warrior is yet; and the elf is NOT right about Chilly. The game keeps that last one a secret. The words here are a draft.
+  dead_chilly: [['Elf', 'Here we are. Chilly.'], ['', 'In the middle of the lobby lies an enormous penguin in a purple cape, flat on his back. Frost all over him. X\'s where his eyes should be.'], ['Elf', 'Slain. As I said. By the warrior of Hüngrruk Alkāmö.'], ['Owen', 'Who IS the warrior of Hüngrruk Alkāmö?'], ['Elf', 'We don\'t know yet.'], ['Jon', '...Huh. That was easy. Señor, nothing is ever that easy.']],
+  dead_chilly_look: [['', '"DEAD CHILLY." He is very cold. To be fair, he was always very cold.'], ['Jon', 'Don\'t poke him. ...Okay. Poke him once.'], ['', 'Poke.'], ['Jon', 'Hm.']],
+  elf_warrior: [['Elf', 'The warrior of the north eastern village of Hüngrruk Alkāmö.'], ['Owen', 'Okay, but WHO is that?'], ['Elf', 'We don\'t know yet, sir.'], ['Jon', 'Very helpful. Five stars.']],
+  puzzle_intro: [['Jon', 'Ice blocks. And two glowy plates on the floor. I bet they want to meet.'], ['Jon', 'Push a block and it slides until something stops it. If you mess it up, step out and come back in. I won\'t tell anyone.']],
+  puzzle_done: [['', 'CLUNK. Both plates sink into the floor. A chest rises out of the ice.'], ['Jon', 'Housekeeping! ...Is what I would say, if I worked here.']],
+  // the Drowned Barrow's bell crypt (draft): Owen can rewrite all of it in OWEN'S SCRIPT
+  bells_intro: [['', 'Three ghost bells hang over the black water. A little one. A middle one. A big one.'], ['', 'Carved in the wall: RING US LITTLE TO BIG. ONLY A SPIRIT CAN TOUCH US.'], ['Jon', 'Only a spirit... The Voodoo Dash, Señor! Dash THROUGH a bell to ring it.'], ['Fluffy', 'Woof!'], ['Jon', 'How did HE get here first? ...Ghost dogs. Never mind.']],
+  bells_wrong: [['', 'CLUNK. Every bell goes quiet.'], ['Jon', 'Wrong order. Little, then middle, then big. Start again, Señor. Nobody saw that.'], ['Fluffy', 'Woof.'], ['Jon', 'Okay. Fluffy saw that.']],
+  bells_done: [['', 'The three bells ring together. Something rises out of the water on the north island.'], ['Fluffy', 'Awoooooo!'], ['Jon', 'He is singing along. Badly. I love him.']],
   // Owen's page 8: he says STOP, and talks his way past the giant
   giant_stop: [
     ['Owen', 'STOP!'],
@@ -294,6 +326,8 @@ const ITEMS = {
     ['', 'You got the THUNDER RUNE!'],
     ['Jon', 'Oh. Oh YES. I remember this. Walter carved it into me. Fill the rune meter, press C, and I come down like lightning!'],
     ['', 'Thunder Strike hits every enemy on the screen. Defeat enemies to fill the rune meter.']] },
+  bell: { name: 'Spirit Bell', icon: 'bell', lines: [['', 'You got the SPIRIT BELL! It\'s a charm. Wear it from the BAG: the Voodoo Dash is ready again twice as fast.'], ['Jon', 'Ding. Zoom. Ding. Zoom. Señor, this is the best day.']] },
+  skates: { name: 'Ice Skates', icon: 'skates', lines: [['', 'You got the ICE SKATES! It\'s a charm. Wear it from the BAG: ice can\'t make you slide.'], ['Jon', 'Penguin-sized, but they stretch. Now WE do the sliding. On purpose.']] },
   piece: { name: 'Piece of Heart', icon: 'piece', lines: [['', 'You got a PIECE OF HEART! Collect four to grow a new heart.']] },
   container: { name: 'Heart Container', icon: 'container', lines: [['', 'You got a HEART CONTAINER! Your life grew by one heart.']] },
   kr20: { name: '20 Kroner', icon: 'coin', lines: [['', 'You found 20 kroner!']] },

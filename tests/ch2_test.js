@@ -94,6 +94,10 @@ const path = require('path');
   await check('objective moves on to Walter\'s Forge', await ev(() => /Forge/.test(objective())));
   await go('overworld', 7, 5);
   await check('CHAPTER 3 COMPLETE banner (Barrow is journal chapter 3)', await ev(() => G.banner === 'CHAPTER 3 COMPLETE'));
+  await ev(() => { G.bannerT = 0.05; G.ents = G.ents.filter(e => !e.enemy); }); await wait(400);
+  await check('...then the credits roll', await ev(() => G.state === 'credits'));
+  await ev(() => { G.credits.t = 9999; }); await wait(100);
+  await check('after the credits you keep playing', await ev(() => G.state === 'play' && flag('credits_seen')));
 
   console.log('errors:', JSON.stringify(errs));
   console.log('FAILS:', fails + errs.length);

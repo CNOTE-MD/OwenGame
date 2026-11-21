@@ -119,7 +119,7 @@ function updatePlayer(dt) {
   if (p.rooted > 0) { p.rooted -= dt; v = { x: 0, y: 0 }; if (Math.random() < 0.2) G.fx.push({ kind: 'leaf', x: p.x + rnd(-6, 6), y: p.y + rnd(-4, 6), vx: 0, vy: -10, grav: 0, t: 0, life: 0.4, color: '#58b840' }); }
   p.moving = !!(v.x || v.y);
   if (p.moving) { p.fx = v.x; p.fy = v.y; p.walk += dt * 14; }
-  const onIce = tileAt(p.x, p.y) === 'i';
+  const onIce = tileAt(p.x, p.y) === 'i' && !charmOn('skates');
   p.boost = Math.max(0, (p.boost || 0) - dt);
   const spd = 72 * G.st.speed * (p.boost > 0 ? 1.4 : 1) * (p.dashing > 0 ? 1 : groundSpeed(p));
   if (onIce) { const k = Math.min(1, 2.2 * dt); p.vx += (v.x * spd * 1.1 - p.vx) * k; p.vy += (v.y * spd * 1.1 - p.vy) * k; }

@@ -51,6 +51,7 @@ function onEnterScreen() {
   jonBossMemory();
   if (G.mapId === 'overworld' && flag('d2done') && !flag('chapter2_banner') && G.scr.x === 0 && G.scr.y === 0) {
     setFlag('chapter2_banner'); G.banner = 'CHAPTER 3 COMPLETE'; G.bannerT = 4; Sound.play('secret'); writeSave();
+    G.creditsDue = true;   // the end of what is built so far: credits roll once the banner clears
   }
   if (G.mapId === 'overworld' && flag('d1done') && !flag('chapter1_banner') && G.scr.x === 2 && G.scr.y === 0) {
     setFlag('chapter1_banner'); G.banner = STORY.chapter_done; G.bannerT = 4; Sound.play('secret'); writeSave();
@@ -91,6 +92,7 @@ function update(dt) {
     case 'talk': updateTalk(dt); return;
     case 'rhythm': updateRhythm(dt); return;
     case 'choice': updateChoice(dt); return;
+    case 'credits': updateCredits(dt); return;
     case 'cutscene': return;
     case 'hold':
       G.player.hold.t -= dt;
@@ -98,11 +100,12 @@ function update(dt) {
       return;
     case 'warp': updateWarp(dt); return;
     case 'menu':
-      if (just('right')) { G.menuPage = ((G.menuPage || 0) + 1) % 6; Sound.play('menu'); }
-      if (just('left')) { G.menuPage = ((G.menuPage || 0) + 5) % 6; Sound.play('menu'); }
-      if (G.menuPage >= 3) { if (G.menuPage === 3) updateJukebox(); else if (G.menuPage === 4) updateSpellsPage(); else updateBagPage(); if (just('menu') || just('tap')) { G.state = 'play'; G.jukebox = null; Sound.play('menu'); } return; }
+      if (G.opt) { updateOptions(); return; }
+      if (just('right')) { G.menuPage = ((G.menuPage || 0) + 1) % 7; Sound.play('menu'); }
+      if (just('left')) { G.menuPage = ((G.menuPage || 0) + 6) % 7; Sound.play('menu'); }
+      if (G.menuPage >= 3) { if (G.menuPage === 3) updateJukebox(); else if (G.menuPage === 4) updateSpellsPage(); else if (G.menuPage === 5) updateBagPage(); else updateWall(); if (just('menu') || just('tap')) { G.state = 'play'; G.jukebox = null; Sound.play('menu'); } return; }
       if (!G.menuPage && just('b')) { toggleDifficulty(); return; }
-      if (!G.menuPage && just('c')) { toggleNotes(); return; }
+      if (!G.menuPage && just('c')) { openOptions(); return; }
       if (just('menu') || just('a') || just('tap')) { G.state = 'play'; G.jukebox = null; Sound.play('menu'); }
       return;
     case 'over':
@@ -126,7 +129,7 @@ function update(dt) {
   updateJon(dt);
   if (G.mode === 'arena') { updateArena(dt); if (G.state !== 'play') return; }
   if (G.map.redeye) updateRedeye(dt);
-  updateJonTalk(dt); jonCompliment(dt);
+  updateJonTalk(dt); jonCompliment(dt); updateTrophies(dt); updateElfWorld(dt); updateBells(dt);
   maybeJonLevelUp();
   if (G.state !== 'play') return;
   if (HK.axes.length) updateHankAxes(dt);
@@ -149,8 +152,9 @@ function render() {
   ctx.clearRect(0, 0, VW, VH);
   if (G.state === 'title') return drawTitle();
   if (G.state === 'rhythm' && G.rh) return drawRhythm();
+  if (G.state === 'credits' && G.credits) return drawCredits();
   if (G.state === 'cutscene' || (G.state === 'talk' && G.talk && G.talk.back === 'cutscene')) { drawCutscene(); drawTalk(); return; }
-  if (G.shake > 0) ctx.setTransform(1, 0, 0, 1, Math.round(rnd(-2, 2)), Math.round(rnd(-2, 2)));
+  if (G.shake > 0 && OPT.shake) ctx.setTransform(1, 0, 0, 1, Math.round(rnd(-2, 2)), Math.round(rnd(-2, 2)));
   drawMap(); drawDecorGround();
   drawIceGlints();
   const p = G.player;
@@ -168,16 +172,16 @@ function render() {
   if (G.map.dungeon || G.map.dark) drawDungeonLight();
   drawAtmosphere();
   drawRedeyeOverlay();
-  if (G.flash > 0) { ctx.globalAlpha = Math.min(1, G.flash * 3); R(0, 0, VW, VH, G.flashColor || '#fff'); ctx.globalAlpha = 1; }
-  if (G.mode === 'arena') drawArenaHud(); else { drawHud(); drawCompass(); }
+  if (G.flash > 0) { ctx.globalAlpha = Math.min(1, G.flash * 3) * flashAlpha(); R(0, 0, VW, VH, G.flashColor || '#fff'); ctx.globalAlpha = 1; }
+  if (G.mode === 'arena') drawArenaHud(); else { drawInteractPrompt(); drawHud(); drawCompass(); drawHints(); }
   if (G.state === 'warp' && G.warp.kind !== 'iris') { ctx.globalAlpha = 0.55 * clamp(1 - Math.abs(G.warp.t - 0.35) / 0.35, 0, 1); R(0, 0, VW, VH, '#000'); ctx.globalAlpha = 1; }
   if (G.bannerT > 0) { R(0, 92, VW, 34, 'rgba(0,0,0,.8)'); text(G.banner, VW / 2, 113, '#ffd84a', 'center'); }
   if (G.photoCard && G.state === 'talk') drawPhoto(G.photoCard, 128, 82, 104, 118, -0.04);
   if (G.state === 'talk') drawTalk();
-  if (G.state === 'menu') { if (G.menuPage === 5) drawBagPage(); else if (G.menuPage === 4) drawSpellsPage(); else if (G.menuPage === 3) drawJukebox(); else if (G.menuPage === 2) drawMapPage(); else if (G.menuPage) drawJonPage(); else drawMenu(); drawMenuTabs(G.menuPage || 0); }
+  if (G.state === 'menu') { if (G.menuPage === 6) drawWall(); else if (G.menuPage === 5) drawBagPage(); else if (G.menuPage === 4) drawSpellsPage(); else if (G.menuPage === 3) drawJukebox(); else if (G.menuPage === 2) drawMapPage(); else if (G.menuPage) drawJonPage(); else drawMenu(); drawMenuTabs(G.menuPage || 0); drawOptions(); }
   drawBossCard(); drawCombo();
   drawJonLevel(); drawLevelBurst();
-  drawChapterCard();
+  drawChapterCard(); drawToasts(); drawSkipHint();
   if (G.state === 'choice') drawChoice();
   drawArenaMenus();
   if (G.state === 'over') {
@@ -193,7 +197,7 @@ function render() {
 
 let last = performance.now();
 G.menuSel = 0;
-buildAll(); buildSnesArt(); buildAwesomeArt(); buildMagicArt(); buildGiantArt(); buildOwenArt(); buildCritterArt();
+buildAll(); buildSnesArt(); buildAwesomeArt(); buildMagicArt(); buildGiantArt(); buildOwenArt(); buildCritterArt(); buildElfArt(); buildBarrowArt();
 function frame(now) {
   try { runFrame(now); } catch (err) { console.error(err); }   // fixed 60 Hz steps; see tech.js
   requestAnimationFrame(frame);

@@ -123,6 +123,41 @@ const MAPS = {
 ]
 },
 {
+"t": "elf",
+"at": [
+38,
+4
+]
+},
+{
+"t": "roadblock",
+"at": [
+15,
+5
+]
+},
+{
+"t": "roadblock",
+"at": [
+15,
+6
+]
+},
+{
+"t": "roadblock",
+"at": [
+15,
+7
+]
+},
+{
+"t": "roadblock",
+"at": [
+15,
+8
+]
+},
+{
 "t": "sign",
 "at": [
 60,
@@ -792,18 +827,18 @@ const MAPS = {
 "Wt____________tWWt____________tWWt____________tW",
 "WWWWWWWWWWWWWWWWWWWWWWW__WWWWWWWWWWWWWWWWWWWWWWW",
 "WWWWWWWWWWWWWWWWWWWWWWW__WWWWWWWWWWWWWWWWWWWWWWW",
-"WWWWWWWWWWWWWWWWWt____________tWWWWWWWWWWWWWWWWW",
-"WWWWWWWWWWWWWWWWW______________WWWWWWWWWWWWWWWWW",
-"WWWWWWWWWWWWWWWWW______________WWWWWWWWWWWWWWWWW",
-"WWWWWWWWWWWWWWWWW______________WWWWWWWWWWWWWWWWW",
-"WWWWWWWWWWWWWWWWW______________WWWWWWWWWWWWWWWWW",
-"WWWWWWWWWWWWWWWWW______________WWWWWWWWWWWWWWWWW",
-"WWWWWWWWWWWWWWWWW______________WWWWWWWWWWWWWWWWW",
-"WWWWWWWWWWWWWWWWW______________WWWWWWWWWWWWWWWWW",
-"WWWWWWWWWWWWWWWWW______________WWWWWWWWWWWWWWWWW",
-"WWWWWWWWWWWWWWWWW______________WWWWWWWWWWWWWWWWW",
-"WWWWWWWWWWWWWWWWW______________WWWWWWWWWWWWWWWWW",
-"WWWWWWWWWWWWWWWWWt____________tWWWWWWWWWWWWWWWWW",
+"Wt____________tWWt____________tWWWWWWWWWWWWWWWWW",
+"W___W______W___WW______________WWWWWWWWWWWWWWWWW",
+"W______________WW______________WWWWWWWWWWWWWWWWW",
+"W______________WW______________WWWWWWWWWWWWWWWWW",
+"W______________WW______________WWWWWWWWWWWWWWWWW",
+"W______________________________WWWWWWWWWWWWWWWWW",
+"W______________________________WWWWWWWWWWWWWWWWW",
+"W__W___________WW______________WWWWWWWWWWWWWWWWW",
+"W______________WW______________WWWWWWWWWWWWWWWWW",
+"W______________WW______________WWWWWWWWWWWWWWWWW",
+"W______________WW______________WWWWWWWWWWWWWWWWW",
+"Wt____________tWWt____________tWWWWWWWWWWWWWWWWW",
 "WWWWWWWWWWWWWWWWWWWWWWW__WWWWWWWWWWWWWWWWWWWWWWW"
 ],
 "ents": [
@@ -845,6 +880,66 @@ const MAPS = {
 48
 ],
 "text": "sign_cavern_in"
+},
+{
+"t": "elf",
+"at": [
+26,
+46
+]
+},
+{
+"t": "deadchilly",
+"at": [
+23,
+46
+]
+},
+{
+"t": "deadchilly",
+"at": [
+24,
+46
+],
+"half": true
+},
+{
+"t": "plate",
+"at": [
+4,
+45
+]
+},
+{
+"t": "plate",
+"at": [
+11,
+45
+]
+},
+{
+"t": "iceblock",
+"at": [
+7,
+50
+]
+},
+{
+"t": "iceblock",
+"at": [
+11,
+50
+]
+},
+{
+"t": "chest",
+"id": "cv_skates",
+"at": [
+7,
+46
+],
+"item": "skates",
+"needs": "puzzle_palace"
 },
 {
 "t": "penguin",
@@ -1501,20 +1596,20 @@ const MAPS = {
 "name": "The Drowned Barrow",
 "rows": [
 "WWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWW",
-"WWWWWWWWWWWWWWWWWww__________wwWWWWWWWWWWWWWWWWW",
-"WWWWWWWWWWWWWWWWWw____________wWWWWWWWWWWWWWWWWW",
-"WWWWWWWWWWWWWWWWW______________WWWWWWWWWWWWWWWWW",
-"WWWWWWWWWWWWWWWWW______________WWWWWWWWWWWWWWWWW",
-"WWWWWWWWWWWWWWWWW______________WWWWWWWWWWWWWWWWW",
-"WWWWWWWWWWWWWWWWW______________WWWWWWWWWWWWWWWWW",
-"WWWWWWWWWWWWWWWWW______________WWWWWWWWWWWWWWWWW",
-"WWWWWWWWWWWWWWWWW______________WWWWWWWWWWWWWWWWW",
-"WWWWWWWWWWWWWWWWW______________WWWWWWWWWWWWWWWWW",
-"WWWWWWWWWWWWWWWWW______________WWWWWWWWWWWWWWWWW",
-"WWWWWWWWWWWWWWWWWw____________wWWWWWWWWWWWWWWWWW",
-"WWWWWWWWWWWWWWWWWww__________wwWWWWWWWWWWWWWWWWW",
-"WWWWWWWWWWWWWWWWWWWWWWWhhWWWWWWWWWWWWWWWWWWWWWWW",
-"WWWWWWWWWWWWWWWWWWWWWWWKKWWWWWWWWWWWWWWWWWWWWWWW",
+"WWWWWWWWWWWWWWWWWww__________wwWWt__ww____ww__tW",
+"WWWWWWWWWWWWWWWWWw____________wWW___ww____ww___W",
+"WWWWWWWWWWWWWWWWW______________WW___ww____ww___W",
+"WWWWWWWWWWWWWWWWW______________WW___wwwwwwww___W",
+"WWWWWWWWWWWWWWWWW______________WW___wwwwwwww___W",
+"WWWWWWWWWWWWWWWWW______________WW___wwwWWwww___W",
+"WWWWWWWWWWWWWWWWW______________WW___wwwWWwww___W",
+"WWWWWWWWWWWWWWWWW______________WW___wwwwwwww___W",
+"WWWWWWWWWWWWWWWWW______________WW___wwwwwwww___W",
+"WWWWWWWWWWWWWWWWW______________WW___ww____ww___W",
+"WWWWWWWWWWWWWWWWWw____________wWW___ww____ww___W",
+"WWWWWWWWWWWWWWWWWww__________wwWWt__ww____ww__tW",
+"WWWWWWWWWWWWWWWWWWWWWWWhhWWWWWWWWWWWWWW__WWWWWWW",
+"WWWWWWWWWWWWWWWWWWWWWWWKKWWWWWWWWWWWWWW__WWWWWWW",
 "Wt____________tWWt____________tWWt___vv_______tW",
 "W______________WW______________WW____vv________W",
 "W______________WW______________WW____vv________W",
@@ -1690,6 +1785,66 @@ const MAPS = {
 20
 ],
 "item": "bigkey"
+},
+{
+"t": "npc",
+"id": "fluffy",
+"at": [
+39,
+9
+]
+},
+{
+"t": "bell",
+"size": 0,
+"at": [
+36,
+11
+],
+"zone": [
+36,
+7,
+37,
+12
+]
+},
+{
+"t": "bell",
+"size": 2,
+"at": [
+36,
+2
+],
+"zone": [
+36,
+1,
+37,
+6
+]
+},
+{
+"t": "bell",
+"size": 1,
+"at": [
+42,
+2
+],
+"zone": [
+42,
+1,
+43,
+6
+]
+},
+{
+"t": "chest",
+"id": "br_bell",
+"at": [
+41,
+2
+],
+"item": "bell",
+"needs": "puzzle_barrow"
 },
 {
 "t": "hank",

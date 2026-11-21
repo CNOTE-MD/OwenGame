@@ -17,6 +17,9 @@
 | `web/src/editor.js` | Notebook paper and photos of Owen's real pages, Jon's memories of what you did, the RUSH Ø piano duel, Chilly's night (bolder creatures, Owen's own grave, resting at runestones), Owen's notes |
 | `web/src/art3.js` | Pixel primitives (lines, ellipses, glows in quarter-step alpha), Scale2x/Scale3x for big sprites, framed boss bars, a hand-built Flight 364, villager props and room decor |
 | `web/src/rock.js` | Jon remembers a song for each rune: the outdoor music fills back in layer by layer, a beat marker joins the HUD, chops on the beat hit 1.5x, bosses strike on the beat |
+| `web/src/barrow.js` | The Drowned Barrow pass (a draft for Owen): Fluffy as the Barrow's guide (Jon translates a hint for wherever you are), the bell crypt (ring three spirit bells little, middle, big with the Voodoo Dash) and the Spirit Bell charm |
+| `web/src/elf.js` | Owen's page 10: the elf, and his answer that the elf leads into the palace and into "dead Chilly". Also the palace concierge (hints), the ice-block puzzle room and Ice Skates, and the dungeon floor plan on the MAP page |
+| `web/src/finish.js` | The finishing layer: credits with your stats, Jon's Trophy Wall, the options screen, fast-forward, control prompts, and fixes found by playing it through (see `REVIEW.md`) |
 | `web/src/palace.js` | Owen's page 9: the front of Jjorvic Palace (hotel and cathedral, ten-plus Imperial Ruby arches, penguins on top) and his scene at the observation point |
 | `web/src/giant.js` | Owen's page 6: the Forest Giant of the North boss at the log (stalk, slam, stuck window, hide as a tree) |
 | `web/src/better.js` | Objective compass, the Penguin King's Royal Rage with icicles, ambient sound (birds, crickets, wind, drips, subway hum), controller rumble, the nap bench, deeds on the map page |
@@ -29,7 +32,37 @@
 | `OWEN_QUESTIONS.md` | Prompts to ask Owen after he plays; his answers drive the next build |
 | `STORY_BIBLE.md` | Characters, chapter arc, items, the Red-Eye side quest, Arena mode |
 
-Rebuild: `python3 tools/maps.py && python3 tools/build_web.py`. Test: `NODE_PATH=$(npm root -g) node tests/web_playtest.js`, then `tests/arena_playtest.js`, `tests/ch1_depth_test.js`, `tests/redeye_test.js`, `tests/ch2_test.js`, `tests/jon_test.js`, `tests/pad_test.js`, `tests/snes_test.js`, `tests/magic_test.js`, `tests/better_test.js`, `tests/giant_test.js`, `tests/owen_test.js`, `tests/polish_test.js`, `tests/tech_test.js`, `tests/critters_test.js`, `tests/script_test.js` and `tests/tour_test.js` the same way.
+Rebuild: `python3 tools/maps.py && python3 tools/build_web.py`. Test: `NODE_PATH=$(npm root -g) node tests/web_playtest.js`, then `tests/arena_playtest.js`, `tests/ch1_depth_test.js`, `tests/redeye_test.js`, `tests/ch2_test.js`, `tests/jon_test.js`, `tests/pad_test.js`, `tests/snes_test.js`, `tests/magic_test.js`, `tests/better_test.js`, `tests/giant_test.js`, `tests/owen_test.js`, `tests/polish_test.js`, `tests/tech_test.js`, `tests/critters_test.js`, `tests/script_test.js`, `tests/tour_test.js`, `tests/finish_test.js`, `tests/elf_test.js`, `tests/barrow_test.js`, `tests/ipad_test.js` and `tests/playthrough_test.js` (a bot plays Owen's nine pages with real inputs; about 90 seconds) the same way.
+
+### Owen's link, and playing on an iPad
+
+`web/index.html` is a whole document, so it runs from any plain web address. Both addresses below serve the `main` branch and update a minute or two after a merge.
+
+| Address | What Owen sees | Status |
+|---|---|---|
+| https://cnote-md.github.io/OwenGame/ | The game, nothing else | **Needs GitHub Pages switched on once**: repo Settings, Pages, Source "Deploy from a branch", Branch `main`, folder `/ (root)`, Save. `.nojekyll` and the root `index.html` (a redirect to `web/`) are already in place for it |
+| https://raw.githack.com/CNOTE-MD/OwenGame/main/web/index.html | A third-party "One more step" page with an advertisement first; tap "Open the page". It comes back about once a day | Works today. Fine as a stopgap, wrong as Owen's front door |
+
+On an iPad or a phone it opens straight into the fill-the-window layout: the game screen, a thumbstick on the left, six buttons on the right. The small X in the corner goes back to the page (OWEN'S SCRIPT lives there); FULL SCREEN returns.
+
+| To do this | Do this on the iPad |
+|---|---|
+| Make it a real full-screen app with its own icon | Open the link in Safari, tap Share, then Add to Home Screen. Open it from the new icon |
+| Keep the save | Always play from the same place. The Safari tab and the home-screen icon each keep their own save, and Safari can clear a tab's save when the page goes unopened for a week or more; the home-screen app's save is not cleared that way |
+| Play with no internet | Open it once online first. `web/sw.js` keeps a copy and only uses it when the network is down |
+| Use a controller | Pair an Xbox, PlayStation or Switch Pro controller over Bluetooth; the touch controls hide themselves |
+| Hear it | Sound starts on the first tap. If it is silent, check the iPad is not muted |
+
+| File | What it is |
+|---|---|
+| `web/head.html` | The document head for the standalone page: viewport, home-screen title and icon |
+| `web/manifest.json`, `web/icon-180.png`, `web/icon-512.png` | The home-screen app's name and icon. Redraw the icon with `node tools/make_icon.js` |
+| `web/sw.js` | The offline copy (network first, so a new build always wins when online; a host's notice page is never kept in place of the game) |
+| `index.html`, `.nojekyll` (repo root) | For GitHub Pages: the short address redirects to `web/`, and Pages serves the files as they are |
+
+The claude.ai artifact wraps the page in its own document, so it is published from the page without `head.html`: `python3 tools/build_web.py --artifact /some/path/jontuka.html`, then publish that file to the artifact's URL.
+
+`tests/ipad_test.js` checks all of this in an emulated iPad (Chromium with touch at iPad sizes). That is not Safari on a real iPad; the first real run is still a test.
 
 ## Godot prototype (frozen)
 

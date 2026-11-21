@@ -263,6 +263,9 @@ OW_ENT = [
     {"t": "cdog", "at": P(0, 2, 10, 1)}, {"t": "cdog", "at": P(0, 2, 9, 2)}, {"t": "cdog", "at": P(0, 2, 11, 3)},
     {"t": "pblion", "at": P(2, 2, 10, 6)},
     {"t": "hiddenstairs", "at": P(3, 1, 13, 11), "to": "sauna", "dest": [8, 11]},
+    {"t": "elf", "at": P(2, 0, 6, 4)},   # Owen's page 10: "Come on, over here"
+    # the walk from the Foothills into the Muck Forest opens after Owen's taxi ride (page 5)
+    {"t": "roadblock", "at": P(0, 0, 15, 5)}, {"t": "roadblock", "at": P(0, 0, 15, 6)}, {"t": "roadblock", "at": P(0, 0, 15, 7)}, {"t": "roadblock", "at": P(0, 0, 15, 8)},
     {"t": "sign", "at": P(3, 1, 12, 11), "text": "sign_nopeng"},
     {"t": "runestone", "at": P(1, 2, 4, 8)},
     {"t": "sign", "at": P(1, 2, 12, 8), "text": "sign_airstrip"},
@@ -352,7 +355,9 @@ def put(g, x0, y0, rows):
 
 R = {}
 low = (9, 10)
-R[(1, 3)] = room(top="_", bottom="_")                          # entrance
+R[(1, 3)] = room(top="_", bottom="_", left="_")                # entrance (the lobby)
+R[(0, 3)] = room(right="_")                                     # housekeeping: the ice block puzzle
+put(R[(0, 3)], 4, 2, ["W      W"]); put(R[(0, 3)], 3, 8, ["W"])   # pillars that stop a sliding block
 R[(1, 2)] = room(top="L", bottom="_", left="_", right="_")      # hub (ice)
 put(R[(1, 2)], 3, 3, ["iiiiiiiiii"] * 8)
 R[(0, 2)] = room(right="_")                                     # west: bats + pots, key on clear
@@ -398,6 +403,13 @@ CAV_ENT = [
     {"t": "warp", "at": P(1, 3, 8, 13), "to": "overworld", "dest": P(2, 0, 7, 4)},
     {"t": "runestone", "at": P(1, 3, 4, 6)},
     {"t": "sign", "at": P(1, 3, 10, 6), "text": "sign_cavern_in"},
+    # Owen's answer: "Come on, over here" leads into the palace and into "dead Chilly". He lies across the lobby (two tiles); the elf waits beside him
+    {"t": "elf", "at": P(1, 3, 10, 4)},
+    {"t": "deadchilly", "at": P(1, 3, 7, 4)}, {"t": "deadchilly", "at": P(1, 3, 8, 4), "half": True},
+    # the ice block puzzle: two blocks, two plates; the chest rises when both plates are covered
+    {"t": "plate", "at": P(0, 3, 4, 3)}, {"t": "plate", "at": P(0, 3, 11, 3)},
+    {"t": "iceblock", "at": P(0, 3, 7, 8)}, {"t": "iceblock", "at": P(0, 3, 11, 8)},
+    {"t": "chest", "id": "cv_skates", "at": P(0, 3, 7, 4), "item": "skates", "needs": "puzzle_palace"},
     {"t": "penguin", "at": P(1, 2, 5, 5)}, {"t": "guard", "at": P(1, 2, 10, 5)}, {"t": "penguin", "at": P(1, 2, 8, 9)},
     {"t": "bat", "at": P(0, 2, 5, 5)}, {"t": "bat", "at": P(0, 2, 10, 8)}, {"t": "bat", "at": P(0, 2, 7, 10)},
     {"t": "chest", "id": "cv_key1", "at": P(0, 2, 7, 6), "item": "key", "clear": True},
@@ -429,8 +441,15 @@ put(BR[(2, 2)], 9, 1, ["ww"] * 12)
 BR[(1, 1)] = room(top="K", bottom="L", left="_", right="y")                        # great hall: channel splits it
 put(BR[(1, 1)], 1, 4, ["wwwwwwwwwwwwww", "wwwwwwwwwwwwww"])
 BR[(0, 1)] = room(right="h")                                                       # mini-boss: Draugr Captain
-BR[(2, 1)] = room(left="_")                                                        # big key across the pits
+BR[(2, 1)] = room(left="_", top="_")                                               # big key across the pits; the far side leads up to the bells
 put(BR[(2, 1)], 5, 1, ["vv"] * 12)
+# the bell crypt (draft): four islands around a drowned pillar. Only the Voodoo Dash crosses the water,
+# and a dash across a gap rings the spirit bell that hangs over it.
+BR[(2, 0)] = room(bottom="_", floor="w")
+put(BR[(2, 0)], 1, 1, ["___"] * 12); put(BR[(2, 0)], 12, 1, ["___"] * 12)              # west and east islands
+put(BR[(2, 0)], 6, 1, ["____"] * 3); put(BR[(2, 0)], 6, 10, ["____"] * 3)               # north and south islands
+put(BR[(2, 0)], 7, 6, ["WW", "WW"])                                                    # the drowned pillar
+for (x, y) in [(1, 1), (14, 1), (1, 12), (14, 12)]: BR[(2, 0)][y][x] = "t"
 BR[(1, 0)] = room(bottom="h")                                                      # Hank's ghost
 put(BR[(1, 0)], 1, 1, ["ww", "w"]); put(BR[(1, 0)], 13, 1, ["ww", " w"]); put(BR[(1, 0)], 1, 11, ["w", "ww"]); put(BR[(1, 0)], 13, 11, [" w", "ww"])
 BR[(1, 2)][0][7] = BR[(1, 2)][0][8] = "L"
@@ -457,6 +476,12 @@ BR_ENT = [
     {"t": "chest", "id": "br_dash", "at": P(0, 1, 8, 6), "item": "dash", "clear": True},
     {"t": "wisp", "at": P(2, 1, 11, 3)}, {"t": "bat", "at": P(2, 1, 12, 10)},
     {"t": "chest", "id": "br_bigkey", "at": P(2, 1, 12, 6), "item": "bigkey"},
+    # the bell crypt: ring little, middle, big. Each bell hangs over one gap; "zone" is the water a dash must cross to ring it
+    {"t": "npc", "id": "fluffy", "at": P(2, 0, 7, 9)},
+    {"t": "bell", "size": 0, "at": P(2, 0, 4, 11), "zone": [*P(2, 0, 4, 7), *P(2, 0, 5, 12)]},
+    {"t": "bell", "size": 2, "at": P(2, 0, 4, 2), "zone": [*P(2, 0, 4, 1), *P(2, 0, 5, 6)]},
+    {"t": "bell", "size": 1, "at": P(2, 0, 10, 2), "zone": [*P(2, 0, 10, 1), *P(2, 0, 11, 6)]},
+    {"t": "chest", "id": "br_bell", "at": P(2, 0, 9, 2), "item": "bell", "needs": "puzzle_barrow"},
     {"t": "hank", "at": P(1, 0, 8, 5)},
     {"t": "container", "id": "hc_barrow", "at": P(1, 0, 6, 9), "clear": True},
     {"t": "warp", "at": P(1, 0, 10, 9), "to": "overworld", "dest": P(0, 0, 7, 4), "clear": True, "portal": True},
@@ -716,6 +741,7 @@ for e in BR_ENT:
 assert near(no_dash, P(0, 1, 8, 6)), "Voodoo Dash chest must be reachable without the dash"
 assert not near(no_dash, P(1, 0, 8, 5)), "boss must need the dash"
 assert not near(no_dash, P(2, 1, 12, 6)), "big key must need the dash"
+assert not near(no_dash, P(2, 0, 7, 11)), "the bell crypt must need the dash"
 # the Red-Eye must be passable with the phantom seats both gone and present
 for phantom in (False, True):
     g = [list(r.replace("J", "A" if phantom else "m")) for r in RE]
