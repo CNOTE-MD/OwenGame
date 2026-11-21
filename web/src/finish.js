@@ -132,8 +132,8 @@ function drawWall() {
   text("JON'S TROPHY WALL", 20, 46, '#ffd84a'); text(`${have}/${n}  ${Math.round(100 * have / n)}%`, 236, 46, have === n ? '#9be08a' : '#c8e8ff', 'right');
   const rows = Math.ceil(n / 2);
   TROPHIES.forEach((t, i) => {
-    const col = i < rows ? 0 : 1, row = col ? i - rows : i, x = 18 + col * 114, y = 62 + row * 12, on = i === sel, h = !!got[t.id];
-    if (on) R(x - 3, y - 9, 113, 12, 'rgba(255,216,74,.16)');
+    const col = i < rows ? 0 : 1, row = col ? i - rows : i, x = 18 + col * 114, y = 62 + row * 11, on = i === sel, h = !!got[t.id];
+    if (on) R(x - 3, y - 9, 113, 11, 'rgba(255,216,74,.16)');
     drawCup(x + 4, y - 3, h);
     text(h || !t.secret ? (t.short || t.name) : '???', x + 14, y, h ? '#f6f0dc' : '#6a6c94', 'left', false);
   });

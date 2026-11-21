@@ -725,6 +725,13 @@ const MAPS = {
 ]
 },
 {
+"t": "elf",
+"at": [
+38,
+4
+]
+},
+{
 "t": "roadblock",
 "at": [
 15,
@@ -1422,18 +1429,18 @@ const MAPS = {
 "Wt____________tWWt____________tWWt____________tW",
 "WWWWWWWWWWWWWWWWWWWWWWW__WWWWWWWWWWWWWWWWWWWWWWW",
 "WWWWWWWWWWWWWWWWWWWWWWW__WWWWWWWWWWWWWWWWWWWWWWW",
-"WWWWWWWWWWWWWWWWWt____________tWWWWWWWWWWWWWWWWW",
-"WWWWWWWWWWWWWWWWW______________WWWWWWWWWWWWWWWWW",
-"WWWWWWWWWWWWWWWWW______________WWWWWWWWWWWWWWWWW",
-"WWWWWWWWWWWWWWWWW______________WWWWWWWWWWWWWWWWW",
-"WWWWWWWWWWWWWWWWW______________WWWWWWWWWWWWWWWWW",
-"WWWWWWWWWWWWWWWWW______________WWWWWWWWWWWWWWWWW",
-"WWWWWWWWWWWWWWWWW______________WWWWWWWWWWWWWWWWW",
-"WWWWWWWWWWWWWWWWW______________WWWWWWWWWWWWWWWWW",
-"WWWWWWWWWWWWWWWWW______________WWWWWWWWWWWWWWWWW",
-"WWWWWWWWWWWWWWWWW______________WWWWWWWWWWWWWWWWW",
-"WWWWWWWWWWWWWWWWW______________WWWWWWWWWWWWWWWWW",
-"WWWWWWWWWWWWWWWWWt____________tWWWWWWWWWWWWWWWWW",
+"Wt____________tWWt____________tWWWWWWWWWWWWWWWWW",
+"W___W______W___WW______________WWWWWWWWWWWWWWWWW",
+"W______________WW______________WWWWWWWWWWWWWWWWW",
+"W______________WW______________WWWWWWWWWWWWWWWWW",
+"W______________WW______________WWWWWWWWWWWWWWWWW",
+"W______________________________WWWWWWWWWWWWWWWWW",
+"W______________________________WWWWWWWWWWWWWWWWW",
+"W__W___________WW______________WWWWWWWWWWWWWWWWW",
+"W______________WW______________WWWWWWWWWWWWWWWWW",
+"W______________WW______________WWWWWWWWWWWWWWWWW",
+"W______________WW______________WWWWWWWWWWWWWWWWW",
+"Wt____________tWWt____________tWWWWWWWWWWWWWWWWW",
 "WWWWWWWWWWWWWWWWWWWWWWW__WWWWWWWWWWWWWWWWWWWWWWW"
 ],
 "ents": [
@@ -1475,6 +1482,51 @@ const MAPS = {
 48
 ],
 "text": "sign_cavern_in"
+},
+{
+"t": "elf",
+"at": [
+27,
+51
+]
+},
+{
+"t": "plate",
+"at": [
+4,
+45
+]
+},
+{
+"t": "plate",
+"at": [
+11,
+45
+]
+},
+{
+"t": "iceblock",
+"at": [
+7,
+50
+]
+},
+{
+"t": "iceblock",
+"at": [
+11,
+50
+]
+},
+{
+"t": "chest",
+"id": "cv_skates",
+"at": [
+7,
+46
+],
+"item": "skates",
+"needs": "puzzle_palace"
 },
 {
 "t": "penguin",
@@ -2599,6 +2651,28 @@ const STORY = {
     ['', 'A new voice said:'],
     ['???', 'How can I be of service?'],
   ],
+  // Owen's page 10: the elf
+  elf_meet: [
+    ['', 'Behind us was an elf (maybe a dwarf with a pointy hat on) no bigger than a lawn chair,'],
+    ['', 'which made him minuscule compared to most Norwegian elves. But, of course, large by Christmas elf standards.'],
+    ['Elf', 'How can I be of service?'],
+    ['', 'he (or she) repeated.'],
+    ['Owen', 'Uhhh...'],
+    ['Jon', 'We\'ve come to slay Chilly (and the ice penguins) due to their fondness of the east\'s giant\'s apartment home getaway!'],
+    ['Elf', 'Oh, well wouldn\'t you be lucky. He\'s already been slain, by a mighty warrior whose name I can not even begin to pronounce correctly.'],
+    ['Elf', 'Something like: The warrior of the north eastern village of Hüngrruk Alkāmö.'],
+    ['Owen', 'Uhh... What?'],
+    ['', 'I said, still confused from the quick change of events.'],
+    ['Elf', 'Come on, over here.'],
+  ],
+  elf_late: [['', 'A voice behind us said:'], ['???', 'How can I be of service?']],
+  // drafts for Owen to change: what the elf says after his page ends
+  elf_door: [['Elf', 'Come on, over here. Right through the front doors.'], ['Jon', 'I don\'t trust anyone that cheerful, Señor. ...Fine. After you.']],
+  elf_lobby: [['Elf', 'How can I be of service?']],
+  elf_place: [['Elf', 'Jjorvic Palace. Five stars. Also a cathedral. We don\'t like to choose.'], ['Elf', 'The previous owner? Slain, as I said. The penguins are still here, though. Nobody has told them.'], ['Jon', 'A hotel full of penguins who don\'t know their boss is gone. Señor, this is going to be loud.']],
+  elf_bye: [['Elf', 'Enjoy your stay. Mind the ice.']],
+  puzzle_intro: [['Jon', 'Ice blocks. And two glowy plates on the floor. I bet they want to meet.'], ['Jon', 'Push a block and it slides until something stops it. If you mess it up, step out and come back in. I won\'t tell anyone.']],
+  puzzle_done: [['', 'CLUNK. Both plates sink into the floor. A chest rises out of the ice.'], ['Jon', 'Housekeeping! ...Is what I would say, if I worked here.']],
   // Owen's page 8: he says STOP, and talks his way past the giant
   giant_stop: [
     ['Owen', 'STOP!'],
@@ -2806,6 +2880,7 @@ const ITEMS = {
     ['', 'You got the THUNDER RUNE!'],
     ['Jon', 'Oh. Oh YES. I remember this. Walter carved it into me. Fill the rune meter, press C, and I come down like lightning!'],
     ['', 'Thunder Strike hits every enemy on the screen. Defeat enemies to fill the rune meter.']] },
+  skates: { name: 'Ice Skates', icon: 'skates', lines: [['', 'You got the ICE SKATES! It\'s a charm. Wear it from the BAG: ice can\'t make you slide.'], ['Jon', 'Penguin-sized, but they stretch. Now WE do the sliding. On purpose.']] },
   piece: { name: 'Piece of Heart', icon: 'piece', lines: [['', 'You got a PIECE OF HEART! Collect four to grow a new heart.']] },
   container: { name: 'Heart Container', icon: 'container', lines: [['', 'You got a HEART CONTAINER! Your life grew by one heart.']] },
   kr20: { name: '20 Kroner', icon: 'coin', lines: [['', 'You found 20 kroner!']] },
@@ -3159,7 +3234,7 @@ const PF_GLYPHS = {
   '♥': '...../##.##/#####/#####/.###./..#..', '★': '..#../..#../#####/.###./.#.#./#...#', '✓': '...../....#/...#./#.#../.#...',
   '♪': '..##/..#./..#./..#./###./###.', '½': '#..../#..#./#.#../..##./.#..#/#...#/...##', '·': './././#', '…': '...../...../...../...../...../...../#.#.#',
   '→': '...../..#../...#./#####/...#./..#..', 'Ø': '.###./#..##/#.#.#/#.#.#/#.#.#/##..#/.###.', 'ø': '...../...../.###./#..##/#.#.#/##..#/.###.',
-  'Ö': '#...#/.###./#...#/#...#/#...#/#...#/.###.', 'ö': '.#.#./...../.###./#...#/#...#/#...#/.###.', 'ü': '.#.#./...../#...#/#...#/#...#/#...#/.####',
+  'Ö': '#...#/.###./#...#/#...#/#...#/#...#/.###.', 'ö': '.#.#./...../.###./#...#/#...#/#...#/.###.', 'ü': '.#.#./...../#...#/#...#/#...#/#...#/.####', 'ā': '.###./...../.###./....#/.####/#...#/.####',
   'ñ': '.##.#/#.##./####./#...#/#...#/#...#/#...#', 'á': '...#./..#../.###./....#/.####/#...#/.####', 'é': '...#./..#../.###./#...#/#####/#..../.###.',
   'í': '.#/#./../.#/.#/.#/.#', 'ó': '...#./..#../.###./#...#/#...#/#...#/.###.', 'ú': '...#./..#../#...#/#...#/#...#/#...#/.####',
   '¡': '#/./#/#/#/#/#', '¿': '..#../...../..#../.#.../#..../#...#/.###.', '—': '..../..../..../####', '–': '..../..../..../####', '’': '#/#', '‘': '#/#', '“': '#.#/#.#', '”': '#.#/#.#',
@@ -3789,7 +3864,7 @@ function updatePlayer(dt) {
   if (p.rooted > 0) { p.rooted -= dt; v = { x: 0, y: 0 }; if (Math.random() < 0.2) G.fx.push({ kind: 'leaf', x: p.x + rnd(-6, 6), y: p.y + rnd(-4, 6), vx: 0, vy: -10, grav: 0, t: 0, life: 0.4, color: '#58b840' }); }
   p.moving = !!(v.x || v.y);
   if (p.moving) { p.fx = v.x; p.fy = v.y; p.walk += dt * 14; }
-  const onIce = tileAt(p.x, p.y) === 'i';
+  const onIce = tileAt(p.x, p.y) === 'i' && !charmOn('skates');
   p.boost = Math.max(0, (p.boost || 0) - dt);
   const spd = 72 * G.st.speed * (p.boost > 0 ? 1.4 : 1) * (p.dashing > 0 ? 1 : groundSpeed(p));
   if (onIce) { const k = Math.min(1, 2.2 * dt); p.vx += (v.x * spd * 1.1 - p.vx) * k; p.vy += (v.y * spd * 1.1 - p.vy) * k; }
@@ -8502,7 +8577,7 @@ const SCENE_NAMES = {
   'signs.sign_fjordvik': 'Sign: Fjordvik', 'signs.sign_beach': 'Sign: the beach', 'signs.sign_airstrip': 'Sign: the airstrip', 'signs.sign_cavern': 'Sign: Jjorvic Palace', 'signs.sign_tbane': 'Sign: the T-bane', 'signs.seal_peak': 'Sealed door: Storm Peak',
   'flight.4': 'Flight 364: refreshments', 'flight.5': 'Flight 364: landing', 'taxi_out.0': 'Taxi to the forest (1)', 'taxi_out.1': 'Taxi to the forest (2)',
   lion_wake: 'Peanut Butter Lion wakes up', lion_again: 'Peanut Butter Lion (again)', lion_down: 'Peanut Butter Lion melts', throne_riddle: 'The riddle in the throne', throne_riddle_right: 'Riddle solved',
-  palace_view: 'Jjorvic Palace: Imperial Ruby and catch', roadblock: 'The muck on the Foothills road',
+  palace_view: 'Jjorvic Palace: Imperial Ruby and catch', elf_meet: 'The elf: How can I be of service?', elf_door: 'The elf at the palace door', elf_place: 'The elf: what is this place?', puzzle_intro: 'The ice block room', roadblock: 'The muck on the Foothills road',
   giant_stop: 'Giant fight: STOP!', giant_east: 'Giant fight: the giant of the east sent us', giant_peace: 'Giant fight: Thou shall pass', giant_wrong_south: 'Giant fight: wrong answer (south)', giant_wrong_nobody: 'Giant fight: wrong answer (nobody)', giant_wrong_why: 'Giant fight: wrong reason', giant_again: 'Giant fight: trying again',
   baron_1: 'Meeting Baron Blubber', baron_trophy: "Baron Blubber's trophy", baron_dartboard: 'The Chilly dartboard', 'signs.sign_nopeng': 'Sign: NO PENGUINS',
 };
@@ -8635,7 +8710,7 @@ function playLines(lines) {
   $('tab-ch4').addEventListener('click', () => { SCRIPT.tab = 'ch4'; renderScript(); });
   $('tab-notebook').addEventListener('click', () => { SCRIPT.tab = 'notebook'; renderScript(); });
   const dl = document.createElement('datalist'); dl.id = 'speakers';
-  dl.innerHTML = ['Owen', 'Jon', 'Astrid', 'Hank', 'Fluffy', 'Walter', 'Chilly', 'Lars', 'Sven', 'Bjarne', 'Ingrid', 'Penguin King', 'Forest Giant', 'Baron Blubber', 'Knörvic'].map(n => `<option value="${n}">`).join('');
+  dl.innerHTML = ['Owen', 'Jon', 'Astrid', 'Hank', 'Fluffy', 'Walter', 'Chilly', 'Lars', 'Sven', 'Bjarne', 'Ingrid', 'Penguin King', 'Forest Giant', 'Baron Blubber', 'Knörvic', 'Elf'].map(n => `<option value="${n}">`).join('');
   document.body.appendChild(dl);
 })();
 
@@ -9845,7 +9920,7 @@ function starPts(cx, cy, r) { const p = []; for (let i = 0; i < 10; i++) { const
 // ---------- the scene: Owen's observation point in the forest ----------
 function palaceScene() {
   setFlag('page9');
-  const done = () => writeSave();
+  const done = () => { writeSave(); elfArrives(false); };
   if (G.state === 'talk' && G.talk) { G.talk.queue.push(...STORY.palace_view); const d = G.talk.done; G.talk.done = () => { if (d) d(); done(); }; return; }
   say(STORY.palace_view, done);
 }
@@ -9853,6 +9928,7 @@ const _onEnterScreen = onEnterScreen;
 onEnterScreen = function () {
   _onEnterScreen();
   if (G.mode === 'story' && onPalaceScreen() && flag('giant_done') && !flag('page9')) palaceScene();
+  else if (G.mode === 'story' && onPalaceScreen() && flag('page9') && !flag('page10') && G.state === 'play') elfArrives(true);
 };
 const _drawDecorGroundP = drawDecorGround;
 drawDecorGround = function () { _drawDecorGroundP(); drawPalace(); };
@@ -9995,8 +10071,8 @@ function drawWall() {
   text("JON'S TROPHY WALL", 20, 46, '#ffd84a'); text(`${have}/${n}  ${Math.round(100 * have / n)}%`, 236, 46, have === n ? '#9be08a' : '#c8e8ff', 'right');
   const rows = Math.ceil(n / 2);
   TROPHIES.forEach((t, i) => {
-    const col = i < rows ? 0 : 1, row = col ? i - rows : i, x = 18 + col * 114, y = 62 + row * 12, on = i === sel, h = !!got[t.id];
-    if (on) R(x - 3, y - 9, 113, 12, 'rgba(255,216,74,.16)');
+    const col = i < rows ? 0 : 1, row = col ? i - rows : i, x = 18 + col * 114, y = 62 + row * 11, on = i === sel, h = !!got[t.id];
+    if (on) R(x - 3, y - 9, 113, 11, 'rgba(255,216,74,.16)');
     drawCup(x + 4, y - 3, h);
     text(h || !t.secret ? (t.short || t.name) : '???', x + 14, y, h ? '#f6f0dc' : '#6a6c94', 'left', false);
   });
@@ -10148,6 +10224,193 @@ floatText = function (x, y, label, color) {
   return _floatTextF(x, y, label, color);
 };
 
+// ===== elf.js =====
+// Owen's page 10: the elf. "Behind us was an elf (maybe a dwarf with a pointy hat on) no bigger
+// than a lawn chair." They ask "How can I be of service?", say Chilly has already been slain by
+// the warrior of Hüngrruk Alkāmö, and say "Come on, over here." That is where Owen's page ends.
+// What follows is a draft built on that one line: inside the palace the elf really is of service
+// (hints, and the floor plan on the MAP page), and housekeeping has an ice-block puzzle.
+
+// ---------------- the elf ----------------
+const PAL_ELF = { r: '#c0392b', R: '#e85a48', w: '#f4f4f8', s: '#f0c8a0', e: '#20141c', b: '#d8d8e0', g: '#2f8a4a', G: '#3aa85a', y: '#ffd84a', k: '#3a2418' };
+const ELF_ROWS = [
+  ['......r...', '.....rR...', '....rRr...', '...rRRrr..', '..wwwwwww.', '...sssss..', '...sesse..', '...sssss..', '...bbbbb..', '..ggbbbgg.', '..gGGyGGg.', '..ggggggg.', '...k...k..'],
+  ['......r...', '.....rR...', '....rRr...', '...rRRrr..', '..wwwwwww.', '...sssss..', '...sesse..', '...sssss..', '...bbbbb..', '..ggbbbgg.', '..gGGyGGg.', '..ggggggg.', '....k.k...'],
+];
+function buildElfArt() {
+  ELF_ROWS.forEach((r, i) => { SPR['elf_' + i] = buildSprite(r, PAL_ELF); });
+  SPR.npc_elf = SPR.elf_0; SPR.npc_elf_blink = buildSprite(ELF_ROWS[0].map(r => r.replace(/e/g, 's')), PAL_ELF);
+  SPR.icon_skates = buildSprite(['.ww.....', '.ww.....', '.www....', '.wwwww..', '.wwwwww.', '..k..k..', 'bbbbbbbb', '........'], { w: '#f4f4f8', k: '#8a8a9c', b: '#7fd4ff' });
+}
+PORTRAIT_NPC.Elf = 'elf';
+function elfArrives(late) {
+  const p = G.player;
+  // behind Owen: he is looking up at the palace, so the elf pops in below him
+  let ex = p.x, ey = p.y + 18; if (blocked(ex, ey, 4, 'walker')) { ex = p.x + 16; ey = p.y; }
+  const e = { kind: 'elf', x: ex, y: ey, talk: true, hop: 0, def: { t: 'elf' } };
+  G.ents = G.ents.filter(o => o.kind !== 'elf'); G.ents.push(e);
+  puff(ex, ey, '#ffffff', 10); Sound.play('secret');
+  p.fx = Math.sign(ex - p.x); p.fy = ex === p.x ? 1 : 0;
+  say(late ? [...STORY.elf_late, ...STORY.elf_meet] : STORY.elf_meet, () => {
+    setFlag('page10'); e.path = [[39 * T + 8, 6 * T + 8], [38 * T + 8, 4 * T + 8]]; writeSave();
+  });
+}
+function talkElf(e) {
+  G.player.cd = 0.2;
+  if (G.mapId !== 'cavern') return say(STORY.elf_door);
+  say(STORY.elf_lobby, () => ask('How can I be of service?', ['Where do I go next?', 'What is this place?', 'Nothing, thanks.'], i => {
+    if (i === 0) return say([['Elf', palaceHint()]]);
+    if (i === 1) return say(STORY.elf_place);
+    say(STORY.elf_bye);
+  }));
+}
+// the concierge knows the building: one hint for wherever Owen is in the palace
+function palaceHint() {
+  const s = G.save, opened = id => flag('chest:' + id);
+  if (flag('d1done')) return flag('puzzle_palace') ? 'You have seen everything, sir. Checkout is whenever you like.' : 'Housekeeping, west of this lobby, has misplaced something under the ice. Two blocks, two plates.';
+  if (s.bigkeys && s.bigkeys.cavern) return 'The throne room is behind the big door at the very top. The big key fits it.';
+  if (flag('cavern:gates')) return 'The gate is down. The upper west wing keeps the big key. The Royal Guards keep the upper west wing.';
+  if (s.items.homing) return 'There is a crystal switch across the pit, north of the ice ballroom. Throw your axe at it. He knows the way now.';
+  if (opened('cv_key1') || opened('cv_key2')) return 'Small keys open the locked doors north of the ice ballroom. A knight in the upper east wing guards something your axe will want.';
+  return 'Two small keys, sir. One in the west wing, with the bats. One in the east wing, past the holes in the floor.';
+}
+function drawElf(e) {
+  const x = Math.round(e.x - G.cam.x), y = Math.round(e.y - G.cam.y), moving = !!(e.path && e.path.length);
+  const hop = moving ? Math.round(Math.abs(Math.sin(G.t * 12)) * 3) : 0;
+  shadowAt(x, y + 5, 0.8);
+  spr(SPR['elf_' + (moving ? Math.floor(G.t * 8) % 2 : 0)], x, y + 6 - hop);
+  if (!moving && G.mapId === 'cavern' && Math.floor(G.t * 0.8) % 3 === 0) text('?', x + 7, y - 12, '#9be08a', 'left', 'outline');
+}
+
+// ---------------- housekeeping: the ice block puzzle ----------------
+// Push a block and it slides until something stops it. Cover both plates and a chest rises.
+// Leaving the room puts the blocks back.
+const blockTile = e => [Math.floor(e.x / T), Math.floor(e.y / T)];
+function tileFreeForBlock(tx, ty, self) {
+  if (solidTile(tx, ty, 'walker')) return false;
+  const sx = G.scr.x * 16, sy = G.scr.y * 14;
+  if (tx <= sx || tx >= sx + 15 || ty <= sy || ty >= sy + 13) return false;      // never out through a doorway
+  return !G.ents.some(o => o !== self && o.solid && Math.floor(o.x / T) === tx && Math.floor(o.y / T) === ty);
+}
+function updateIceBlocks(dt) {
+  const p = G.player, v = inputVec();
+  let moved = false;
+  for (const b of G.ents) {
+    if (b.kind !== 'iceblock') continue;
+    if (b.to) {
+      const dx = b.to.x - b.x, dy = b.to.y - b.y, d = Math.hypot(dx, dy), step = 150 * dt;
+      if (d <= step) { b.x = b.to.x; b.y = b.to.y; b.to = null; Sound.play('clank'); G.shake = Math.max(G.shake, 0.08); moved = true; }
+      else { b.x += dx / d * step; b.y += dy / d * step; }
+      continue;
+    }
+    const dx = b.x - p.x, dy = b.y - p.y;
+    let dir = null;
+    if (Math.abs(dy) < 7 && Math.abs(dx) > 8 && Math.abs(dx) < 15 && Math.abs(v.x) > 0.7 && Math.sign(v.x) === Math.sign(dx)) dir = [Math.sign(dx), 0];
+    else if (Math.abs(dx) < 7 && Math.abs(dy) > 8 && Math.abs(dy) < 15 && Math.abs(v.y) > 0.7 && Math.sign(v.y) === Math.sign(dy)) dir = [0, Math.sign(dy)];
+    b.pushT = dir ? (b.pushT || 0) + dt : 0;
+    if (b.pushT > 0.22) {
+      b.pushT = 0;
+      let [tx, ty] = blockTile(b), n = 0;
+      while (tileFreeForBlock(tx + dir[0], ty + dir[1], b)) { tx += dir[0]; ty += dir[1]; n++; }
+      if (n) { b.to = { x: tx * T + 8, y: ty * T + 8 }; Sound.play('swing'); } else Sound.play('clank');
+    }
+  }
+  if (moved && !flag('puzzle_palace')) {
+    const plates = G.ents.filter(e => e.kind === 'plate'), blocks = G.ents.filter(e => e.kind === 'iceblock');
+    if (plates.length && plates.every(pl => blocks.some(b => !b.to && Math.abs(b.x - pl.x) < 3 && Math.abs(b.y - pl.y) < 3))) {
+      setFlag('puzzle_palace'); Sound.play('secret'); G.shake = 0.3;
+      const d = MAPS[G.mapId].ents.find(o => o.id === 'cv_skates');
+      if (d) { const c = makeEnt(d, d.at[0] * T + 8, d.at[1] * T + 8); if (c) { G.ents.push(c); puff(c.x, c.y, '#cfefff', 14); } }
+      say(STORY.puzzle_done, writeSave);
+    }
+  }
+}
+function drawIceBlock(e) {
+  const x = Math.round(e.x - G.cam.x), y = Math.round(e.y - G.cam.y);
+  shadowAt(x, y + 7, 1.2);
+  R(x - 8, y - 9, 16, 16, '#0a0812'); R(x - 7, y - 8, 14, 14, '#9fd8f4'); R(x - 7, y - 8, 14, 4, '#dff6ff'); R(x - 7, y + 3, 14, 3, '#6aa8d0');
+  R(x - 5, y - 6, 2, 6, '#ffffff'); R(x + 2, y - 1, 3, 1, '#dff6ff'); R(x + 3, y + 1, 2, 1, '#dff6ff');
+}
+function drawPlate(e) {
+  const x = Math.round(e.x - G.cam.x), y = Math.round(e.y - G.cam.y);
+  const on = G.ents.some(b => b.kind === 'iceblock' && Math.abs(b.x - e.x) < 3 && Math.abs(b.y - e.y) < 3);
+  R(x - 7, y - 7, 14, 14, '#1a2a5a'); R(x - 6, y - 6, 12, 12, on ? '#ffd84a' : '#2a4a9a');
+  const g = on ? '#fff6c0' : (Math.floor(G.t * 2) % 2 ? '#7fd4ff' : '#4a8ad0');
+  R(x - 1, y - 4, 2, 8, g); R(x - 4, y - 1, 8, 2, g);
+}
+
+// ---------------- the palace floor plan on the MAP page ----------------
+const _markSeenE = markSeen;
+markSeen = function () { _markSeenE(); if (G.map && G.map.dungeon && G.scr) setFlag(`room:${G.mapId}:${G.scr.x},${G.scr.y}`); };
+function roomExists(M, rx, ry) { for (let y = 1; y < 13; y++) for (let x = 1; x < 15; x++) if (M.rows[ry * 14 + y][rx * 16 + x] !== 'W') return true; return false; }
+function drawDungeonMap() {
+  const M = G.map, cols = Math.round(M.rows[0].length / 16), rows = Math.round(M.rows.length / 14);
+  R(14, 36, 228, 104, '#14163a');
+  const cw = Math.min(40, Math.floor(200 / cols)), ch = Math.min(24, Math.floor(100 / rows)), ox = Math.round(128 - cols * cw / 2), oy = 40 + Math.round((100 - rows * ch) / 2);
+  const door = c => c !== 'W' && c !== 't';
+  for (let ry = 0; ry < rows; ry++) for (let rx = 0; rx < cols; rx++) {
+    if (!roomExists(M, rx, ry)) continue;
+    const seen = flag(`room:${G.mapId}:${rx},${ry}`), X = ox + rx * cw, Y = oy + ry * ch, here = G.scr.x === rx && G.scr.y === ry;
+    R(X + 1, Y + 1, cw - 2, ch - 2, '#0a0812'); R(X + 2, Y + 2, cw - 4, ch - 4, seen ? '#4a5aa8' : '#1e2250');
+    // doorways, read off the room's own walls
+    const gx = rx * 16, gy = ry * 14, row = y => M.rows[gy + y];
+    if (door(row(0)[gx + 7])) R(X + cw / 2 - 2, Y, 4, 2, seen ? '#4a5aa8' : '#1e2250');
+    if (door(row(13)[gx + 7])) R(X + cw / 2 - 2, Y + ch - 2, 4, 2, seen ? '#4a5aa8' : '#1e2250');
+    for (const y of [6, 9]) { if (door(row(y)[gx])) R(X, Y + ch / 2 - 2, 2, 4, seen ? '#4a5aa8' : '#1e2250'); if (door(row(y)[gx + 15])) R(X + cw - 2, Y + ch / 2 - 2, 2, 4, seen ? '#4a5aa8' : '#1e2250'); }
+    if (!seen) { text('?', X + cw / 2 - 1, Y + ch / 2 + 3, '#3a3f80', 'center', false); continue; }
+    const inRoom = d => Math.floor(d.at[0] / 16) === rx && Math.floor(d.at[1] / 14) === ry;
+    if (M.ents.some(d => d.t === 'chest' && inRoom(d) && !flag('chest:' + d.id) && (!d.needs || flag(d.needs)))) { R(X + 5, Y + ch - 9, 6, 5, '#8a5a28'); R(X + 5, Y + ch - 9, 6, 2, '#ffd84a'); }
+    if (M.ents.some(d => ['king', 'knight', 'hank', 'captain'].includes(d.t) && inRoom(d)) && !flag(`clear:${G.mapId}:${rx},${ry}`)) { R(X + cw - 11, Y + 4, 6, 6, '#e23'); R(X + cw - 10, Y + 6, 1, 1, '#000'); R(X + cw - 7, Y + 6, 1, 1, '#000'); }
+    if (M.ents.some(d => d.t === 'elf' && inRoom(d)) && flag('page10')) text('?', X + cw - 8, Y + ch - 4, '#9be08a', 'left', false);
+    if (here && Math.floor(G.t * 3) % 2 === 0) { R(X + cw / 2 - 3, Y + ch / 2 - 3, 6, 6, '#0a0812'); R(X + cw / 2 - 2, Y + ch / 2 - 2, 4, 4, '#ffd84a'); }
+  }
+}
+const _drawMapPageE = drawMapPage;
+drawMapPage = function () { _drawMapPageE(); if (G.map && G.map.dungeon && !G.map.redeye) drawDungeonMap(); };
+
+// ---------------- wiring ----------------
+CHARMS.skates = { name: 'Ice Skates', icon: 'skates', desc: 'Ice cannot make you slide.', apply: () => {} };
+function updateElfWorld(dt) {
+  for (const e of G.ents) {
+    if (e.kind !== 'elf' || !e.path || !e.path.length) continue;
+    const [tx, ty] = e.path[0], dx = tx - e.x, dy = ty - e.y, d = Math.hypot(dx, dy), step = 70 * dt;
+    if (d <= step) { e.x = tx; e.y = ty; e.path.shift(); if (!e.path.length) e.solid = true; } else { e.x += dx / d * step; e.y += dy / d * step; }
+  }
+  if (G.mapId === 'cavern') updateIceBlocks(dt);
+}
+const _makeEntE = makeEnt;
+makeEnt = function (d, x, y) {
+  const s = G.save, base = { x, y, def: d, kind: d.t };
+  switch (d.t) {
+    case 'elf': return s.flags.page10 ? { ...base, solid: true, talk: true } : null;
+    case 'plate': return { ...base };
+    case 'iceblock': {
+      // once solved, the blocks rest on the plates
+      if (s.flags.puzzle_palace) { const M = MAPS[G.mapId], i = M.ents.filter(o => o.t === 'iceblock').indexOf(d), pl = M.ents.filter(o => o.t === 'plate')[i]; if (pl) return { ...base, x: pl.at[0] * T + 8, y: pl.at[1] * T + 8, solid: true }; }
+      return { ...base, solid: true };
+    }
+  }
+  return _makeEntE(d, x, y);
+};
+const _interactE = interact;
+interact = function (e) { if (e.kind === 'elf') return talkElf(e); return _interactE(e); };
+const _drawThingE = drawThing;
+drawThing = function (e) {
+  switch (e.kind) { case 'elf': return drawElf(e); case 'iceblock': return drawIceBlock(e); case 'plate': return; }
+  return _drawThingE(e);
+};
+const _drawDecorGroundE = drawDecorGround;
+drawDecorGround = function () { _drawDecorGroundE(); for (const e of G.ents) if (e.kind === 'plate') drawPlate(e); };
+const _onEnterScreenE = onEnterScreen;
+onEnterScreen = function () {
+  _onEnterScreenE();
+  if (G.mapId === 'cavern' && G.scr.x === 0 && G.scr.y === 3 && !flag('intro:puzzle') && G.state === 'play') { setFlag('intro:puzzle'); say(STORY.puzzle_intro); }
+};
+TROPHIES.splice(TROPHIES.findIndex(t => t.id === 'king'), 0,
+  { id: 'elf', name: 'Of Service', desc: 'Meet the elf at Jjorvic Palace.', ok: () => flag('page10') });
+TROPHIES.splice(TROPHIES.findIndex(t => t.id === 'hank'), 0,
+  { id: 'housekeeping', name: 'Housekeeping', desc: 'Solve the ice block puzzle in the palace.', ok: () => flag('puzzle_palace') });
+
 // ===== main.js =====
 // State machine and main loop.
 
@@ -10280,7 +10543,7 @@ function update(dt) {
   updateJon(dt);
   if (G.mode === 'arena') { updateArena(dt); if (G.state !== 'play') return; }
   if (G.map.redeye) updateRedeye(dt);
-  updateJonTalk(dt); jonCompliment(dt); updateTrophies(dt);
+  updateJonTalk(dt); jonCompliment(dt); updateTrophies(dt); updateElfWorld(dt);
   maybeJonLevelUp();
   if (G.state !== 'play') return;
   if (HK.axes.length) updateHankAxes(dt);
@@ -10348,7 +10611,7 @@ function render() {
 
 let last = performance.now();
 G.menuSel = 0;
-buildAll(); buildSnesArt(); buildAwesomeArt(); buildMagicArt(); buildGiantArt(); buildOwenArt(); buildCritterArt();
+buildAll(); buildSnesArt(); buildAwesomeArt(); buildMagicArt(); buildGiantArt(); buildOwenArt(); buildCritterArt(); buildElfArt();
 function frame(now) {
   try { runFrame(now); } catch (err) { console.error(err); }   // fixed 60 Hz steps; see tech.js
   requestAnimationFrame(frame);

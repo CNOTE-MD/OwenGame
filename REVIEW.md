@@ -36,7 +36,7 @@ What the playthrough found, all fixed in this pass:
 | What 90+ games do | Before | Now |
 |---|---|---|
 | End properly | A banner, then nothing | Credits: written by Owen, the cast, your stats, a rank from Jon, and what comes next |
-| Show how much there is and reward finding it | Counters spread over menu pages | Jon's Trophy Wall: 22 trophies, 5 of them secret, a completion percent |
+| Show how much there is and reward finding it | Counters spread over menu pages | Jon's Trophy Wall: 24 trophies, 5 of them secret, a completion percent |
 | Teach controls where they are needed | A key list under the screen, hidden on touch | A button prompt over anything Owen can talk to or read; first-time hints for walking, looking, fighting and the menu |
 | Respect the player's time | Every line of every scene, every time | Hold THROW to fast-forward a conversation; three text speeds |
 | Options and accessibility | Easy/Normal and sound | An options screen: text speed, screen shake, flash strength, notes, sound, music, TV filter |
@@ -63,3 +63,24 @@ These are not polish, and three of them are not Claude's to add.
 3. **Nobody has watched a child play it.** Every difficulty number is a guess from code and a bot. One session of Owen playing while someone takes notes is worth more than this document.
 4. **The art and music are generated.** They are consistent and charming, but a 90 usually has a human's hand in at least one of them. Owen's own drawings on the cards (already supported) are the cheapest way there.
 5. **It has only been run in a desktop browser engine.** It is meant for an iPad.
+
+## Second pass (the same week): Owen's page 10, and the dungeon
+
+Owen's page 10 arrived: an elf the size of a lawn chair who says Chilly has already been slain. It is the best twist in the story so far, and it is built as written. His elf's one line, "How can I be of service?", also became the answer to two of the gaps above.
+
+| Gap | What changed |
+|---|---|
+| The dungeons are thin | Jjorvic Palace gained a ninth room, housekeeping, with a sliding ice-block puzzle (a wrong push can jam it; stepping out resets it). Its reward, the Ice Skates, changes how the rest of the palace plays. |
+| A child can get lost in a dungeon | The elf is the palace's concierge: ask, and they give one hint for wherever you are. The MAP page shows the palace's floor plan, with rooms you haven't entered, unopened chests and bosses. |
+
+| Critic | First pass | Second pass | Why |
+|---|---|---|---|
+| The mainstream reviewer | 85 | 87 | The elf scene; a twist worth talking about |
+| The design critic | 83 | 86 | A real puzzle, a dungeon map, an item that changes movement |
+| The retro specialist | 86 | 87 | A floor plan and a block puzzle are exactly the genre |
+| The family reviewer | 85 | 87 | A hint is always one conversation away |
+| The hard-nosed critic | 79 | 81 | Still three chapters of five |
+| **Average** | **84** | **86** | |
+
+It is not a 90, and more features will not make it one. The remaining four points are the same list: Owen's chapters 4 and 5 and an ending; a second dungeon built with this much care (the Drowned Barrow has not had this pass); a session of a child playing it with someone watching; and a run on a real iPad.
+

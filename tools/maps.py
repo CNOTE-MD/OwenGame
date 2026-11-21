@@ -263,6 +263,7 @@ OW_ENT = [
     {"t": "cdog", "at": P(0, 2, 10, 1)}, {"t": "cdog", "at": P(0, 2, 9, 2)}, {"t": "cdog", "at": P(0, 2, 11, 3)},
     {"t": "pblion", "at": P(2, 2, 10, 6)},
     {"t": "hiddenstairs", "at": P(3, 1, 13, 11), "to": "sauna", "dest": [8, 11]},
+    {"t": "elf", "at": P(2, 0, 6, 4)},   # Owen's page 10: "Come on, over here"
     # the walk from the Foothills into the Muck Forest opens after Owen's taxi ride (page 5)
     {"t": "roadblock", "at": P(0, 0, 15, 5)}, {"t": "roadblock", "at": P(0, 0, 15, 6)}, {"t": "roadblock", "at": P(0, 0, 15, 7)}, {"t": "roadblock", "at": P(0, 0, 15, 8)},
     {"t": "sign", "at": P(3, 1, 12, 11), "text": "sign_nopeng"},
@@ -354,7 +355,9 @@ def put(g, x0, y0, rows):
 
 R = {}
 low = (9, 10)
-R[(1, 3)] = room(top="_", bottom="_")                          # entrance
+R[(1, 3)] = room(top="_", bottom="_", left="_")                # entrance (the lobby)
+R[(0, 3)] = room(right="_")                                     # housekeeping: the ice block puzzle
+put(R[(0, 3)], 4, 2, ["W      W"]); put(R[(0, 3)], 3, 8, ["W"])   # pillars that stop a sliding block
 R[(1, 2)] = room(top="L", bottom="_", left="_", right="_")      # hub (ice)
 put(R[(1, 2)], 3, 3, ["iiiiiiiiii"] * 8)
 R[(0, 2)] = room(right="_")                                     # west: bats + pots, key on clear
@@ -400,6 +403,11 @@ CAV_ENT = [
     {"t": "warp", "at": P(1, 3, 8, 13), "to": "overworld", "dest": P(2, 0, 7, 4)},
     {"t": "runestone", "at": P(1, 3, 4, 6)},
     {"t": "sign", "at": P(1, 3, 10, 6), "text": "sign_cavern_in"},
+    {"t": "elf", "at": P(1, 3, 11, 9)},
+    # the ice block puzzle: two blocks, two plates; the chest rises when both plates are covered
+    {"t": "plate", "at": P(0, 3, 4, 3)}, {"t": "plate", "at": P(0, 3, 11, 3)},
+    {"t": "iceblock", "at": P(0, 3, 7, 8)}, {"t": "iceblock", "at": P(0, 3, 11, 8)},
+    {"t": "chest", "id": "cv_skates", "at": P(0, 3, 7, 4), "item": "skates", "needs": "puzzle_palace"},
     {"t": "penguin", "at": P(1, 2, 5, 5)}, {"t": "guard", "at": P(1, 2, 10, 5)}, {"t": "penguin", "at": P(1, 2, 8, 9)},
     {"t": "bat", "at": P(0, 2, 5, 5)}, {"t": "bat", "at": P(0, 2, 10, 8)}, {"t": "bat", "at": P(0, 2, 7, 10)},
     {"t": "chest", "id": "cv_key1", "at": P(0, 2, 7, 6), "item": "key", "clear": True},

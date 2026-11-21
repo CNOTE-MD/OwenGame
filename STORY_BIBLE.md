@@ -71,6 +71,16 @@ Full answers are in `story/OWEN_ANSWERS.md`. What they settle:
 - **Chilly's arch-enemy:** a walrus called **Baron Blubber** (placeholder; Owen names him) in a towel and a monocle. Chilly froze his sauna, so he built a new one beside the volcano. He does not help Owen. He is just mad at Chilly, and throws a fish at a Chilly dartboard every morning. He mentions Chilly's cousin on top of the Storm Peak (Owen's Q36) only to say he doesn't like him either.
 - **The throne riddle:** carved into the armrest of Chilly's throne, under a fish bone.
 
+## Page 10: the elf, and Chilly "already slain" (built)
+
+The voice belongs to an elf (maybe a dwarf with a pointy hat on) no bigger than a lawn chair: minuscule for a Norwegian elf, large for a Christmas elf. Jon shouts the cover story ("We've come to slay Chilly, and the ice penguins, due to their fondness of the east's giant's apartment home getaway!"). The elf answers that Chilly has already been slain, by a mighty warrior whose name they can't pronounce: "the warrior of the north eastern village of Hüngrruk Alkāmö". Owen: "Uhh... What?" The elf: "Come on, over here."
+
+- **The Elf:** he, she or they (Owen uses all three); the game says "the Elf" and they. Polite, helpful, hotel-staff manner ("How can I be of service?").
+- **Chilly may already be dead.** Owen's biggest twist so far. The game does not decide whether the elf is right.
+- **Hüngrruk Alkāmö:** a village in the north-east with a mighty warrior.
+- **In the game (Owen's page):** after the page 9 scene the elf pops up behind Owen, the page plays, and the elf hops to the palace doors and waits.
+- **In the game (draft, built on "How can I be of service?"):** the elf is the palace's concierge. In the lobby they offer a hint for wherever Owen is in the palace, and the MAP page shows the palace's floor plan. They say the penguins are still here because nobody has told them the owner is gone. West of the lobby is housekeeping: an ice-block puzzle (slide two blocks onto two plates) that gives the Ice Skates charm, so ice can't make Owen slide.
+
 ## Page 9: Jjorvic Palace, Imperial Ruby, and catch (built)
 
 From an observation point in the deep forest, Owen sees Jjorvic Palace: "a five star hotel and a cathedral put in a bowl and mixed into one", with at least ten arches and penguins sitting on top of them. Jon hisses: Imperial Ruby, the meanest and second sharpest axe-making material in the nine realms. Jon is the sharpest; he can cut anything Jotuns, Gods and Humans throw at him. Owen asks if that's why Jon is so bad at catch with MLB baseballs. Jon says he looks bad on purpose so he doesn't destroy Owen every time. Then a new voice: "How can I be of service?"
@@ -178,4 +188,5 @@ Jon hums all four when Owen stands still.
 6. Chilly's arch-enemy's real name (Baron Blubber is a placeholder), and whether he's a walrus.
 7. Chapter 4, Walter's Forge: Owen writes it in OWEN'S SCRIPT under the game.
 8. How the Giant of the East's name is spelled: KNÖRVIC (as built) or KNCÖRVIC.
-9. Who says "How can I be of service?" at the palace, and what Imperial Ruby is part of.
+9. What Imperial Ruby is part of.
+10. Is the elf telling the truth about Chilly? Who is the warrior of Hüngrruk Alkāmö? Where does "Come on, over here" lead?

@@ -67,7 +67,7 @@ function starPts(cx, cy, r) { const p = []; for (let i = 0; i < 10; i++) { const
 // ---------- the scene: Owen's observation point in the forest ----------
 function palaceScene() {
   setFlag('page9');
-  const done = () => writeSave();
+  const done = () => { writeSave(); elfArrives(false); };
   if (G.state === 'talk' && G.talk) { G.talk.queue.push(...STORY.palace_view); const d = G.talk.done; G.talk.done = () => { if (d) d(); done(); }; return; }
   say(STORY.palace_view, done);
 }
@@ -75,6 +75,7 @@ const _onEnterScreen = onEnterScreen;
 onEnterScreen = function () {
   _onEnterScreen();
   if (G.mode === 'story' && onPalaceScreen() && flag('giant_done') && !flag('page9')) palaceScene();
+  else if (G.mode === 'story' && onPalaceScreen() && flag('page9') && !flag('page10') && G.state === 'play') elfArrives(true);
 };
 const _drawDecorGroundP = drawDecorGround;
 drawDecorGround = function () { _drawDecorGroundP(); drawPalace(); };

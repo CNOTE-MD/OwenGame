@@ -80,3 +80,10 @@ See `REVIEW.md` for the review that led to this. All of it lives in `web/src/fin
 - **Prompts:** a small button label bounces over anything Owen is facing that he can talk to or read. Four first-time hints (walk, look, fight, menu) show once each and name the right button for touch or keyboard.
 - **Robustness:** Owen slides out of any wall he overlaps; floating words stack; the walk from the Foothills to the Muck Forest is blocked by deep muck until the first taxi ride, so Owen's page 5 is how you get there.
 
+## Owen's page 10 and the palace (November 2026)
+
+- **The elf (Owen's page):** see `STORY_BIBLE.md`. After page 9's scene the elf appears behind Owen, page 10 plays, and the elf hops to the palace doors.
+- **Concierge (draft):** in the lobby the elf asks "How can I be of service?" and offers a hint (`palaceHint()`), which follows progress: small keys, the knight, the crystal switch, the big key, the throne room, then housekeeping.
+- **Ice-block puzzle (draft):** the room west of the lobby. A pushed block slides until a wall, pillar or other block stops it. Two blocks, two plates, three correct pushes. A wrong push can jam it; leaving the room resets it. Solving it raises a chest with the **Ice Skates** charm: ice no longer makes Owen slide.
+- **Floor plan:** inside a dungeon the MAP page shows its rooms: entered or not, doorways, unopened chests, bosses not yet beaten, and where Owen is.
+

@@ -123,6 +123,13 @@ const MAPS = {
 ]
 },
 {
+"t": "elf",
+"at": [
+38,
+4
+]
+},
+{
 "t": "roadblock",
 "at": [
 15,
@@ -820,18 +827,18 @@ const MAPS = {
 "Wt____________tWWt____________tWWt____________tW",
 "WWWWWWWWWWWWWWWWWWWWWWW__WWWWWWWWWWWWWWWWWWWWWWW",
 "WWWWWWWWWWWWWWWWWWWWWWW__WWWWWWWWWWWWWWWWWWWWWWW",
-"WWWWWWWWWWWWWWWWWt____________tWWWWWWWWWWWWWWWWW",
-"WWWWWWWWWWWWWWWWW______________WWWWWWWWWWWWWWWWW",
-"WWWWWWWWWWWWWWWWW______________WWWWWWWWWWWWWWWWW",
-"WWWWWWWWWWWWWWWWW______________WWWWWWWWWWWWWWWWW",
-"WWWWWWWWWWWWWWWWW______________WWWWWWWWWWWWWWWWW",
-"WWWWWWWWWWWWWWWWW______________WWWWWWWWWWWWWWWWW",
-"WWWWWWWWWWWWWWWWW______________WWWWWWWWWWWWWWWWW",
-"WWWWWWWWWWWWWWWWW______________WWWWWWWWWWWWWWWWW",
-"WWWWWWWWWWWWWWWWW______________WWWWWWWWWWWWWWWWW",
-"WWWWWWWWWWWWWWWWW______________WWWWWWWWWWWWWWWWW",
-"WWWWWWWWWWWWWWWWW______________WWWWWWWWWWWWWWWWW",
-"WWWWWWWWWWWWWWWWWt____________tWWWWWWWWWWWWWWWWW",
+"Wt____________tWWt____________tWWWWWWWWWWWWWWWWW",
+"W___W______W___WW______________WWWWWWWWWWWWWWWWW",
+"W______________WW______________WWWWWWWWWWWWWWWWW",
+"W______________WW______________WWWWWWWWWWWWWWWWW",
+"W______________WW______________WWWWWWWWWWWWWWWWW",
+"W______________________________WWWWWWWWWWWWWWWWW",
+"W______________________________WWWWWWWWWWWWWWWWW",
+"W__W___________WW______________WWWWWWWWWWWWWWWWW",
+"W______________WW______________WWWWWWWWWWWWWWWWW",
+"W______________WW______________WWWWWWWWWWWWWWWWW",
+"W______________WW______________WWWWWWWWWWWWWWWWW",
+"Wt____________tWWt____________tWWWWWWWWWWWWWWWWW",
 "WWWWWWWWWWWWWWWWWWWWWWW__WWWWWWWWWWWWWWWWWWWWWWW"
 ],
 "ents": [
@@ -873,6 +880,51 @@ const MAPS = {
 48
 ],
 "text": "sign_cavern_in"
+},
+{
+"t": "elf",
+"at": [
+27,
+51
+]
+},
+{
+"t": "plate",
+"at": [
+4,
+45
+]
+},
+{
+"t": "plate",
+"at": [
+11,
+45
+]
+},
+{
+"t": "iceblock",
+"at": [
+7,
+50
+]
+},
+{
+"t": "iceblock",
+"at": [
+11,
+50
+]
+},
+{
+"t": "chest",
+"id": "cv_skates",
+"at": [
+7,
+46
+],
+"item": "skates",
+"needs": "puzzle_palace"
 },
 {
 "t": "penguin",

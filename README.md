@@ -17,6 +17,7 @@
 | `web/src/editor.js` | Notebook paper and photos of Owen's real pages, Jon's memories of what you did, the RUSH Ø piano duel, Chilly's night (bolder creatures, Owen's own grave, resting at runestones), Owen's notes |
 | `web/src/art3.js` | Pixel primitives (lines, ellipses, glows in quarter-step alpha), Scale2x/Scale3x for big sprites, framed boss bars, a hand-built Flight 364, villager props and room decor |
 | `web/src/rock.js` | Jon remembers a song for each rune: the outdoor music fills back in layer by layer, a beat marker joins the HUD, chops on the beat hit 1.5x, bosses strike on the beat |
+| `web/src/elf.js` | Owen's page 10: the elf. Also the palace concierge (hints), the ice-block puzzle room and Ice Skates, and the dungeon floor plan on the MAP page |
 | `web/src/finish.js` | The finishing layer: credits with your stats, Jon's Trophy Wall, the options screen, fast-forward, control prompts, and fixes found by playing it through (see `REVIEW.md`) |
 | `web/src/palace.js` | Owen's page 9: the front of Jjorvic Palace (hotel and cathedral, ten-plus Imperial Ruby arches, penguins on top) and his scene at the observation point |
 | `web/src/giant.js` | Owen's page 6: the Forest Giant of the North boss at the log (stalk, slam, stuck window, hide as a tree) |
@@ -30,7 +31,7 @@
 | `OWEN_QUESTIONS.md` | Prompts to ask Owen after he plays; his answers drive the next build |
 | `STORY_BIBLE.md` | Characters, chapter arc, items, the Red-Eye side quest, Arena mode |
 
-Rebuild: `python3 tools/maps.py && python3 tools/build_web.py`. Test: `NODE_PATH=$(npm root -g) node tests/web_playtest.js`, then `tests/arena_playtest.js`, `tests/ch1_depth_test.js`, `tests/redeye_test.js`, `tests/ch2_test.js`, `tests/jon_test.js`, `tests/pad_test.js`, `tests/snes_test.js`, `tests/magic_test.js`, `tests/better_test.js`, `tests/giant_test.js`, `tests/owen_test.js`, `tests/polish_test.js`, `tests/tech_test.js`, `tests/critters_test.js`, `tests/script_test.js`, `tests/tour_test.js`, `tests/finish_test.js` and `tests/playthrough_test.js` (a bot plays Owen's nine pages with real inputs; about 90 seconds) the same way.
+Rebuild: `python3 tools/maps.py && python3 tools/build_web.py`. Test: `NODE_PATH=$(npm root -g) node tests/web_playtest.js`, then `tests/arena_playtest.js`, `tests/ch1_depth_test.js`, `tests/redeye_test.js`, `tests/ch2_test.js`, `tests/jon_test.js`, `tests/pad_test.js`, `tests/snes_test.js`, `tests/magic_test.js`, `tests/better_test.js`, `tests/giant_test.js`, `tests/owen_test.js`, `tests/polish_test.js`, `tests/tech_test.js`, `tests/critters_test.js`, `tests/script_test.js`, `tests/tour_test.js`, `tests/finish_test.js`, `tests/elf_test.js` and `tests/playthrough_test.js` (a bot plays Owen's nine pages with real inputs; about 90 seconds) the same way.
 
 ## Godot prototype (frozen)
 

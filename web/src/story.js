@@ -88,6 +88,28 @@ const STORY = {
     ['', 'A new voice said:'],
     ['???', 'How can I be of service?'],
   ],
+  // Owen's page 10: the elf
+  elf_meet: [
+    ['', 'Behind us was an elf (maybe a dwarf with a pointy hat on) no bigger than a lawn chair,'],
+    ['', 'which made him minuscule compared to most Norwegian elves. But, of course, large by Christmas elf standards.'],
+    ['Elf', 'How can I be of service?'],
+    ['', 'he (or she) repeated.'],
+    ['Owen', 'Uhhh...'],
+    ['Jon', 'We\'ve come to slay Chilly (and the ice penguins) due to their fondness of the east\'s giant\'s apartment home getaway!'],
+    ['Elf', 'Oh, well wouldn\'t you be lucky. He\'s already been slain, by a mighty warrior whose name I can not even begin to pronounce correctly.'],
+    ['Elf', 'Something like: The warrior of the north eastern village of Hüngrruk Alkāmö.'],
+    ['Owen', 'Uhh... What?'],
+    ['', 'I said, still confused from the quick change of events.'],
+    ['Elf', 'Come on, over here.'],
+  ],
+  elf_late: [['', 'A voice behind us said:'], ['???', 'How can I be of service?']],
+  // drafts for Owen to change: what the elf says after his page ends
+  elf_door: [['Elf', 'Come on, over here. Right through the front doors.'], ['Jon', 'I don\'t trust anyone that cheerful, Señor. ...Fine. After you.']],
+  elf_lobby: [['Elf', 'How can I be of service?']],
+  elf_place: [['Elf', 'Jjorvic Palace. Five stars. Also a cathedral. We don\'t like to choose.'], ['Elf', 'The previous owner? Slain, as I said. The penguins are still here, though. Nobody has told them.'], ['Jon', 'A hotel full of penguins who don\'t know their boss is gone. Señor, this is going to be loud.']],
+  elf_bye: [['Elf', 'Enjoy your stay. Mind the ice.']],
+  puzzle_intro: [['Jon', 'Ice blocks. And two glowy plates on the floor. I bet they want to meet.'], ['Jon', 'Push a block and it slides until something stops it. If you mess it up, step out and come back in. I won\'t tell anyone.']],
+  puzzle_done: [['', 'CLUNK. Both plates sink into the floor. A chest rises out of the ice.'], ['Jon', 'Housekeeping! ...Is what I would say, if I worked here.']],
   // Owen's page 8: he says STOP, and talks his way past the giant
   giant_stop: [
     ['Owen', 'STOP!'],
@@ -295,6 +317,7 @@ const ITEMS = {
     ['', 'You got the THUNDER RUNE!'],
     ['Jon', 'Oh. Oh YES. I remember this. Walter carved it into me. Fill the rune meter, press C, and I come down like lightning!'],
     ['', 'Thunder Strike hits every enemy on the screen. Defeat enemies to fill the rune meter.']] },
+  skates: { name: 'Ice Skates', icon: 'skates', lines: [['', 'You got the ICE SKATES! It\'s a charm. Wear it from the BAG: ice can\'t make you slide.'], ['Jon', 'Penguin-sized, but they stretch. Now WE do the sliding. On purpose.']] },
   piece: { name: 'Piece of Heart', icon: 'piece', lines: [['', 'You got a PIECE OF HEART! Collect four to grow a new heart.']] },
   container: { name: 'Heart Container', icon: 'container', lines: [['', 'You got a HEART CONTAINER! Your life grew by one heart.']] },
   kr20: { name: '20 Kroner', icon: 'coin', lines: [['', 'You found 20 kroner!']] },
