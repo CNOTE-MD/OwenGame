@@ -99,7 +99,8 @@ const WEB = path.resolve(__dirname, '../web');
 
   // ---- no internet: once opened online, it opens again offline ----
   const types = { '.html': 'text/html; charset=utf-8', '.js': 'application/javascript', '.json': 'application/json', '.png': 'image/png' };
-  const srv = http.createServer((q, s) => { const f = path.join(WEB, decodeURIComponent(q.url.split('?')[0]).replace(/^\/+/, '') || 'index.html'); if (!f.startsWith(WEB) || !fs.existsSync(f) || fs.statSync(f).isDirectory()) { s.writeHead(404); return s.end(); } s.writeHead(200, { 'content-type': types[path.extname(f)] || 'application/octet-stream' }); fs.createReadStream(f).pipe(s); });
+  let notice = false;   // a host's "one more step" page in front of the game
+  const srv = http.createServer((q, s) => { if (notice && /index\.html/.test(q.url)) { s.writeHead(200, { 'content-type': 'text/html; charset=utf-8' }); return s.end('<!doctype html><title>External Content Notice</title><p>One more step</p>'); } const f = path.join(WEB, decodeURIComponent(q.url.split('?')[0]).replace(/^\/+/, '') || 'index.html'); if (!f.startsWith(WEB) || !fs.existsSync(f) || fs.statSync(f).isDirectory()) { s.writeHead(404); return s.end(); } s.writeHead(200, { 'content-type': types[path.extname(f)] || 'application/octet-stream' }); fs.createReadStream(f).pipe(s); });
   await new Promise(r => srv.listen(0, '127.0.0.1', r));
   const port = srv.address().port;
   ctx = await b.newContext({ viewport: { width: 1180, height: 820 }, hasTouch: true, isMobile: true, userAgent: UA });
@@ -109,10 +110,12 @@ const WEB = path.resolve(__dirname, '../web');
   const swOk = await pg.evaluate(() => navigator.serviceWorker.ready.then(r => !!r.active).catch(() => false));
   check('the offline helper installs on a real web address', swOk);
   await pg.reload(); await pg.waitForFunction(() => typeof G !== 'undefined' && !!navigator.serviceWorker.controller); await pg.waitForTimeout(400);
+  notice = true; await pg.reload(); await pg.waitForTimeout(500);
+  check('(setup) the host now shows a notice page instead of the game', await pg.title() === 'External Content Notice');
   await ctx.setOffline(true); srv.close(); srv.closeAllConnections && srv.closeAllConnections();
   let offline = false;
   try { await pg.reload({ timeout: 8000 }); offline = await pg.waitForFunction(() => typeof G !== 'undefined' && G.state === 'title', null, { timeout: 5000 }).then(() => true); } catch (e) { offline = false; }
-  check('with the network gone, the game still opens from the copy it kept', offline);
+  check('with the network gone, the game still opens from the copy it kept (the notice page did not replace it)', offline);
   check('...icon included', offline && await pg.evaluate(() => fetch('icon-180.png').then(r => r.ok).catch(() => false)));
   await ctx.close();
 

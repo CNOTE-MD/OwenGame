@@ -36,9 +36,12 @@ Rebuild: `python3 tools/maps.py && python3 tools/build_web.py`. Test: `NODE_PATH
 
 ### Owen's link, and playing on an iPad
 
-`web/index.html` is a whole document, so it runs from any plain web address. Owen's link serves the `main` branch and updates a minute or two after a merge:
+`web/index.html` is a whole document, so it runs from any plain web address. Both addresses below serve the `main` branch and update a minute or two after a merge.
 
-https://raw.githack.com/CNOTE-MD/OwenGame/main/web/index.html
+| Address | What Owen sees | Status |
+|---|---|---|
+| https://cnote-md.github.io/OwenGame/ | The game, nothing else | **Needs GitHub Pages switched on once**: repo Settings, Pages, Source "Deploy from a branch", Branch `main`, folder `/ (root)`, Save. `.nojekyll` and the root `index.html` (a redirect to `web/`) are already in place for it |
+| https://raw.githack.com/CNOTE-MD/OwenGame/main/web/index.html | A third-party "One more step" page with an advertisement first; tap "Open the page". It comes back about once a day | Works today. Fine as a stopgap, wrong as Owen's front door |
 
 On an iPad or a phone it opens straight into the fill-the-window layout: the game screen, a thumbstick on the left, six buttons on the right. The small X in the corner goes back to the page (OWEN'S SCRIPT lives there); FULL SCREEN returns.
 
@@ -54,7 +57,8 @@ On an iPad or a phone it opens straight into the fill-the-window layout: the gam
 |---|---|
 | `web/head.html` | The document head for the standalone page: viewport, home-screen title and icon |
 | `web/manifest.json`, `web/icon-180.png`, `web/icon-512.png` | The home-screen app's name and icon. Redraw the icon with `node tools/make_icon.js` |
-| `web/sw.js` | The offline copy (network first, so a new build always wins when online) |
+| `web/sw.js` | The offline copy (network first, so a new build always wins when online; a host's notice page is never kept in place of the game) |
+| `index.html`, `.nojekyll` (repo root) | For GitHub Pages: the short address redirects to `web/`, and Pages serves the files as they are |
 
 The claude.ai artifact wraps the page in its own document, so it is published from the page without `head.html`: `python3 tools/build_web.py --artifact /some/path/jontuka.html`, then publish that file to the artifact's URL.
 
