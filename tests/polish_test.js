@@ -24,8 +24,8 @@ const path = require('path');
   await check('text measures in whole pixels', await ev(() => textWidth('Hello Señor!') > 40 && Number.isInteger(textWidth('Jöntuka'))));
   await check('the screen presents at a whole-number multiple of 256x224', await ev(() => { fitScreen(); return cv.width % 256 === 0 && cv.height % 224 === 0 && cv.width / 256 === cv.height / 224 && PRESCALE >= 2; }));
   await ev(() => { G.mode = 'story'; G.save = newSave(); applyJonPerks(); G.player = makePlayer(); G.jon = makeJon(); setFlag('met_astrid'); loadMap('overworld', 20 * 16 + 8, 36 * 16 + 8); G.state = 'menu'; });
-  for (let i = 0; i < 6; i++) { await ev(i => { G.menuPage = i; render(); }, i); }
-  await check('all six menu pages draw under one tab strip', errs.length === 0 && await ev(() => MENU_TABS.length === 6));
+  for (let i = 0; i < 7; i++) { await ev(i => { G.menuPage = i; render(); }, i); }
+  await check('all seven menu pages draw under one tab strip', errs.length === 0 && await ev(() => MENU_TABS.length === 7));
   await ev(() => { G.state = 'play'; say([['Jon', 'Hello Señor! ¡Vámonos!'], ['Astrid', 'Wipe your feet.'], ['Penguin King', 'AK!'], ['Stranger', 'Twenty kroner.']]); });
   for (let i = 0; i < 4; i++) { await ev(() => { G.talk.shown = 999; render(); }); await pg.keyboard.press('KeyZ'); await wait(40); }
   await check('dialogue draws with and without portraits', errs.length === 0 && await ev(() => HAS_PORTRAIT('Jon') && HAS_PORTRAIT('Astrid') && HAS_PORTRAIT('Driver') && !HAS_PORTRAIT('Stranger')));

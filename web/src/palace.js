@@ -67,7 +67,7 @@ function starPts(cx, cy, r) { const p = []; for (let i = 0; i < 10; i++) { const
 // ---------- the scene: Owen's observation point in the forest ----------
 function palaceScene() {
   setFlag('page9');
-  const done = () => { G.banner = 'TO BE CONTINUED...'; G.bannerT = 3; writeSave(); };
+  const done = () => writeSave();
   if (G.state === 'talk' && G.talk) { G.talk.queue.push(...STORY.palace_view); const d = G.talk.done; G.talk.done = () => { if (d) d(); done(); }; return; }
   say(STORY.palace_view, done);
 }

@@ -19,7 +19,8 @@ function nextLine() {
 }
 function updateTalk(dt) {
   const tk = G.talk, before = Math.floor(tk.shown);
-  tk.shown += dt * 55;
+  if (talkSkip(dt)) return;
+  tk.shown += dt * 55 * textRate();
   if (Math.floor(tk.shown) !== before && Math.floor(tk.shown) % 3 === 0 && tk.shown < tk.cur[1].length) Sound.play('blip');
   if (just('a') || just('b') || just('tap')) { if (tk.shown < tk.cur[1].length) tk.shown = 999; else nextLine(); }
 }
@@ -112,7 +113,7 @@ function objective() {
 const MENU_TABS = ['GEAR', 'JON', 'MAP', 'MUSIC', 'SPELLS', 'BAG'];
 function drawMenuTabs(active) {
   R(11, 11, 234, 22, '#14163a'); R(11, 11, 234, 10, '#1e2250'); R(14, 32, 228, 1, '#3a3f80');
-  const gap = 9, ws = MENU_TABS.map(t => textWidth(t)), total = ws.reduce((a, b) => a + b, 0) + gap * (MENU_TABS.length - 1);
+  const gap = 7, ws = MENU_TABS.map(t => textWidth(t)), total = ws.reduce((a, b) => a + b, 0) + gap * (MENU_TABS.length - 1);
   let x = Math.round(128 - total / 2);
   MENU_TABS.forEach((t, i) => {
     const on = i === active;
@@ -145,10 +146,8 @@ function drawMenu() {
   text('Next heart: ' + s.pieces + '/4 pieces', 20, 140, '#f2ebcc');
   text('Voodoo bond ' + (s.voodoo ? 'ready' : 'used'), 20, 151, s.voodoo ? '#9be08a' : '#c9a0f0');
   if (side.length) text('Side quests ' + side.join('  '), 20, 162, '#c8e8ff', 'left', false);
-  text(Sound.muted ? 'M sound off' : 'M sound on', 236, 140, '#8a8ab0', 'right', false);
-  text((isEasy() ? 'EASY' : 'NORMAL') + ' (X)', 236, 162, isEasy() ? '#9be08a' : '#8a8ab0', 'right', false);
-  text('NOTES ' + (NOTES.on ? 'ON' : 'OFF') + ' (C)', 236, 129, NOTES.on ? '#f4eedb' : '#8a8ab0', 'right', false);
-  text(Music.on ? 'N music on' : 'N music off', 236, 151, '#8a8ab0', 'right', false);
+  text('OPTIONS (C)', 236, 140, '#ffd84a', 'right', false);
+  text((isEasy() ? 'EASY' : 'NORMAL') + ' (X)', 236, 151, isEasy() ? '#9be08a' : '#8a8ab0', 'right', false);
   R(16, 169, 224, 1, '#3a3f80');
   text('QUEST', 20, 180, '#ffd84a');
   wrap(objective(), 216).slice(0, 3).forEach((l, i) => text(l, 20, 191 + i * 10, '#f6f0dc', 'left', false));

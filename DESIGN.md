@@ -69,3 +69,14 @@ Names, dialogue, enemy stats and level layouts live in plain data files under `d
 - **Chilly's arch-enemy (Q43):** Baron Blubber, a walrus in a towel and monocle (placeholder name until Owen picks one), lives in a sauna by the volcano so Chilly can't freeze it again. His door is under a bush beside a NO PENGUINS sign on the Volcano Road. He does not help. He is just mad at Chilly. His trophy case holds a heart piece he stole from Chilly.
 - **Heart pieces:** eight now (forest, grave, cave, Bjarne, squirrel stash, lion, riddle, Baron), so two full hearts.
 
+## The finishing layer (November 2026, from the critics' review)
+
+See `REVIEW.md` for the review that led to this. All of it lives in `web/src/finish.js`.
+
+- **Credits:** after Hank is freed and the CHAPTER 3 COMPLETE banner clears, credits roll: written by Owen, the cast with their sprites, the bands, your stats (time, chops, best combo, naps, animals freed, trophies) and a rank from Jon. The top rank is the one Jon carved in Owen's room. Hold Z to speed up. Play continues afterwards.
+- **Jon's Trophy Wall:** a seventh menu tab. 22 trophies for things Owen does, five of them secret (shown as ??? until earned), with a completion percent. A toast slides in when one is earned and waits for a quiet moment to do it.
+- **Options:** C on the gear page. Difficulty, text speed (normal, fast, instant), screen shake, flash strength, Owen's notes, sound, music and the TV filter. Remembered between sessions.
+- **Fast-forward:** hold THROW (X) during a conversation to run through it.
+- **Prompts:** a small button label bounces over anything Owen is facing that he can talk to or read. Four first-time hints (walk, look, fight, menu) show once each and name the right button for touch or keyboard.
+- **Robustness:** Owen slides out of any wall he overlaps; floating words stack; the walk from the Foothills to the Muck Forest is blocked by deep muck until the first taxi ride, so Owen's page 5 is how you get there.
+

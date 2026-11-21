@@ -27,7 +27,8 @@ const path = require('path');
   check('every room and dungeon loads and runs', errs.length === n0);
   check('overworld screens stay fair: no more than 5 enemies on any one', await ev(() => { const c = {}; for (const e of MAPS.overworld.ents) if (ENEMY[e.t]) { const k = Math.floor(e.at[0] / 16) + ',' + Math.floor(e.at[1] / 14); c[k] = (c[k] || 0) + 1; } return Math.max(...Object.values(c)) <= 5; }));
   await visit('overworld', 20, 36);
-  for (let i = 0; i < 6; i++) { await ev(i => { G.state = 'menu'; G.menuPage = i; }, i); await wait(80); }
+  for (let i = 0; i < 7; i++) { await ev(i => { G.state = 'menu'; G.menuPage = i; }, i); await wait(80); }
+  await ev(() => openOptions()); await wait(80); await ev(() => { G.opt = null; G.state = 'play'; startCredits(); }); await wait(200); await ev(() => { G.credits = null; G.state = 'play'; });
   await ev(() => { G.state = 'over'; }); await wait(80);
   await ev(() => { G.state = 'play'; ask('Test?', ['Yes', 'A much longer answer that has to wrap onto a second line'], () => {}); }); await wait(80);
   await ev(() => { G.choice = null; G.state = 'play'; startDuel(); G.rh.started = true; }); await wait(200);

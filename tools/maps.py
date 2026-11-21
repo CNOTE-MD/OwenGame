@@ -263,6 +263,8 @@ OW_ENT = [
     {"t": "cdog", "at": P(0, 2, 10, 1)}, {"t": "cdog", "at": P(0, 2, 9, 2)}, {"t": "cdog", "at": P(0, 2, 11, 3)},
     {"t": "pblion", "at": P(2, 2, 10, 6)},
     {"t": "hiddenstairs", "at": P(3, 1, 13, 11), "to": "sauna", "dest": [8, 11]},
+    # the walk from the Foothills into the Muck Forest opens after Owen's taxi ride (page 5)
+    {"t": "roadblock", "at": P(0, 0, 15, 5)}, {"t": "roadblock", "at": P(0, 0, 15, 6)}, {"t": "roadblock", "at": P(0, 0, 15, 7)}, {"t": "roadblock", "at": P(0, 0, 15, 8)},
     {"t": "sign", "at": P(3, 1, 12, 11), "text": "sign_nopeng"},
     {"t": "runestone", "at": P(1, 2, 4, 8)},
     {"t": "sign", "at": P(1, 2, 12, 8), "text": "sign_airstrip"},

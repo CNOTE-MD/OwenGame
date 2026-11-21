@@ -123,6 +123,34 @@ const MAPS = {
 ]
 },
 {
+"t": "roadblock",
+"at": [
+15,
+5
+]
+},
+{
+"t": "roadblock",
+"at": [
+15,
+6
+]
+},
+{
+"t": "roadblock",
+"at": [
+15,
+7
+]
+},
+{
+"t": "roadblock",
+"at": [
+15,
+8
+]
+},
+{
 "t": "sign",
 "at": [
 60,

@@ -71,6 +71,7 @@ const STORY = {
   ],
   giant_hide: [['Forest Giant', 'ENOUGH. You will never find me among my brothers.'], ['', 'He steps backward into the forest and is gone. Three trees stand where there were none.'], ['Jon', 'One of those trees is HIM. Throw me at the one that can\'t hold still!']],
   giant_down: [['Forest Giant', 'The penguins... said... you were small...'], ['', 'The Forest Giant of the North topples, slowly, like a tree. Then he shrinks, and stiffens, and turns back into a log.'], ['', 'The log rolls off the path, bumps into a bush, and starts to snore.'], ['Jon', 'TIMBER! For REAL this time! Did you see that? Did you SEE that?'], ['Owen', 'I saw it, Jon.'], ['Jon', 'Big boss fight scene: complete. Jjorvic Palace is east, through the snow. Let\'s go wreck it.']],
+  roadblock: [['', 'Muck. Deep, sucking, boot-stealing muck, all the way to the trees.'], ['Jon', 'That\'s two hours of trudging, Señor, and that\'s if it doesn\'t eat you. Take the T-bane by the airstrip and get a taxi like a civilized zombie.']],
   // Owen's page 9: Jjorvic Palace from the deep forest
   palace_view: [
     ['Owen', 'The palace looked like a five star hotel and a cathedral were put in a bowl and mixed into one.'],
