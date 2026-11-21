@@ -134,7 +134,7 @@ function drawDungeonMap() {
     const inRoom = d => Math.floor(d.at[0] / 16) === rx && Math.floor(d.at[1] / 14) === ry;
     if (M.ents.some(d => d.t === 'chest' && inRoom(d) && !flag('chest:' + d.id) && (!d.needs || flag(d.needs)))) { R(X + 5, Y + ch - 9, 6, 5, '#8a5a28'); R(X + 5, Y + ch - 9, 6, 2, '#ffd84a'); }
     if (M.ents.some(d => ['king', 'knight', 'hank', 'captain'].includes(d.t) && inRoom(d)) && !flag(`clear:${G.mapId}:${rx},${ry}`)) { R(X + cw - 11, Y + 4, 6, 6, '#e23'); R(X + cw - 10, Y + 6, 1, 1, '#000'); R(X + cw - 7, Y + 6, 1, 1, '#000'); }
-    if (M.ents.some(d => d.t === 'elf' && inRoom(d)) && flag('page10')) text('?', X + cw - 8, Y + ch - 4, '#9be08a', 'left', false);
+    if (M.ents.some(d => (d.t === 'elf' && flag('page10') || d.id === 'fluffy') && inRoom(d))) text('?', X + cw - 8, Y + ch - 4, '#9be08a', 'left', false);
     if (here && Math.floor(G.t * 3) % 2 === 0) { R(X + cw / 2 - 3, Y + ch / 2 - 3, 6, 6, '#0a0812'); R(X + cw / 2 - 2, Y + ch / 2 - 2, 4, 4, '#ffd84a'); }
   }
 }

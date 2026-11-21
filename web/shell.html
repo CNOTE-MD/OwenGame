@@ -15,6 +15,11 @@
     color-scheme: dark;
   }
   html, body { background: var(--bg); color: var(--ink); }
+  [hidden] { display: none !important; }   /* a closed panel stays closed, whatever its own display rule says */
+  /* touch: no double-tap zoom, no text selection or callout on the game, no rubber-band scrolling */
+  html { -webkit-text-size-adjust: 100%; touch-action: manipulation; }
+  body { -webkit-tap-highlight-color: transparent; overscroll-behavior: none; }
+  .screen, .pad, .bar, .legend { -webkit-user-select: none; user-select: none; -webkit-touch-callout: none; }
   body { margin: 0; padding-inline: 16px; padding-block: 16px 24px; font-family: var(--pixel); font-size: 10px; line-height: 1.7; }
   main { max-width: 768px; margin-inline: auto; display: flex; flex-direction: column; gap: 14px; }
   .screen { position: relative; width: 100%; aspect-ratio: 8 / 7; background: #000; border: 3px solid var(--panel); outline: 2px solid var(--axe); }
@@ -40,10 +45,12 @@
   #padnote.on { display: inline; }
   /* Theater: fills the whole viewport (and real full screen where the browser allows it).
      Canvas scales to fit; the thumbstick and buttons float over the bottom corners. */
-  body.theater { padding: 0; overflow: hidden; }
+  body.theater { padding: 0; overflow: hidden; position: fixed; inset: 0; touch-action: none; }
   body.theater main { max-width: none; position: fixed; inset: 0; display: block; }
   body.theater .screen { position: absolute; left: 50%; top: 50%; transform: translate(-50%, -50%);
     width: min(100vw, calc(100vh * 8 / 7)); height: min(100vh, calc(100vw * 7 / 8)); border: 0; outline: 0; }
+  /* dvh is the part of the window you can actually see (Safari's toolbar comes and goes) */
+  @supports (height: 100dvh) { body.theater .screen { width: min(100vw, calc(100dvh * 8 / 7)); height: min(100dvh, calc(100vw * 7 / 8)); } }
   body.theater .legend, body.theater .bar { display: none; }
   body.theater .pad { display: flex; position: fixed; left: 0; right: 0; bottom: max(12px, env(safe-area-inset-bottom, 0px)); padding: 0 18px; pointer-events: none; }
   body.theater .pad > * { pointer-events: auto; }

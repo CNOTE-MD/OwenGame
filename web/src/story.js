@@ -110,6 +110,10 @@ const STORY = {
   elf_bye: [['Elf', 'Enjoy your stay. Mind the ice.']],
   puzzle_intro: [['Jon', 'Ice blocks. And two glowy plates on the floor. I bet they want to meet.'], ['Jon', 'Push a block and it slides until something stops it. If you mess it up, step out and come back in. I won\'t tell anyone.']],
   puzzle_done: [['', 'CLUNK. Both plates sink into the floor. A chest rises out of the ice.'], ['Jon', 'Housekeeping! ...Is what I would say, if I worked here.']],
+  // the Drowned Barrow's bell crypt (draft): Owen can rewrite all of it in OWEN'S SCRIPT
+  bells_intro: [['', 'Three ghost bells hang over the black water. A little one. A middle one. A big one.'], ['', 'Carved in the wall: RING US LITTLE TO BIG. ONLY A SPIRIT CAN TOUCH US.'], ['Jon', 'Only a spirit... The Voodoo Dash, Señor! Dash THROUGH a bell to ring it.'], ['Fluffy', 'Woof!'], ['Jon', 'How did HE get here first? ...Ghost dogs. Never mind.']],
+  bells_wrong: [['', 'CLUNK. Every bell goes quiet.'], ['Jon', 'Wrong order. Little, then middle, then big. Start again, Señor. Nobody saw that.'], ['Fluffy', 'Woof.'], ['Jon', 'Okay. Fluffy saw that.']],
+  bells_done: [['', 'The three bells ring together. Something rises out of the water on the north island.'], ['Fluffy', 'Awoooooo!'], ['Jon', 'He is singing along. Badly. I love him.']],
   // Owen's page 8: he says STOP, and talks his way past the giant
   giant_stop: [
     ['Owen', 'STOP!'],
@@ -317,6 +321,7 @@ const ITEMS = {
     ['', 'You got the THUNDER RUNE!'],
     ['Jon', 'Oh. Oh YES. I remember this. Walter carved it into me. Fill the rune meter, press C, and I come down like lightning!'],
     ['', 'Thunder Strike hits every enemy on the screen. Defeat enemies to fill the rune meter.']] },
+  bell: { name: 'Spirit Bell', icon: 'bell', lines: [['', 'You got the SPIRIT BELL! It\'s a charm. Wear it from the BAG: the Voodoo Dash is ready again twice as fast.'], ['Jon', 'Ding. Zoom. Ding. Zoom. Señor, this is the best day.']] },
   skates: { name: 'Ice Skates', icon: 'skates', lines: [['', 'You got the ICE SKATES! It\'s a charm. Wear it from the BAG: ice can\'t make you slide.'], ['Jon', 'Penguin-sized, but they stretch. Now WE do the sliding. On purpose.']] },
   piece: { name: 'Piece of Heart', icon: 'piece', lines: [['', 'You got a PIECE OF HEART! Collect four to grow a new heart.']] },
   container: { name: 'Heart Container', icon: 'container', lines: [['', 'You got a HEART CONTAINER! Your life grew by one heart.']] },

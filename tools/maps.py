@@ -439,8 +439,15 @@ put(BR[(2, 2)], 9, 1, ["ww"] * 12)
 BR[(1, 1)] = room(top="K", bottom="L", left="_", right="y")                        # great hall: channel splits it
 put(BR[(1, 1)], 1, 4, ["wwwwwwwwwwwwww", "wwwwwwwwwwwwww"])
 BR[(0, 1)] = room(right="h")                                                       # mini-boss: Draugr Captain
-BR[(2, 1)] = room(left="_")                                                        # big key across the pits
+BR[(2, 1)] = room(left="_", top="_")                                               # big key across the pits; the far side leads up to the bells
 put(BR[(2, 1)], 5, 1, ["vv"] * 12)
+# the bell crypt (draft): four islands around a drowned pillar. Only the Voodoo Dash crosses the water,
+# and a dash across a gap rings the spirit bell that hangs over it.
+BR[(2, 0)] = room(bottom="_", floor="w")
+put(BR[(2, 0)], 1, 1, ["___"] * 12); put(BR[(2, 0)], 12, 1, ["___"] * 12)              # west and east islands
+put(BR[(2, 0)], 6, 1, ["____"] * 3); put(BR[(2, 0)], 6, 10, ["____"] * 3)               # north and south islands
+put(BR[(2, 0)], 7, 6, ["WW", "WW"])                                                    # the drowned pillar
+for (x, y) in [(1, 1), (14, 1), (1, 12), (14, 12)]: BR[(2, 0)][y][x] = "t"
 BR[(1, 0)] = room(bottom="h")                                                      # Hank's ghost
 put(BR[(1, 0)], 1, 1, ["ww", "w"]); put(BR[(1, 0)], 13, 1, ["ww", " w"]); put(BR[(1, 0)], 1, 11, ["w", "ww"]); put(BR[(1, 0)], 13, 11, [" w", "ww"])
 BR[(1, 2)][0][7] = BR[(1, 2)][0][8] = "L"
@@ -467,6 +474,12 @@ BR_ENT = [
     {"t": "chest", "id": "br_dash", "at": P(0, 1, 8, 6), "item": "dash", "clear": True},
     {"t": "wisp", "at": P(2, 1, 11, 3)}, {"t": "bat", "at": P(2, 1, 12, 10)},
     {"t": "chest", "id": "br_bigkey", "at": P(2, 1, 12, 6), "item": "bigkey"},
+    # the bell crypt: ring little, middle, big. Each bell hangs over one gap; "zone" is the water a dash must cross to ring it
+    {"t": "npc", "id": "fluffy", "at": P(2, 0, 7, 9)},
+    {"t": "bell", "size": 0, "at": P(2, 0, 4, 11), "zone": [*P(2, 0, 4, 7), *P(2, 0, 5, 12)]},
+    {"t": "bell", "size": 2, "at": P(2, 0, 4, 2), "zone": [*P(2, 0, 4, 1), *P(2, 0, 5, 6)]},
+    {"t": "bell", "size": 1, "at": P(2, 0, 10, 2), "zone": [*P(2, 0, 10, 1), *P(2, 0, 11, 6)]},
+    {"t": "chest", "id": "br_bell", "at": P(2, 0, 9, 2), "item": "bell", "needs": "puzzle_barrow"},
     {"t": "hank", "at": P(1, 0, 8, 5)},
     {"t": "container", "id": "hc_barrow", "at": P(1, 0, 6, 9), "clear": True},
     {"t": "warp", "at": P(1, 0, 10, 9), "to": "overworld", "dest": P(0, 0, 7, 4), "clear": True, "portal": True},
@@ -726,6 +739,7 @@ for e in BR_ENT:
 assert near(no_dash, P(0, 1, 8, 6)), "Voodoo Dash chest must be reachable without the dash"
 assert not near(no_dash, P(1, 0, 8, 5)), "boss must need the dash"
 assert not near(no_dash, P(2, 1, 12, 6)), "big key must need the dash"
+assert not near(no_dash, P(2, 0, 7, 11)), "the bell crypt must need the dash"
 # the Red-Eye must be passable with the phantom seats both gone and present
 for phantom in (False, True):
     g = [list(r.replace("J", "A" if phantom else "m")) for r in RE]

@@ -129,7 +129,7 @@ function update(dt) {
   updateJon(dt);
   if (G.mode === 'arena') { updateArena(dt); if (G.state !== 'play') return; }
   if (G.map.redeye) updateRedeye(dt);
-  updateJonTalk(dt); jonCompliment(dt); updateTrophies(dt); updateElfWorld(dt);
+  updateJonTalk(dt); jonCompliment(dt); updateTrophies(dt); updateElfWorld(dt); updateBells(dt);
   maybeJonLevelUp();
   if (G.state !== 'play') return;
   if (HK.axes.length) updateHankAxes(dt);
@@ -197,7 +197,7 @@ function render() {
 
 let last = performance.now();
 G.menuSel = 0;
-buildAll(); buildSnesArt(); buildAwesomeArt(); buildMagicArt(); buildGiantArt(); buildOwenArt(); buildCritterArt(); buildElfArt();
+buildAll(); buildSnesArt(); buildAwesomeArt(); buildMagicArt(); buildGiantArt(); buildOwenArt(); buildCritterArt(); buildElfArt(); buildBarrowArt();
 function frame(now) {
   try { runFrame(now); } catch (err) { console.error(err); }   // fixed 60 Hz steps; see tech.js
   requestAnimationFrame(frame);

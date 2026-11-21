@@ -141,7 +141,9 @@ You don't have to do it. After the Penguin Palace you can sit on the bench by th
 
 ## Chapter 3 draft notes (the Drowned Barrow; for Owen to change)
 
-Chilly froze Hank's ghost to guard the barrow until the axe came home. Fluffy's ghost points the way. Hank, freed, apologizes for throwing Jon in a lake, sends Owen to Walter's Forge, and almost says Walter's real name.
+Chilly froze Hank's ghost to guard the barrow until the axe came home. Fluffy's ghost points the way. (Built: Fluffy gives a hint for wherever Owen is, with Jon translating.) Hank, freed, apologizes for throwing Jon in a lake, sends Owen to Walter's Forge, and almost says Walter's real name.
+
+**The bell crypt (draft, not from Owen's pages).** North of the big key room. Three spirit bells over black water; only the Voodoo Dash can ring them, and they must ring little, middle, big. The chest holds the Spirit Bell charm (the dash is ready again twice as fast). Nothing in it says anything new about Hank, Chilly or Fluffy. Questions for Owen: are there bells in Hank's tomb at all? What would Fluffy really do while Owen solves a puzzle?
 
 ## Magic: Rune Spells
 

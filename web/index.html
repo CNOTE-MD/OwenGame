@@ -1,3 +1,17 @@
+<!doctype html>
+<html lang="en">
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="description" content="Jöntuka: A Viking Tale. Story by Owen.">
+<meta name="theme-color" content="#14121f">
+<!-- iPad and iPhone: Share, then Add to Home Screen, makes this a full-screen app with its own icon -->
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="Jöntuka">
+<link rel="apple-touch-icon" href="icon-180.png">
+<link rel="icon" type="image/png" href="icon-180.png">
+<link rel="manifest" href="manifest.json">
 <title>Jöntuka</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -15,6 +29,11 @@
     color-scheme: dark;
   }
   html, body { background: var(--bg); color: var(--ink); }
+  [hidden] { display: none !important; }   /* a closed panel stays closed, whatever its own display rule says */
+  /* touch: no double-tap zoom, no text selection or callout on the game, no rubber-band scrolling */
+  html { -webkit-text-size-adjust: 100%; touch-action: manipulation; }
+  body { -webkit-tap-highlight-color: transparent; overscroll-behavior: none; }
+  .screen, .pad, .bar, .legend { -webkit-user-select: none; user-select: none; -webkit-touch-callout: none; }
   body { margin: 0; padding-inline: 16px; padding-block: 16px 24px; font-family: var(--pixel); font-size: 10px; line-height: 1.7; }
   main { max-width: 768px; margin-inline: auto; display: flex; flex-direction: column; gap: 14px; }
   .screen { position: relative; width: 100%; aspect-ratio: 8 / 7; background: #000; border: 3px solid var(--panel); outline: 2px solid var(--axe); }
@@ -40,10 +59,12 @@
   #padnote.on { display: inline; }
   /* Theater: fills the whole viewport (and real full screen where the browser allows it).
      Canvas scales to fit; the thumbstick and buttons float over the bottom corners. */
-  body.theater { padding: 0; overflow: hidden; }
+  body.theater { padding: 0; overflow: hidden; position: fixed; inset: 0; touch-action: none; }
   body.theater main { max-width: none; position: fixed; inset: 0; display: block; }
   body.theater .screen { position: absolute; left: 50%; top: 50%; transform: translate(-50%, -50%);
     width: min(100vw, calc(100vh * 8 / 7)); height: min(100vh, calc(100vw * 7 / 8)); border: 0; outline: 0; }
+  /* dvh is the part of the window you can actually see (Safari's toolbar comes and goes) */
+  @supports (height: 100dvh) { body.theater .screen { width: min(100vw, calc(100dvh * 8 / 7)); height: min(100dvh, calc(100vw * 7 / 8)); } }
   body.theater .legend, body.theater .bar { display: none; }
   body.theater .pad { display: flex; position: fixed; left: 0; right: 0; bottom: max(12px, env(safe-area-inset-bottom, 0px)); padding: 0 18px; pointer-events: none; }
   body.theater .pad > * { pointer-events: auto; }
@@ -2183,20 +2204,20 @@ const MAPS = {
 "name": "The Drowned Barrow",
 "rows": [
 "WWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWW",
-"WWWWWWWWWWWWWWWWWww__________wwWWWWWWWWWWWWWWWWW",
-"WWWWWWWWWWWWWWWWWw____________wWWWWWWWWWWWWWWWWW",
-"WWWWWWWWWWWWWWWWW______________WWWWWWWWWWWWWWWWW",
-"WWWWWWWWWWWWWWWWW______________WWWWWWWWWWWWWWWWW",
-"WWWWWWWWWWWWWWWWW______________WWWWWWWWWWWWWWWWW",
-"WWWWWWWWWWWWWWWWW______________WWWWWWWWWWWWWWWWW",
-"WWWWWWWWWWWWWWWWW______________WWWWWWWWWWWWWWWWW",
-"WWWWWWWWWWWWWWWWW______________WWWWWWWWWWWWWWWWW",
-"WWWWWWWWWWWWWWWWW______________WWWWWWWWWWWWWWWWW",
-"WWWWWWWWWWWWWWWWW______________WWWWWWWWWWWWWWWWW",
-"WWWWWWWWWWWWWWWWWw____________wWWWWWWWWWWWWWWWWW",
-"WWWWWWWWWWWWWWWWWww__________wwWWWWWWWWWWWWWWWWW",
-"WWWWWWWWWWWWWWWWWWWWWWWhhWWWWWWWWWWWWWWWWWWWWWWW",
-"WWWWWWWWWWWWWWWWWWWWWWWKKWWWWWWWWWWWWWWWWWWWWWWW",
+"WWWWWWWWWWWWWWWWWww__________wwWWt__ww____ww__tW",
+"WWWWWWWWWWWWWWWWWw____________wWW___ww____ww___W",
+"WWWWWWWWWWWWWWWWW______________WW___ww____ww___W",
+"WWWWWWWWWWWWWWWWW______________WW___wwwwwwww___W",
+"WWWWWWWWWWWWWWWWW______________WW___wwwwwwww___W",
+"WWWWWWWWWWWWWWWWW______________WW___wwwWWwww___W",
+"WWWWWWWWWWWWWWWWW______________WW___wwwWWwww___W",
+"WWWWWWWWWWWWWWWWW______________WW___wwwwwwww___W",
+"WWWWWWWWWWWWWWWWW______________WW___wwwwwwww___W",
+"WWWWWWWWWWWWWWWWW______________WW___ww____ww___W",
+"WWWWWWWWWWWWWWWWWw____________wWW___ww____ww___W",
+"WWWWWWWWWWWWWWWWWww__________wwWWt__ww____ww__tW",
+"WWWWWWWWWWWWWWWWWWWWWWWhhWWWWWWWWWWWWWW__WWWWWWW",
+"WWWWWWWWWWWWWWWWWWWWWWWKKWWWWWWWWWWWWWW__WWWWWWW",
 "Wt____________tWWt____________tWWt___vv_______tW",
 "W______________WW______________WW____vv________W",
 "W______________WW______________WW____vv________W",
@@ -2372,6 +2393,66 @@ const MAPS = {
 20
 ],
 "item": "bigkey"
+},
+{
+"t": "npc",
+"id": "fluffy",
+"at": [
+39,
+9
+]
+},
+{
+"t": "bell",
+"size": 0,
+"at": [
+36,
+11
+],
+"zone": [
+36,
+7,
+37,
+12
+]
+},
+{
+"t": "bell",
+"size": 2,
+"at": [
+36,
+2
+],
+"zone": [
+36,
+1,
+37,
+6
+]
+},
+{
+"t": "bell",
+"size": 1,
+"at": [
+42,
+2
+],
+"zone": [
+42,
+1,
+43,
+6
+]
+},
+{
+"t": "chest",
+"id": "br_bell",
+"at": [
+41,
+2
+],
+"item": "bell",
+"needs": "puzzle_barrow"
 },
 {
 "t": "hank",
@@ -2673,6 +2754,10 @@ const STORY = {
   elf_bye: [['Elf', 'Enjoy your stay. Mind the ice.']],
   puzzle_intro: [['Jon', 'Ice blocks. And two glowy plates on the floor. I bet they want to meet.'], ['Jon', 'Push a block and it slides until something stops it. If you mess it up, step out and come back in. I won\'t tell anyone.']],
   puzzle_done: [['', 'CLUNK. Both plates sink into the floor. A chest rises out of the ice.'], ['Jon', 'Housekeeping! ...Is what I would say, if I worked here.']],
+  // the Drowned Barrow's bell crypt (draft): Owen can rewrite all of it in OWEN'S SCRIPT
+  bells_intro: [['', 'Three ghost bells hang over the black water. A little one. A middle one. A big one.'], ['', 'Carved in the wall: RING US LITTLE TO BIG. ONLY A SPIRIT CAN TOUCH US.'], ['Jon', 'Only a spirit... The Voodoo Dash, Señor! Dash THROUGH a bell to ring it.'], ['Fluffy', 'Woof!'], ['Jon', 'How did HE get here first? ...Ghost dogs. Never mind.']],
+  bells_wrong: [['', 'CLUNK. Every bell goes quiet.'], ['Jon', 'Wrong order. Little, then middle, then big. Start again, Señor. Nobody saw that.'], ['Fluffy', 'Woof.'], ['Jon', 'Okay. Fluffy saw that.']],
+  bells_done: [['', 'The three bells ring together. Something rises out of the water on the north island.'], ['Fluffy', 'Awoooooo!'], ['Jon', 'He is singing along. Badly. I love him.']],
   // Owen's page 8: he says STOP, and talks his way past the giant
   giant_stop: [
     ['Owen', 'STOP!'],
@@ -2880,6 +2965,7 @@ const ITEMS = {
     ['', 'You got the THUNDER RUNE!'],
     ['Jon', 'Oh. Oh YES. I remember this. Walter carved it into me. Fill the rune meter, press C, and I come down like lightning!'],
     ['', 'Thunder Strike hits every enemy on the screen. Defeat enemies to fill the rune meter.']] },
+  bell: { name: 'Spirit Bell', icon: 'bell', lines: [['', 'You got the SPIRIT BELL! It\'s a charm. Wear it from the BAG: the Voodoo Dash is ready again twice as fast.'], ['Jon', 'Ding. Zoom. Ding. Zoom. Señor, this is the best day.']] },
   skates: { name: 'Ice Skates', icon: 'skates', lines: [['', 'You got the ICE SKATES! It\'s a charm. Wear it from the BAG: ice can\'t make you slide.'], ['Jon', 'Penguin-sized, but they stretch. Now WE do the sliding. On purpose.']] },
   piece: { name: 'Piece of Heart', icon: 'piece', lines: [['', 'You got a PIECE OF HEART! Collect four to grow a new heart.']] },
   container: { name: 'Heart Container', icon: 'container', lines: [['', 'You got a HEART CONTAINER! Your life grew by one heart.']] },
@@ -3092,7 +3178,20 @@ function exitTheater() {
   let theaterWasFull = false;
   document.addEventListener('fullscreenchange', onChange); document.addEventListener('webkitfullscreenchange', onChange);
   window.addEventListener('keydown', e => { if (e.code === 'Escape' && document.body.classList.contains('theater') && !(document.fullscreenElement || document.webkitFullscreenElement)) exitTheater(); });
+  // iPad and phones: open straight into the fill-the-window layout, so the screen and the touch
+  // controls fit without scrolling. Same when launched from the home screen. The X goes back to the page.
+  const mq = q => typeof matchMedia === 'function' && matchMedia(q).matches;
+  if (navigator.standalone === true || mq('(display-mode: standalone)') || mq('(hover: none) and (pointer: coarse)')) document.body.classList.add('theater');
 })();
+// Keep a copy for playing with no internet. Only on a real https page of its own (not inside another page).
+(function setupOffline() {
+  try {
+    const ok = (location.protocol === 'https:' || location.hostname === 'localhost') && window.top === window && 'serviceWorker' in navigator;
+    if (ok) window.addEventListener('load', () => { navigator.serviceWorker.register('sw.js').catch(() => {}); });
+  } catch (e) { /* no offline copy; the game is unaffected */ }
+})();
+// iOS pauses sound when the app goes to the background; pick it back up on return
+document.addEventListener('visibilitychange', () => { if (!document.hidden && Sound.ac) Sound.unlock(); });
 
 function inputVec() {
   if (PAD.active) return { x: PAD.x, y: PAD.y };
@@ -3124,7 +3223,7 @@ document.querySelectorAll('.btn[data-a]').forEach(b => {
 // ---------- sound: tiny chiptune effects ----------
 const Sound = {
   ac: null, muted: false,
-  unlock() { try { if (!this.ac) this.ac = new (window.AudioContext || window.webkitAudioContext)(); if (this.ac.state === 'suspended') this.ac.resume(); } catch (e) { this.ac = null; } },
+  unlock() { try { if (!this.ac) this.ac = new (window.AudioContext || window.webkitAudioContext)(); if (this.ac.state !== 'running') this.ac.resume(); } catch (e) { this.ac = null; } },
   tone(seq, vol = 0.08) {
     if (this.muted || !this.ac) return;
     let t = this.ac.currentTime;
@@ -8577,7 +8676,7 @@ const SCENE_NAMES = {
   'signs.sign_fjordvik': 'Sign: Fjordvik', 'signs.sign_beach': 'Sign: the beach', 'signs.sign_airstrip': 'Sign: the airstrip', 'signs.sign_cavern': 'Sign: Jjorvic Palace', 'signs.sign_tbane': 'Sign: the T-bane', 'signs.seal_peak': 'Sealed door: Storm Peak',
   'flight.4': 'Flight 364: refreshments', 'flight.5': 'Flight 364: landing', 'taxi_out.0': 'Taxi to the forest (1)', 'taxi_out.1': 'Taxi to the forest (2)',
   lion_wake: 'Peanut Butter Lion wakes up', lion_again: 'Peanut Butter Lion (again)', lion_down: 'Peanut Butter Lion melts', throne_riddle: 'The riddle in the throne', throne_riddle_right: 'Riddle solved',
-  palace_view: 'Jjorvic Palace: Imperial Ruby and catch', elf_meet: 'The elf: How can I be of service?', elf_door: 'The elf at the palace door', elf_place: 'The elf: what is this place?', puzzle_intro: 'The ice block room', roadblock: 'The muck on the Foothills road',
+  palace_view: 'Jjorvic Palace: Imperial Ruby and catch', elf_meet: 'The elf: How can I be of service?', elf_door: 'The elf at the palace door', elf_place: 'The elf: what is this place?', puzzle_intro: 'The ice block room', bells_intro: 'The bell crypt', bells_wrong: 'The bells go quiet', bells_done: 'The bells ring together', roadblock: 'The muck on the Foothills road',
   giant_stop: 'Giant fight: STOP!', giant_east: 'Giant fight: the giant of the east sent us', giant_peace: 'Giant fight: Thou shall pass', giant_wrong_south: 'Giant fight: wrong answer (south)', giant_wrong_nobody: 'Giant fight: wrong answer (nobody)', giant_wrong_why: 'Giant fight: wrong reason', giant_again: 'Giant fight: trying again',
   baron_1: 'Meeting Baron Blubber', baron_trophy: "Baron Blubber's trophy", baron_dartboard: 'The Chilly dartboard', 'signs.sign_nopeng': 'Sign: NO PENGUINS',
 };
@@ -10361,7 +10460,7 @@ function drawDungeonMap() {
     const inRoom = d => Math.floor(d.at[0] / 16) === rx && Math.floor(d.at[1] / 14) === ry;
     if (M.ents.some(d => d.t === 'chest' && inRoom(d) && !flag('chest:' + d.id) && (!d.needs || flag(d.needs)))) { R(X + 5, Y + ch - 9, 6, 5, '#8a5a28'); R(X + 5, Y + ch - 9, 6, 2, '#ffd84a'); }
     if (M.ents.some(d => ['king', 'knight', 'hank', 'captain'].includes(d.t) && inRoom(d)) && !flag(`clear:${G.mapId}:${rx},${ry}`)) { R(X + cw - 11, Y + 4, 6, 6, '#e23'); R(X + cw - 10, Y + 6, 1, 1, '#000'); R(X + cw - 7, Y + 6, 1, 1, '#000'); }
-    if (M.ents.some(d => d.t === 'elf' && inRoom(d)) && flag('page10')) text('?', X + cw - 8, Y + ch - 4, '#9be08a', 'left', false);
+    if (M.ents.some(d => (d.t === 'elf' && flag('page10') || d.id === 'fluffy') && inRoom(d))) text('?', X + cw - 8, Y + ch - 4, '#9be08a', 'left', false);
     if (here && Math.floor(G.t * 3) % 2 === 0) { R(X + cw / 2 - 3, Y + ch / 2 - 3, 6, 6, '#0a0812'); R(X + cw / 2 - 2, Y + ch / 2 - 2, 4, 4, '#ffd84a'); }
   }
 }
@@ -10410,6 +10509,142 @@ TROPHIES.splice(TROPHIES.findIndex(t => t.id === 'king'), 0,
   { id: 'elf', name: 'Of Service', desc: 'Meet the elf at Jjorvic Palace.', ok: () => flag('page10') });
 TROPHIES.splice(TROPHIES.findIndex(t => t.id === 'hank'), 0,
   { id: 'housekeeping', name: 'Housekeeping', desc: 'Solve the ice block puzzle in the palace.', ok: () => flag('puzzle_palace') });
+
+// ===== barrow.js =====
+// The Drowned Barrow gets the care the palace got. All of it is a draft for Owen to change:
+//   - Fluffy is the Barrow's guide. Talk to him anywhere and Jon translates a hint for where you are.
+//   - The bell crypt, north of the big key room: three spirit bells over the water. Only the Voodoo
+//     Dash can touch them. Ring them little, middle, big and a chest rises.
+//   - The reward is the Spirit Bell charm: the Voodoo Dash is ready again twice as fast.
+
+// ---------------- Fluffy, the guide ----------------
+const inBellCrypt = () => G.mapId === 'barrow' && G.scr && G.scr.x === 2 && G.scr.y === 0;
+function barrowHint() {
+  const s = G.save, n = BELL.seq.length;
+  if (inBellCrypt() && !flag('puzzle_barrow')) {
+    if (n === 0) return 'He says the little bell is first. It hangs over the water just left of this island. Dash through it.';
+    if (n === 1) return 'He says the middle bell is on the far side. Do NOT go north from here, that is the big one. Go back the way we came, and around the other way.';
+    return 'He says the big one is all that is left. Dash through it!';
+  }
+  if (flag('d2done')) return flag('puzzle_barrow') ? null : 'He says there are bells he likes to sing with. Past the pits where the big key was, a door goes north.';
+  if (s.bigkeys && s.bigkeys.barrow) return null;                         // Owen's own scene covers this one (fluffy_2)
+  if (s.items.dash) return 'He says the glowing wall on the east side of the great hall is a spirit wall. Dash through it. The big key is past the pits.';
+  if (flag('chest:br_key')) return 'He says the key opens the door north of here. Then go west. Something big is guarding a treasure.';
+  return 'He says go west from here. Beat the dead guys and a key shows up.';
+}
+function talkFluffy() {
+  G.player.cd = 0.2;
+  if (!flag('met_fluffy') && !inBellCrypt()) { setFlag('met_fluffy'); return say(STORY.fluffy_1); }
+  setFlag('met_fluffy');
+  const h = barrowHint();
+  if (h) return say([['Fluffy', inBellCrypt() ? 'Woof! Woof!' : 'Woof!'], ['Jon', h]]);
+  say(flag('d2done') ? STORY.fluffy_after : STORY.fluffy_2);
+}
+
+// ---------------- the bell crypt ----------------
+// A dash that crosses a bell's water and LANDS rings it. Little, middle, big is the order.
+// A bell out of order silences them all. Leaving the room does too.
+const BELL = { seq: [], touched: [], was: 0 };
+const BELL_HZ = [1568, 1175, 784], BELL_WORD = ['ding!', 'DONG!', 'BONNNG!'];
+function updateBells(dt) {
+  const p = G.player, bells = G.ents.filter(e => e.kind === 'bell');
+  if (!bells.length) { BELL.was = 0; BELL.touched.length = 0; return; }
+  for (const b of bells) b.ring = Math.max(0, b.ring - dt);
+  if (p.dashing > 0) {
+    const tx = Math.floor(p.x / T), ty = Math.floor(p.y / T);
+    for (const b of bells) { const z = b.def.zone; if (tx >= z[0] && tx <= z[2] && ty >= z[1] && ty <= z[3] && !BELL.touched.includes(b)) BELL.touched.push(b); }
+  } else if (BELL.was > 0) {
+    const landed = tileAt(p.x, p.y) !== 'w' && !(p.falling > 0);         // a spirit who sinks rings nothing
+    const hit = BELL.touched.splice(0);
+    if (landed) for (const b of hit) ringBell(b, bells);
+  }
+  BELL.was = p.dashing;
+}
+const wordY = b => b.y - G.cam.y < 4 * T ? b.y + 22 : b.y - 22;                 // keep the word clear of the HUD
+function ringBell(b, bells) {
+  const size = b.def.size, f = BELL_HZ[size], fluffy = G.ents.find(e => e.id === 'fluffy');
+  b.ring = 0.9;
+  if (b.lit) { Sound.tone([[f, 0.4, 'sine', f * 0.995]], 0.05); return; }   // already singing (or the puzzle is done): just a chime
+  if (size !== BELL.seq.length) {
+    // out of order: every bell goes quiet
+    for (const o of bells) o.lit = false;
+    BELL.seq.length = 0; G.shake = Math.max(G.shake, 0.15);
+    Sound.tone([[233, 0.22, 'triangle', 110], [0, 0.03], [117, 0.3, 'triangle', 70]], 0.09);
+    if (!flag('tip:bells')) { setFlag('tip:bells'); return say(STORY.bells_wrong); }
+    floatText(b.x + 8, wordY(b), 'CLUNK. The bells go quiet.', '#aab');
+    if (fluffy) floatText(fluffy.x, fluffy.y - 18, 'woof.', '#9fe0ff');
+    return;
+  }
+  b.lit = true; BELL.seq.push(size);
+  Sound.tone([[f, 0.7, 'sine', f * 0.995]], 0.08); Sound.tone([[f * 2.76, 0.3, 'sine']], 0.025);
+  floatText(b.x + 8, wordY(b), BELL_WORD[size], '#ffe9a0');
+  for (let i = 0; i < 10; i++) { const a = i / 10 * Math.PI * 2; G.fx.push({ x: b.x + 8, y: b.y - 4, vx: Math.cos(a) * 50, vy: Math.sin(a) * 50, t: 0, life: 0.5, color: i % 2 ? '#ffffff' : '#ffe9a0', size: 2 }); }
+  if (fluffy) floatText(fluffy.x, fluffy.y - 18, 'Awoo!', '#9fe0ff');
+  if (BELL.seq.length === 3) {
+    setFlag('puzzle_barrow'); Sound.play('secret'); G.shake = 0.3;
+    const d = MAPS[G.mapId].ents.find(o => o.id === 'br_bell');
+    if (d) { const c = makeEnt(d, d.at[0] * T + 8, d.at[1] * T + 8); if (c) { G.ents.push(c); puff(c.x, c.y, '#ffe9a0', 14); } }
+    say(STORY.bells_done, writeSave);
+  }
+}
+function drawBell(e) {
+  const size = e.def.size, w = [8, 12, 18][size], h = [9, 13, 17][size], lit = e.lit;
+  const swing = e.ring > 0 ? Math.sin(G.t * 34) * 2.5 * Math.min(1, e.ring * 2) : 0;
+  const x = Math.round(e.x - G.cam.x) + 8, y = Math.round(e.y - G.cam.y) + 5 + Math.round(Math.sin(G.t * 2 + size * 2) * 1.5);
+  const body = lit ? '#ffe9a0' : '#bfe6ff', edge = lit ? '#c89a2a' : '#5a86c0';
+  if (lit) { ctx.globalAlpha = 0.2 + 0.08 * Math.sin(G.t * 6 + size); ctx.fillStyle = '#ffe9a0'; ctx.beginPath(); ctx.arc(x, y - h / 2, w + 2, 0, 7); ctx.fill(); }
+  ctx.globalAlpha = lit ? 1 : 0.85;
+  R(x - 1, y - h - 2, 2, 2, edge);                                                              // the loop it hangs from
+  for (let i = 0; i < h; i++) {
+    const t = i / (h - 1), k = t < 0.72 ? 0.42 + 0.5 * t : 0.78 + 0.8 * (t - 0.72), ww = Math.max(2, Math.round(w * k / 2) * 2), sx = Math.round(swing * t);
+    R(x - ww / 2 + sx, y - h + i, ww, 1, i >= h - 2 ? edge : body);
+    if (i > 1 && i < h - 3) R(x - ww / 2 + 1 + sx, y - h + i, 1, 1, '#ffffff');
+  }
+  R(x - 1 + Math.round(swing * 1.6), y, 2, 2, edge);                                             // the clapper
+  ctx.globalAlpha = 1;
+}
+// a thread of light across each bell's gap, so it is clear that crossing here touches the bell
+function drawBellThreads() {
+  for (const e of G.ents) {
+    if (e.kind !== 'bell') continue;
+    const x = Math.round(e.x - G.cam.x) + 8, y0 = Math.round(e.y - G.cam.y) - 24;
+    for (let i = 0; i < 9; i++) {
+      const y = y0 + i * 6 + Math.round(Math.sin(G.t * 3 + i) * 1), on = (Math.floor(G.t * 4) + i) % 3 === 0;
+      R(x + Math.round(Math.sin(G.t * 2 + i * 1.7) * 2), y, on ? 2 : 1, on ? 2 : 1, e.lit ? (on ? '#ffffff' : '#ffe9a0') : (on ? '#dff6ff' : '#7aa6e0'));
+    }
+  }
+}
+function buildBarrowArt() {
+  SPR.icon_bell = buildSprite(['...kk...', '..yYYy..', '..yYYy..', '.yYYYYy.', '.yYYYYy.', 'yyyyyyyy', '...kk...', '........'], { y: '#c89a2a', Y: '#ffe9a0', k: '#8a6a1a' });
+}
+
+// ---------------- wiring ----------------
+CHARMS.bell = { name: 'Spirit Bell', icon: 'bell', desc: 'Dash again twice as fast.', apply: () => {} };
+const _startDashB = startDash;
+startDash = function () {
+  const p = G.player, was = p.dashing > 0;
+  _startDashB();
+  if (!was && p.dashing > 0 && charmOn('bell')) p.dashCd *= 0.5;
+};
+const _makeEntB = makeEnt;
+makeEnt = function (d, x, y) {
+  if (d.t === 'bell') return { x, y, def: d, kind: 'bell', lit: !!G.save.flags.puzzle_barrow, ring: 0 };
+  return _makeEntB(d, x, y);
+};
+const _interactB = interact;
+interact = function (e) { if (e.kind === 'npc' && e.id === 'fluffy' && G.mapId === 'barrow') return talkFluffy(); return _interactB(e); };
+const _drawThingB = drawThing;
+drawThing = function (e) { if (e.kind === 'bell') return drawBell(e); return _drawThingB(e); };
+const _drawDecorGroundB = drawDecorGround;
+drawDecorGround = function () { _drawDecorGroundB(); drawBellThreads(); };
+const _onEnterScreenB = onEnterScreen;
+onEnterScreen = function () {
+  _onEnterScreenB();
+  BELL.seq.length = 0; BELL.touched.length = 0; BELL.was = 0;
+  if (inBellCrypt() && !flag('intro:bells') && G.state === 'play') { setFlag('intro:bells'); say(STORY.bells_intro); }
+};
+TROPHIES.splice(TROPHIES.findIndex(t => t.id === 'hank') + 1, 0,
+  { id: 'bells', name: 'Ding Dong', desc: 'Ring the spirit bells of the Drowned Barrow in order.', ok: () => flag('puzzle_barrow') });
 
 // ===== main.js =====
 // State machine and main loop.
@@ -10543,7 +10778,7 @@ function update(dt) {
   updateJon(dt);
   if (G.mode === 'arena') { updateArena(dt); if (G.state !== 'play') return; }
   if (G.map.redeye) updateRedeye(dt);
-  updateJonTalk(dt); jonCompliment(dt); updateTrophies(dt); updateElfWorld(dt);
+  updateJonTalk(dt); jonCompliment(dt); updateTrophies(dt); updateElfWorld(dt); updateBells(dt);
   maybeJonLevelUp();
   if (G.state !== 'play') return;
   if (HK.axes.length) updateHankAxes(dt);
@@ -10611,7 +10846,7 @@ function render() {
 
 let last = performance.now();
 G.menuSel = 0;
-buildAll(); buildSnesArt(); buildAwesomeArt(); buildMagicArt(); buildGiantArt(); buildOwenArt(); buildCritterArt(); buildElfArt();
+buildAll(); buildSnesArt(); buildAwesomeArt(); buildMagicArt(); buildGiantArt(); buildOwenArt(); buildCritterArt(); buildElfArt(); buildBarrowArt();
 function frame(now) {
   try { runFrame(now); } catch (err) { console.error(err); }   // fixed 60 Hz steps; see tech.js
   requestAnimationFrame(frame);

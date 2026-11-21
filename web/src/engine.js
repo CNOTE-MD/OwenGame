@@ -117,7 +117,20 @@ function exitTheater() {
   let theaterWasFull = false;
   document.addEventListener('fullscreenchange', onChange); document.addEventListener('webkitfullscreenchange', onChange);
   window.addEventListener('keydown', e => { if (e.code === 'Escape' && document.body.classList.contains('theater') && !(document.fullscreenElement || document.webkitFullscreenElement)) exitTheater(); });
+  // iPad and phones: open straight into the fill-the-window layout, so the screen and the touch
+  // controls fit without scrolling. Same when launched from the home screen. The X goes back to the page.
+  const mq = q => typeof matchMedia === 'function' && matchMedia(q).matches;
+  if (navigator.standalone === true || mq('(display-mode: standalone)') || mq('(hover: none) and (pointer: coarse)')) document.body.classList.add('theater');
 })();
+// Keep a copy for playing with no internet. Only on a real https page of its own (not inside another page).
+(function setupOffline() {
+  try {
+    const ok = (location.protocol === 'https:' || location.hostname === 'localhost') && window.top === window && 'serviceWorker' in navigator;
+    if (ok) window.addEventListener('load', () => { navigator.serviceWorker.register('sw.js').catch(() => {}); });
+  } catch (e) { /* no offline copy; the game is unaffected */ }
+})();
+// iOS pauses sound when the app goes to the background; pick it back up on return
+document.addEventListener('visibilitychange', () => { if (!document.hidden && Sound.ac) Sound.unlock(); });
 
 function inputVec() {
   if (PAD.active) return { x: PAD.x, y: PAD.y };
@@ -149,7 +162,7 @@ document.querySelectorAll('.btn[data-a]').forEach(b => {
 // ---------- sound: tiny chiptune effects ----------
 const Sound = {
   ac: null, muted: false,
-  unlock() { try { if (!this.ac) this.ac = new (window.AudioContext || window.webkitAudioContext)(); if (this.ac.state === 'suspended') this.ac.resume(); } catch (e) { this.ac = null; } },
+  unlock() { try { if (!this.ac) this.ac = new (window.AudioContext || window.webkitAudioContext)(); if (this.ac.state !== 'running') this.ac.resume(); } catch (e) { this.ac = null; } },
   tone(seq, vol = 0.08) {
     if (this.muted || !this.ac) return;
     let t = this.ac.currentTime;

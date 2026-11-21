@@ -1581,20 +1581,20 @@ const MAPS = {
 "name": "The Drowned Barrow",
 "rows": [
 "WWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWW",
-"WWWWWWWWWWWWWWWWWww__________wwWWWWWWWWWWWWWWWWW",
-"WWWWWWWWWWWWWWWWWw____________wWWWWWWWWWWWWWWWWW",
-"WWWWWWWWWWWWWWWWW______________WWWWWWWWWWWWWWWWW",
-"WWWWWWWWWWWWWWWWW______________WWWWWWWWWWWWWWWWW",
-"WWWWWWWWWWWWWWWWW______________WWWWWWWWWWWWWWWWW",
-"WWWWWWWWWWWWWWWWW______________WWWWWWWWWWWWWWWWW",
-"WWWWWWWWWWWWWWWWW______________WWWWWWWWWWWWWWWWW",
-"WWWWWWWWWWWWWWWWW______________WWWWWWWWWWWWWWWWW",
-"WWWWWWWWWWWWWWWWW______________WWWWWWWWWWWWWWWWW",
-"WWWWWWWWWWWWWWWWW______________WWWWWWWWWWWWWWWWW",
-"WWWWWWWWWWWWWWWWWw____________wWWWWWWWWWWWWWWWWW",
-"WWWWWWWWWWWWWWWWWww__________wwWWWWWWWWWWWWWWWWW",
-"WWWWWWWWWWWWWWWWWWWWWWWhhWWWWWWWWWWWWWWWWWWWWWWW",
-"WWWWWWWWWWWWWWWWWWWWWWWKKWWWWWWWWWWWWWWWWWWWWWWW",
+"WWWWWWWWWWWWWWWWWww__________wwWWt__ww____ww__tW",
+"WWWWWWWWWWWWWWWWWw____________wWW___ww____ww___W",
+"WWWWWWWWWWWWWWWWW______________WW___ww____ww___W",
+"WWWWWWWWWWWWWWWWW______________WW___wwwwwwww___W",
+"WWWWWWWWWWWWWWWWW______________WW___wwwwwwww___W",
+"WWWWWWWWWWWWWWWWW______________WW___wwwWWwww___W",
+"WWWWWWWWWWWWWWWWW______________WW___wwwWWwww___W",
+"WWWWWWWWWWWWWWWWW______________WW___wwwwwwww___W",
+"WWWWWWWWWWWWWWWWW______________WW___wwwwwwww___W",
+"WWWWWWWWWWWWWWWWW______________WW___ww____ww___W",
+"WWWWWWWWWWWWWWWWWw____________wWW___ww____ww___W",
+"WWWWWWWWWWWWWWWWWww__________wwWWt__ww____ww__tW",
+"WWWWWWWWWWWWWWWWWWWWWWWhhWWWWWWWWWWWWWW__WWWWWWW",
+"WWWWWWWWWWWWWWWWWWWWWWWKKWWWWWWWWWWWWWW__WWWWWWW",
 "Wt____________tWWt____________tWWt___vv_______tW",
 "W______________WW______________WW____vv________W",
 "W______________WW______________WW____vv________W",
@@ -1770,6 +1770,66 @@ const MAPS = {
 20
 ],
 "item": "bigkey"
+},
+{
+"t": "npc",
+"id": "fluffy",
+"at": [
+39,
+9
+]
+},
+{
+"t": "bell",
+"size": 0,
+"at": [
+36,
+11
+],
+"zone": [
+36,
+7,
+37,
+12
+]
+},
+{
+"t": "bell",
+"size": 2,
+"at": [
+36,
+2
+],
+"zone": [
+36,
+1,
+37,
+6
+]
+},
+{
+"t": "bell",
+"size": 1,
+"at": [
+42,
+2
+],
+"zone": [
+42,
+1,
+43,
+6
+]
+},
+{
+"t": "chest",
+"id": "br_bell",
+"at": [
+41,
+2
+],
+"item": "bell",
+"needs": "puzzle_barrow"
 },
 {
 "t": "hank",

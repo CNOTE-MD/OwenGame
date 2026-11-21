@@ -84,3 +84,23 @@ Owen's page 10 arrived: an elf the size of a lawn chair who says Chilly has alre
 
 It is not a 90, and more features will not make it one. The remaining four points are the same list: Owen's chapters 4 and 5 and an ending; a second dungeon built with this much care (the Drowned Barrow has not had this pass); a session of a child playing it with someone watching; and a run on a real iPad.
 
+## Third pass: the Drowned Barrow, and getting it onto Owen's iPad
+
+Two of the four remaining gaps were things code could close, so they were worked.
+
+| Gap | What changed |
+|---|---|
+| A second dungeon built with the palace's care | The Barrow has an eighth room, the bell crypt, north of the big key. Three spirit bells hang over the water between four islands. Only the Voodoo Dash can touch them, a dash across a gap rings the bell over it, and they must ring little, middle, big. The obvious route rings the big one second, so the answer is to go back and around. The reward, the Spirit Bell charm, halves the dash's wait. |
+| A child can get lost in a dungeon | Fluffy is the Barrow's guide. He says "Woof!" and Jon translates one hint for wherever you are, in the entrance and in the crypt. The floor plan on the MAP page marks him. |
+| It has only been run in a desktop browser engine | The page is now a whole document with a tablet viewport and home-screen metadata. Touch devices open straight into the fill-the-window layout with the thumbstick and buttons. Add to Home Screen makes it a full-screen app with its own icon, and it opens with no internet after one online visit. A closed OWEN'S SCRIPT panel was being drawn over the top of the full-window layout; that is fixed. |
+
+| Critic | Second pass | Third pass | Why |
+|---|---|---|---|
+| The mainstream reviewer | 87 | 87 | Nothing new in the story |
+| The design critic | 86 | 88 | Both dungeons now have a puzzle built on their item |
+| The retro specialist | 87 | 88 | A bell-order room is the genre |
+| The family reviewer | 87 | 88 | A hint-giver in each dungeon; it opens like an app |
+| The hard-nosed critic | 81 | 82 | Still three chapters of five |
+| **Average** | **86** | **87** | |
+
+These are one reviewer's numbers, not outlets'. What is left is not code. Owen's chapters 4 and 5 and the ending. A session of Owen playing while someone watches where he gets stuck. And the iPad work above has been checked in an emulated iPad only: Chromium with touch, not Safari. Sound unlocking, the home-screen app and the offline copy are built to Safari's documented behaviour and have not been seen on the device. The first ten minutes on Owen's iPad are the test.
