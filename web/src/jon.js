@@ -75,8 +75,25 @@ function jonFaceNow() {
   return 'happy';
 }
 
+// On a phone or tablet held upright (full-window layout) there is empty space above the game screen.
+// Jon's pop-up lines go there, as a bubble outside the game, so they cover none of it.
+const JCAP = { el: document.getElementById('jonline'), mq: typeof matchMedia === 'function' ? matchMedia('(max-aspect-ratio: 3/4)') : null, x: 128, line: null, tail: -1, on: false };
+const jonCaptionMode = () => !!(JCAP.el && JCAP.mq && JCAP.mq.matches && document.body.classList.contains('theater'));
+function syncJonCaption() {
+  const el = JCAP.el; if (!el) return;
+  const show = jonCaptionMode() && JT.t > 0 && !!JT.line && G.state === 'play';
+  if (show !== JCAP.on) { JCAP.on = show; el.classList.toggle('on', show); if (!show) JCAP.line = null; }
+  if (!show) return;
+  if (JCAP.line !== JT.line) { JCAP.line = JT.line; el.textContent = JT.line; JCAP.tail = -1; }
+  el.style.opacity = Math.min(1, JT.t * 3).toFixed(2);
+  // the tail points down at Jon
+  const c = cv.getBoundingClientRect(), jx = Math.round(c.left + JCAP.x / VW * c.width);
+  if (Math.abs(jx - JCAP.tail) >= 3) { JCAP.tail = jx; const r = el.getBoundingClientRect(); el.style.setProperty('--tail', clamp(jx - r.left, 14, r.width - 14) + 'px'); }
+}
 function drawJonBubble(x, y) {
+  JCAP.x = x;
   if (JT.t <= 0 || !JT.line || G.state !== 'play') return;
+  if (jonCaptionMode()) return;                       // shown above the screen instead (syncJonCaption)
   const lines = wrap(JT.line, 150).slice(0, 3);
   const w = Math.max(...lines.map(l => textWidth(l))) + 10, h = lines.length * 10 + 5;
   const bx = clamp(Math.round(x - w / 2), 2, VW - w - 2), by = clamp(Math.round(y - 22 - h), 24, VH - h - 4);

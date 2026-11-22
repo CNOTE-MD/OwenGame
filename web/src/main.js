@@ -148,6 +148,7 @@ function update(dt) {
 }
 
 function render() {
+  syncJonCaption();
   ctx.setTransform(1, 0, 0, 1, 0, 0);
   ctx.clearRect(0, 0, VW, VH);
   if (G.state === 'title') return drawTitle();

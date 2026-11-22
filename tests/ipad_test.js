@@ -86,10 +86,31 @@ const WEB = path.resolve(__dirname, '../web');
   await pg.screenshot({ path: SHOTS + '/ipad_portrait.png' });
   await ctx.close();
 
-  // ---- a phone, for good measure ----
+  // ---- a phone, held upright: Jon's pop-up lines go in the empty space above the game ----
   ({ ctx, pg, ev, wait } = await open(390, 844));
   scr = await box(pg, '.screen'); stick = await box(pg, '#stick'); ab = await box(pg, '.ab');
   check('phone: screen and controls all fit', inView(scr, 390, 844) && inView(stick, 390, 844) && inView(ab, 390, 844) && stick.y >= scr.b - 1, { scr, stick, ab });
+  const playing = () => ev(() => { try { localStorage.clear(); } catch (e) {} TOASTS.length = 0; G.mode = 'story'; G.save = newSave(); applyJonPerks(); G.save.trophies = Object.fromEntries(TROPHIES.map(t => [t.id, true])); G.player = makePlayer(); G.jon = makeJon(); for (const f of ['met_astrid', 'hint:move', 'hint:look', 'hint:chop', 'hint:gear', 'chapter_card:1', 'jonarea:overworld']) setFlag(f); G.state = 'play'; G.talk = null; loadMap('overworld', 20 * 16 + 8, 34 * 16 + 8); G.ents = G.ents.filter(e => !e.enemy); G.talk = null; G.state = 'play'; });
+  const LINE = "Reminder: I am a MAGICAL. TALKING. FLYING. AXE. Just so we're clear.";
+  // how much of the game picture is the bubble's cream color (the bubble drawn inside the game)
+  const cream = () => ev(() => { render(); const d = cv.getContext('2d').getImageData(0, 0, cv.width, cv.height).data; let n = 0; for (let i = 0; i < d.length; i += 4) if (d[i] > 250 && d[i + 1] > 246 && d[i + 2] > 226 && d[i + 2] < 238) n++; return n / (cv.width * cv.height); });
+  await playing(); await wait(150);
+  await ev(l => { JT.line = l; JT.t = 6; }, LINE); await wait(500);
+  const cap = await box(pg, '#jonline');
+  check('upright: Jon\'s pop-up line shows in a bubble above the game screen', await ev(l => { const e = document.getElementById('jonline'); return e.classList.contains('on') && e.textContent === l && getComputedStyle(e).display === 'block'; }, LINE) && inView(cap, 390, 844), cap);
+  check('...and it covers none of the game', cap.b <= scr.y + 0.5 && (await cream()) < 0.002, { cap, scrTop: scr.y, cream: await cream() });
+  check('...with its tail pointing down at Jon', await ev(() => { const e = document.getElementById('jonline'), r = e.getBoundingClientRect(), c = cv.getBoundingClientRect(); const tail = r.left + parseFloat(e.style.getPropertyValue('--tail')); return Math.abs(tail - (c.left + JCAP.x / VW * c.width)) < 16; }));
+  await pg.screenshot({ path: SHOTS + '/phone_jon_caption.png' });
+  await ev(() => { G.state = 'menu'; }); await wait(120);
+  check('it goes away while the game is paused', await ev(() => !document.getElementById('jonline').classList.contains('on')));
+  await ev(() => { G.state = 'play'; JT.t = 0; }); await wait(120);
+  check('...and is gone once he stops', await ev(() => getComputedStyle(document.getElementById('jonline')).display === 'none'));
+  await ctx.close();
+  // sideways there is no empty space above, so the bubble stays over Jon as before
+  ({ ctx, pg, ev, wait } = await open(844, 390));
+  await playing(); await wait(150);
+  await ev(l => { JT.line = l; JT.t = 6; }, LINE); await wait(500);
+  check('sideways: the bubble is drawn in the game, over Jon, as before', await ev(() => !document.getElementById('jonline').classList.contains('on')) && (await cream()) > 0.02, await cream());
   await ctx.close();
 
   // ---- a desktop is unchanged ----

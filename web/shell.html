@@ -58,6 +58,17 @@
   body.theater .stick.on, body.theater .ab .btn.on { opacity: 0.95; }
   body.theater #exitfs { display: block; position: fixed; top: max(8px, env(safe-area-inset-top, 0px)); right: 8px; opacity: 0.6; z-index: 2; }
   #exitfs { display: none; }
+  /* Jon's pop-up lines. With the device upright in the full-window layout there is empty space above
+     the game screen, so his bubble goes there instead of over the game. */
+  #jonline { display: none; }
+  @media (max-aspect-ratio: 3/4) {
+    body.theater #jonline.on { display: block; position: absolute; left: 8px; right: 8px; bottom: calc(50% + 43.75vw + 9px);
+      width: fit-content; max-width: min(560px, calc(100vw - 16px)); margin-inline: auto; box-sizing: border-box;
+      background: #fffbe8; color: #2a1a10; border: 2px solid #0a0812; border-radius: 4px; padding: 8px 10px 7px;
+      font-family: var(--pixel); font-size: clamp(9px, 2.5vw, 15px); line-height: 1.65; text-align: left; pointer-events: none; }
+    body.theater #jonline.on::after { content: ''; position: absolute; left: var(--tail, 50%); bottom: -9px; margin-left: -6px;
+      border: 6px solid transparent; border-top: 8px solid #fffbe8; border-bottom: 0; filter: drop-shadow(0 2px 0 #0a0812); }
+  }
   body.theater.nopad .pad { display: none; }
   @media (hover: hover) and (pointer: fine) { body.theater .pad { display: none; } }
   /* Owen's Script: a writer's notebook under the game screen. Pixel font for headings, a readable face for writing. */
@@ -118,6 +129,7 @@
     <span class="btns"><button class="btn" id="scriptbtn" aria-controls="script">OWEN'S SCRIPT</button><button class="btn" id="fsbtn" aria-label="Play full screen">FULL SCREEN</button></span>
   </div>
   <button class="btn" id="exitfs" aria-label="Leave full screen">✕</button>
+  <div id="jonline" aria-hidden="true"></div>
   <div class="legend">
     <span><b>Arrows / WASD</b> move</span>
     <span><b>Z / Space</b> swing Jon</span>
