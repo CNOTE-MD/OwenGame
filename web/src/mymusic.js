@@ -73,8 +73,8 @@ function mymInst(prog, note) {
 function mymDrum(note) {
   if (note === 35 || note === 36) return 0;
   if (note === 38 || note === 40 || note === 39) return 1;
-  if (note === 37) return 2;
-  if (note === 42 || note === 44 || note === 51 || note === 53 || note === 59 || note === 54 || note === 69 || note === 70) return 3;
+  if (note === 37 || note === 31 || note === 32 || note === 56 || (note >= 75 && note <= 77)) return 2;   // rim, sticks, cowbell, claves, wood blocks
+  if (note === 42 || note === 44 || note === 51 || note === 53 || note === 59 || note === 54 || note === 69 || note === 70 || note === 80 || note === 81 || note === 82) return 3;
   if (note === 46) return 4;
   if (note === 49 || note === 52 || note === 55 || note === 57) return 5;
   if (note === 48 || note === 50) return 6;

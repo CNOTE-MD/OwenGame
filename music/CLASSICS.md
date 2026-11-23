@@ -28,6 +28,10 @@ These are original compositions that their composers released under [CC0](https:
 | `cc0_r0rque_fight_harder.mid` | Fight Harder... To Obtain a Better Victory! | R0rque | [double-impact-midi-pack](https://opengameart.org/content/double-impact-midi-pack) | Valhalla Arena, waves 13 to 16 |
 | `cc0_continuum_liberate_the_stars.mid` | Liberate the Stars | continuum.mid | [double-impact-midi-pack](https://opengameart.org/content/double-impact-midi-pack) | Valhalla Arena, waves 17 to 20 |
 | `cc0_zemystic_andromeda.mid` | Andromeda | ZeMystic | [double-impact-midi-pack](https://opengameart.org/content/double-impact-midi-pack) | The Arena's shop |
+| `cc0_korp_ambiguity.mid` | Ambiguity | Korp | [double-impact-midi-pack](https://opengameart.org/content/double-impact-midi-pack) | Norway at night (the open country) |
+| `cc0_northivanastan_the_journey_continues.mid` | The Journey Continues | northivanastan | [the-journey-continues](https://opengameart.org/content/the-journey-continues) | The Peanut Butter Lion |
+| `cc0_kbar1982_unhappy_man.mid` | Unhappy Man | kbar1982 | [unhappy-man](https://opengameart.org/content/unhappy-man) | Bjarne's house, before his sheet music is found |
+| `cc0_northivanastan_fun_is_infinite_at_agm.mid` | Fun Is Infinite at AGM | northivanastan | [fun-is-infinite-at-agm](https://opengameart.org/content/fun-is-infinite-at-agm) | Owen's room in New York |
 
 The Double Impact pack was organized by northivanastan, whose page says: "I asked all contributors to create fully original music, and dedicate their work to the public domain so it could be used in other projects."
 
@@ -42,4 +46,4 @@ Either way the game's synth plays them, so they sound like the rest of the game,
 
 ## What is not here, and why
 
-Freely *downloadable* is not the same as free to *use*. MIDI files of songs by Rush, Queen, Journey, Metallica and the rest are all over the web, but those songs are under copyright and the sites offering them have no right to. None of them are here. The game's rock tracks stay original pieces written in the sound of those bands, and the tracks above were chosen because their instrumentation and tempo suit the same feel. A player who has their own files can still play them in their own copy: OWEN'S SCRIPT, My music (see `web/src/mymusic.js`); those files never leave the device.
+Freely *downloadable* is not the same as free to *use*. MIDI files of songs by Rush, Queen, Journey, Metallica, Pink Floyd, Led Zeppelin, Twenty One Pilots and the rest are all over the web, but those songs are under copyright and the sites offering them have no right to. None of them are here. The game's rock tracks stay original pieces written in the sound of those bands, and the tracks above were chosen because their instrumentation and tempo suit the same feel. A player who has their own files can still play them in their own copy: OWEN'S SCRIPT, My music (see `web/src/mymusic.js`); those files never leave the device.

@@ -15,7 +15,7 @@ function fixture() {
   const chord = [40, 47, 52, 56, 59, 64];
   const gtr = [0x00, 0xc1, 30, ...chord.flatMap(n => [0x00, 0x91, n, 90]), ...chord.flatMap((n, i) => [...vlq(i ? 0 : 960), 0x81, n, 0]), ...END];
   const lead = [0x00, 0xc2, 80, ...vlq(1920), 0x92, 76, 100, ...vlq(480), 0x82, 76, 0, ...END];                                  // starts after the tempo change
-  const drums = [0x00, 0x99, 36, 100, 0x00, 75, 100, ...vlq(240), 42, 80, ...vlq(240), 38, 120, ...vlq(10), 0x89, 36, 0, 0x00, 75, 0, 0x00, 42, 0, 0x00, 38, 0, ...END];
+  const drums = [0x00, 0x99, 36, 100, 0x00, 87, 100, ...vlq(240), 42, 80, ...vlq(240), 38, 120, ...vlq(10), 0x89, 36, 0, 0x00, 87, 0, 0x00, 42, 0, 0x00, 38, 0, ...END];   // 87 is not in the kit
   const tracks = [tempo, bass, gtr, lead, drums];
   return Buffer.from([0x4d, 0x54, 0x68, 0x64, 0, 0, 0, 6, 0, 1, 0, tracks.length, div >> 8, div & 255, ...tracks.flatMap(track)]);
 }

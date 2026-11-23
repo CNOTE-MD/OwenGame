@@ -53,6 +53,10 @@ const PIECES = [
   { id: 'rock_fight', band: true, file: 'cc0_r0rque_fight_harder.mid', name: 'Fight Harder... To Obtain a Better Victory!', by: 'R0rque', source: 'OpenGameArt.org, "Double Impact MIDI Pack" (CC0)', gain: 0.75, fight: true },
   { id: 'rock_liberate', band: true, file: 'cc0_continuum_liberate_the_stars.mid', name: 'Liberate the Stars', by: 'continuum.mid', source: 'OpenGameArt.org, "Double Impact MIDI Pack" (CC0)', gain: 0.8, fight: true, pianoBass: true },
   { id: 'rock_andromeda', band: true, file: 'cc0_zemystic_andromeda.mid', name: 'Andromeda', by: 'ZeMystic', source: 'OpenGameArt.org, "Double Impact MIDI Pack" (CC0)', gain: 0.8 },
+  { id: 'rock_ambiguity', band: true, file: 'cc0_korp_ambiguity.mid', name: 'Ambiguity', by: 'Korp', source: 'OpenGameArt.org, "Double Impact MIDI Pack" (CC0)', gain: 0.85, blocks: 14 },
+  { id: 'rock_journey_on', band: true, file: 'cc0_northivanastan_the_journey_continues.mid', name: 'The Journey Continues', by: 'northivanastan', source: 'OpenGameArt.org, "The Journey Continues" by northivanastan (CC0)', gain: 0.8, fight: true },
+  { id: 'folk_unhappy', band: true, file: 'cc0_kbar1982_unhappy_man.mid', name: 'Unhappy Man', by: 'kbar1982', source: 'OpenGameArt.org, "Unhappy Man" by kbar1982 (CC0)', gain: 0.9, noDrums: true },   // its drum track is written for a kit that is not General MIDI, so the band plays it unplugged
+  { id: 'synth_agm', band: true, file: 'cc0_northivanastan_fun_is_infinite_at_agm.mid', name: 'Fun Is Infinite at AGM', by: 'northivanastan', source: 'OpenGameArt.org, "Fun is infinite at AGM" by northivanastan (CC0)', gain: 0.8, pianoBass: true },
 ];
 
 function arrange(parsed, st) {
@@ -132,7 +136,7 @@ function arrange(parsed, st) {
       song = await pg.evaluate(([bytes, st]) => {
         const p = parseMidi(new Uint8Array(bytes).buffer), blk = p.sig[0] * 4 / p.sig[1] * 4;
         const cut = st.blocks ? st.blocks * blk : Infinity;
-        p.notes = p.notes.filter(n => n.b < cut);
+        p.notes = p.notes.filter(n => n.b < cut && !(st.noDrums && n.ch === 9));
         if (st.pianoBass) for (const n of p.notes) if (n.ch !== 9 && n.prog <= 7 && n.note <= 50) n.prog = 33;   // no bass player in the file: the piano's low notes are the bass line
         const s = midiToSong(p, st.name);
         if (st.blocks) s.len = +(p.beats[Math.min(p.beats.length - 1, cut)] - Math.min(...p.notes.map(n => n.t))).toFixed(3);   // loop on a bar line

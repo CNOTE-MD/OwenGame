@@ -15,6 +15,10 @@
 //   Valhalla Arena, waves 13 to 16 . R0rque, Fight Harder... To Obtain a Better Victory!
 //   Valhalla Arena, waves 17 to 20 . continuum.mid, Liberate the Stars
 //   the Arena's shop ............... ZeMystic, Andromeda
+//   Norway at night ................ Korp, Ambiguity (the open country only; the village and forests keep theirs)
+//   the Peanut Butter Lion ......... northivanastan, The Journey Continues
+//   Bjarne's house, before his sheet music is found ... kbar1982, Unhappy Man
+//   Owen's room in New York ........ northivanastan, Fun Is Infinite at AGM
 // Owen's bands keep every place they already had in the story, and the bosses keep their music.
 const CLASSIC_IDS = Object.keys(CLASSICS);
 for (const id of CLASSIC_IDS) {
@@ -43,6 +47,10 @@ function classicFor(base) {
     return id === 'arena' ? id : findSong(id);
   }
   if (!G.map) return base;
+  if (base === 'aero' && G.mapId === 'overworld') return 'rock_journey_on';                          // the Peanut Butter Lion was borrowing the subway's song
+  if (base === 'overworld' && typeof isNight === 'function' && isNight()) return 'rock_ambiguity';   // Chilly's night
+  if (base === 'village' && G.mapId === 'home') return 'synth_agm';
+  if (base === 'village' && G.mapId === 'bjarne_house' && !flag('bjarne_done')) return 'folk_unhappy';
   if (base === 'boss') return G.ents.some(e => e.boss && e.alive && !MINI_BOSSES.has(e.type)) ? base : G.ents.some(e => e.alive && MINI_BOSSES.has(e.type)) ? 'grieg_trolls' : base;
   if (G.mapId === 'secret_cave') return 'grieg_king';
   if (G.mapId === 'sauna') return 'grieg_wedding';

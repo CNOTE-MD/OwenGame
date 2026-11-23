@@ -1,5 +1,5 @@
 // Music that is free to use, played by the game's band: seven public-domain classics (Grieg, Bach,
-// Beethoven) and four original rock tracks their composers released as CC0. What is shipped, where
+// Beethoven) and eight original tracks their composers released as CC0. What is shipped, where
 // each one plays, what they leave alone, the Jukebox and the credits.
 // Run: NODE_PATH=$(npm root -g) node tests/classics_test.js
 const { chromium } = require('playwright');
@@ -16,31 +16,32 @@ const ROOT = path.resolve(__dirname, '..');
   const SHOTS = process.env.SHOTS || '/tmp';
   const check = async (name, ok, extra) => { console.log((ok ? 'PASS ' : 'FAIL ') + name); if (!ok) { fails++; console.log('   ', JSON.stringify(extra !== undefined ? extra : await ev(() => ({ st: G.state, map: G.mapId, scr: G.scr, music: musicFor() })))); } };
   const GRIEG = ['grieg_king', 'grieg_trolls', 'grieg_wedding', 'grieg_mountaineer', 'grieg_aase'];
-  const ROCK = ['rock_endless', 'rock_fight', 'rock_liberate', 'rock_andromeda'];
+  const BAND = ['rock_endless', 'rock_fight', 'rock_liberate', 'rock_andromeda', 'rock_ambiguity', 'rock_journey_on'];   // guitars, bass and drums
+  const ROCK = [...BAND, 'folk_unhappy', 'synth_agm'];
   const IDS = [...GRIEG, 'bach_toccata', 'beethoven_fifth', ...ROCK];
 
   // ---- what is in the repo ----
   const doc = fs.readFileSync(path.join(ROOT, 'music/CLASSICS.md'), 'utf8');
   const mids = fs.readdirSync(path.join(ROOT, 'music/midi')).filter(f => /^(grieg_|bach_|beethoven_|cc0_)/.test(f));
-  await check('eleven source MIDI files, each a real MIDI file', mids.length === 11 && mids.every(f => fs.readFileSync(path.join(ROOT, 'music/midi', f)).slice(0, 4).toString() === 'MThd'), mids);
-  await check('every source file is credited with its page and license: Mutopia (Public Domain) or OpenGameArt (CC0)', mids.every(f => doc.includes('`' + f + '`')) && (doc.match(/piece-info\.cgi\?id=\d+/g) || []).length === 7 && (doc.match(/opengameart\.org\/content\//g) || []).length === 4 && /Public Domain/.test(doc) && /CC0/.test(doc));
-  await check('no file is a song by the bands the game is styled after', mids.every(f => !/rush|queen|journey|metallica|zeppelin|aerosmith|foreigner/i.test(f)) && /None of them are here/.test(doc));
+  await check('fifteen source MIDI files, each a real MIDI file', mids.length === 15 && mids.every(f => fs.readFileSync(path.join(ROOT, 'music/midi', f)).slice(0, 4).toString() === 'MThd'), mids);
+  await check('every source file is credited with its page and license: Mutopia (Public Domain) or OpenGameArt (CC0)', mids.every(f => doc.includes('`' + f + '`')) && (doc.match(/piece-info\.cgi\?id=\d+/g) || []).length === 7 && (doc.match(/opengameart\.org\/content\//g) || []).length === 8 && /Public Domain/.test(doc) && /CC0/.test(doc));
+  await check('no file is a song by the bands the game is styled after', mids.every(f => !/rush|queen|metallica|zeppelin|floyd|pilots|aerosmith|foreigner/i.test(f)) && /None of them are here/.test(doc));
   const data = JSON.parse(fs.readFileSync(path.join(ROOT, 'music/classics.json'), 'utf8'));
-  await check('the arranged songs carry their composer and source', JSON.stringify(Object.keys(data)) === JSON.stringify(IDS) && IDS.every(id => data[id].by && data[id].n.length > 300 && data[id].len > 60) && GRIEG.every(id => data[id].by === 'Edvard Grieg') && [...GRIEG, 'bach_toccata', 'beethoven_fifth'].every(id => /Mutopia Project, piece \d+ \(Public Domain\)/.test(data[id].source)) && ROCK.every(id => /OpenGameArt\.org.*\(CC0\)/.test(data[id].source)));
+  await check('the arranged songs carry their composer and source', JSON.stringify(Object.keys(data)) === JSON.stringify(IDS) && IDS.every(id => data[id].by && data[id].n.length > 150 && data[id].len > 60) && GRIEG.every(id => data[id].by === 'Edvard Grieg') && [...GRIEG, 'bach_toccata', 'beethoven_fifth'].every(id => /Mutopia Project, piece \d+ \(Public Domain\)/.test(data[id].source)) && ROCK.every(id => /OpenGameArt\.org.*\(CC0\)/.test(data[id].source)));
   const voices = id => { const ed = []; for (const e of data[id].n) { ed.push([e[0], e.length - 3]); ed.push([e[0] + e[1], -(e.length - 3)]); } ed.sort((a, b) => a[0] - b[0] || a[1] - b[1]); let live = 0, peak = 0; for (const e of ed) { live += e[1]; peak = Math.max(peak, live); } return peak; };
   await check('each one is light enough for a phone (never more than 22 notes at once)', IDS.every(id => voices(id) <= 22), IDS.map(voices));
-  await check('the quiet pieces have no drums; the band pieces and the rock tracks do', ['grieg_mountaineer', 'grieg_aase', 'bach_toccata'].every(id => data[id].d.length === 0) && ['grieg_king', 'grieg_trolls', 'grieg_wedding', 'beethoven_fifth', ...ROCK].every(id => data[id].d.length > 300));
-  await check('the rock tracks kept their guitars, bass and drums', ROCK.every(id => data[id].n.some(e => e[2] === 1) && data[id].n.some(e => e[2] === 0) && data[id].d.some(e => e[1] === 0) && data[id].d.some(e => e[1] === 1)));
+  await check('the quiet pieces have no drums; the band pieces and the rock tracks do', ['grieg_mountaineer', 'grieg_aase', 'bach_toccata', 'folk_unhappy'].every(id => data[id].d.length === 0) && ['grieg_king', 'grieg_trolls', 'grieg_wedding', 'beethoven_fifth', ...BAND, 'synth_agm'].every(id => data[id].d.length > 300));
+  await check('the rock tracks kept their guitars, bass and drums', BAND.every(id => data[id].n.some(e => e[2] === 1) && data[id].n.some(e => e[2] === 0) && data[id].d.some(e => e[1] === 0) && data[id].d.some(e => e[1] === 1)));
   await check('the bass plays one note at a time (and in the arranged classics, always low)', IDS.every(id => data[id].n.filter(e => e[2] === 0).every(e => e.length === 4)) && IDS.filter(id => !ROCK.includes(id)).every(id => data[id].n.filter(e => e[2] === 0).every(e => e[3] >= 28 && e[3] <= 50)), IDS.map(id => data[id].n.filter(e => e[2] === 0 && e.length !== 4).length));
 
   await pg.goto('file://' + path.join(ROOT, 'web/index.html'));
   await ev(() => { try { localStorage.clear(); } catch (e) {} });
   await pg.reload(); await pg.waitForFunction(() => typeof G !== 'undefined' && G.state === 'title');
-  const start = () => ev(() => { TOASTS.length = 0; G.mode = 'story'; G.save = newSave(); applyJonPerks(); G.save.trophies = Object.fromEntries(TROPHIES.map(t => [t.id, true])); G.player = makePlayer(); G.jon = makeJon(); for (const f of ['met_astrid', 'hint:move', 'hint:look', 'hint:chop', 'hint:gear', 'chapter_card:1', 'chapter_card:2', 'chapter_card:3', 'jonarea:overworld', 'jonarea:cavern', 'jonarea:barrow', 'intro:cavern', 'intro:barrow', 'intro:knight', 'intro:bells', 'sauna_found', 'baron_met']) setFlag(f); G.save.items.dash = true; G.state = 'play'; G.talk = null; loadMap('overworld', 20 * 16 + 8, 34 * 16 + 8); G.ents = G.ents.filter(e => !e.enemy); G.talk = null; G.state = 'play'; });
+  const start = () => ev(() => { TOASTS.length = 0; G.mode = 'story'; G.save = newSave(); applyJonPerks(); G.save.trophies = Object.fromEntries(TROPHIES.map(t => [t.id, true])); G.player = makePlayer(); G.jon = makeJon(); for (const f of ['met_astrid', 'hint:move', 'hint:look', 'hint:chop', 'hint:gear', 'chapter_card:1', 'chapter_card:2', 'chapter_card:3', 'jonarea:overworld', 'jonarea:cavern', 'jonarea:barrow', 'intro:cavern', 'intro:barrow', 'intro:knight', 'intro:bells', 'sauna_found', 'baron_met']) setFlag(f); G.save.items.dash = true; G.save.clock = 12; G.state = 'play'; G.talk = null; loadMap('overworld', 20 * 16 + 8, 34 * 16 + 8); G.ents = G.ents.filter(e => !e.enemy); G.talk = null; G.state = 'play'; });
   const at = (map, tx, ty, keep) => ev(([map, tx, ty, keep]) => { G.state = 'play'; G.talk = null; loadMap(map, tx * 16 + 8, ty * 16 + 8); if (!keep) G.ents = G.ents.filter(e => !e.enemy); G.talk = null; G.state = 'play'; G.bossCard = null; return musicFor(); }, [map, tx, ty, keep]);
   await start();
 
-  await check('the game knows all eleven, after its own fifteen songs', await ev(IDS => IDS.every(id => Music.cache[id] && SCORE[id].by) && JSON.stringify(JUKE_ORDER.slice(-11)) === JSON.stringify(IDS) && JUKE_ORDER.length === 26 && JUKE_ORDER[0] === 'title', IDS));
+  await check('the game knows all fifteen, after its own fifteen songs', await ev(IDS => IDS.every(id => Music.cache[id] && SCORE[id].by) && JSON.stringify(JUKE_ORDER.slice(-15)) === JSON.stringify(IDS) && JUKE_ORDER.length === 30 && JUKE_ORDER[0] === 'title', IDS));
 
   // ---- where they play ----
   await check('the Hidden Cave: In the Hall of the Mountain King', (await at('secret_cave', 5, 8)) === 'grieg_king');
@@ -54,6 +55,12 @@ const ROOT = path.resolve(__dirname, '..');
   await check('the palace lobby: the plain palace theme, until "dead Chilly" is lying in it; then Bach\'s Toccata', (await at('cavern', 24, 52)) === 'palace' && await ev(() => { setFlag('page10'); setFlag('dead_chilly'); return true; }) && (await at('cavern', 24, 52)) === 'bach_toccata');
   await check('...and only the lobby: the rest of the palace keeps its theme', (await at('cavern', 24, 38)) === 'palace');
 
+  // ---- four more story places that were borrowing a tune ----
+  await check('Owen\'s room in New York has its own track', (await at('home', 3, 4)) === 'synth_agm');
+  await check('Bjarne\'s house: "Unhappy Man" while his sheet music is lost, his own song once it is found', (await at('bjarne_house', 5, 6)) === 'folk_unhappy' && await ev(() => { setFlag('bjarne_done'); return musicFor() === 'bjarne'; }));
+  await check('the Peanut Butter Lion has his own fight music; the subway keeps the song he was borrowing', await ev(() => { loadMap('overworld', 44 * 16 + 8, 31 * 16 + 8); G.talk = null; G.state = 'play'; G.ents = G.ents.filter(e => !e.enemy); G.ents.push({ type: 'pblion', alive: true, st: 'chase', enemy: true, x: 0, y: 0, r: 8 }); const m = musicFor(); G.ents.pop(); return m === 'rock_journey_on'; }) && (await at('subway', 8, 5)) === 'aero');
+  await check('Norway at night: the open country gets a night piece; the village and the forests keep theirs', await ev(() => { G.save.clock = 22; return isNight(); }) && (await at('overworld', 20, 34)) === 'rock_ambiguity' && (await at('overworld', 5, 20)) === 'village' && (await at('overworld', 24, 6)) === 'journey' && await ev(() => { G.save.clock = 12; return !isNight() && musicFor() === 'journey'; }) && (await at('overworld', 20, 34)) === 'overworld');
+
   // ---- Valhalla Arena: a new set every four waves ----
   const arena = w => ev(w => { const st = G.state, mode = G.mode, ents = G.ents; G.mode = 'arena'; G.state = 'play'; G.ents = []; A.wave = w; const m = musicFor(); G.state = 'shop'; const shop = musicFor(); G.state = 'play'; G.ents = [{ type: 'king', alive: true, boss: true }]; const boss = musicFor(); G.mode = mode; G.state = st; G.ents = ents; A.wave = 0; return [m, shop, boss]; }, w);
   const sets = []; for (const w of [1, 4, 5, 8, 9, 12, 13, 16, 17, 20]) sets.push((await arena(w))[0]);
@@ -63,7 +70,7 @@ const ROOT = path.resolve(__dirname, '..');
 
   // ---- what they leave alone ----
   await check('the real bosses keep their music: the Penguin King (Owen\'s "chop") and Hank', (await at('cavern', 24, 5, true)) === 'chop' && (await at('barrow', 24, 5, true)) === 'boss');
-  await check('Owen\'s bands keep every place they had', (await at('overworld', 20, 34)) === 'overworld' && (await at('overworld', 5, 20)) === 'village' && (await at('overworld', 24, 6)) === 'journey' && (await at('overworld', 40, 6)) === 'cold' && (await at('subway', 8, 5)) === 'aero' && (await at('cavern', 24, 38)) === 'palace' && (await at('astrid_house', 5, 6)) === 'village');
+  await check('Owen\'s bands keep every place they had', (await at('overworld', 20, 34)) === 'overworld' && (await at('overworld', 5, 20)) === 'village' && (await at('overworld', 24, 6)) === 'journey' && (await at('overworld', 40, 6)) === 'cold' && (await at('subway', 8, 5)) === 'aero' && (await at('cavern', 24, 38)) === 'palace' && (await at('astrid_house', 5, 6)) === 'village' && (await at('bjarne_house', 5, 6)) === 'bjarne');
   await check('the title and the arena\'s game over are untouched', await ev(() => { const st = G.state; G.state = 'title'; const t = musicFor(); G.state = 'arenaover'; const a = musicFor(); G.state = st; return t === 'title' && a === null; }));
 
   // ---- with "play everywhere" from My music ----
@@ -83,13 +90,13 @@ const ROOT = path.resolve(__dirname, '..');
   await check('then Z plays it, and the band plays it without an error', errs.length === 0 && await ev(() => G.jukebox === 'grieg_king' && Music.name === 'grieg_king' && !!Music.bus), errs);
   await pg.screenshot({ path: SHOTS + '/classics_jukebox.png' });
   for (const id of IDS.slice(1)) { await ev(id => { setFlag('heard:' + id); G.jukebox = id; }, id); await wait(600); }
-  await check('all eleven play through the engine without an error', errs.length === 0 && await ev(() => Music.name === 'rock_andromeda'), errs);
+  await check('all fifteen play through the engine without an error', errs.length === 0 && await ev(() => Music.name === 'synth_agm'), errs);
   await ev(() => { G.jukeSel = JUKE_ORDER.indexOf('rock_endless'); }); await wait(120);
   await pg.screenshot({ path: SHOTS + '/classics_jukebox2.png' });
 
   // ---- credit where it is due ----
   await ev(() => { G.jukebox = null; G.state = 'play'; startCredits(); }); await wait(200);
-  await check('the credits name Grieg of Norway, Bach, Beethoven and the four rock composers', await ev(() => { const t = G.credits.lines.map(l => l.t).join(' | '); return /Edvard Grieg of Norway/.test(t) && /Bach/.test(t) && /Beethoven/.test(t) && /nene, R0rque, ZeMystic/.test(t) && /continuum\.mid/.test(t); }));
+  await check('the credits name Grieg of Norway, Bach, Beethoven and all seven CC0 composers', await ev(() => { const t = G.credits.lines.map(l => l.t).join(' | '); return /Edvard Grieg of Norway/.test(t) && /Bach/.test(t) && /Beethoven/.test(t) && /nene, R0rque, ZeMystic, Korp/.test(t) && /continuum\.mid, kbar1982/.test(t) && /northivanastan/.test(t); }));
 
   console.log('errors:', errs);
   console.log('FAILS:', fails);
