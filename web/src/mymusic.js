@@ -9,7 +9,8 @@ const MYM_INST = ['bass', 'gtr', 'lead', 'pad', 'pluck', 'bell', 'flute', 'piano
 const MYM_DRUM = ['k', 's', 'r', 'h', 'o', 'c', 'th', 'tm', 'tl'];
 
 // ---------------- reading a Standard MIDI File ----------------
-// Returns { notes: [{ t, d, ch, note, vel, prog }] (seconds), bpm }.
+// Returns { notes: [{ t, d, ch, note, vel, prog, tr, b }] (t, d in seconds; tr = track; b = start in beats), bpm, sig, beats }.
+// beats[k] is the time in seconds of quarter-note beat k, through every tempo change.
 function parseMidi(buf) {
   const d = new DataView(buf); let p = 0;
   const tag = at => String.fromCharCode(d.getUint8(at), d.getUint8(at + 1), d.getUint8(at + 2), d.getUint8(at + 3));
@@ -18,7 +19,7 @@ function parseMidi(buf) {
   if (tag(p) !== 'MThd') throw new Error('not a MIDI file');
   const hl = d.getUint32(p + 4), ntr = d.getUint16(p + 10), div = d.getUint16(p + 12); p += 8 + hl;
   if (div & 0x8000 || !div) throw new Error('this kind of MIDI timing is not supported');
-  const raw = [], tempos = [{ tick: 0, us: 500000 }];
+  const raw = [], tempos = [{ tick: 0, us: 500000 }]; let sig = null;
   for (let tr = 0; tr < ntr && p + 8 <= d.byteLength; tr++) {
     const id = tag(p), len = d.getUint32(p + 4); p += 8;
     const end = Math.min(d.byteLength, p + len);
@@ -29,16 +30,16 @@ function parseMidi(buf) {
       tick += vlq(); if (p >= end) break;
       let st = d.getUint8(p);
       if (st & 0x80) { p++; if (st < 0xf0) run = st; } else st = run;                           // running status
-      if (st === 0xff) { const type = d.getUint8(p++), l = vlq(); if (type === 0x51 && l === 3) tempos.push({ tick, us: (d.getUint8(p) << 16) | (d.getUint8(p + 1) << 8) | d.getUint8(p + 2) }); p += l; if (type === 0x2f) break; continue; }
+      if (st === 0xff) { const type = d.getUint8(p++), l = vlq(); if (type === 0x51 && l === 3) tempos.push({ tick, us: (d.getUint8(p) << 16) | (d.getUint8(p + 1) << 8) | d.getUint8(p + 2) }); if (type === 0x58 && l >= 2 && !sig) sig = [d.getUint8(p), 1 << d.getUint8(p + 1)]; p += l; if (type === 0x2f) break; continue; }
       if (st === 0xf0 || st === 0xf7) { p += vlq(); continue; }
       if (st < 0x80) break;                                                                      // garbage: give up on this track
       const hi = st & 0xf0, ch = st & 0x0f;
       if (hi === 0xc0 || hi === 0xd0) { const v = d.getUint8(p++); if (hi === 0xc0) prog[ch] = v; continue; }
       const a = d.getUint8(p++), b = d.getUint8(p++), key = ch * 128 + a;
       if (hi === 0x90 && b > 0) (on[key] = on[key] || []).push({ tick, vel: b, prog: prog[ch] });
-      else if (hi === 0x80 || hi === 0x90) { const q = on[key]; if (q && q.length) { const s = q.shift(); raw.push({ tick: s.tick, end: tick, ch, note: a, vel: s.vel, prog: s.prog }); } }
+      else if (hi === 0x80 || hi === 0x90) { const q = on[key]; if (q && q.length) { const s = q.shift(); raw.push({ tick: s.tick, end: tick, ch, note: a, vel: s.vel, prog: s.prog, tr }); } }
     }
-    for (const key in on) for (const s of on[key]) raw.push({ tick: s.tick, end: s.tick + div, ch: key >> 7, note: key & 127, vel: s.vel, prog: s.prog });   // notes never switched off
+    for (const key in on) for (const s of on[key]) raw.push({ tick: s.tick, end: s.tick + div, ch: key >> 7, note: key & 127, vel: s.vel, prog: s.prog, tr });   // notes never switched off
     p = end;
   }
   // ticks to seconds, through every tempo change
@@ -46,7 +47,8 @@ function parseMidi(buf) {
   let sec = 0; const map = tempos.map((t, i) => { if (i) sec += (t.tick - tempos[i - 1].tick) * tempos[i - 1].us / 1e6 / div; return { tick: t.tick, sec, us: t.us }; });
   const toSec = tk => { let m = map[0]; for (const x of map) { if (x.tick <= tk) m = x; else break; } return m.sec + (tk - m.tick) * m.us / 1e6 / div; };
   const first = tempos.find(t => t.us > 0) || tempos[0];
-  return { notes: raw.map(n => ({ t: toSec(n.tick), d: Math.max(0.03, toSec(n.end) - toSec(n.tick)), ch: n.ch, note: n.note, vel: n.vel, prog: n.prog })), bpm: Math.round(6e7 / (tempos[tempos.length > 1 ? 1 : 0].us || first.us)) };
+  const last = raw.reduce((m, n) => Math.max(m, n.end), 0), beats = []; for (let k = 0; k * div <= last + div; k++) beats.push(toSec(k * div));
+  return { sig: sig || [4, 4], beats, notes: raw.map(n => ({ t: toSec(n.tick), d: Math.max(0.03, toSec(n.end) - toSec(n.tick)), ch: n.ch, note: n.note, vel: n.vel, prog: n.prog, tr: n.tr, b: n.tick / div })), bpm: Math.round(6e7 / (tempos[tempos.length > 1 ? 1 : 0].us || first.us)) };
 }
 
 // ---------------- arranging it for the game's band ----------------
@@ -188,11 +190,11 @@ const _musicForM = musicFor;
 musicFor = function () {
   if (MYM.preview && !SCRIPT.open) MYM.preview = null;                       // listening stops when the panel closes
   if (MYM.preview && Music.cache[MYM.preview]) return MYM.preview;
-  const base = _musicForM();
+  const base = classicFor(_musicForM());
   if (!MYM.keep || !Music.cache[MYM.keep] || !base || G.mode === 'arena') return base;
   if (G.state === 'menu' && G.jukebox) return base;
   if (!['play', 'talk', 'menu', 'choice', 'jonlevel', 'hold', 'warp'].includes(G.state) || (G.state === 'talk' && G.talk && G.talk.back === 'cutscene')) return base;
-  if (base === 'boss' || base === 'chop' || base === 'zep') return base;
+  if (base === 'boss' || base === 'chop' || base === 'zep' || (SCORE[base] && SCORE[base].fight)) return base;
   return MYM.keep;
 };
 
@@ -226,7 +228,8 @@ drawJukebox = function () {
   if (top > 0) text('▲', 240, 52, '#8a8ab0', 'right', false);
   if (top + ROWS < list.length) text('▼', 240, 57 + (ROWS - 1) * 10, '#8a8ab0', 'right', false);
   const c = TOUCH ? 'RUNE' : 'C';
-  text(mymIs(list[sel]) ? `${BTN.a} plays · ${c} plays it everywhere` : mine ? `${BTN.a} plays` : 'Find songs in the world · Z plays', 128, 210, '#8a8ab0', 'center', false);
+  const cur = SCORE[list[sel]], known = cur && cur.by && flag('heard:' + list[sel]);
+  text(mymIs(list[sel]) ? `${BTN.a} plays · ${c} plays it everywhere` : known ? `by ${cur.by} · played by Jon's band` : mine ? `${BTN.a} plays` : 'Find songs in the world · Z plays', 128, 210, known ? '#c8e8ff' : '#8a8ab0', 'center', false);
 };
 
 // ---------------- the "My music" tab under the game ----------------

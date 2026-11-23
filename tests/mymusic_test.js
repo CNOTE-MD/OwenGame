@@ -94,7 +94,7 @@ function fixture() {
   await pg.screenshot({ path: SHOTS + '/mymusic_jukebox2.png' });
   await pg.keyboard.press('Enter'); await wait(300);
   await check('back in the game it keeps playing: outdoors, indoors, in a dungeon', await ev(id => { const out = [musicFor()]; loadMap('astrid_house', 5 * 16 + 8, 6 * 16 + 8); G.talk = null; G.state = 'play'; out.push(musicFor()); loadMap('cavern', 24 * 16 + 8, 52 * 16 + 8); G.talk = null; G.state = 'play'; out.push(musicFor()); return out.every(m => m === id); }, id));
-  await check('bosses keep their own music', await ev(id => { G.ents.push({ boss: true, alive: true, type: 'knight', x: 0, y: 0 }); const m = musicFor(); G.ents.pop(); return m === 'boss' && musicFor() === id; }, id));
+  await check('bosses and mini-bosses keep their own music', await ev(id => { G.ents.push({ boss: true, alive: true, type: 'hank', x: 0, y: 0 }); const m = musicFor(); G.ents.pop(); G.ents.push({ boss: true, alive: true, type: 'knight', x: 0, y: 0 }); const mini = musicFor(); G.ents.pop(); return m === 'boss' && mini === 'grieg_trolls' && musicFor() === id; }, id));
   await check('so do the title screen and the arena', await ev(id => { const st = G.state; G.state = 'title'; const t = musicFor(); G.state = st; G.mode = 'arena'; const a = musicFor(); G.mode = 'story'; return t === 'title' && a !== id; }, id));
   await wait(1500);
   await check('the band plays it without a single error', errs.length === 0 && await ev(id => Music.name === id && Music.idx >= 0, id), errs);

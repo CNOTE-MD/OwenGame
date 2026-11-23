@@ -166,7 +166,7 @@ function creditLines() {
   who('The Peanut Butter Lion', 'smooth, not crunchy', (x, y) => spr(SPR.lion_0, x, y + 8));
   who('Baron Blubber', 'not helping', (x, y) => spr(SPR.baron, x, y + 9));
   gap(16);
-  head('MUSIC'); line('in the sound of Owen\'s bands'); line('Rush, Queen, Led Zeppelin, Journey,'); line('Aerosmith and Foreigner'); gap(22);
+  head('MUSIC'); line('in the sound of Owen\'s bands'); line('Rush, Queen, Led Zeppelin, Journey,'); line('Aerosmith and Foreigner'); gap(8); line('and five pieces by Edvard Grieg'); line('of Norway (1843-1907),'); line('played by Jon\'s band'); gap(22);
   head('YOUR ADVENTURE');
   line(`Time played: ${mins} min`); line(`Chops: ${d.kills || 0}    Best combo: x${d.combo || 0}`); line(`Naps: ${d.deaths || 0}    Animals freed: ${freedTotal()}`);
   line(`Trophies: ${trophyCount()} of ${TROPHIES.length}`); gap(8);
