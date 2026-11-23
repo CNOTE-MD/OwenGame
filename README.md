@@ -17,6 +17,8 @@
 | `web/src/editor.js` | Notebook paper and photos of Owen's real pages, Jon's memories of what you did, the RUSH Ø piano duel, Chilly's night (bolder creatures, Owen's own grave, resting at runestones), Owen's notes |
 | `web/src/art3.js` | Pixel primitives (lines, ellipses, glows in quarter-step alpha), Scale2x/Scale3x for big sprites, framed boss bars, a hand-built Flight 364, villager props and room decor |
 | `web/src/rock.js` | Jon remembers a song for each rune: the outdoor music fills back in layer by layer, a beat marker joins the HUD, chops on the beat hit 1.5x, bosses strike on the beat |
+| `web/src/classics.js`, `music/classics.json`, `music/CLASSICS.md` | Free-to-use music played by the game's band: seven public-domain classics (Grieg, Bach, Beethoven; Mutopia Project) and four original rock and metal tracks their composers released as CC0 (OpenGameArt). `tools/arrange_classics.js` builds them from the files in `music/midi/`. Where each plays, and every source and license, are in `music/CLASSICS.md` |
+| `web/src/mymusic.js` | MY MUSIC: bring your own MIDI files. Reads .mid files picked on the device, arranges them for the game's band, lists them at the top of the Jukebox, and can play one everywhere. Kept in that browser only; never uploaded and never part of the repo |
 | `web/src/barrow.js` | The Drowned Barrow pass (a draft for Owen): Fluffy as the Barrow's guide (Jon translates a hint for wherever you are), the bell crypt (ring three spirit bells little, middle, big with the Voodoo Dash) and the Spirit Bell charm |
 | `web/src/elf.js` | Owen's page 10: the elf, and his answer that the elf leads into the palace and into "dead Chilly". Also the palace concierge (hints), the ice-block puzzle room and Ice Skates, and the dungeon floor plan on the MAP page |
 | `web/src/finish.js` | The finishing layer: credits with your stats, Jon's Trophy Wall, the options screen, fast-forward, control prompts, and fixes found by playing it through (see `REVIEW.md`) |
@@ -32,7 +34,7 @@
 | `OWEN_QUESTIONS.md` | Prompts to ask Owen after he plays; his answers drive the next build |
 | `STORY_BIBLE.md` | Characters, chapter arc, items, the Red-Eye side quest, Arena mode |
 
-Rebuild: `python3 tools/maps.py && python3 tools/build_web.py`. Test: `NODE_PATH=$(npm root -g) node tests/web_playtest.js`, then `tests/arena_playtest.js`, `tests/ch1_depth_test.js`, `tests/redeye_test.js`, `tests/ch2_test.js`, `tests/jon_test.js`, `tests/pad_test.js`, `tests/snes_test.js`, `tests/magic_test.js`, `tests/better_test.js`, `tests/giant_test.js`, `tests/owen_test.js`, `tests/polish_test.js`, `tests/tech_test.js`, `tests/critters_test.js`, `tests/script_test.js`, `tests/tour_test.js`, `tests/finish_test.js`, `tests/elf_test.js`, `tests/barrow_test.js`, `tests/ipad_test.js` and `tests/playthrough_test.js` (a bot plays Owen's nine pages with real inputs; about 90 seconds) the same way.
+Rebuild: `python3 tools/maps.py && python3 tools/build_web.py`. Test: `NODE_PATH=$(npm root -g) node tests/web_playtest.js`, then `tests/arena_playtest.js`, `tests/ch1_depth_test.js`, `tests/redeye_test.js`, `tests/ch2_test.js`, `tests/jon_test.js`, `tests/pad_test.js`, `tests/snes_test.js`, `tests/magic_test.js`, `tests/better_test.js`, `tests/giant_test.js`, `tests/owen_test.js`, `tests/polish_test.js`, `tests/tech_test.js`, `tests/critters_test.js`, `tests/script_test.js`, `tests/tour_test.js`, `tests/finish_test.js`, `tests/elf_test.js`, `tests/barrow_test.js`, `tests/ipad_test.js`, `tests/mymusic_test.js`, `tests/classics_test.js` and `tests/playthrough_test.js` (a bot plays Owen's nine pages with real inputs; about 90 seconds) the same way.
 
 ### Owen's link, and playing on an iPad
 
@@ -52,6 +54,7 @@ On an iPad or a phone it opens straight into the fill-the-window layout: the gam
 | Play with no internet | Open it once online first. `web/sw.js` keeps a copy and only uses it when the network is down |
 | Use a controller | Pair an Xbox, PlayStation or Switch Pro controller over Bluetooth; the touch controls hide themselves |
 | Hear it | Sound starts on the first tap. If it is silent, check the iPad is not muted |
+| Play your own songs | Put .mid files on the iPad (Files or iCloud Drive). In the game tap the X, then OWEN'S SCRIPT, My music, Add MIDI files. They appear at the top of the Jukebox (GEAR, then MUSIC); RUNE on a song makes it play everywhere |
 
 | File | What it is |
 |---|---|

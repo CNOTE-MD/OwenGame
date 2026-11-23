@@ -66,7 +66,7 @@ const path = require('path');
   await wait(200);
   await check('walking up wakes it: boss card and its own scene', await ev(() => G.state === 'talk' && G.bossCard && /PEANUT/.test(G.bossCard.name)));
   await talkThrough();
-  await check('the fight plays the Aerosmith-sound piece', await ev(() => musicFor() === 'aero'));
+  await check('the fight has its own music (a public-domain rock track), and the subway keeps the Aerosmith-sound piece', await ev(() => musicFor() === 'rock_journey_on'));
   await ev(() => { G.player.inv = 99; const l = G.ents.find(o => o.type === 'pblion'); l.st = 'prowl'; l.t = 1.79; l.n = 0; l.flash = 0; damageEnemy(l, 2, G.player, 'swing'); });
   await check('outside its opening Jon only SQUISHes it (half damage)', Math.abs((await one('pblion')).hp - 13) < 1e-9);
   await pg.waitForFunction(() => { const l = G.ents.find(o => o.type === 'pblion'); return l && l.st === 'stuck'; }, null, { timeout: 4000 }).catch(() => {});
