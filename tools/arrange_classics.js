@@ -1,12 +1,19 @@
-// Arranges public-domain piano scores for the game's band and writes music/classics.json.
+// Arranges freely usable music for the game's band and writes music/classics.json.
 //
-// The sources are MIDI files from the Mutopia Project (mutopiaproject.org), each marked Public Domain
-// there, of pieces by Edvard Grieg (1843-1907). They are two-hand piano scores. The band plays them
-// like this: the top of the right hand is the melody, the low notes of the left hand are the bass
-// line, what is left is the chords, and a drum part is written on the score's own beat grid. Each
-// piece is cut into four-bar blocks and every block is given a level (0 quiet, 1 medium, 2 loud)
-// that picks the instruments and the drum pattern, so the band follows the shape of the piece.
-// Loud blocks also play the melody in octaves and add a second chord instrument.
+// Two kinds of source, both in music/midi/ and credited in music/CLASSICS.md:
+//
+// 1. Public-domain keyboard scores from the Mutopia Project (mutopiaproject.org), each marked Public
+//    Domain there: Grieg, Bach, Beethoven. The band plays them like this: the top of the upper staff
+//    is the melody, the low notes of the lower staves are the bass line, what is left is the chords,
+//    and a drum part is written on the score's own beat grid. Each piece is cut into four-bar blocks
+//    and every block is given a level (0 quiet, 1 medium, 2 loud) that picks the instruments and the
+//    drum pattern, so the band follows the shape of the piece. Loud blocks also play the melody in
+//    octaves and add a second chord instrument.
+//
+// 2. Original rock and metal tracks from OpenGameArt.org whose composers dedicated them to the
+//    public domain (CC0). These are already written for a band (guitars, bass, drums), so they go
+//    through the same General MIDI mapping the game uses for a player's own files (midiToSong in
+//    web/src/mymusic.js).
 //
 // Run after a build:  NODE_PATH=$(npm root -g) node tools/arrange_classics.js
 // then rebuild:       python3 tools/build_web.py
@@ -35,13 +42,29 @@ const PIECES = [
   { id: 'grieg_aase', file: 'grieg_aases_death.mid', name: "Aase's Death", work: 'Peer Gynt Suite No. 1, Op. 46 No. 2', mutopia: 246, gain: 0.9, blocks: 6, minVel: 20,
     stages: [[0, 0]],
     levels: [{ lead: CHOIR, chords: PAD, drums: 'none' }] },
+  { id: 'bach_toccata', file: 'bach_toccata_fugue.mid', name: 'Toccata and Fugue in D Minor', by: 'Johann Sebastian Bach', work: 'BWV 565 (the Toccata)', mutopia: 1780, gain: 0.9, blocks: 7,
+    stages: [[0, 0]],
+    levels: [{ lead: FLUTE, octave: true, chords: PAD, drums: 'none' }] },
+  { id: 'beethoven_fifth', file: 'beethoven_fifth.mid', name: 'Symphony No. 5', by: 'Ludwig van Beethoven', work: 'Op. 67, first movement (the exposition)', mutopia: 497, gain: 0.8, blocks: 31, fight: true,
+    dense: 34,
+    levels: [{ lead: FLUTE, chords: PAD, drums: 'none' }, { lead: PIANO, chords: PLUCK, drums: 'alla1' }, { lead: LEAD, chords: GTR, also: PIANO, octave: true, drums: 'alla2' }] },
+  // original tracks, dedicated to the public domain (CC0) by their composers
+  { id: 'rock_endless', band: true, file: 'cc0_nene_endless_pain.mid', name: 'Endless Pain of Nightmares', by: 'nene', source: 'OpenGameArt.org, "Endless Pain of Nightmares" by nene (CC0)', gain: 0.75, blocks: 28, fight: true },
+  { id: 'rock_fight', band: true, file: 'cc0_r0rque_fight_harder.mid', name: 'Fight Harder... To Obtain a Better Victory!', by: 'R0rque', source: 'OpenGameArt.org, "Double Impact MIDI Pack" (CC0)', gain: 0.75, fight: true },
+  { id: 'rock_liberate', band: true, file: 'cc0_continuum_liberate_the_stars.mid', name: 'Liberate the Stars', by: 'continuum.mid', source: 'OpenGameArt.org, "Double Impact MIDI Pack" (CC0)', gain: 0.8, fight: true, pianoBass: true },
+  { id: 'rock_andromeda', band: true, file: 'cc0_zemystic_andromeda.mid', name: 'Andromeda', by: 'ZeMystic', source: 'OpenGameArt.org, "Double Impact MIDI Pack" (CC0)', gain: 0.8 },
 ];
 
 function arrange(parsed, st) {
   const speed = st.speed || 1, bpb = parsed.sig[0] * 4 / parsed.sig[1], blk = bpb * 4;      // quarter-note beats per bar, per block
   const beatSec = q => { const i = Math.min(parsed.beats.length - 2, Math.max(0, Math.floor(q))); return (parsed.beats[i] + (q - i) * (parsed.beats[i + 1] - parsed.beats[i])) / speed; };
   const endBeat = st.blocks ? st.blocks * blk : Math.ceil(Math.max(...parsed.notes.map(n => n.b + 0.01)) / bpb) * bpb;
-  const levelAt = b => { let l = st.stages[0][1]; for (const [from, lv] of st.stages) if (b >= from * blk) l = lv; return st.levels[Math.min(l, st.levels.length - 1)]; };
+  // a level per block: listed by hand (stages), or by how busy the block is when the score has no dynamics (dense)
+  const busy = []; if (st.dense) for (const n of parsed.notes) { const i = Math.floor(n.b / blk); busy[i] = (busy[i] || 0) + 1; }
+  const levelAt = b => {
+    if (st.dense) { const i = Math.floor(b / blk); return st.levels[i === 0 || (busy[i] || 0) >= st.dense ? 2 : 1]; }
+    let l = st.stages[0][1]; for (const [from, lv] of st.stages) if (b >= from * blk) l = lv; return st.levels[Math.min(l, st.levels.length - 1)];
+  };
   const notes = parsed.notes.filter(n => n.b < endBeat && n.vel >= (st.minVel || 0)).sort((a, b) => a.b - b.b || a.note - b.note);
   const rh = Math.min(...notes.map(n => n.tr));
   // one entry per moment: what each hand plays there
@@ -87,6 +110,8 @@ function arrange(parsed, st) {
     if (first && (pat === 'rock' || pat === 'march2')) hit(q0, C, true);
     if (pat === 'kick') { for (let q = 0; q < bpb; q++) { if (q % 2 === 0) hit(q0 + q, K); hit(q0 + q, H); } continue; }
     if (pat === 'rock') { for (let q = 0; q < bpb; q++) { hit(q0 + q, q % 2 ? S : K, q % 2 === 1); hit(q0 + q, H); hit(q0 + q + 0.5, H); } continue; }
+    if (pat === 'alla1') { if (bar % 2 === 0) hit(q0, K); for (let q = 0; q < bpb; q++) hit(q0 + q, H); continue; }                 // one beat to the bar: kick every other bar
+    if (pat === 'alla2') { if (first) hit(q0, C, true); hit(q0, bar % 2 ? S : K, bar % 2 === 1); for (let q = 0; q < bpb; q++) hit(q0 + q, H); continue; }   // kick, snare, bar by bar
     if (pat === 'march1') { hit(q0, K); for (let q = 0; q < bpb; q += 0.5) hit(q0 + q, H); continue; }
     if (pat === 'march2') { for (let q = 0; q < bpb; q++) { hit(q0 + q, q % 2 ? S : K, q % 2 === 1); hit(q0 + q, H); hit(q0 + q + 0.5, H); } }
   }
@@ -102,9 +127,22 @@ function arrange(parsed, st) {
   const out = {};
   for (const st of PIECES) {
     const bytes = [...fs.readFileSync(path.join(ROOT, 'music/midi', st.file))];
-    const parsed = await pg.evaluate(bytes => parseMidi(new Uint8Array(bytes).buffer), bytes);
-    const song = arrange(parsed, st);
-    out[st.id] = { ...song, by: 'Edvard Grieg', work: st.work, source: `Mutopia Project, piece ${st.mutopia} (Public Domain)`, fight: !!st.fight };
+    let song;
+    if (st.band) {
+      song = await pg.evaluate(([bytes, st]) => {
+        const p = parseMidi(new Uint8Array(bytes).buffer), blk = p.sig[0] * 4 / p.sig[1] * 4;
+        const cut = st.blocks ? st.blocks * blk : Infinity;
+        p.notes = p.notes.filter(n => n.b < cut);
+        if (st.pianoBass) for (const n of p.notes) if (n.ch !== 9 && n.prog <= 7 && n.note <= 50) n.prog = 33;   // no bass player in the file: the piano's low notes are the bass line
+        const s = midiToSong(p, st.name);
+        if (st.blocks) s.len = +(p.beats[Math.min(p.beats.length - 1, cut)] - Math.min(...p.notes.map(n => n.t))).toFixed(3);   // loop on a bar line
+        return { ...s, gain: st.gain || 0.8 };
+      }, [bytes, st]);
+    } else {
+      const parsed = await pg.evaluate(bytes => parseMidi(new Uint8Array(bytes).buffer), bytes);
+      song = arrange(parsed, st);
+    }
+    out[st.id] = { ...song, by: st.by || 'Edvard Grieg', work: st.work || '', source: st.source || `Mutopia Project, piece ${st.mutopia} (Public Domain)`, fight: !!st.fight };
     console.log(st.id.padEnd(18), `${song.n.length} notes, ${song.d.length} drum hits, ${Math.round(song.len)} s, ${song.bpm} bpm`);
   }
   await b.close();

@@ -92,6 +92,11 @@ function midiToSong(parsed, name) {
     const t = n.t - t0; if (t > MYM.MAX_SEC) break;
     const ms = Math.round(t * 1000), slot = Math.round(t * 50);              // notes within 20 ms are one chord; it keeps the first one's exact time
     if (n.ch === 9) { const k = mymDrum(n.note); if (k >= 0) { const key = slot * 16 + k, e = drums.get(key); if (!e) drums.set(key, [ms, k, n.vel >= 112 ? 1 : 0]); else if (n.vel >= 112) e[2] = 1; end = Math.max(end, t + 0.2); } continue; }
+    if (n.prog >= 115) {                                                     // percussion played on a pitched channel: woodblock, taiko, toms, synth drum
+      const k = n.prog === 115 ? 2 : n.prog <= 118 ? (n.note >= 60 ? 6 : n.note >= 48 ? 7 : 8) : -1;   // anything above 118 is a sound effect: left out
+      if (k >= 0) { const key = slot * 16 + k, e = drums.get(key); if (!e) drums.set(key, [ms, k, n.vel >= 112 ? 1 : 0]); end = Math.max(end, t + 0.2); }
+      continue;
+    }
     const inst = mymInst(n.prog, n.note), key = slot * 16 + inst, dur = Math.round(Math.min(6, n.d) * 1000);
     let c = chords.get(key); if (!c) chords.set(key, c = [ms, dur, inst]);
     c[1] = Math.max(c[1], dur); if (!c.includes(n.note, 3)) c.push(n.note);
@@ -121,6 +126,8 @@ function midiToSong(parsed, name) {
   }
   out.length = 0; out.push(...fit);
   const d = [...drums.values()].sort((a, b) => a[0] - b[0]);
+  // a drummer riding the crash (metal does): only the first of a run is a full crash, the rest are open hats
+  let crash = -1e9; for (const k of d) { if (k[1] !== 5) continue; if (k[0] - crash < 1500) k[1] = 4; else crash = k[0]; }
   if (out.length + d.length > MYM.MAX_EV) {                                  // a very busy file: keep the first part
     const cut = [...out.map(e => e[0]), ...d.map(e => e[0])].sort((a, b) => a - b)[MYM.MAX_EV];
     while (out.length && out[out.length - 1][0] >= cut) out.pop();
@@ -207,18 +214,18 @@ updateJukebox = function () {
   if (just('up')) { G.jukeSel = (G.jukeSel + list.length - 1) % list.length; Sound.play('menu'); }
   if (just('down')) { G.jukeSel = (G.jukeSel + 1) % list.length; Sound.play('menu'); }
   const id = list[G.jukeSel];
-  if (just('a')) { if (mymIs(id) || flag('heard:' + id)) { G.jukebox = G.jukebox === id ? null : id; Sound.play('coin'); } else Sound.play('clank'); }
+  if (just('a')) { if (mymIs(id) || songFound(id)) { G.jukebox = G.jukebox === id ? null : id; Sound.play('coin'); } else Sound.play('clank'); }
   if (just('c') && mymIs(id)) { mymKeep(id); Sound.play('coin'); }
 };
 drawJukebox = function () {
   const list = jukeList(), mine = MYM.songs.length, sel = G.jukeSel || 0, ROWS = 14;
   R(0, 0, VW, VH, 'rgba(5,5,20,.92)'); drawPanel(8, 8, 240, 208);
   text('◀ MAP', 20, 26, '#8a8ab0', 'left', false); text('JUKEBOX', 128, 26, '#ffe64d', 'center'); text('GEAR ▶', 236, 26, '#8a8ab0', 'right', false);
-  const game = list.slice(mine), heard = game.filter(id => flag('heard:' + id)).length;
+  const game = list.slice(mine), heard = game.filter(id => songFound(id)).length;
   text(`${heard} of ${game.length} songs found` + (mine ? ` · ${mine} of yours` : ''), 128, 44, '#a79fc4', 'center', false);
   const top = clamp(sel - Math.floor(ROWS / 2), 0, Math.max(0, list.length - ROWS));
   list.slice(top, top + ROWS).forEach((id, k) => {
-    const i = top + k, y = 57 + k * 10, on = i === sel, my = mymIs(id), got = my || flag('heard:' + id), playing = G.jukebox === id;
+    const i = top + k, y = 57 + k * 10, on = i === sel, my = mymIs(id), got = my || songFound(id), playing = G.jukebox === id;
     const nm = my ? SCORE[id].name : got ? SCORE[id].name.replace(/ \(.*\)$/, '') : '???';
     if (on) R(18, y - 8, 220, 10, '#232860');
     text((on ? '> ' : '  ') + nm, 22, y, !got ? '#55577a' : on ? '#ffd84a' : my ? '#9be08a' : '#f3ecd2', 'left', false);
@@ -228,7 +235,7 @@ drawJukebox = function () {
   if (top > 0) text('▲', 240, 52, '#8a8ab0', 'right', false);
   if (top + ROWS < list.length) text('▼', 240, 57 + (ROWS - 1) * 10, '#8a8ab0', 'right', false);
   const c = TOUCH ? 'RUNE' : 'C';
-  const cur = SCORE[list[sel]], known = cur && cur.by && flag('heard:' + list[sel]);
+  const cur = SCORE[list[sel]], known = cur && cur.by && songFound(list[sel]);
   text(mymIs(list[sel]) ? `${BTN.a} plays · ${c} plays it everywhere` : known ? `by ${cur.by} · played by Jon's band` : mine ? `${BTN.a} plays` : 'Find songs in the world · Z plays', 128, 210, known ? '#c8e8ff' : '#8a8ab0', 'center', false);
 };
 
