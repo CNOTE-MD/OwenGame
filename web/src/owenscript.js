@@ -168,10 +168,11 @@ function draftLines(id) { return (SCRIPT.edits[id] || sceneGet(id, STORY_ORIG) |
 function renderScript() {
   const box = $('script'); if (!box || box.hidden) return;
   $('st-status').textContent = SCRIPT.status;
-  for (const t of ['scenes', 'ch4', 'notebook']) $('tab-' + t).setAttribute('aria-selected', SCRIPT.tab === t);
+  for (const t of ['scenes', 'ch4', 'notebook', 'music']) $('tab-' + t).setAttribute('aria-selected', SCRIPT.tab === t);
   const body = $('st-body');
   if (SCRIPT.tab === 'ch4') return renderCh4(body);
   if (SCRIPT.tab === 'notebook') return renderNotebookTab(body);
+  if (SCRIPT.tab === 'music') return renderMusicTab(body);
   if (!SCRIPT.sel) {
     body.innerHTML = '<p class="hint">Pick a scene. Change any words you want; they play in the game right away.</p><ul class="scenes">' +
       SCENE_ORDER.map(id => `<li><button class="scene" data-id="${esc(id)}"><span>${esc(SCENE_NAMES[id])}</span>${SCRIPT.edits[id] ? '<em>edited</em>' : NOTES.map[id] ? '<em>note</em>' : ''}</button></li>`).join('') + '</ul>';
@@ -222,6 +223,7 @@ function playLines(lines) {
   $('tab-scenes').addEventListener('click', () => { SCRIPT.tab = 'scenes'; renderScript(); });
   $('tab-ch4').addEventListener('click', () => { SCRIPT.tab = 'ch4'; renderScript(); });
   $('tab-notebook').addEventListener('click', () => { SCRIPT.tab = 'notebook'; renderScript(); });
+  $('tab-music').addEventListener('click', () => { SCRIPT.tab = 'music'; renderScript(); });
   const dl = document.createElement('datalist'); dl.id = 'speakers';
   dl.innerHTML = ['Owen', 'Jon', 'Astrid', 'Hank', 'Fluffy', 'Walter', 'Chilly', 'Lars', 'Sven', 'Bjarne', 'Ingrid', 'Penguin King', 'Forest Giant', 'Baron Blubber', 'Knörvic', 'Elf'].map(n => `<option value="${n}">`).join('');
   document.body.appendChild(dl);
